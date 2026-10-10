@@ -1,7 +1,6 @@
 """Gymnasium environment for Champions singles (3v3) on the local Showdown server.
 
-Observation: a fixed-size feature vector (active matchup, the 4 moves' expected power,
-the team's HP/matchups). Actions follow poke-env's SinglesEnv mapping
+Observation: a fixed-size feature vector (see pokesim.rl.features). Actions follow poke-env's SinglesEnv mapping
 (0-5 switch, 6-9 move, 10-13 move + mega); illegal actions are masked.
 """
 import uuid
@@ -9,103 +8,14 @@ import uuid
 import numpy as np
 from gymnasium import Env, spaces
 from poke_env import AccountConfiguration, LocalhostServerConfiguration, ServerConfiguration
-from poke_env.battle import AbstractBattle, Battle, Move, MoveCategory, Pokemon, PokemonType, Status
+from poke_env.battle import AbstractBattle, Battle
 from poke_env.environment import SingleAgentWrapper, SinglesEnv
 from poke_env.player import Player
 
 from pokesim.config import FORMAT
-from pokesim.sim.effectiveness import effectiveness, type_vs_defender
+from pokesim.rl.features import OBS_SIZE, embed
 
-TYPES = [t for t in PokemonType if t.name not in ("THREE_QUESTION_MARKS", "STELLAR")]
-STATUSES = list(Status)
-BOOSTS = ["atk", "def", "spa", "spd", "spe", "accuracy", "evasion"]
 N_ACTIONS = SinglesEnv.get_action_space_size(9)
-
-
-def _types(mon: Pokemon | None) -> list[float]:
-    present = set(mon.types) if mon else set()
-    return [float(t in present) for t in TYPES]
-
-
-def _status(mon: Pokemon | None) -> list[float]:
-    return [float(mon is not None and mon.status == s) for s in STATUSES]
-
-
-def _boosts(mon: Pokemon | None) -> list[float]:
-    return [(mon.boosts.get(b, 0) / 6.0) if mon else 0.0 for b in BOOSTS]
-
-
-def _speed_ratio(a: Pokemon | None, b: Pokemon | None) -> float:
-    if not a or not b:
-        return 0.0
-    return float(np.clip((a.base_stats["spe"] - b.base_stats["spe"]) / 100.0, -1, 1))
-
-
-def _log_mult(mult: float) -> float:
-    return np.log2(mult) / 2.0 if mult > 0 else -1.5
-
-
-def _move_features(move: Move | None, user: Pokemon | None, target: Pokemon | None) -> list[float]:
-    if move is None or user is None:
-        return [0.0] * 9
-    eff = effectiveness(move, user, target) if target else None
-    mult = eff.multiplier if eff else 1.0
-    stab = 1.5 if move.type in user.types else 1.0
-    power = move.base_power * stab * mult * (move.accuracy if isinstance(move.accuracy, float) else 1.0)
-    return [
-        move.base_power / 150.0,
-        _log_mult(mult),
-        eff.p_immune if eff else 0.0,  # e.g. Ground into a (possible) Levitate / Air Balloon
-        float(stab > 1),
-        power / 300.0,
-        float(move.category == MoveCategory.PHYSICAL),
-        float(move.category == MoveCategory.SPECIAL),
-        float(move.category == MoveCategory.STATUS),
-        move.priority / 3.0,
-    ]
-
-
-def _matchup(mon: Pokemon, opp: Pokemon | None) -> list[float]:
-    """Ability/item-aware matchup of a team member against the opposing active Pokémon.
-
-    offense: best expected multiplier of mon's moves vs opp
-    defense: worst multiplier of opp's types (STAB) vs mon
-    threat:  worst multiplier of opp's revealed attacking moves vs mon
-    """
-    if opp is None:
-        return [0.0, 0.0, 0.0]
-    offense = max((effectiveness(m, mon, opp).multiplier for m in mon.moves.values() if m.base_power > 0),
-                  default=1.0)
-    defense = max((type_vs_defender(t.name.lower(), mon) for t in opp.types if t), default=1.0)
-    threat = max((effectiveness(m, opp, mon).multiplier for m in opp.moves.values() if m.base_power > 0),
-                 default=1.0)
-    return [_log_mult(offense), _log_mult(defense), _log_mult(threat)]
-
-
-def embed(battle: AbstractBattle) -> np.ndarray:
-    me, opp = battle.active_pokemon, battle.opponent_active_pokemon
-    moves = list(me.moves.values())[:4] if me else []
-    moves += [None] * (4 - len(moves))
-    feats: list[float] = []
-    for mon in (me, opp):
-        feats += [mon.current_hp_fraction if mon else 0.0] + _types(mon) + _status(mon) + _boosts(mon)
-    feats += [_speed_ratio(me, opp), float(battle.can_mega_evolve)]
-    for move in moves:
-        feats += _move_features(move, me, opp)
-    team = list(battle.team.values())[:6]
-    for mon in team + [None] * (6 - len(team)):
-        if mon is None:
-            feats += [0.0] * 7
-            continue
-        feats += [mon.current_hp_fraction, float(mon.fainted), float(mon.active),
-                  _speed_ratio(mon, opp)] + _matchup(mon, opp)
-    opp_fainted = sum(m.fainted for m in battle.opponent_team.values())
-    my_fainted = sum(m.fainted for m in battle.team.values())
-    feats += [opp_fainted / 3.0, my_fainted / 3.0, min(battle.turn, 30) / 30.0]
-    return np.asarray(feats, dtype=np.float32)
-
-
-OBS_SIZE = 2 * (1 + len(TYPES) + len(STATUSES) + len(BOOSTS)) + 2 + 4 * 9 + 6 * 7 + 3
 
 
 class ChampionsSinglesEnv(SinglesEnv):

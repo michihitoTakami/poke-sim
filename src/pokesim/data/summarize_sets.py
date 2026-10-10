@@ -48,12 +48,24 @@ def write_ability_prior(season: str) -> None:
     (PROCESSED_DIR / f"ability_prior_{season}.json").write_text(json.dumps(prior, indent=1))
 
 
+def write_spread_prior(season: str) -> None:
+    """species -> most common stat points and nature, used by pokesim.sim.damage for opponents."""
+    prior = {}
+    for sm in summarize(season):
+        if sm.spreads:
+            spread = sm.spreads.most_common(1)[0][0]
+            prior[sm.species_id] = {"points": [int(x) for x in spread.split("-")],
+                                    "nature": sm.natures.most_common(1)[0][0] if sm.natures else "serious"}
+    (PROCESSED_DIR / f"spread_prior_{season}.json").write_text(json.dumps(prior, indent=1))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--season", default="M-6")
     parser.add_argument("--top", type=int, default=15)
     args = parser.parse_args()
     write_ability_prior(args.season)
+    write_spread_prior(args.season)
     with Session() as s:
         ja = dict(s.execute(select(NameI18n.ref_id, NameI18n.name).where(NameI18n.lang == "ja")).all())
 

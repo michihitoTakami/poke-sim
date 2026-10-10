@@ -76,7 +76,7 @@ def _ability_multiplier(ability: str, move: Move, defender: Pokemon, type_mult: 
     mult = type_mult * TYPE_MODIFIER_ABILITIES.get(ability, {}).get(move_type, 1.0)
     if type_mult > 1:
         mult *= SUPER_EFFECTIVE_REDUCTION.get(ability, 1.0)
-    if defender.current_hp_fraction >= 1.0:
+    if defender.current_hp_fraction >= 1.0 or not defender.max_hp:  # unseen Pokémon are at full HP
         mult *= FULL_HP_REDUCTION.get(ability, 1.0)
     if CATEGORY_REDUCTION.get(ability) == move.category:
         mult *= 0.5
