@@ -145,3 +145,18 @@ class MyBattle(Base):
     started_at: Mapped[datetime] = mapped_column(server_default=func.now())
     events: Mapped[list] = mapped_column(Json, default=list)  # normalized protocol-like events from vision
     result: Mapped[str | None] = mapped_column(String(8))
+
+
+class BuildArticle(Base):
+    """Link to a top player's team write-up (構築記事), collected from a ranking listing."""
+    __tablename__ = "build_articles"
+    __table_args__ = (UniqueConstraint("source", "season", "battle_mode", "rank", "url"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source: Mapped[str] = mapped_column(String(32))  # gamewith
+    season: Mapped[str] = mapped_column(String(16), index=True)  # M-6
+    battle_mode: Mapped[str] = mapped_column(String(8))  # single / double
+    rank: Mapped[int | None]
+    rating: Mapped[float | None]
+    player_name: Mapped[str | None] = mapped_column(String(64))
+    url: Mapped[str] = mapped_column(Text)
+    fetched_at: Mapped[datetime] = mapped_column(server_default=func.now())
