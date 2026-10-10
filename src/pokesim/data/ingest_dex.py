@@ -16,6 +16,11 @@ from pokesim.db.models import Ability, Item, Learnset, Move, NameI18n, Species, 
 from pokesim.db.session import Session
 from pokesim.lookup.tags import derive_tags
 
+# Champions-new entries without Japanese text in Showdown or PokeAPI yet.
+JA_NAME_OVERRIDES: dict[tuple[str, str], str] = {
+    ("ability", "auraguard"): "はどうのぼうご",  # 波動の防護 (Lucario-Mega-Z)
+}
+
 LANG_JA_KANA = "1"  # ja-Hrkt: what the game displays
 LANG_EN = "9"
 
@@ -55,6 +60,10 @@ def ability_descriptions() -> dict[str, str]:
     return {k: v[1] for k, v in best.items()}
 
 
+def has_japanese(text: str | None) -> bool:
+    return bool(text) and bool(re.search(r"[\u3040-\u30ff\u4e00-\u9fff]", text))
+
+
 def species_ja_names(species: list[dict]) -> dict[str, str]:
     base = {}
     for row in read_csv("pokemon_species_names"):
@@ -68,7 +77,7 @@ def species_ja_names(species: list[dict]) -> dict[str, str]:
             form_names[to_id(form_to_pokemon.get(row["pokemon_form_id"], ""))] = row["pokemon_name"]
     out = {}
     for s in species:
-        if s["nameJa"]:
+        if has_japanese(s["nameJa"]):
             out[s["id"]] = s["nameJa"]
         elif s["id"] in form_names:
             out[s["id"]] = form_names[s["id"]]
@@ -146,7 +155,9 @@ def main() -> None:
             """Japanese name: Showdown's ja text first, PokeAPI (ja-Hrkt) as fallback."""
             for e in entries:
                 s.add(NameI18n(kind=kind, ref_id=e["id"], lang="en", name=e["name"]))
-                ja = e.get("nameJa") or pokeapi.get(e["id"], {}).get(LANG_JA_KANA)
+                ja = (e.get("nameJa") if has_japanese(e.get("nameJa")) else None) \
+                    or pokeapi.get(e["id"], {}).get(LANG_JA_KANA) \
+                    or JA_NAME_OVERRIDES.get((kind, e["id"]))
                 if ja:
                     s.add(NameI18n(kind=kind, ref_id=e["id"], lang="ja", name=ja,
                                    description=(descs or {}).get(e["id"])))

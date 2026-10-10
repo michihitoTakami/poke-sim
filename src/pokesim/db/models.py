@@ -5,7 +5,7 @@ from sqlalchemy import JSON, Float, ForeignKey, Integer, String, Text, UniqueCon
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-Json = JSON().with_variant(JSONB(), "postgresql")
+Json = JSON(none_as_null=True).with_variant(JSONB(none_as_null=True), "postgresql")
 
 
 class Base(DeclarativeBase):
@@ -160,3 +160,20 @@ class BuildArticle(Base):
     player_name: Mapped[str | None] = mapped_column(String(64))
     url: Mapped[str] = mapped_column(Text)
     fetched_at: Mapped[datetime] = mapped_column(server_default=func.now())
+
+
+class ArticleSet(Base):
+    """One Pokémon set extracted from a team article (fields are None when not found)."""
+    __tablename__ = "article_sets"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    article_id: Mapped[int] = mapped_column(ForeignKey("build_articles.id"), index=True)
+    slot: Mapped[int]  # order of appearance in the article
+    species_id: Mapped[str] = mapped_column(String(64))
+    item_id: Mapped[str | None] = mapped_column(String(64))
+    ability_id: Mapped[str | None] = mapped_column(String(64))
+    nature: Mapped[str | None] = mapped_column(String(16))
+    moves: Mapped[list] = mapped_column(Json, default=list)
+    stat_points: Mapped[list | None] = mapped_column(Json)  # [hp, atk, def, spa, spd, spe], 0-32 each
+    problems: Mapped[list] = mapped_column(Json, default=list)  # legality issues found by validation
+    raw_text: Mapped[str] = mapped_column(Text)
+    parsed_at: Mapped[datetime] = mapped_column(server_default=func.now())

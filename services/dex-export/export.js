@@ -37,7 +37,7 @@ const legalSpecies = dex.species.all().filter(s =>
 const species = legalSpecies.map(s => {
   const learnset = new Set();
   for (const move of dex.moves.all()) {
-    if (move.isNonstandard) continue;
+    if (move.isNonstandard && move.isNonstandard !== 'Future') continue;
     if (!validator.checkCanLearn(move, s, validator.allSources(s), {})) learnset.add(move.id);
   }
   return {
@@ -49,7 +49,11 @@ const species = legalSpecies.map(s => {
   };
 });
 
-const moves = dex.moves.all().filter(m => !m.isNonstandard).map(m => ({
+// Champions-new entries are tagged isNonstandard 'Future' in the base dex; keep whatever legal species use.
+const usedMoves = new Set(species.flatMap(s => s.learnset));
+const usedAbilities = new Set(species.flatMap(s => s.abilities.map(a => dex.abilities.get(a).id)));
+const usedItems = new Set(legalSpecies.map(s => s.requiredItem).filter(Boolean).map(i => dex.items.get(i).id));
+const moves = dex.moves.all().filter(m => !m.isNonstandard || usedMoves.has(m.id)).map(m => ({
   id: m.id, name: m.name, num: m.num, type: m.type, category: m.category,
   basePower: m.basePower, accuracy: m.accuracy, pp: m.pp, priority: m.priority,
   target: m.target, flags: Object.keys(m.flags), ...text('Moves', m.id),
@@ -61,13 +65,15 @@ const moves = dex.moves.all().filter(m => !m.isNonstandard).map(m => ({
   selfSwitch: m.selfSwitch || null, forceSwitch: !!m.forceSwitch,
 }));
 
-const abilities = dex.abilities.all().filter(a => !a.isNonstandard && a.id !== 'noability').map(a => ({
+const abilities = dex.abilities.all().filter(a => (!a.isNonstandard || usedAbilities.has(a.id)) && a.id !== 'noability').map(a => ({
   id: a.id, name: a.name, num: a.num, ...text('Abilities', a.id), rating: a.rating,
   flags: Object.keys(a.flags || {}),
   handlers: Object.keys(a).filter(k => /^on[A-Z]/.test(k)).sort(),
 }));
 
-const items = dex.items.all().filter(i => !i.isNonstandard).map(i => ({
+const items = dex.items.all().filter(i => !i.isNonstandard || usedItems.has(i.id) ||
+  (i.isNonstandard === 'Future' && !validator.validateSet({ species: 'Pikachu', item: i.name, moves: ['thunderbolt'], ability: 'static', evs: {}, level: 50 }, {})?.some(p => p.includes(i.name))))
+  .map(i => ({
   id: i.id, name: i.name, num: i.num, ...text('Items', i.id),
   megaStone: i.megaStone || null, megaEvolves: i.megaEvolves || null,
   isBerry: !!i.isBerry, fling: i.fling || null,

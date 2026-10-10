@@ -8,6 +8,7 @@ from sqlalchemy import select
 
 from pokesim.db.models import NameI18n
 from pokesim.db.session import Session
+from pokesim.lookup.aliases import reading
 
 
 def normalize(text: str) -> str:
@@ -30,7 +31,8 @@ class NameIndex:
     def __init__(self, rows: list[tuple[str, str, str, str]]):
         self._exact: dict[tuple[str, str], list[tuple[str, str, str]]] = {}
         self._by_kind: dict[str, list[str]] = {}
-        for kind, ref_id, lang, name in rows:
+        # Shortest id first, so a shared name ("イエッサン") resolves to the base form, not "indeedeef".
+        for kind, ref_id, lang, name in sorted(rows, key=lambda r: (len(r[1]), r[1])):
             key = normalize(name)
             self._exact.setdefault((kind, key), []).append((ref_id, name, lang))
             self._exact.setdefault((kind, normalize(ref_id)), []).append((ref_id, name, lang))
@@ -44,9 +46,11 @@ class NameIndex:
 
     def search(self, text: str, kind: str, limit: int = 5, cutoff: float = 0.6) -> list[NameHit]:
         key = normalize(text)
-        if hits := self._exact.get((kind, key)):
-            ref_id, name, lang = hits[0]
-            return [NameHit(kind, ref_id, name, lang, 1.0)]
+        for candidate in (key, normalize(reading(text))):  # as written, then kanji -> kana reading
+            if hits := self._exact.get((kind, candidate)):
+                ref_id, name, lang = hits[0]
+                return [NameHit(kind, ref_id, name, lang, 1.0)]
+        key = normalize(reading(text))
         out: list[NameHit] = []
         seen: set[str] = set()
         for cand in difflib.get_close_matches(key, self._by_kind.get(kind, []), n=limit * 2, cutoff=cutoff):
