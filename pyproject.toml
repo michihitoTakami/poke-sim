@@ -1,0 +1,46 @@
+[project]
+name = "pokesim"
+version = "0.1.0"
+description = "Pokémon Champions singles battle support tool"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "torch>=2.7",
+  "numpy",
+  "poke-env>=0.9",
+  "sqlalchemy>=2.0",
+  "alembic",
+  "psycopg[binary]",
+  "httpx",
+  "selectolax",
+  "fastapi",
+  "uvicorn[standard]",
+  "obsws-python",
+  "opencv-python-headless",
+  "tensorboard",
+  "pydantic>=2",
+]
+
+[dependency-groups]
+dev = ["pytest", "ruff"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pokesim"]
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["src/pokesim/db/alembic"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

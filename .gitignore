@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+external/
+data/raw/
+data/processed/
+checkpoints/
+runs/
+node_modules/
+.env
