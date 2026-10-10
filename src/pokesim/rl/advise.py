@@ -53,7 +53,8 @@ def run(model_path: str, opponent: str, episodes: int, show: int, season: str) -
             mask = env.action_masks()
             probs = action_probs(model, obs, mask)
             battle = battle_from(env)
-            if verbose and battle and battle.active_pokemon and battle.opponent_active_pokemon:
+            decision = battle is not None and not battle._wait and mask.sum() > 1
+            if verbose and decision and battle.active_pokemon and battle.opponent_active_pokemon:
                 me, opp = battle.active_pokemon, battle.opponent_active_pokemon
                 ranked = sorted(np.flatnonzero(mask), key=lambda a: -probs[a])[:4]
                 print(f"T{battle.turn:>2} {ja.get(me.species, me.species)}({me.current_hp_fraction:.0%}) vs "
