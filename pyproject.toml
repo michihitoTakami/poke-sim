@@ -19,6 +19,7 @@ dependencies = [
   "tensorboard",
   "pydantic>=2",
   "pykakasi>=2.3.0",
+  "sb3-contrib>=2.9.0",
 ]
 
 [dependency-groups]
