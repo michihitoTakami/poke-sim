@@ -15,6 +15,7 @@ from pokesim.db.models import NameI18n
 from pokesim.db.session import Session
 from pokesim.rl.env import MaskedSinglesEnv, battle_from
 from pokesim.rl.train import OPPONENTS
+from pokesim.sim.effectiveness import effectiveness
 from pokesim.sim.pool import TeamPool, load_teams
 
 
@@ -45,7 +46,7 @@ def run(model_path: str, opponent: str, episodes: int, show: int, season: str) -
     model = MaskablePPO.load(model_path, device="cuda")
     env = MaskedSinglesEnv(OPPONENTS[opponent], TeamPool(teams, 11), TeamPool(teams, 12))
     ja = ja_names() if show else {}
-    wins = 0
+    wins = attacks = wasted = 0
     for ep in range(episodes):
         obs, _ = env.reset()
         done, verbose = False, ep < show
@@ -61,12 +62,19 @@ def run(model_path: str, opponent: str, episodes: int, show: int, season: str) -
                       f"{ja.get(opp.species, opp.species)}({opp.current_hp_fraction:.0%}): " +
                       " / ".join(f"{describe_action(a, battle, ja)} {probs[a]:.0%}" for a in ranked))
             action = int(np.argmax(np.where(mask, probs, -1)))
+            if battle and action >= 6 and battle.active_pokemon and battle.opponent_active_pokemon:
+                moves = list(battle.active_pokemon.moves.values())[:4]
+                if (action - 6) % 4 < len(moves) and (move := moves[(action - 6) % 4]).base_power > 0:
+                    attacks += 1
+                    wasted += effectiveness(move, battle.active_pokemon,
+                                            battle.opponent_active_pokemon).p_immune >= 0.9
             obs, _, term, trunc, info = env.step(action)
             done = term or trunc
         wins += info.get("won", False)
         if verbose:
             print(f"--- battle {ep + 1}: {'WIN' if info.get('won') else 'LOSE'}\n")
-    print(f"vs {opponent}: {wins}/{episodes} ({wins / episodes:.0%})")
+    print(f"vs {opponent}: {wins}/{episodes} ({wins / episodes:.0%}), "
+          f"attacks into an immunity: {wasted}/{attacks} ({wasted / max(attacks, 1):.1%})")
     env.close()
 
 

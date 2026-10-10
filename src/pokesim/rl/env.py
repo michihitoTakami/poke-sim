@@ -8,12 +8,13 @@ import uuid
 
 import numpy as np
 from gymnasium import Env, spaces
-from poke_env import AccountConfiguration, LocalhostServerConfiguration
+from poke_env import AccountConfiguration, LocalhostServerConfiguration, ServerConfiguration
 from poke_env.battle import AbstractBattle, Battle, Move, MoveCategory, Pokemon, PokemonType, Status
 from poke_env.environment import SingleAgentWrapper, SinglesEnv
 from poke_env.player import Player
 
 from pokesim.config import FORMAT
+from pokesim.sim.effectiveness import effectiveness, type_vs_defender
 
 TYPES = [t for t in PokemonType if t.name not in ("THREE_QUESTION_MARKS", "STELLAR")]
 STATUSES = list(Status)
@@ -40,15 +41,21 @@ def _speed_ratio(a: Pokemon | None, b: Pokemon | None) -> float:
     return float(np.clip((a.base_stats["spe"] - b.base_stats["spe"]) / 100.0, -1, 1))
 
 
+def _log_mult(mult: float) -> float:
+    return np.log2(mult) / 2.0 if mult > 0 else -1.5
+
+
 def _move_features(move: Move | None, user: Pokemon | None, target: Pokemon | None) -> list[float]:
     if move is None or user is None:
-        return [0.0] * 8
-    mult = target.damage_multiplier(move) if target else 1.0
+        return [0.0] * 9
+    eff = effectiveness(move, user, target) if target else None
+    mult = eff.multiplier if eff else 1.0
     stab = 1.5 if move.type in user.types else 1.0
     power = move.base_power * stab * mult * (move.accuracy if isinstance(move.accuracy, float) else 1.0)
     return [
         move.base_power / 150.0,
-        np.log2(mult + 1e-3) / 2.0 if mult > 0 else -1.5,
+        _log_mult(mult),
+        eff.p_immune if eff else 0.0,  # e.g. Ground into a (possible) Levitate / Air Balloon
         float(stab > 1),
         power / 300.0,
         float(move.category == MoveCategory.PHYSICAL),
@@ -59,12 +66,20 @@ def _move_features(move: Move | None, user: Pokemon | None, target: Pokemon | No
 
 
 def _matchup(mon: Pokemon, opp: Pokemon | None) -> list[float]:
-    """Offense: best multiplier of mon's known moves vs opp; defense: worst multiplier of opp's types vs mon."""
+    """Ability/item-aware matchup of a team member against the opposing active Pokémon.
+
+    offense: best expected multiplier of mon's moves vs opp
+    defense: worst multiplier of opp's types (STAB) vs mon
+    threat:  worst multiplier of opp's revealed attacking moves vs mon
+    """
     if opp is None:
-        return [0.0, 0.0]
-    offense = max((opp.damage_multiplier(m) for m in mon.moves.values() if m.base_power > 0), default=1.0)
-    defense = max((mon.damage_multiplier(t) for t in opp.types if t), default=1.0)
-    return [np.log2(offense + 1e-3) / 2.0, np.log2(defense + 1e-3) / 2.0]
+        return [0.0, 0.0, 0.0]
+    offense = max((effectiveness(m, mon, opp).multiplier for m in mon.moves.values() if m.base_power > 0),
+                  default=1.0)
+    defense = max((type_vs_defender(t.name.lower(), mon) for t in opp.types if t), default=1.0)
+    threat = max((effectiveness(m, opp, mon).multiplier for m in opp.moves.values() if m.base_power > 0),
+                 default=1.0)
+    return [_log_mult(offense), _log_mult(defense), _log_mult(threat)]
 
 
 def embed(battle: AbstractBattle) -> np.ndarray:
@@ -80,7 +95,7 @@ def embed(battle: AbstractBattle) -> np.ndarray:
     team = list(battle.team.values())[:6]
     for mon in team + [None] * (6 - len(team)):
         if mon is None:
-            feats += [0.0] * 6
+            feats += [0.0] * 7
             continue
         feats += [mon.current_hp_fraction, float(mon.fainted), float(mon.active),
                   _speed_ratio(mon, opp)] + _matchup(mon, opp)
@@ -90,7 +105,7 @@ def embed(battle: AbstractBattle) -> np.ndarray:
     return np.asarray(feats, dtype=np.float32)
 
 
-OBS_SIZE = 2 * (1 + len(TYPES) + len(STATUSES) + len(BOOSTS)) + 2 + 4 * 8 + 6 * 6 + 3
+OBS_SIZE = 2 * (1 + len(TYPES) + len(STATUSES) + len(BOOSTS)) + 2 + 4 * 9 + 6 * 7 + 3
 
 
 class ChampionsSinglesEnv(SinglesEnv):
@@ -112,14 +127,16 @@ class ChampionsSinglesEnv(SinglesEnv):
 class MaskedSinglesEnv(Env):
     """Single-agent view (vs a fixed opponent) exposing `action_masks()` for MaskablePPO."""
 
-    def __init__(self, opponent_cls: type[Player], team, opponent_team, format_id: str = FORMAT):
+    def __init__(self, opponent_cls: type[Player], team, opponent_team, format_id: str = FORMAT,
+                 server_configuration: ServerConfiguration = LocalhostServerConfiguration):
         tag = uuid.uuid4().hex[:6]
         self.poke_env = ChampionsSinglesEnv(
-            battle_format=format_id, server_configuration=LocalhostServerConfiguration,
+            battle_format=format_id, server_configuration=server_configuration,
             account_configuration1=AccountConfiguration(f"agent_{tag}", None),
             account_configuration2=AccountConfiguration(f"envopp_{tag}", None),
             team=team, choose_on_teampreview=False, strict=False)
         opponent = opponent_cls(battle_format=format_id, team=opponent_team, start_listening=False,
+                                server_configuration=server_configuration,
                                 account_configuration=AccountConfiguration(f"oppbot_{tag}", None))
         self.env = SingleAgentWrapper(self.poke_env, opponent)
         self.observation_space = spaces.Box(-np.inf, np.inf, shape=(OBS_SIZE,), dtype=np.float32)

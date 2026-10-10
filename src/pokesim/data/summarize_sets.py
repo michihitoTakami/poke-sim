@@ -3,11 +3,13 @@
 Usage: uv run python -m pokesim.data.summarize_sets --season M-6 [--top 15]
 """
 import argparse
+import json
 from collections import Counter
 from dataclasses import dataclass, field
 
 from sqlalchemy import select
 
+from pokesim.config import PROCESSED_DIR
 from pokesim.db.models import ArticleSet, BuildArticle, NameI18n
 from pokesim.db.session import Session
 
@@ -39,11 +41,19 @@ def summarize(season: str) -> list[SpeciesSummary]:
     return sorted(out.values(), key=lambda x: -x.teams)
 
 
+def write_ability_prior(season: str) -> None:
+    """species -> {ability: share} from article sets, used by pokesim.sim.effectiveness."""
+    prior = {sm.species_id: {a: n / sum(sm.abilities.values()) for a, n in sm.abilities.items()}
+             for sm in summarize(season) if sm.abilities}
+    (PROCESSED_DIR / f"ability_prior_{season}.json").write_text(json.dumps(prior, indent=1))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--season", default="M-6")
     parser.add_argument("--top", type=int, default=15)
     args = parser.parse_args()
+    write_ability_prior(args.season)
     with Session() as s:
         ja = dict(s.execute(select(NameI18n.ref_id, NameI18n.name).where(NameI18n.lang == "ja")).all())
 
@@ -62,3 +72,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
