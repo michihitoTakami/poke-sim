@@ -22,11 +22,12 @@ async def main() -> None:
     parser.add_argument("--samples", type=int, default=6)
     parser.add_argument("--seeds", type=int, default=2)
     parser.add_argument("--rollout", type=int, default=3)
+    parser.add_argument("--show", action="store_true", help="print each turn's recommendation")
     args = parser.parse_args()
     teams = load_teams(args.teams)
     tag = uuid.uuid4().hex[:6]
     player = LookaheadPlayer(battle_format=FORMAT, team=TeamPool(teams, 51), teams=teams, seasons=["M-6"],
-                             samples=args.samples, seeds=args.seeds, rollout=args.rollout,
+                             samples=args.samples, seeds=args.seeds, rollout=args.rollout, show=args.show,
                              account_configuration=AccountConfiguration(f"lookahead_{tag}", None))
     bot = SimpleHeuristicsPlayer(battle_format=FORMAT, team=TeamPool(teams, 52),
                                  account_configuration=AccountConfiguration(f"heurbot_{tag}", None))
