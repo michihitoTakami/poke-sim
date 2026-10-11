@@ -27,10 +27,22 @@ REWARDS = {
 
 
 class ChampionsSinglesEnv(SinglesEnv):
-    def __init__(self, reward: str = "dense", **kwargs):
+    """`extra` appends features (e.g. pokesim.rl.myteam.TeamFeatures); `lineup` fixes our team preview order
+    (e.g. "123"); `opponent_preview(battle) -> "/team ..."` picks the opponent's 3 (default: random)."""
+
+    def __init__(self, reward: str = "dense", extra: Callable[[AbstractBattle], np.ndarray] | None = None,
+                 lineup: str | None = None, opponent_preview: Callable[[AbstractBattle], str] | None = None,
+                 **kwargs):
         super().__init__(**kwargs)
         self.reward_weights = REWARDS[reward]
-        box = spaces.Box(-np.inf, np.inf, shape=(OBS_SIZE,), dtype=np.float32)
+        self.extra, self.lineup, self.opponent_preview = extra, lineup, opponent_preview
+        self.obs_size = obs_size(extra)
+        box = spaces.Box(-np.inf, np.inf, shape=(self.obs_size,), dtype=np.float32)
+        # team preview is decided by the inner env players, so override theirs
+        if lineup:
+            self.agent1.teampreview = lambda battle: "/team " + lineup
+        if opponent_preview:
+            self.agent2.teampreview = opponent_preview
         self.observation_spaces = {agent: spaces.Dict({
             "observation": box, "action_mask": spaces.Box(0, 1, shape=(N_ACTIONS,), dtype=np.int8)})
             for agent in self.possible_agents}
@@ -39,25 +51,31 @@ class ChampionsSinglesEnv(SinglesEnv):
         return self.reward_computing_helper(battle, number_of_pokemons=3, **self.reward_weights)
 
     def embed_battle(self, battle: AbstractBattle) -> np.ndarray:
-        return embed(battle)
+        obs = embed(battle)
+        return np.concatenate([obs, self.extra(battle)]) if self.extra else obs
+
+
+def obs_size(extra=None) -> int:
+    return OBS_SIZE + (extra.size if extra is not None else 0)
 
 
 class MaskedSinglesEnv(Env):
     """Single-agent view (vs a fixed opponent) exposing `action_masks()` for MaskablePPO."""
 
     def __init__(self, opponent_cls: Callable[..., Player], team, opponent_team, format_id: str = FORMAT,
-                 server_configuration: ServerConfiguration = LocalhostServerConfiguration, reward: str = "dense"):
+                 server_configuration: ServerConfiguration = LocalhostServerConfiguration, reward: str = "dense",
+                 **env_kwargs):
         tag = uuid.uuid4().hex[:6]
         self.poke_env = ChampionsSinglesEnv(
             reward=reward, battle_format=format_id, server_configuration=server_configuration,
             account_configuration1=AccountConfiguration(f"agent_{tag}", None),
             account_configuration2=AccountConfiguration(f"envopp_{tag}", None),
-            team=team, choose_on_teampreview=False, strict=False)
+            team=team, choose_on_teampreview=False, strict=False, **env_kwargs)
         opponent = opponent_cls(battle_format=format_id, team=opponent_team, start_listening=False,
                                 server_configuration=server_configuration,
                                 account_configuration=AccountConfiguration(f"oppbot_{tag}", None))
         self.env = SingleAgentWrapper(self.poke_env, opponent)
-        self.observation_space = spaces.Box(-np.inf, np.inf, shape=(OBS_SIZE,), dtype=np.float32)
+        self.observation_space = spaces.Box(-np.inf, np.inf, shape=(self.poke_env.obs_size,), dtype=np.float32)
         self.action_space = spaces.Discrete(N_ACTIONS)
         self._mask = np.ones(N_ACTIONS, dtype=bool)
 
