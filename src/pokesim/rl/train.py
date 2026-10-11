@@ -17,18 +17,18 @@ Usage: uv run python -m pokesim.rl.train --steps 300000 [--opponent heuristic] [
 """
 
 import argparse
-import random
 from functools import partial
 
 from poke_env.player import MaxBasePowerPlayer, RandomPlayer, SimpleHeuristicsPlayer
 from sb3_contrib import MaskablePPO
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import SubprocVecEnv
 
 from pokesim.config import ROOT
 from pokesim.rl.bc import DEFAULT_LINEUP
 from pokesim.rl.env import REWARDS, MaskedSinglesEnv
-from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, load_my_team
+from pokesim.rl.myteam import CounterPreview, FixedTeam, TeamFeatures, load_my_team
 from pokesim.rl.opponents import LeaguePlayer
 from pokesim.sim.pool import TeamPool, load_teams
 from pokesim.sim.server import ShowdownServer
@@ -42,13 +42,14 @@ class WinRateCallback(BaseCallback):
 
     def __init__(self, window: int = 200):
         super().__init__()
-        self.window, self.results = window, []
+        self.window, self.results, self.last_print = window, [], 0
 
     def _on_step(self) -> bool:
         for info in self.locals["infos"]:
             if "won" in info:
                 self.results.append(info["won"])
-        if self.results and self.n_calls % 5000 == 0:
+        if self.results and self.num_timesteps - self.last_print >= 5000:
+            self.last_print = self.num_timesteps
             recent = self.results[-self.window :]
             self.logger.record("battle/win_rate", sum(recent) / len(recent))
             self.logger.record("battle/battles", len(self.results))
@@ -58,6 +59,15 @@ class WinRateCallback(BaseCallback):
                 flush=True,
             )
         return True
+
+
+def make_env(opponent, team, opponent_team, server_configuration, reward, env_kwargs, subprocess=False):
+    if subprocess:  # keep torch (snapshot opponents on CPU) to one thread per environment
+        import torch
+
+        torch.set_num_threads(1)
+    return Monitor(MaskedSinglesEnv(opponent, team, opponent_team, server_configuration=server_configuration,
+                                    reward=reward, **env_kwargs), info_keywords=("won",))
 
 
 def new_model(env) -> MaskablePPO:
@@ -93,6 +103,10 @@ def main() -> None:
     parser.add_argument("--lineup", nargs=3, default=DEFAULT_LINEUP)
     parser.add_argument("--p-counter", type=float, default=0.7, help="chance the opponent counter-picks its 3")
     parser.add_argument("--opp-snapshots", nargs="*", default=[], help="general policies used as league opponents")
+    parser.add_argument("--p-lookahead", type=float, default=0.0,
+                        help="league: chance a battle's opponent is the (slow) lookahead player")
+    parser.add_argument("--n-envs", type=int, default=1, help="parallel environments (subprocesses)")
+    parser.add_argument("--n-steps", type=int, help="rollout length per environment (overrides the checkpoint's)")
     args = parser.parse_args()
 
     teams = load_teams(args.season)
@@ -103,30 +117,29 @@ def main() -> None:
     if args.my_team:
         sets = load_my_team(args.my_team, args.lineup)
         my_team, snapshots = FixedTeam(sets), list(args.opp_snapshots)
-        preview_rng = random.Random(0)
-        env_kwargs = {"extra": TeamFeatures([s["species"] for s in sets]), "lineup": "123",
-                      "opponent_preview": lambda battle: counter_preview(battle, preview_rng, args.p_counter)}
+        env_kwargs = {"extra": TeamFeatures([s["species"] for s in sets]), "lineup": "123"}
     callback, model, done, seg = WinRateCallback(), None, 0, 0
     while done < args.steps:
         with ShowdownServer(args.port) as server:
-            if args.league:
-                opponent = partial(LeaguePlayer, snapshots=snapshots[:1] + snapshots[1:][-args.league_size:],
-                                   p_heuristic=args.p_heuristic, seed=seg)
-            else:
-                opponent = OPPONENTS[args.opponent]
-            env = Monitor(
-                MaskedSinglesEnv(
-                    opponent,
-                    my_team or TeamPool(teams, 1 + seg),
-                    TeamPool(teams, 100 + seg),
-                    server_configuration=server.configuration,
-                    reward=args.reward,
-                    **env_kwargs,
-                ),
-                info_keywords=("won",),
-            )
+            factories = []
+            for rank in range(args.n_envs):
+                if args.league:
+                    opponent = partial(LeaguePlayer, snapshots=snapshots[:1] + snapshots[1:][-args.league_size:],
+                                       p_heuristic=args.p_heuristic, seed=seg * 100 + rank,
+                                       p_lookahead=args.p_lookahead, teams=teams)
+                else:
+                    opponent = OPPONENTS[args.opponent]
+                kwargs = dict(env_kwargs)
+                if args.my_team:
+                    kwargs["opponent_preview"] = CounterPreview(args.p_counter, seed=seg * 100 + rank)
+                factories.append(partial(make_env, opponent, my_team or TeamPool(teams, 1 + seg + 1000 * rank),
+                                         TeamPool(teams, 100 + seg + 1000 * rank), server.configuration,
+                                         args.reward, kwargs, args.n_envs > 1))
+            env = SubprocVecEnv(factories, start_method="spawn") if args.n_envs > 1 else factories[0]()
             if model is None and args.init:
-                model = MaskablePPO.load(args.init, env=env, device="cuda", tensorboard_log=str(ROOT / "runs"))
+                custom = {"n_steps": args.n_steps} if args.n_steps else None
+                model = MaskablePPO.load(args.init, env=env, device="cuda", tensorboard_log=str(ROOT / "runs"),
+                                         custom_objects=custom)
             elif model is None:
                 model = new_model(env)
             else:

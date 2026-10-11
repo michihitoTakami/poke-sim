@@ -26,17 +26,27 @@ class PolicyStrategy:
 
 
 class LeaguePlayer(Player):
-    """Picks one strategy per battle: the heuristic bot with probability `p_heuristic`, else a random snapshot."""
+    """Picks one strategy per battle: the lookahead player (pokesim.search) with probability `p_lookahead`, else
+    the heuristic bot with probability `p_heuristic`, else a random snapshot."""
 
-    def __init__(self, *args, snapshots: list[str | Path] = (), p_heuristic: float = 0.5, seed: int = 0, **kwargs):
+    def __init__(self, *args, snapshots: list[str | Path] = (), p_heuristic: float = 0.5, seed: int = 0,
+                 p_lookahead: float = 0.0, teams: list[dict] | None = None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.heuristic = SimpleHeuristicsPlayer(battle_format=kwargs.get("battle_format"), start_listening=False)
+        fmt = kwargs.get("battle_format")
+        self.heuristic = SimpleHeuristicsPlayer(battle_format=fmt, start_listening=False)
         self.policies = [PolicyStrategy(p) for p in snapshots]
         self.p_heuristic = p_heuristic if self.policies else 1.0
+        self.p_lookahead, self.lookahead = p_lookahead, None
+        if p_lookahead > 0:
+            from pokesim.search.player import LookaheadPlayer
+
+            self.lookahead = LookaheadPlayer(battle_format=fmt, teams=teams, seasons=["M-6"], start_listening=False)
         self.rng = random.Random(seed)
         self.assigned: dict[str, object] = {}
 
     def _strategy(self, battle):
+        if battle.battle_tag not in self.assigned and self.lookahead and self.rng.random() < self.p_lookahead:
+            self.assigned[battle.battle_tag] = self.lookahead
         if battle.battle_tag not in self.assigned:
             use_bot = self.rng.random() < self.p_heuristic
             self.assigned[battle.battle_tag] = self.heuristic if use_bot else self.rng.choice(self.policies)

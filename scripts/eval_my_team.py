@@ -18,7 +18,7 @@ from poke_env.player import SimpleHeuristicsPlayer
 from sb3_contrib import MaskablePPO
 
 from pokesim.config import FORMAT, ROOT
-from pokesim.rl.baton import BatonScript, disruptions
+from pokesim.rl.baton import BatonScript, compress, disruptions, my_actions, stint
 from pokesim.rl.features import embed
 from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, load_my_team
 from pokesim.search.player import LookaheadPlayer
@@ -42,6 +42,35 @@ class PolicyPilot(BatonScript):
         return SinglesEnv.action_to_order(np.int64(action), battle, strict=False)
 
 
+def trace(me, lineup: list[str]) -> None:
+    """Which moves each lineup member used and in what order, with win rates per opening."""
+    names = [n.split("-")[0] for n in lineup]
+    openings: dict[str, list[bool]] = {}
+    later: dict[str, Counter] = {n: Counter() for n in names}
+    after_pass, usage = Counter(), {n: Counter() for n in names}
+    for battle in me.battles.values():
+        acts = my_actions(me.logs.get(battle.battle_tag, []), battle.player_role)
+        openings.setdefault(compress(stint(acts, names[0])), []).append(battle.won)
+        for n in names[1:]:
+            first = stint(acts, n)
+            if first:
+                later[n][compress(first[:5])] += 1
+        for i, (_, name, act) in enumerate(acts):
+            if name in usage and act not in ("switch", "drag", "faint"):
+                usage[name][act] += 1
+            if act == "Baton Pass":
+                nxt = next((nm for _, nm, a in acts[i + 1:] if a == "switch"), None)
+                after_pass[nxt] += 1
+    print(f"  {names[0]}'s first stay (games, win rate):")
+    for seq, res in sorted(openings.items(), key=lambda kv: -len(kv[1]))[:10]:
+        print(f"    {len(res):3d}  {sum(res) / len(res):4.0%}  {seq or '(no move)'}")
+    print("  switched in after Baton Pass:", dict(after_pass.most_common()))
+    for n in names:
+        print(f"  {n} moves:", dict(usage[n].most_common()))
+    for n in names[1:]:
+        print(f"  {n}'s first stay (top):", "; ".join(f"{k}x {s}" for s, k in later[n].most_common(5)))
+
+
 async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
@@ -54,6 +83,7 @@ async def main() -> None:
                              "recipient sets up to +6 behind Substitute")
     parser.add_argument("--pass-to", help="preferred Baton Pass recipient (species name)")
     parser.add_argument("--policy", help="play this trained policy instead of the script")
+    parser.add_argument("--trace", action="store_true", help="summarise which moves we used, in what order")
     parser.add_argument("--counter-pick", type=float, default=0.0,
                         help="chance the opponent picks its 3 by counter_score after seeing our team (else random)")
     args = parser.parse_args()
@@ -93,6 +123,8 @@ async def main() -> None:
     for case, results in by_case.items():
         print(f"  {case:9s}: {sum(results)}/{len(results)} won ({sum(results) / len(results):.0%})")
     print("  events:", dict(total.most_common()))
+    if args.trace:
+        trace(me, args.lineup)
     if args.opponent == "lookahead":
         opp.engine.close()
 

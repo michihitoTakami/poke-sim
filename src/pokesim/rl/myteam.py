@@ -170,6 +170,16 @@ def counter_preview(battle: AbstractBattle, rng: random.Random, p_counter: float
     return "/team " + "".join(str(i + 1) for i in picks + rest)
 
 
+class CounterPreview:
+    """Picklable `opponent_preview` for the environment (see counter_preview)."""
+
+    def __init__(self, p_counter: float = 0.7, seed: int = 0):
+        self.p_counter, self.rng = p_counter, random.Random(seed)
+
+    def __call__(self, battle: AbstractBattle) -> str:
+        return counter_preview(battle, self.rng, self.p_counter)
+
+
 def main() -> None:
     priors = build_priors()
     PRIORS_PATH.write_text(json.dumps(priors, ensure_ascii=False, indent=0))

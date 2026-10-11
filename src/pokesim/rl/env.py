@@ -71,6 +71,8 @@ class MaskedSinglesEnv(Env):
             account_configuration1=AccountConfiguration(f"agent_{tag}", None),
             account_configuration2=AccountConfiguration(f"envopp_{tag}", None),
             team=team, choose_on_teampreview=False, strict=False, **env_kwargs)
+        # poke-env gives `team` to both inner players; the opponent brings its own team instead
+        self.poke_env.agent2._team = opponent_team
         opponent = opponent_cls(battle_format=format_id, team=opponent_team, start_listening=False,
                                 server_configuration=server_configuration,
                                 account_configuration=AccountConfiguration(f"oppbot_{tag}", None))

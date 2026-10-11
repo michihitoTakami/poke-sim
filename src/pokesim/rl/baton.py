@@ -124,3 +124,59 @@ def disruptions(log: list[list[str]], my_role: str) -> Counter:
         elif kind == "move" and mine and ev[3] == "Baton Pass":
             out["baton pass"] += 1
     return out
+
+
+def my_actions(log: list[list[str]], my_role: str) -> list[tuple[int, str, str]]:
+    """Our side's actions in order: (turn, Pokémon, move name or 'switch' / 'faint')."""
+    out, turn = [], 0
+    for ev in log:
+        if len(ev) < 3:
+            continue
+        kind = ev[1]
+        if kind == "turn":
+            turn = int(ev[2])
+        elif kind in ("move", "switch", "drag", "faint") and ev[2].startswith(my_role):
+            name = ev[2].split(": ", 1)[-1]
+            if kind == "move" and len(ev) > 3 and "[from]" not in "".join(ev[4:]):
+                out.append((turn, name, ev[3]))
+            elif kind in ("switch", "drag"):
+                out.append((turn, name, kind))
+            elif kind == "faint":
+                out.append((turn, name, "faint"))
+    return out
+
+
+def compress(moves: list[str]) -> str:
+    """'Protect > Iron Defense x2 > Baton Pass' from a list of moves."""
+    parts: list[list] = []
+    for m in moves:
+        if parts and parts[-1][0] == m:
+            parts[-1][1] += 1
+        else:
+            parts.append([m, 1])
+    return " > ".join(m if k == 1 else f"{m} x{k}" for m, k in parts)
+
+
+def stint(actions: list[tuple[int, str, str]], who: str, nth: int = 0, limit: int = 8) -> list[str]:
+    """Moves of `who` during its nth stay on the field (until it switches out, passes or faints)."""
+    stays, current, active = [], [], None
+    for _, name, act in actions:
+        if act in ("switch", "drag"):
+            if active == who and current:
+                stays.append(current)
+            active, current = name, []
+            continue
+        if name != who:
+            continue
+        if act == "faint":
+            current.append("(faint)")
+            stays.append(current)
+            current, active = [], None
+            continue
+        current.append(act)
+        if act == "Baton Pass":
+            stays.append(current)
+            current, active = [], None
+    if active == who and current:
+        stays.append(current)
+    return stays[nth][:limit] if len(stays) > nth else []
