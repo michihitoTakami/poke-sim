@@ -3,10 +3,15 @@
 Runs its own Showdown server (port 8001) and restarts it every --segment steps, because the
 server's battle process keeps growing (~45MB/min) during long runs.
 
-Usage: uv run python -m pokesim.rl.train --steps 300000 [--opponent heuristic]
+With --league, a snapshot is saved after every segment and later segments play against a mix of the heuristic
+bot and recent snapshots (plus the --init model), so the policy also learns against opponents that set up and heal.
+
+Usage: uv run python -m pokesim.rl.train --steps 300000 [--opponent heuristic] [--reward sparse]
+       uv run python -m pokesim.rl.train --steps 3000000 --league --init checkpoints/ppo_m6_status.zip
 """
 
 import argparse
+from functools import partial
 
 from poke_env.player import MaxBasePowerPlayer, RandomPlayer, SimpleHeuristicsPlayer
 from sb3_contrib import MaskablePPO
@@ -14,7 +19,8 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.monitor import Monitor
 
 from pokesim.config import ROOT
-from pokesim.rl.env import MaskedSinglesEnv
+from pokesim.rl.env import REWARDS, MaskedSinglesEnv
+from pokesim.rl.opponents import LeaguePlayer
 from pokesim.sim.pool import TeamPool, load_teams
 from pokesim.sim.server import ShowdownServer
 
@@ -53,23 +59,38 @@ def main() -> None:
     parser.add_argument("--name", default="ppo_m6")
     parser.add_argument("--segment", type=int, default=100_000, help="restart the server every N steps")
     parser.add_argument("--port", type=int, default=8001)
+    parser.add_argument("--reward", default="dense", choices=list(REWARDS))
+    parser.add_argument("--init", help="continue training from this checkpoint")
+    parser.add_argument("--league", action="store_true", help="play against past snapshots and the heuristic bot")
+    parser.add_argument("--league-size", type=int, default=5, help="number of recent snapshots kept as opponents")
+    parser.add_argument("--p-heuristic", type=float, default=0.4)
     args = parser.parse_args()
 
     teams = load_teams(args.season)
     CKPT_DIR.mkdir(exist_ok=True)
+    league_dir = CKPT_DIR / f"{args.name}_league"
+    snapshots = [args.init] if args.init else []
     callback, model, done, seg = WinRateCallback(), None, 0, 0
     while done < args.steps:
         with ShowdownServer(args.port) as server:
+            if args.league:
+                opponent = partial(LeaguePlayer, snapshots=snapshots[:1] + snapshots[1:][-args.league_size:],
+                                   p_heuristic=args.p_heuristic, seed=seg)
+            else:
+                opponent = OPPONENTS[args.opponent]
             env = Monitor(
                 MaskedSinglesEnv(
-                    OPPONENTS[args.opponent],
+                    opponent,
                     TeamPool(teams, 1 + seg),
                     TeamPool(teams, 100 + seg),
                     server_configuration=server.configuration,
+                    reward=args.reward,
                 ),
                 info_keywords=("won",),
             )
-            if model is None:
+            if model is None and args.init:
+                model = MaskablePPO.load(args.init, env=env, device="cuda", tensorboard_log=str(ROOT / "runs"))
+            elif model is None:
                 model = MaskablePPO(
                     "MlpPolicy",
                     env,
@@ -96,6 +117,10 @@ def main() -> None:
             seg += 1
             env.close()
         model.save(CKPT_DIR / args.name)
+        if args.league:
+            league_dir.mkdir(exist_ok=True)
+            model.save(league_dir / f"seg{seg:03d}")
+            snapshots.append(str(league_dir / f"seg{seg:03d}.zip"))
         print(f"segment {seg} done ({done} steps), saved {CKPT_DIR / args.name}.zip", flush=True)
 
 

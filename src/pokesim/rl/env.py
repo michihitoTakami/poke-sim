@@ -4,6 +4,7 @@ Observation: a fixed-size feature vector (see pokesim.rl.features). Actions foll
 (0-5 switch, 6-9 move, 10-13 move + mega); illegal actions are masked.
 """
 import uuid
+from collections.abc import Callable
 
 import numpy as np
 from gymnasium import Env, spaces
@@ -17,18 +18,25 @@ from pokesim.rl.features import OBS_SIZE, embed
 
 N_ACTIONS = SinglesEnv.get_action_space_size(9)
 
+# Reward presets: "dense" pays every HP point traded each turn; "sparse" mostly pays for winning, so turns spent
+# setting up or recovering are not judged by the immediate HP swing.
+REWARDS = {
+    "dense": {"fainted_value": 2.0, "hp_value": 1.0, "victory_value": 15.0},
+    "sparse": {"fainted_value": 1.0, "hp_value": 0.25, "victory_value": 20.0},
+}
+
 
 class ChampionsSinglesEnv(SinglesEnv):
-    def __init__(self, **kwargs):
+    def __init__(self, reward: str = "dense", **kwargs):
         super().__init__(**kwargs)
+        self.reward_weights = REWARDS[reward]
         box = spaces.Box(-np.inf, np.inf, shape=(OBS_SIZE,), dtype=np.float32)
         self.observation_spaces = {agent: spaces.Dict({
             "observation": box, "action_mask": spaces.Box(0, 1, shape=(N_ACTIONS,), dtype=np.int8)})
             for agent in self.possible_agents}
 
     def calc_reward(self, battle: AbstractBattle) -> float:
-        return self.reward_computing_helper(battle, fainted_value=2.0, hp_value=1.0, number_of_pokemons=3,
-                                            victory_value=15.0)
+        return self.reward_computing_helper(battle, number_of_pokemons=3, **self.reward_weights)
 
     def embed_battle(self, battle: AbstractBattle) -> np.ndarray:
         return embed(battle)
@@ -37,11 +45,11 @@ class ChampionsSinglesEnv(SinglesEnv):
 class MaskedSinglesEnv(Env):
     """Single-agent view (vs a fixed opponent) exposing `action_masks()` for MaskablePPO."""
 
-    def __init__(self, opponent_cls: type[Player], team, opponent_team, format_id: str = FORMAT,
-                 server_configuration: ServerConfiguration = LocalhostServerConfiguration):
+    def __init__(self, opponent_cls: Callable[..., Player], team, opponent_team, format_id: str = FORMAT,
+                 server_configuration: ServerConfiguration = LocalhostServerConfiguration, reward: str = "dense"):
         tag = uuid.uuid4().hex[:6]
         self.poke_env = ChampionsSinglesEnv(
-            battle_format=format_id, server_configuration=server_configuration,
+            reward=reward, battle_format=format_id, server_configuration=server_configuration,
             account_configuration1=AccountConfiguration(f"agent_{tag}", None),
             account_configuration2=AccountConfiguration(f"envopp_{tag}", None),
             team=team, choose_on_teampreview=False, strict=False)
