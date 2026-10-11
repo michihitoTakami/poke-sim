@@ -26,6 +26,7 @@ class Species(Base):
     is_mega: Mapped[bool]
     required_item: Mapped[str | None] = mapped_column(String(64))
     changes_from: Mapped[str | None] = mapped_column(String(64))
+    battle_only: Mapped[str | None] = mapped_column(String(64))  # in-battle forme of this species (Mimikyu-Busted)
 
 
 class Move(Base):

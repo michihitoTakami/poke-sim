@@ -1,10 +1,13 @@
 """Build legal Showdown teams from extracted article sets.
 
-Missing fields are filled from the season's per-species common sets (summarize_sets), then
-from simple fallbacks (STAB/high-power learnset moves, a nature matching the attacking side).
+Missing fields are filled from per-species common sets: the article sets (summarize_sets) and Smogon's usage
+stats for the Showdown format (smogon_stats), in an order depending on the team's source; then from simple
+fallbacks (STAB/high-power learnset moves, a nature matching the attacking side).
 Items are kept unique per team (Item Clause). Every team is checked by Showdown's validator.
+Showdown replay teams (season SD-M-C, see parse_replays) are deduplicated by player and species.
 
 Usage: uv run python -m pokesim.sim.teams --season M-6
+       uv run python -m pokesim.sim.teams --season M-6 M-5 M-4 M-3 M-2 M-1 SD-M-C --name all
 """
 import argparse
 import json
@@ -15,6 +18,8 @@ from dataclasses import dataclass
 from sqlalchemy import select
 
 from pokesim.config import FORMAT, PROCESSED_DIR, ROOT, SHOWDOWN_DIR
+from pokesim.data.parse_replays import SEASON as REPLAY_SEASON
+from pokesim.data.smogon_stats import smogon_summaries
 from pokesim.data.summarize_sets import SpeciesSummary, summarize
 from pokesim.db.models import ArticleSet, BuildArticle, Item, Learnset, Move, Species
 from pokesim.db.session import Session
@@ -36,9 +41,13 @@ class BuiltTeam:
 
 
 class TeamBuilder:
-    def __init__(self, session, season: str):
+    def __init__(self, session, summaries: list[dict[str, SpeciesSummary]], min_teams: int = 3):
+        """`summaries` in priority order; a species uses the first one with at least `min_teams` samples."""
         self.s = session
-        self.summary: dict[str, SpeciesSummary] = {x.species_id: x for x in summarize(season)}
+        self.summary: dict[str, SpeciesSummary] = {}
+        for sid in {sid for table in summaries for sid in table}:
+            candidates = [table[sid] for table in summaries if sid in table]
+            self.summary[sid] = next((c for c in candidates if c.teams >= min_teams), candidates[0])
         self.moves = {m.id: m for m in session.scalars(select(Move))}
         self.items = {i.id: i for i in session.scalars(select(Item))}
 
@@ -99,13 +108,16 @@ class TeamBuilder:
             ability = next((a for a, _ in (common.abilities.most_common() if common else [])
                             if a in species.abilities), species.abilities[0])
 
-        nature = row.nature
+        nature, points = row.nature, row.stat_points
+        if nature is None and points is None and common and common.nature_spreads:
+            filled += 2
+            joint, spread = common.nature_spreads.most_common(1)[0][0].split(":")
+            nature, points = joint, [int(x) for x in spread.split("-")]
         if nature is None:
             filled += 1
             nature = (common.natures.most_common(1)[0][0] if common and common.natures
                       else ("modest" if side == "special" else "adamant"))
 
-        points = row.stat_points
         if points is None:
             filled += 1
             spread = common.spreads.most_common(1)[0][0] if common and common.spreads else None
@@ -128,17 +140,18 @@ class TeamBuilder:
         return bool(mega and mega.changes_from == species.name)
 
 
-def complete_teams(session, season: str) -> list[tuple[BuildArticle, list[ArticleSet]]]:
-    """Articles with all 6 sets extracted, one per URL (some articles are listed under two ranks)."""
+def complete_teams(session, season: str, seen: set) -> list[tuple[BuildArticle, list[ArticleSet]]]:
+    """Articles with all 6 sets extracted, one per URL (some articles are listed under two ranks or seasons).
+    Replay teams are keyed by player and species instead, since a player's team shows up in many replays."""
     articles = session.scalars(select(BuildArticle).where(BuildArticle.season == season)
-                               .order_by(BuildArticle.rank)).all()
-    seen_urls: set[str] = set()
+                               .order_by(BuildArticle.rank, BuildArticle.rating.desc())).all()
     out = []
     for art in articles:
         rows = session.scalars(select(ArticleSet).where(ArticleSet.article_id == art.id)
                                .order_by(ArticleSet.slot)).all()
-        if len(rows) == 6 and art.url not in seen_urls:
-            seen_urls.add(art.url)
+        key = (art.player_name, frozenset(r.species_id for r in rows)) if season == REPLAY_SEASON else art.url
+        if len(rows) == 6 and key not in seen:
+            seen.add(key)
             out.append((art, rows))
     return out
 
@@ -152,13 +165,20 @@ def validate(teams: list[list[dict]]) -> list[dict]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--season", default="M-6")
+    parser.add_argument("--season", nargs="+", default=["M-6"])
+    parser.add_argument("--name", help="output name (teams_<name>.json); default: the season")
     args = parser.parse_args()
+    name = args.name or "_".join(args.season)
 
+    articles = summarize([x for x in args.season if x != REPLAY_SEASON])
+    articles = {x.species_id: x for x in articles}
+    smogon = smogon_summaries()
     with Session() as s:
-        builder = TeamBuilder(s, args.season)
+        builders = {"articles": TeamBuilder(s, [articles, smogon]), "replays": TeamBuilder(s, [smogon, articles])}
         built: list[BuiltTeam] = []
-        for art, rows in complete_teams(s, args.season):
+        seen: set = set()
+        for season, art, rows in ((x, a, r) for x in args.season for a, r in complete_teams(s, x, seen)):
+            builder = builders["replays" if season == REPLAY_SEASON else "articles"]
             used: set[str] = set()
             sets, filled = [], 0
             for row in rows:
@@ -173,8 +193,8 @@ def main() -> None:
         if res["ok"]:
             legal.append({**team.__dict__, "packed": res["packed"]})
         else:
-            print(f"rank {team.rank} rejected: {res['problems'][:3]}")
-    out = PROCESSED_DIR / f"teams_{args.season}.json"
+            print(f"{team.url} rejected: {res['problems'][:3]}")
+    out = PROCESSED_DIR / f"teams_{name}.json"
     out.write_text(json.dumps(legal, ensure_ascii=False, indent=1))
     print(f"{len(legal)}/{len(built)} teams legal -> {out}")
 

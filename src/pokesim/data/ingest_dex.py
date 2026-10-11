@@ -143,7 +143,7 @@ def main() -> None:
                           forme=sp["forme"], types=sp["types"], base_stats=sp["baseStats"],
                           abilities=[ability_ids[a] for a in sp["abilities"] if a in ability_ids],
                           weightkg=sp["weightkg"], is_mega=sp["isMega"], required_item=sp["requiredItem"],
-                          changes_from=sp["changesFrom"]))
+                          changes_from=sp["changesFrom"], battle_only=sp["battleOnly"]))
         s.flush()
         for sp in dex["species"]:
             s.add_all(Learnset(species_id=sp["id"], move_id=mv) for mv in sp["learnset"])

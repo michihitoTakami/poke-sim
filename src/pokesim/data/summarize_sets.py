@@ -23,11 +23,13 @@ class SpeciesSummary:
     natures: Counter = field(default_factory=Counter)
     moves: Counter = field(default_factory=Counter)
     spreads: Counter = field(default_factory=Counter)
+    nature_spreads: Counter = field(default_factory=Counter)  # "nature:points" seen together
 
 
-def summarize(season: str) -> list[SpeciesSummary]:
+def summarize(season: str | list[str]) -> list[SpeciesSummary]:
+    seasons = [season] if isinstance(season, str) else season
     with Session() as s:
-        rows = s.scalars(select(ArticleSet).join(BuildArticle).where(BuildArticle.season == season)).all()
+        rows = s.scalars(select(ArticleSet).join(BuildArticle).where(BuildArticle.season.in_(seasons))).all()
     out: dict[str, SpeciesSummary] = {}
     for r in rows:
         sm = out.setdefault(r.species_id, SpeciesSummary(r.species_id))
@@ -38,6 +40,8 @@ def summarize(season: str) -> list[SpeciesSummary]:
         sm.moves.update(r.moves)
         if r.stat_points:
             sm.spreads["-".join(map(str, r.stat_points))] += 1
+            if r.nature:
+                sm.nature_spreads[r.nature + ":" + "-".join(map(str, r.stat_points))] += 1
     return sorted(out.values(), key=lambda x: -x.teams)
 
 

@@ -1,8 +1,8 @@
 """Download team articles (構築記事) linked from build_articles, politely and with a local cache.
 
 Only hosts whose terms allow automated access are fetched (see ALLOWED_HOSTS).
-Pokesol forbids automated collection and note.com serves a bot challenge, so those are
-imported manually instead.
+Pokesol forbids automated collection, note.com serves a bot challenge and yakkun.com refuses
+non-browser clients, so those are imported manually instead.
 
 Usage: uv run python -m pokesim.data.fetch_articles --season M-6 [--limit 20]
 """
@@ -18,7 +18,8 @@ from pokesim.config import RAW_DIR
 from pokesim.db.models import BuildArticle
 from pokesim.db.session import Session
 
-ALLOWED_HOSTS = re.compile(r"\.(hatenablog\.(com|jp)|hateblo\.jp|hatenadiary\.(org|jp|com)|hatenablog-parts\.com)$")
+ALLOWED_HOSTS = re.compile(r"\.(hatenablog\.(com|jp)|hateblo\.jp|hatenadiary\.(org|jp|com)|hatenablog-parts\.com"
+                           r"|blog\.livedoor\.jp|blog\.jp|blog\.fc2\.com|fc2\.net|ameblo\.jp)$")
 HEADERS = {"User-Agent": "Mozilla/5.0 (poke-sim personal research)"}
 DELAY_SEC = 3.0
 CACHE_DIR = RAW_DIR / "articles"
@@ -35,15 +36,15 @@ def is_allowed(url: str) -> bool:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--season", default="M-6")
+    parser.add_argument("--season", nargs="+", default=["M-6"])
     parser.add_argument("--mode", default="single")
     parser.add_argument("--limit", type=int)
     args = parser.parse_args()
 
     with Session() as s:
         rows = s.execute(select(BuildArticle.id, BuildArticle.url)
-                         .where(BuildArticle.season == args.season, BuildArticle.battle_mode == args.mode)
-                         .order_by(BuildArticle.rank)).all()
+                         .where(BuildArticle.season.in_(args.season), BuildArticle.battle_mode == args.mode)
+                         .order_by(BuildArticle.season.desc(), BuildArticle.rank)).all()
     targets = [(aid, url) for aid, url in rows if is_allowed(url) and not cache_path(aid).exists()]
     if args.limit:
         targets = targets[:args.limit]

@@ -44,7 +44,8 @@ const species = legalSpecies.map(s => {
     id: s.id, name: s.name, nameJa: ((textJa.Pokedex[s.id] || {}).name !== s.name && (textJa.Pokedex[s.id] || {}).name) || null, num: s.num, baseSpecies: s.baseSpecies, forme: s.forme,
     types: s.types, baseStats: s.baseStats, abilities: Object.values(s.abilities),
     weightkg: s.weightkg, isMega: !!s.isMega, requiredItem: s.requiredItem || null,
-    changesFrom: s.changesFrom || null, otherFormes: s.otherFormes || [],
+    changesFrom: s.changesFrom || null,
+    battleOnly: (Array.isArray(s.battleOnly) ? s.battleOnly[0] : s.battleOnly) || null, otherFormes: s.otherFormes || [],
     learnset: [...learnset].sort(),
   };
 });
