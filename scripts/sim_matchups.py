@@ -97,22 +97,48 @@ def logistic(X: np.ndarray, y: np.ndarray, l2: float, iters: int = 50) -> np.nda
     return w
 
 
+def design(rows: list[dict], species: list[str]) -> tuple[np.ndarray, np.ndarray]:
+    index = {s: i + 1 for i, s in enumerate(species)}
+    X = np.zeros((len(rows), len(species) + 1))
+    X[:, 0] = 1.0
+    for r, g in enumerate(rows):
+        for s in g["opponent"]:
+            if s in index:
+                X[r, index[s]] = 1.0
+    return X, np.array([g["won"] for g in rows], dtype=float)
+
+
+def held_out_loss(games: dict[str, list[dict]], l2: float) -> float:
+    """Mean log-loss on every 5th game, fitting each lineup on the rest."""
+    total, n = 0.0, 0
+    for rows in games.values():
+        train = [g for i, g in enumerate(rows) if i % 5]
+        test = [g for i, g in enumerate(rows) if not i % 5]
+        species = sorted({s for g in train for s in g["opponent"]})
+        w = logistic(*design(train, species), l2)
+        X, y = design(test, species)
+        p = np.clip(1 / (1 + np.exp(-X @ w)), 1e-6, 1 - 1e-6)
+        total += float(-(y * np.log(p) + (1 - y) * np.log(1 - p)).sum())
+        n += len(test)
+    return total / n
+
+
 def fit(args) -> None:
     games = defaultdict(list)
     for line in DATA.read_text().splitlines():
         g = json.loads(line)
         games[g["lineup"]].append(g)
-    model = {"lineups": {}}
+    l2 = args.l2
+    if l2 is None:  # choose the regularisation by held-out log-loss
+        losses = {c: held_out_loss(games, c) for c in (0.1, 0.3, 1, 3, 10)}
+        l2 = min(losses, key=losses.get)
+        print("held-out log-loss by l2:", {k: round(v, 4) for k, v in losses.items()}, "-> l2 =", l2)
+    model = {"lineups": {}, "l2": l2}
     for lineup, rows in sorted(games.items()):
         species = sorted({s for g in rows for s in g["opponent"]})
         index = {s: i + 1 for i, s in enumerate(species)}
-        X = np.zeros((len(rows), len(species) + 1))
-        X[:, 0] = 1.0
-        for r, g in enumerate(rows):
-            for s in g["opponent"]:
-                X[r, index[s]] = 1.0
-        y = np.array([g["won"] for g in rows], dtype=float)
-        w = logistic(X, y, args.l2)
+        X, y = design(rows, species)
+        w = logistic(X, y, l2)
         model["lineups"][lineup] = {"bias": float(w[0]), "games": len(rows), "win_rate": float(y.mean()),
                                     "effects": {s: round(float(w[index[s]]), 4) for s in species}}
     MATCHUP_MODEL.write_text(json.dumps(model))
@@ -141,7 +167,7 @@ def main() -> None:
     rec.add_argument("--p-counter", type=float, default=0.7)
     rec.add_argument("--seed", type=int, default=0)
     ft = sub.add_parser("fit")
-    ft.add_argument("--l2", type=float, default=2.0)
+    ft.add_argument("--l2", type=float, help="regularisation (default: chosen by held-out log-loss)")
     args = parser.parse_args()
     if args.cmd == "record":
         asyncio.run(record(args))
