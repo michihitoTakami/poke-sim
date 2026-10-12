@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>poke-sim overlay</title>
+<style>
+  html, body { margin:0; background:transparent; color:#fff; font:600 22px/1.35 system-ui, "Noto Sans JP", sans-serif; text-shadow:0 2px 4px #000c; }
+  .box { display:inline-block; background:#0009; border-radius:10px; padding:10px 14px; margin:8px; min-width:320px; }
+  .title { font-size:15px; color:#9fe0ff; margin-bottom:4px; }
+  .row { display:flex; align-items:center; gap:8px; }
+  .label { width:190px; } .p { width:56px; text-align:right; }
+  .bar { height:8px; background:#5cc8ff; border-radius:4px; }
+  .opp .bar { background:#ffb86b; }
+  .win { font-size:16px; color:#cfd6e4; margin-top:4px; }
+</style>
+</head>
+<body>
+<div class="box" id="me"><div class="title">推奨行動</div><div id="actions">-</div><div class="win" id="win"></div></div>
+<div class="box opp" id="opp"><div class="title">相手の次の行動（予測）</div><div id="opponent">-</div></div>
+<script>
+const pct = p => `${Math.round(p * 100)}%`;
+const rows = list => list.slice(0, 3).map(x => `<div class="row"><span class="label">${x.label}</span><span class="p">${pct(x.p)}</span><div class="bar" style="width:${Math.round(x.p * 120)}px"></div></div>`).join('');
+function render(s) {
+  const a = s.advice;
+  document.getElementById('actions').innerHTML = a ? rows(a.actions) : '-';
+  document.getElementById('opponent').innerHTML = a && a.opponent.length ? rows(a.opponent) : '-';
+  document.getElementById('win').textContent = a && a.win_prob != null ? `推定勝率 ${pct(a.win_prob)}` : '';
+}
+function connect() {
+  const ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onmessage = e => render(JSON.parse(e.data));
+  ws.onclose = () => setTimeout(connect, 1000);
+}
+connect();
+</script>
+</body>
+</html>

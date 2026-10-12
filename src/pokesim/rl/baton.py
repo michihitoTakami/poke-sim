@@ -9,8 +9,14 @@ When Taunted or Encored, the passer switches out.
 """
 from collections import Counter
 
+import numpy as np
 from poke_env.battle import Effect, MoveCategory
+from poke_env.environment import SinglesEnv
 from poke_env.player import Player
+from sb3_contrib import MaskablePPO
+
+from pokesim.rl.features import embed
+from pokesim.rl.myteam import TeamFeatures
 
 PASSER = "scolipede"
 SETUP = {"dragondance": "atk", "nastyplot": "spa", "calmmind": "spa", "irondefense": "def"}
@@ -99,6 +105,23 @@ class BatonScript(Player):
         if attacks:
             return self.create_order(max(attacks, key=lambda m: self.power(m, me, opp, me.boosts)), mega=mega)
         return self.choose_random_move(battle)
+
+
+class PolicyPilot(BatonScript):
+    """Plays a trained fixed-team policy (pokesim.rl.train --my-team) instead of the script; keeps the logging."""
+
+    def __init__(self, *args, policy: str, roster: list[str], deterministic: bool = True, **kwargs):
+        self.model = MaskablePPO.load(policy, device="cpu")
+        self.extra, self.deterministic = TeamFeatures(roster), deterministic
+        super().__init__(*args, **kwargs)
+
+    def choose_move(self, battle):
+        mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
+        if not mask.any():
+            return self.choose_random_move(battle)
+        obs = np.concatenate([embed(battle), self.extra(battle)])
+        action, _ = self.model.predict(obs, action_masks=mask, deterministic=self.deterministic)
+        return SinglesEnv.action_to_order(np.int64(action), battle, strict=False)
 
 
 def disruptions(log: list[list[str]], my_role: str) -> Counter:

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>poke-sim 対戦サポート</title>
+<style>
+  :root { --bg:#14161c; --panel:#1e222b; --line:#333a47; --text:#e8eaf0; --muted:#9aa3b5; --accent:#5cc8ff; --good:#6ee7a8; --warn:#ffb86b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, "Noto Sans JP", sans-serif; }
+  header { padding:10px 16px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:center; }
+  header h1 { font-size:16px; margin:0; }
+  main { display:grid; grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr); gap:12px; padding:12px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  h2 { font-size:14px; margin:0 0 8px; color:var(--accent); }
+  button { background:#2b3342; color:var(--text); border:1px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:#1f4f6b; border-color:var(--accent); }
+  input, select { background:#11141a; color:var(--text); border:1px solid var(--line); border-radius:6px; padding:4px 6px; }
+  table { width:100%; border-collapse:collapse; }
+  td, th { padding:3px 6px; border-bottom:1px solid var(--line); text-align:left; }
+  tr.pick { cursor:pointer; } tr.pick:hover { background:#263040; }
+  .bar { height:6px; background:var(--accent); border-radius:3px; }
+  .row { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin:4px 0; }
+  .muted { color:var(--muted); font-size:12px; }
+  .queue span { display:inline-block; background:#2b3342; border-radius:4px; padding:1px 6px; margin:2px; }
+  .big { font-size:18px; font-weight:600; }
+  .slot { display:flex; gap:6px; align-items:center; margin:2px 0; }
+  pre { white-space:pre-wrap; font-size:11px; color:var(--muted); max-height:180px; overflow:auto; margin:0; }
+</style>
+</head>
+<body>
+<header><h1>poke-sim 対戦サポート</h1><span class="muted">練習・振り返り・配信解説用（公式大会では使えません）</span></header>
+<main>
+  <section id="preview-sec">
+    <h2>1. 選出画面</h2>
+    <div class="row"><input type="file" id="shot" accept="image/*"><button id="recognize">画像から認識</button></div>
+    <div id="slots"></div>
+    <div class="row"><button class="primary" id="send-preview">この6体で選出を考える</button></div>
+    <div id="picks"></div>
+    <h2 style="margin-top:10px">選出の提案</h2>
+    <div id="lineups" class="muted">相手の6体を送ると表示されます</div>
+    <div class="row"><span class="muted">手動で選ぶ（先発→残り）:</span><select id="l1"></select><select id="l2"></select><select id="l3"></select><button id="select-manual">この選出で開始</button></div>
+  </section>
+
+  <section id="advice-sec">
+    <h2>2. 推奨行動</h2>
+    <div id="status" class="big">-</div>
+    <div id="advice"></div>
+    <h2 style="margin-top:10px">相手の次の行動（予測）</h2>
+    <div id="opp-advice"></div>
+  </section>
+
+  <section>
+    <h2>3. ターン入力（起きた順に追加 → 「ターン確定」）</h2>
+    <div class="row"><b>自分</b>
+      <select id="my-action"></select><button data-add="my-action">追加</button>
+      HP <input id="my-hp" type="number" style="width:70px"><button data-add="my-hp">HP更新</button>
+      <button data-add="my-faint">ひんし</button>
+    </div>
+    <div class="row"><b>相手</b>
+      <input id="opp-switch" list="species-list" placeholder="交代/登場したポケモン" style="width:150px"><button data-add="opp-switch">登場</button>
+      <input id="opp-move" list="move-list" placeholder="使った技" style="width:150px"><button data-add="opp-move">技</button>
+    </div>
+    <div class="row">
+      HP% <input id="opp-hp" type="number" style="width:60px"><button data-add="opp-hp">相手HP更新</button>
+      <button data-add="opp-faint">相手ひんし</button>
+    </div>
+    <div class="row"><b>その他</b>
+      <select id="ev-side"><option value="me">自分</option><option value="opp">相手</option></select>
+      <select id="ev-status"><option value="">状態異常</option><option value="brn">やけど</option><option value="par">まひ</option><option value="slp">ねむり</option><option value="psn">どく</option><option value="tox">もうどく</option><option value="frz">こおり</option></select><button data-add="status">付与</button>
+      <select id="ev-stat"><option value="atk">攻撃</option><option value="def">防御</option><option value="spa">特攻</option><option value="spd">特防</option><option value="spe">素早さ</option></select>
+      <input id="ev-amount" type="number" value="1" style="width:50px"><button data-add="boost">ランク</button>
+      <button data-add="mega">メガシンカ</button>
+      <input id="ev-item" placeholder="持ち物 (英語id)" style="width:110px"><button data-add="item">持ち物判明</button>
+      <input id="ev-ability" placeholder="特性 (英語id)" style="width:110px"><button data-add="ability">特性判明</button>
+    </div>
+    <div class="queue" id="queue"></div>
+    <div class="row">
+      <button class="primary" id="commit">ターン確定（次のターンへ）</button>
+      <button id="commit-switch">確定（交代先を選ぶ場面）</button>
+      <button id="apply-now">今の入力だけ反映</button>
+      <button id="clear">入力を消す</button>
+    </div>
+    <div class="row"><button id="win">勝ち</button><button id="loss">負け</button><span id="saved" class="muted"></span></div>
+  </section>
+
+  <section>
+    <h2>盤面</h2>
+    <div id="board" class="muted">-</div>
+    <pre id="log"></pre>
+  </section>
+</main>
+<datalist id="species-list"></datalist>
+<datalist id="move-list"></datalist>
+<script>
+const $ = id => document.getElementById(id);
+let team = [], species = [], queue = [], preview = null, state = {};
+const pct = p => `${Math.round(p * 100)}%`;
+async function api(path, body) {
+  const r = await fetch(path, body === undefined ? {} : {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  if (!r.ok) { alert(`${path}: ${await r.text()}`); throw new Error(path); }
+  return r.json();
+}
+function speciesInput(i, value) {
+  return `<div class="slot">${i + 1}. <input class="opp6" list="species-list" value="${value || ''}" style="width:180px"></div>`;
+}
+function resolveSpecies(text) {
+  const s = species.find(x => x.ja === text || x.name === text || x.id === text);
+  return s ? s.name : text;
+}
+function renderSlots(slots) {
+  $('slots').innerHTML = slots.map((s, i) => {
+    const first = s.species ? (species.find(x => x.name === s.species)?.ja || s.species) : '';
+    const cands = (s.candidates || []).map(c => `${c.ja}(${c.score})`).join(' / ');
+    return speciesInput(i, first) + `<div class="muted" style="margin-left:18px">${s.species ? '' : '未識別: '}${cands}</div>`;
+  }).join('');
+}
+async function init() {
+  [team, species] = await Promise.all([api('/api/team'), api('/api/options/species')]);
+  $('species-list').innerHTML = species.map(s => `<option value="${s.ja}">${s.name}</option>`).join('');
+  const opts = team.map(t => `<option value="${t.species}">${t.ja}</option>`).join('');
+  for (const id of ['l1', 'l2', 'l3']) $(id).innerHTML = opts;
+  renderSlots(Array.from({length: 6}, () => ({})));
+  connect();
+}
+function connect() {
+  const ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onmessage = e => render(JSON.parse(e.data));
+  ws.onclose = () => setTimeout(connect, 1000);
+}
+let shownRecognition = null;
+function render(s) {
+  state = s;
+  if (s.recognized && JSON.stringify(s.recognized) !== shownRecognition) {  // auto-recognised from OBS
+    shownRecognition = JSON.stringify(s.recognized);
+    renderSlots(s.recognized);
+  }
+  if (s.preview) {
+    const p = s.preview;
+    $('picks').innerHTML = '<table><tr><th>相手</th><th>選出率</th><th>先発率</th></tr>' +
+      p.names.map((n, i) => `<tr><td>${n}</td><td>${pct(p.brought[i])}</td><td>${pct(p.lead[i])}</td></tr>`).join('') + '</table>';
+    $('lineups').innerHTML = p.lineups.length ? '<table><tr><th>先発</th><th>残り</th><th>推定勝率</th></tr>' +
+      p.lineups.map((l, i) => `<tr class="pick" data-i="${i}"><td>${l.names[0]}</td><td>${l.names.slice(1).join('・')}</td><td>${pct(l.win)}</td></tr>`).join('') + '</table>'
+      : '選出ごとの勝率モデルがまだありません（scripts/sim_matchups.py）。手動で選んでください。';
+    document.querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => selectLineup(p.lineups[+tr.dataset.i].lineup));
+  }
+  const b = s.battle;
+  if (b && b.me) {
+    $('status').textContent = `T${b.turn}  ${b.me.name} (${b.me.hp_points ?? pct(b.me.hp)})  vs  ${b.opp ? b.opp.name + ' (' + pct(b.opp.hp) + ')' : '-'}`;
+    const me = team.find(t => b.me.species.startsWith(t.id) || t.id === b.me.species);
+    const moves = me ? me.moves.map(m => `<option value="move:${m.id}">${m.ja}</option>`) : [];
+    const switches = b.team.filter(m => m.species !== b.me.species && !m.fainted && (s.lineup || []).some(x => m.species.startsWith(x.toLowerCase().replace(/[^a-z0-9]/g, ''))))
+      .map(m => `<option value="switch:${m.species}">交代→${m.name}</option>`);
+    $('my-action').innerHTML = moves.concat(switches).join('');
+    const fmt = m => m ? `${m.name} HP ${m.hp_points ?? pct(m.hp)} ${m.status || ''} ${Object.entries(m.boosts).map(([k, v]) => `${k}${v > 0 ? '+' : ''}${v}`).join(' ')}<br><span class="muted">技: ${m.moves.join(', ')} ${m.item ? '持ち物: ' + m.item : ''} ${m.ability ? '特性: ' + m.ability : ''}</span>` : '-';
+    $('board').innerHTML = `<b>自分</b> ${fmt(b.me)}<br><b>相手</b> ${fmt(b.opp)}<br><span class="muted">相手の判明: ${b.opp_team.map(m => m.name + (m.fainted ? '(ひんし)' : ` ${pct(m.hp)}`)).join(' / ')}</span>`;
+    $('log').textContent = b.log.join('\n');
+    if (b.opp) refreshMoveList(b.opp.species);
+  }
+  const a = s.advice;
+  const bars = list => list.map(x => `<div class="row"><span style="width:170px">${x.label}</span><span style="width:44px">${pct(x.p)}</span><div class="bar" style="width:${Math.round(x.p * 160)}px"></div></div>`).join('');
+  $('advice').innerHTML = a ? bars(a.actions) + `<div class="muted">推定勝率（目安）: ${a.win_prob == null ? '-' : pct(a.win_prob)} ・ 計算 ${a.elapsed}s</div>` : '<span class="muted">-</span>';
+  $('opp-advice').innerHTML = a && a.opponent.length ? bars(a.opponent) : '<span class="muted">-</span>';
+}
+let moveListFor = null;
+async function refreshMoveList(sp) {
+  if (moveListFor === sp) return;
+  moveListFor = sp;
+  const moves = await api(`/api/options/moves?species=${encodeURIComponent(sp)}`);
+  $('move-list').innerHTML = moves.map(m => `<option value="${m.ja}">${m.likely ? '★' : ''}${m.id}</option>`).join('');
+  window._moves = moves;
+}
+async function selectLineup(lineup) {
+  await api('/api/select', {lineup});
+  queue = [{type: 'switch', side: 'me', species: lineup[0]}];
+  drawQueue();
+}
+function resolveMove(text) {
+  const m = (window._moves || []).find(x => x.ja === text || x.id === text);
+  return m ? m.id : text;
+}
+function add(kind) {
+  const side = $('ev-side').value;
+  const ev = {
+    'my-action': () => { const v = $('my-action').value; return v.startsWith('switch:') ? {type: 'switch', side: 'me', species: v.slice(7)} : {type: 'move', side: 'me', move: v.slice(5)}; },
+    'my-hp': () => ({type: 'hp', side: 'me', hp: +$('my-hp').value}),
+    'my-faint': () => ({type: 'faint', side: 'me'}),
+    'opp-switch': () => ({type: 'switch', side: 'opp', species: resolveSpecies($('opp-switch').value)}),
+    'opp-move': () => ({type: 'move', side: 'opp', move: resolveMove($('opp-move').value)}),
+    'opp-hp': () => ({type: 'hp', side: 'opp', hp: +$('opp-hp').value}),
+    'opp-faint': () => ({type: 'faint', side: 'opp'}),
+    'status': () => ({type: 'status', side, status: $('ev-status').value}),
+    'boost': () => ({type: 'boost', side, stat: $('ev-stat').value, amount: +$('ev-amount').value}),
+    'mega': () => ({type: 'mega', side}),
+    'item': () => ({type: 'item', side, item: $('ev-item').value}),
+    'ability': () => ({type: 'ability', side, ability: $('ev-ability').value}),
+  }[kind]();
+  queue.push(ev);
+  drawQueue();
+}
+function drawQueue() {
+  $('queue').innerHTML = queue.map((e, i) => `<span title="クリックで削除" data-i="${i}">${e.side === 'opp' ? '相手' : '自分'}:${e.type} ${e.move || e.species || e.hp || e.status || e.stat || ''}${e.amount ? ' ' + e.amount : ''}</span>`).join('');
+  document.querySelectorAll('#queue span').forEach(s => s.onclick = () => { queue.splice(+s.dataset.i, 1); drawQueue(); });
+}
+async function send(extra, forceSwitch = false) {
+  const events = queue.concat(extra);
+  queue = []; drawQueue();
+  await api('/api/events', {events, force_switch: forceSwitch});
+}
+document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => add(b.dataset.add));
+$('commit').onclick = () => send([{type: 'turn'}]);
+$('commit-switch').onclick = () => send([], true);
+$('apply-now').onclick = () => send([]);
+$('clear').onclick = () => { queue = []; drawQueue(); };
+$('recognize').onclick = async () => {
+  const f = $('shot').files[0];
+  if (!f) return alert('画像を選んでください');
+  const image = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); });
+  $('slots').innerHTML = '<span class="muted">認識中…（初回はモデルの読み込みで時間がかかります）</span>';
+  renderSlots(await api('/api/preview/recognize', {image}));
+};
+$('send-preview').onclick = async () => {
+  const names = [...document.querySelectorAll('.opp6')].map(i => resolveSpecies(i.value.trim()));
+  if (names.some(n => !n)) return alert('6体すべて入力してください');
+  await api('/api/preview', {species: names});
+};
+$('select-manual').onclick = () => selectLineup([$('l1').value, $('l2').value, $('l3').value]);
+$('win').onclick = async () => { await send([{type: 'win', winner: 'me'}]); $('saved').textContent = (await api('/api/end', {result: 'win'})).saved; };
+$('loss').onclick = async () => { await send([{type: 'win', winner: 'opp'}]); $('saved').textContent = (await api('/api/end', {result: 'loss'})).saved; };
+init();
+</script>
+</body>
+</html>

@@ -11,35 +11,14 @@ import random
 import uuid
 from collections import Counter
 
-import numpy as np
 from poke_env import AccountConfiguration
-from poke_env.environment import SinglesEnv
 from poke_env.player import SimpleHeuristicsPlayer
-from sb3_contrib import MaskablePPO
 
 from pokesim.config import FORMAT, ROOT
-from pokesim.rl.baton import BatonScript, compress, disruptions, my_actions, stint
-from pokesim.rl.features import embed
-from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, load_my_team
+from pokesim.rl.baton import BatonScript, PolicyPilot, compress, disruptions, my_actions, stint
+from pokesim.rl.myteam import FixedTeam, counter_preview, load_my_team
 from pokesim.search.player import LookaheadPlayer
 from pokesim.sim.pool import TeamPool, load_teams
-
-
-class PolicyPilot(BatonScript):
-    """Plays a trained fixed-team policy (pokesim.rl.train --my-team) instead of the script; keeps the logging."""
-
-    def __init__(self, *args, policy: str, roster: list[str], deterministic: bool = True, **kwargs):
-        self.model = MaskablePPO.load(policy, device="cpu")
-        self.extra, self.deterministic = TeamFeatures(roster), deterministic
-        super().__init__(*args, **kwargs)
-
-    def choose_move(self, battle):
-        mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
-        if not mask.any():
-            return self.choose_random_move(battle)
-        obs = np.concatenate([embed(battle), self.extra(battle)])
-        action, _ = self.model.predict(obs, action_masks=mask, deterministic=self.deterministic)
-        return SinglesEnv.action_to_order(np.int64(action), battle, strict=False)
 
 
 def trace(me, lineup: list[str]) -> None:

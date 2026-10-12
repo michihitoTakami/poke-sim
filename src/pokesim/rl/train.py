@@ -28,7 +28,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from pokesim.config import ROOT
 from pokesim.rl.bc import DEFAULT_LINEUP
 from pokesim.rl.env import REWARDS, MaskedSinglesEnv
-from pokesim.rl.myteam import CounterPreview, FixedTeam, TeamFeatures, load_my_team
+from pokesim.rl.myteam import CounterPreview, FixedTeam, RandomLineup, TeamFeatures, load_my_team
 from pokesim.rl.opponents import LeaguePlayer
 from pokesim.sim.pool import TeamPool, load_teams
 from pokesim.sim.server import ShowdownServer
@@ -101,6 +101,8 @@ def main() -> None:
     parser.add_argument("--p-heuristic", type=float, default=0.4)
     parser.add_argument("--my-team", help="train this fixed team (JSON sets, e.g. data/my_teams/baton.json)")
     parser.add_argument("--lineup", nargs=3, default=DEFAULT_LINEUP)
+    parser.add_argument("--random-lineup", action="store_true",
+                        help="bring a random 3 every battle (team order stays as --lineup puts it)")
     parser.add_argument("--p-counter", type=float, default=0.7, help="chance the opponent counter-picks its 3")
     parser.add_argument("--opp-snapshots", nargs="*", default=[], help="general policies used as league opponents")
     parser.add_argument("--p-lookahead", type=float, default=0.0,
@@ -132,6 +134,8 @@ def main() -> None:
                 kwargs = dict(env_kwargs)
                 if args.my_team:
                     kwargs["opponent_preview"] = CounterPreview(args.p_counter, seed=seg * 100 + rank)
+                    if args.random_lineup:
+                        kwargs["lineup"] = RandomLineup(seed=seg * 100 + rank)
                 factories.append(partial(make_env, opponent, my_team or TeamPool(teams, 1 + seg + 1000 * rank),
                                          TeamPool(teams, 100 + seg + 1000 * rank), server.configuration,
                                          args.reward, kwargs, args.n_envs > 1))

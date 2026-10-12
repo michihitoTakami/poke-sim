@@ -170,6 +170,17 @@ def counter_preview(battle: AbstractBattle, rng: random.Random, p_counter: float
     return "/team " + "".join(str(i + 1) for i in picks + rest)
 
 
+class RandomLineup:
+    """Picklable team preview for our side: a random 3 of the 6 (random lead) every battle."""
+
+    def __init__(self, seed: int = 0):
+        self.rng = random.Random(seed)
+
+    def __call__(self, battle: AbstractBattle) -> str:
+        picks = self.rng.sample(range(6), 3)
+        return "/team " + "".join(str(i + 1) for i in picks + [i for i in range(6) if i not in picks])
+
+
 class CounterPreview:
     """Picklable `opponent_preview` for the environment (see counter_preview)."""
 

@@ -31,7 +31,8 @@ class ChampionsSinglesEnv(SinglesEnv):
     (e.g. "123"); `opponent_preview(battle) -> "/team ..."` picks the opponent's 3 (default: random)."""
 
     def __init__(self, reward: str = "dense", extra: Callable[[AbstractBattle], np.ndarray] | None = None,
-                 lineup: str | None = None, opponent_preview: Callable[[AbstractBattle], str] | None = None,
+                 lineup: str | Callable[[AbstractBattle], str] | None = None,
+                 opponent_preview: Callable[[AbstractBattle], str] | None = None,
                  **kwargs):
         super().__init__(**kwargs)
         self.reward_weights = REWARDS[reward]
@@ -39,7 +40,9 @@ class ChampionsSinglesEnv(SinglesEnv):
         self.obs_size = obs_size(extra)
         box = spaces.Box(-np.inf, np.inf, shape=(self.obs_size,), dtype=np.float32)
         # team preview is decided by the inner env players, so override theirs
-        if lineup:
+        if callable(lineup):
+            self.agent1.teampreview = lineup
+        elif lineup:
             self.agent1.teampreview = lambda battle: "/team " + lineup
         if opponent_preview:
             self.agent2.teampreview = opponent_preview
