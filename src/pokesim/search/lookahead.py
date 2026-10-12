@@ -39,6 +39,17 @@ def to_id(text: str) -> str:
     return re.sub(r"[^a-z0-9]", "", text.lower())
 
 
+def mega_evolved(mon) -> bool:
+    """poke-env keeps the species id on a Mega forme change (|detailschange|) and only swaps stats, types and ability:
+    a Mega shows as stats that differ from its own species entry."""
+    if "mega" in mon.species:
+        return True
+    from poke_env.data import GenData
+
+    entry = GenData.from_gen(9).pokedex.get(mon.species)
+    return bool(entry) and bool(mon.base_stats) and dict(entry["baseStats"]) != dict(mon.base_stats)
+
+
 @dataclass
 class Advice:
     labels: list[str]  # "move:<id>", "move:<id>:mega", "switch:<species id>"
@@ -141,7 +152,7 @@ def mon_state(mon: Pokemon, active: bool) -> dict:
     if active:
         out["boosts"] = {k: v for k, v in mon.boosts.items() if k in BOOSTS and v}
         out["volatiles"] = [VOLATILE_IDS[e.name] for e in mon.effects if e.name in VOLATILE_IDS]
-        out["mega"] = "mega" in mon.species
+        out["mega"] = mega_evolved(mon)
     return out
 
 
@@ -206,7 +217,7 @@ class Lookahead:
         team, mons = [], []
         for i, m in enumerate(seen[:3]):
             item = None if m.item == "unknown_item" else (m.item or "")
-            if "mega" in m.species and not item:
+            if mega_evolved(m) and not item:
                 item = None
             team.append(self.sampler.sample(m.species, list(m.moves), item, m.ability))
             mons.append(mon_state(m, i == 0))

@@ -46,6 +46,17 @@ FIELD = {"電気がかけめぐる": "Electric Terrain", "草がおいしげっ�
 ITEM_MSG = {"ふうせんで浮いている": ("airballoon", False), "ふうせんが割れた": ("airballoon", True),
             "たべのこしで少し回復": ("leftovers", False), "命が少し削られた": ("lifeorb", False),
             "きあいのタスキでもちこたえた": ("focussash", True), "くろいヘドロで": ("blacksludge", False)}
+# volatile effects on a Pokémon: phrase -> (start/end, effect as Showdown writes it in -start / -end)
+VOLATILE = {"身代わりが現れた": ("start", "Substitute"), "身代わりは消えてしまった": ("end", "Substitute"),
+            "眠気を誘": ("start", "move: Yawn"), "ねむけをさそ": ("start", "move: Yawn"),
+            "混乱した": ("start", "confusion"), "混乱が解けた": ("end", "confusion"),
+            "挑発に乗ってしまった": ("start", "move: Taunt"), "挑発の効果が解けた": ("end", "move: Taunt"),
+            "アンコールを受けた": ("start", "Encore"), "アンコール状態が解けた": ("end", "Encore"),
+            "種を植えつけた": ("start", "move: Leech Seed"), "やどりぎのタネから解放": ("end", "move: Leech Seed"),
+            "回復動作を封じられた": ("start", "move: Heal Block"), "いちゃもんをつけられた": ("start", "move: Torment"),
+            "しおづけになった": ("start", "Salt Cure"), "のろいをかけた": ("start", "Curse"),
+            "メロメロになった": ("start", "Attract"), "張り切っている": ("start", "move: Focus Energy"),
+            "道連れにしようとしている": ("start", "Destiny Bond")}
 ABILITY_MSG = {"ばけのかわがはがれた": "disguise", "ばけのかわが": "disguise"}
 MY_SWITCH = ("ゆけっ", "いけっ", "行け", "ゆけ", "いけ", "がんばれ", "まかせた", "たのんだ", "いってこい", "頼んだ")
 PIVOTS = {"batonpass", "uturn", "voltswitch", "flipturn", "partingshot", "teleport", "shedtail", "chillyreception"}
@@ -196,6 +207,14 @@ class MessageParser:
             if m:
                 sid, s = self.who(m.group(1), side)
                 return [{"type": "cure", "side": s, "status": status, "species": sid}] if sid else []
+        for phrase, (kind, effect) in VOLATILE.items():
+            if norm(phrase) not in t:
+                continue
+            # "{SOURCE}は ... {POKEMON}に のろいを かけた": the cursed one is named last
+            names = re.findall("(.+?)" + "[のはに]", t[:t.find(norm(phrase))])
+            name = names[-1] if phrase == "のろいをかけた" and names else (names[0] if names else "")
+            sid, s = self.who(name, side)
+            return [{"type": kind, "side": s, "effect": effect, "species": sid}] if sid else []
         for phrase, (item, consumed) in ITEM_MSG.items():
             m = re.match("(.+?)" + "[はの]" + norm(phrase), t)
             if m:

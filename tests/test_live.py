@@ -7,6 +7,7 @@ from pokesim.live.events import EventTranslator
 from pokesim.live.selection import PickModel, scale_to
 from pokesim.live.session import BattleSession
 from pokesim.rl.myteam import load_my_team
+from pokesim.search.lookahead import mega_evolved
 
 TEAM = ROOT / "data/my_teams/baton.json"
 
@@ -57,3 +58,18 @@ def test_pick_model_scaling():
     picks = PickModel().predict(["Garchomp", "Primarina", "Ninetales-Alola", "Hippowdon", "Gyarados", "Kingambit"])
     assert picks.brought.sum() == pytest.approx(3.0) and picks.lead.sum() == pytest.approx(1.0)
     json.dumps(picks.brought.tolist())
+
+
+def test_mega_floette_substitute_and_yawn_reach_the_battle(session):
+    t = EventTranslator(session)
+    t.apply([{"type": "switch", "side": "me", "species": "Floette-Eternal"},
+             {"type": "switch", "side": "opp", "species": "Hippowdon"}, {"type": "turn"},
+             {"type": "mega", "side": "me"}, {"type": "move", "side": "me", "move": "substitute"},
+             {"type": "start", "side": "me", "effect": "Substitute"},
+             {"type": "move", "side": "opp", "move": "yawn"}, {"type": "start", "side": "me", "effect": "move: Yawn"}])
+    me = session.decision().active_pokemon  # our request is rebuilt as at a decision
+    assert mega_evolved(me) and me.ability == "fairyaura" and me.base_stats["spa"] == 155
+    assert not mega_evolved(session.battle.opponent_active_pokemon)
+    assert {e.name for e in me.effects} >= {"SUBSTITUTE", "YAWN"}
+    req = session.request()
+    assert "canMegaEvo" not in req["active"][0]

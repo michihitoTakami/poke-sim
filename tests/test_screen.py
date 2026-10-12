@@ -75,3 +75,12 @@ def test_tracker_infers_missed_switch_and_turn():
     # the switch-ins were never shown; a side moving twice means a turn prompt was missed
     assert kinds == [("switch", "opp"), ("move", "opp"), ("switch", "me"), ("move", "me"), ("turn", None),
                      ("move", "me")]
+
+
+def test_parse_volatile_effects():
+    p = MessageParser(vocab())
+    assert p.parse("ペンドラーの みか あらわ 身代わりが 現れた!")[0] | {"species": None} == {
+        "type": "start", "side": "me", "effect": "Substitute", "species": None}
+    assert p.parse("ペンドラーの みか 身代わりは 消えてしまつた")[0]["type"] == "end"
+    assert p.parse("ペンドラーの 眠気を 誘った!")[0]["effect"] == "move: Yawn"
+    assert p.parse("相手の ゲンガーは 混乱した!")[0]["side"] == "opp"

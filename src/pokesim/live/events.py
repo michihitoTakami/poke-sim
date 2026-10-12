@@ -5,6 +5,7 @@ Events are dicts with "type" and "side" ("me" / "opp"):
   status {status}            cure                  boost {stat, amount}
   mega {species?}            item {item, consumed?} ability {ability}
   weather {weather}          field {field}          side_start / side_end {condition}
+  start / end {effect}       (volatile: "Substitute", "move: Yawn", "confusion", ...)
   turn                       win {winner: "me"|"opp"}
 HP: our side in actual HP points, the opponent in percent (as the game shows them).
 Moves, items, abilities and species are Showdown ids or names; display names are looked up for the lines.
@@ -102,11 +103,15 @@ class EventTranslator:
         if kind == "mega":
             mon = self.s.battle.active_pokemon if side == "me" else self.s.battle.opponent_active_pokemon
             mega = ev.get("mega") or f"{species_name(mon.species)}-Mega"
-            if to_id(mega) not in DEX.pokedex:  # two Mega formes (Charizard X/Y): take the first
-                mega = next((k for k in DEX.pokedex if k.startswith(to_id(mon.species) + "mega")), mega)
+            if to_id(mega) not in DEX.pokedex:  # Charizard X/Y: the first; Floette-Eternal -> Floette-Mega
+                base = to_id(DEX.pokedex.get(to_id(mon.species), {}).get("baseSpecies", mon.species))
+                mega = next((k for k in DEX.pokedex if k.startswith(to_id(mon.species) + "mega")),
+                            next((k for k in DEX.pokedex if k.startswith(base + "mega")), mega))
             mega = species_name(mega)
             stone = ev.get("item", "")
             return [f"|detailschange|{who}|{mega}, L50", f"|-mega|{who}|{species_name(mon.species)}|{stone}"]
+        if kind in ("start", "end"):  # volatile effects: Substitute, Yawn, confusion, Taunt, ...
+            return [f"|-{kind}|{who}|{ev['effect']}"]
         if kind == "item":
             verb = "-enditem" if ev.get("consumed") else "-item"
             return [f"|{verb}|{who}|{ev['item']}"]
