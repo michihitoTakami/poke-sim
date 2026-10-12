@@ -43,7 +43,8 @@ uv run python scripts/sim_matchups.py fit         # 選出ごとの勝率モデ�
 
 # サーバー（ブラウザで http://127.0.0.1:8100 、OBS のブラウザソースには /overlay）
 uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_any.zip \
-    [--obs-source "キャプチャのソース名" --obs-password ...]   # OBS の選出画面を自動で認識
+    [--obs-source "キャプチャのソース名"] [--obs-record /data/poke-sim/obs_frames]
+    # OBS の選出画面を自動で認識（パスワードは環境変数 OBS_PASSWORD）。--obs-record は変化した画面を保存（容量が大きいので別ディスク推奨）
 ```
 
 - 選出画面: OBS から自動認識（または画像をアップロード）。誤認識は候補から直せます。
