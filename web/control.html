@@ -26,6 +26,8 @@
   .muted { color:var(--muted); font-size:12px; }
   .queue span { display:inline-block; background:#2b3342; border-radius:4px; padding:1px 6px; margin:2px; }
   .big { font-size:18px; font-weight:600; }
+  .chosen { background:#1f4f6b; }
+  #lead-pick button { font-size:15px; padding:8px 12px; }
   .slot { display:flex; gap:6px; align-items:center; margin:2px 0; }
   pre { white-space:pre-wrap; font-size:11px; color:var(--muted); max-height:180px; overflow:auto; margin:0; }
 </style>
@@ -39,14 +41,19 @@
     <div id="slots"></div>
     <div class="row"><button class="primary" id="send-preview">この6体で選出を考える</button></div>
     <div id="picks"></div>
-    <h2 style="margin-top:10px">選出の提案</h2>
+    <h2 style="margin-top:10px">選出の提案（実際に選んだ行をクリック）</h2>
     <div id="lineups" class="muted">相手の6体を送ると表示されます</div>
     <div class="row"><span class="muted">手動で選ぶ（先発→残り）:</span><select id="l1"></select><select id="l2"></select><select id="l3"></select><button id="select-manual">この選出で開始</button></div>
+    <div id="lead-box" style="display:none">
+      <h2 style="margin-top:10px">相手の先発は？（クリックで1ターン目の推奨を表示）</h2>
+      <div id="lead-pick" class="row"></div>
+    </div>
   </section>
 
   <section id="advice-sec">
     <h2>2. 推奨行動</h2>
     <div id="status" class="big">-</div>
+    <div id="guide" class="muted"></div>
     <div id="advice"></div>
     <h2 style="margin-top:10px">相手の次の行動（予測）</h2>
     <div id="opp-advice"></div>
@@ -142,11 +149,23 @@ function render(s) {
     $('picks').innerHTML = '<table><tr><th>相手</th><th>選出率</th><th>先発率</th></tr>' +
       p.names.map((n, i) => `<tr><td>${n}</td><td>${pct(p.brought[i])}</td><td>${pct(p.lead[i])}</td></tr>`).join('') + '</table>';
     $('lineups').innerHTML = p.lineups.length ? '<table><tr><th>先発</th><th>残り</th><th>推定勝率</th></tr>' +
-      p.lineups.map((l, i) => `<tr class="pick" data-i="${i}"><td>${l.names[0]}</td><td>${l.names.slice(1).join('・')}</td><td>${pct(l.win)}</td></tr>`).join('') + '</table>'
+      p.lineups.map((l, i) => `<tr class="pick${sameLineup(l.lineup, s.lineup) ? ' chosen' : ''}" data-i="${i}"><td>${l.names[0]}</td><td>${l.names.slice(1).join('・')}</td><td>${pct(l.win)}</td></tr>`).join('') + '</table>'
       : '選出ごとの勝率モデルがまだありません（scripts/sim_matchups.py）。手動で選んでください。';
     document.querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => selectLineup(p.lineups[+tr.dataset.i].lineup));
   }
   const b = s.battle;
+  const started = b && b.me && b.opp;
+  $('lead-box').style.display = s.preview && s.lineup && !started ? '' : 'none';
+  if (s.preview && s.lineup && !started) {
+    const p = s.preview;
+    const order = p.species.map((sp, i) => i).sort((x, y) => p.lead[y] - p.lead[x]);
+    $('lead-pick').innerHTML = order.map(i => `<button data-sp="${p.species[i]}">${p.names[i]} <span class="muted">${pct(p.lead[i])}</span></button>`).join('');
+    document.querySelectorAll('#lead-pick button').forEach(bt => bt.onclick = () => startBattle(bt.dataset.sp));
+  }
+  $('guide').textContent = !s.preview ? '選出画面を待っています（OBS で自動認識、または画像から認識）'
+    : !s.lineup ? '左の「選出の提案」から実際に選んだ選出をクリック'
+    : !started ? '左の「相手の先発は？」で相手の先発をクリック'
+    : '毎ターン、起きたことを下で入力して「ターン確定」';
   if (b && b.me) {
     $('status').textContent = `T${b.turn}  ${b.me.name} (${b.me.hp_points ?? pct(b.me.hp)})  vs  ${b.opp ? b.opp.name + ' (' + pct(b.opp.hp) + ')' : '-'}`;
     const me = team.find(t => b.me.species.startsWith(t.id) || t.id === b.me.species);
@@ -172,10 +191,17 @@ async function refreshMoveList(sp) {
   $('move-list').innerHTML = moves.map(m => `<option value="${m.ja}">${m.likely ? '★' : ''}${m.id}</option>`).join('');
   window._moves = moves;
 }
+function sameLineup(a, b) {
+  return !!a && !!b && a.length === b.length && a.every((x, i) => x === b[i]);
+}
 async function selectLineup(lineup) {
   await api('/api/select', {lineup});
-  queue = [{type: 'switch', side: 'me', species: lineup[0]}];
-  drawQueue();
+}
+async function startBattle(oppLead) {
+  // both leads come out, then turn 1 starts: this gives the first advice
+  queue = []; drawQueue();
+  $('advice').innerHTML = '<span class="muted">計算中…</span>';
+  await api('/api/events', {events: [{type: 'switch', side: 'me', species: state.lineup[0]}, {type: 'switch', side: 'opp', species: oppLead}, {type: 'turn'}]});
 }
 function resolveMove(text) {
   const m = (window._moves || []).find(x => x.ja === text || x.id === text);
