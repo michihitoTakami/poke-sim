@@ -11,7 +11,9 @@ API:   POST /api/preview/recognize {image: base64}   -> recognised opponent 6 wi
        GET  /api/state, /api/options/...              WS /ws (state pushes)
 
 Usage: uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_any.zip [--port 8100]
-         [--obs-source "Capture Card"]  (password from $OBS_PASSWORD)   # watch OBS for the team preview
+         [--obs-source "Capture Card"]  (password from $OBS_PASSWORD)   # watch OBS: team preview, then the battle
+With OBS, the battle screen is read during the game (pokesim.vision.battle + pokesim.live.screen): messages, HP and
+the command prompt become turn events and advice without manual input (--no-screen to turn it off).
 For practice, reviewing games and commentary: official tournaments forbid outside help during battles.
 """
 import argparse
@@ -31,6 +33,7 @@ from fastapi.responses import FileResponse
 from pokesim.config import RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor, Suggestion
 from pokesim.live.events import EventTranslator
+from pokesim.live.screen import ScreenTracker, Vocab
 from pokesim.live.selection import MatchupModel, PickModel
 from pokesim.live.session import BattleSession
 from pokesim.rl.myteam import to_id
@@ -56,6 +59,8 @@ class Live:
         self.advisor = Advisor(self.sets, policy=policy, lookahead=lookahead)
         self.picks_model, self.matchups = PickModel(), MatchupModel()
         self.reader = None  # PreviewReader, loaded on first use (GPU model)
+        self.screen = None  # ScreenReader (OCR), loaded on the first battle frame
+        self.read_screen = True
         self.clients: set[WebSocket] = set()
         self.reset()
 
@@ -68,6 +73,10 @@ class Live:
         self.history: list[dict] = []
         self.recognized: list[dict] | None = None
         self.started = time.time()
+        self.tracker: ScreenTracker | None = None
+        self.seen_me: list[str] = []      # our Pokémon that have been on the field
+        self.screen_log: list[str] = []   # what the screen reader understood, for the control page
+        self.saved: str | None = None
 
     # --- names ---------------------------------------------------------------------------------------------------
     def name(self, sid: str) -> str:
@@ -83,7 +92,8 @@ class Live:
     # --- state -----------------------------------------------------------------------------------------------------
     def state(self) -> dict:
         out: dict = {"preview": self.preview, "recognized": self.recognized, "lineup": self.lineup, "advice": None,
-                     "battle": None}
+                     "battle": None, "screen": {"on": self.tracker is not None and self.read_screen,
+                                                "log": self.screen_log[-25:], "saved": self.saved}}
         if self.session:
             b = self.session.battle
             me, opp = b.active_pokemon, b.opponent_active_pokemon
@@ -140,8 +150,68 @@ class Live:
         self.session = BattleSession(self.sets)
         self.session.preview(species)
         self.translator = EventTranslator(self.session)
+        self.tracker = ScreenTracker(Vocab.build(self.sets, species, self.ja),
+                                     maxhp={i["species"]: i["maxhp"] for i in self.session.info})
         await self.broadcast()
         return self.preview
+
+    def set_lineup(self, lineup: list[str]) -> None:
+        ids = [to_id(s) for s in lineup]
+        order = [next(i for i, s in enumerate(self.sets) if to_id(s["species"]) == sid) for sid in ids]
+        self.session.select(order)
+        self.lineup = [self.sets[i]["species"] for i in order]
+
+    def ensure_member(self, species: str) -> None:
+        """Our Pokémon switched in: register the lineup if nobody did (best suggested lineup with this lead), or
+        correct it when this one is not in it (it replaces a member not seen yet)."""
+        if to_id(species) not in map(to_id, self.seen_me):
+            self.seen_me.append(species)
+        if self.lineup is None:
+            suggested = next((entry["lineup"] for entry in (self.preview or {}).get("lineups", [])
+                              if to_id(entry["lineup"][0]) == to_id(species)), None)
+            self.set_lineup(suggested or [species] + [s for s in self.roster if to_id(s) != to_id(species)][:2])
+        elif to_id(species) not in map(to_id, self.lineup):
+            lineup = list(self.lineup)
+            unseen = [i for i, s in enumerate(lineup) if to_id(s) not in map(to_id, self.seen_me)]
+            lineup[unseen[-1] if unseen else -1] = species
+            self.set_lineup(lineup)
+
+    def describe(self, ev: dict) -> str:
+        who = "相手" if ev.get("side") == "opp" else "自分"
+        kind = ev["type"]
+        if kind == "switch":
+            return f"{who}: {self.name(ev['species'])} が登場"
+        if kind == "move":
+            return f"{who}: {self.name(ev['move'])}"
+        if kind == "hp":
+            return f"{who}: HP {ev['hp']}{'%' if ev.get('side') == 'opp' else ''}"
+        if kind == "boost":
+            return f"{who}: {ev['stat']} {'+' if ev['amount'] > 0 else ''}{ev['amount']}"
+        if kind in ("turn", "force_switch"):
+            return "── 次のターン ──" if kind == "turn" else "── 交代先を選ぶ ──"
+        detail = {k: v for k, v in ev.items() if k not in ("type", "side")}
+        return f"{who}: {kind} {detail}"
+
+    async def on_screen_events(self, events: list[dict]) -> None:
+        """Events from the screen reader -> battle state; advice at our decisions; record at the end."""
+        for ev in events:
+            self.screen_log.append(self.describe(ev))
+            try:
+                if ev["type"] == "switch" and ev["side"] == "me":
+                    self.ensure_member(ev["species"])
+                if ev["type"] == "force_switch":
+                    await self.advise(force_switch=True)
+                    continue
+                self.translator.apply([{k: v for k, v in ev.items() if k != "missed"}])
+                if ev["type"] == "turn" and not ev.get("missed"):
+                    await self.advise()
+                if ev["type"] == "win" and self.saved is None:
+                    self.saved = str(save_record(self, "win" if ev["winner"] == "me" else "loss"))
+            except Exception as e:  # noqa: BLE001 - one bad read must not stop the battle
+                self.screen_log.append(f"(反映できませんでした: {ev['type']} {repr(e)[:80]})")
+                print("screen event failed:", ev, repr(e)[:200], flush=True)
+        if events:
+            await self.broadcast()
 
     async def watch_obs(self, frames, fps: float, record: Path | None = None) -> None:
         """Poll OBS; on a newly seen team preview, recognise it and start the lineup suggestion.
@@ -150,6 +220,7 @@ class Live:
 
         armed, last_seen, last_saved = True, 0.0, None
         while True:
+            tick = time.time()
             try:
                 frame = await asyncio.to_thread(frames.grab)
             except Exception as e:  # noqa: BLE001 - OBS closed or source renamed: keep retrying
@@ -159,13 +230,24 @@ class Live:
             now = time.time()
             if record is not None and frame is not None:
                 small = cv2.resize(frame, (96, 54), interpolation=cv2.INTER_AREA).astype(np.int16)
-                if last_saved is None or np.abs(small - last_saved).mean() > 4:
+                # whole frame, or the message box / HUD rows (small text changes are a small share of the frame)
+                diff = None if last_saved is None else np.abs(small - last_saved)
+                if diff is None or diff.mean() > 4 or diff[38:52].mean() > 3 or diff[:9].mean() > 3:
                     last_saved = small
                     day = record / time.strftime("%Y%m%d")
                     day.mkdir(parents=True, exist_ok=True)
                     await asyncio.to_thread(cv2.imwrite, str(day / f"{now:.1f}.jpg"), frame,
                                             [cv2.IMWRITE_JPEG_QUALITY, 90])
-            if frame is not None and await asyncio.to_thread(is_team_preview, frame):
+            preview = frame is not None and await asyncio.to_thread(is_team_preview, frame)
+            if frame is not None and not preview and self.read_screen and self.tracker is not None \
+                    and not self.tracker.finished:
+                if self.screen is None:
+                    from pokesim.vision.battle import ScreenReader
+
+                    self.screen = await asyncio.to_thread(ScreenReader)
+                reading = await asyncio.to_thread(self.screen.read, frame)
+                await self.on_screen_events(self.tracker.feed(reading))
+            if preview:
                 last_seen = now
                 if armed:
                     armed = False
@@ -176,7 +258,7 @@ class Live:
                     print("team preview:", species, flush=True)
             elif not armed and now - last_seen > 20:
                 armed = True  # gone for a while: the next team preview is a new battle
-            await asyncio.sleep(1 / fps)
+            await asyncio.sleep(max(0.0, 1 / fps - (time.time() - tick)))
 
     async def advise(self, force_switch: bool = False) -> None:
         battle = self.session.decision(force_switch=force_switch)
@@ -259,10 +341,7 @@ def create_app(live: Live, obs: dict | None = None) -> FastAPI:
     async def select(body: dict):
         if live.session is None:
             raise HTTPException(400, "send the team preview first")
-        ids = [to_id(s) for s in body["lineup"]]
-        order = [next(i for i, s in enumerate(live.sets) if to_id(s["species"]) == sid) for sid in ids]
-        live.session.select(order)
-        live.lineup = body["lineup"]
+        live.set_lineup(body["lineup"])
         await live.broadcast()
         return live.state()
 
@@ -296,6 +375,7 @@ def create_app(live: Live, obs: dict | None = None) -> FastAPI:
             raise HTTPException(400, "no battle")
         result = body.get("result")
         path = save_record(live, result)
+        live.saved = str(path)
         await live.broadcast()
         return {"saved": str(path)}
 
@@ -343,15 +423,17 @@ def main() -> None:
     parser.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     parser.add_argument("--policy", help="fixed-team policy checkpoint (trained with this team order)")
     parser.add_argument("--no-lookahead", action="store_true")
+    parser.add_argument("--no-screen", action="store_true", help="OBS: only the team preview, enter turns by hand")
     parser.add_argument("--port", type=int, default=8100)
     parser.add_argument("--obs-source", help="OBS capture source name: watch it for the team preview")
     parser.add_argument("--obs-host", default="localhost")
     parser.add_argument("--obs-port", type=int, default=4455)
     parser.add_argument("--obs-password", default=os.environ.get("OBS_PASSWORD", ""), help="default: $OBS_PASSWORD")
-    parser.add_argument("--obs-fps", type=float, default=2.0)
+    parser.add_argument("--obs-fps", type=float, default=4.0)
     parser.add_argument("--obs-record", type=Path, help="save changed frames here (e.g. data/raw/obs_frames)")
     args = parser.parse_args()
     live = Live(Path(args.team), args.policy, lookahead=not args.no_lookahead)
+    live.read_screen = not args.no_screen
     obs = None
     if args.obs_source:
         obs = {"source": args.obs_source, "host": args.obs_host, "port": args.obs_port,

@@ -37,7 +37,7 @@ class ObsFrames:
         self.source = source
 
     def grab(self) -> np.ndarray | None:
-        resp = self.client.get_source_screenshot(self.source, "png", 1920, 1080, -1)
+        resp = self.client.get_source_screenshot(self.source, "jpg", 1920, 1080, 90)  # ~15 ms; png ~70-400 ms
         data = base64.b64decode(resp.image_data.split(",", 1)[-1])
         return cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
 

@@ -70,6 +70,19 @@ class EventTranslator:
             name = species_name(ev["species"])
             hp = ev.get("hp", 100)
             return [f"|switch|{role}a: {name.split('-')[0]}|{name}, L50|{self.hp('opp', hp)}"]
+        if kind == "weather":
+            return [f"|-weather|{ev['weather']}"]
+        if kind == "field":
+            return [f"|-fieldstart|move: {ev['field']}"]
+        if kind in ("side_start", "side_end"):
+            verb = "-sidestart" if kind == "side_start" else "-sideend"
+            player = f"{role}: {'me' if side == 'me' else 'opponent'}"
+            return [f"|{verb}|{player}|move: {ev['condition']}"]
+        if kind == "turn":
+            return ["|", "|upkeep", f"|turn|{self.s.battle.turn + 1}"]
+        if kind == "win":
+            winner = self.s.username if ev.get("winner") == "me" else self.s.battle.opponent_username or "opponent"
+            return [f"|win|{winner}"]
         who = self.ident(side, ev.get("species"))
         target = self.ident("opp" if side == "me" else "me")
         if kind == "move":
@@ -88,7 +101,10 @@ class EventTranslator:
             return [f"|{verb}|{who}|{ev['stat']}|{abs(amount)}"]
         if kind == "mega":
             mon = self.s.battle.active_pokemon if side == "me" else self.s.battle.opponent_active_pokemon
-            mega = species_name(ev.get("species") or f"{species_name(mon.species)}-Mega")
+            mega = ev.get("mega") or f"{species_name(mon.species)}-Mega"
+            if to_id(mega) not in DEX.pokedex:  # two Mega formes (Charizard X/Y): take the first
+                mega = next((k for k in DEX.pokedex if k.startswith(to_id(mon.species) + "mega")), mega)
+            mega = species_name(mega)
             stone = ev.get("item", "")
             return [f"|detailschange|{who}|{mega}, L50", f"|-mega|{who}|{species_name(mon.species)}|{stone}"]
         if kind == "item":
@@ -96,19 +112,6 @@ class EventTranslator:
             return [f"|{verb}|{who}|{ev['item']}"]
         if kind == "ability":
             return [f"|-ability|{who}|{ev['ability']}"]
-        if kind == "weather":
-            return [f"|-weather|{ev['weather']}"]
-        if kind == "field":
-            return [f"|-fieldstart|move: {ev['field']}"]
-        if kind in ("side_start", "side_end"):
-            verb = "-sidestart" if kind == "side_start" else "-sideend"
-            player = f"{role}: {'me' if side == 'me' else 'opponent'}"
-            return [f"|{verb}|{player}|move: {ev['condition']}"]
-        if kind == "turn":
-            return ["|", "|upkeep", f"|turn|{self.s.battle.turn + 1}"]
-        if kind == "win":
-            winner = self.s.username if ev.get("winner") == "me" else self.s.battle.opponent_username or "opponent"
-            return [f"|win|{winner}"]
         raise ValueError(f"unknown event: {ev}")
 
     def apply(self, events: list[dict]) -> list[str]:

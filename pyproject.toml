@@ -20,6 +20,9 @@ dependencies = [
   "pydantic>=2",
   "pykakasi>=2.3.0",
   "sb3-contrib>=2.9.0",
+  "easyocr>=1.7.2",
+  "manga-ocr>=0.1.16",
+  "torchvision>=0.26.0",
 ]
 
 [dependency-groups]
@@ -27,6 +30,7 @@ dev = ["pytest", "ruff"]
 
 [tool.uv.sources]
 torch = { index = "pytorch-cu128" }
+torchvision = { index = "pytorch-cu128" }
 
 [[tool.uv.index]]
 name = "pytorch-cu128"
