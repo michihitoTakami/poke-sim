@@ -284,8 +284,8 @@ class Lookahead:
         return self._query({"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout,
                             "samples": samples})["results"]
 
-    def advise(self, battle: Battle, own_sets: dict[str, dict]) -> Advice:
-        return aggregate(self.query(battle, own_sets), self.opponent_model)
+    def advise(self, battle: Battle, own_sets: dict[str, dict], last_move: str | None = None) -> Advice:
+        return aggregate(self.query(battle, own_sets), self.opponent_model, last_move)
 
 
 def opponent_mix(payoff: np.ndarray, x: np.ndarray, y: np.ndarray, model: dict) -> np.ndarray:
@@ -301,7 +301,9 @@ def opponent_mix(payoff: np.ndarray, x: np.ndarray, y: np.ndarray, model: dict) 
     return (1 - w) * y + w * br / br.sum()
 
 
-def aggregate(results: list[dict], opponent_model: dict | None = None) -> Advice:
+def aggregate(results: list[dict], opponent_model: dict | None = None, last_move: str | None = None) -> Advice:
+    """last_move: the opponent active's previous move ("move:<id>"); players repeat it about half the time, so the
+    prediction gives it a share `repeat` (from scripts/eval_records.py on our records)."""
     labels = results[0]["p1"]
     prob, value = np.zeros(len(labels)), np.zeros(len(labels))
     opponent: dict[str, float] = {}
@@ -314,6 +316,10 @@ def aggregate(results: list[dict], opponent_model: dict | None = None) -> Advice
         q = opponent_mix(payoff[idx], x, y, opponent_model or {})
         for lab, p in zip(res["p2"], q):  # the opponent's options depend on its sampled set
             opponent[lab] = opponent.get(lab, 0.0) + float(p) / len(results)
+    repeat = (opponent_model or {}).get("repeat", 0.0)
+    if repeat > 0 and last_move and any(k.split(":")[:2] == last_move.split(":")[:2] for k in opponent):
+        opponent = {k: (1 - repeat) * p for k, p in opponent.items()}
+        opponent[last_move] = opponent.get(last_move, 0.0) + repeat
     return Advice(labels, prob, value, opponent)
 
 

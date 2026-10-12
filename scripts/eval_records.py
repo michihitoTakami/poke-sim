@@ -91,12 +91,18 @@ def query(args) -> None:
 
 
 def score(args) -> dict:
-    model = {"br_weight": args.br_weight, "tau": args.tau}
+    model = {"br_weight": args.br_weight, "tau": args.tau, "repeat": args.repeat}
     hit1 = hit3 = 0
     ll = []
     rows = [json.loads(line) for line in open(args.out)]
+    prev: dict[tuple, str] = {}  # (battle, opponent active) -> its previous move
     for r in rows:
-        opp = aggregate(r["results"], model).opponent
+        key = (r["battle"], r["opp_active"])
+        opp = aggregate(r["results"], model, prev.get(key)).opponent
+        if r["opponent"].startswith("move:"):
+            prev[key] = r["opponent"]
+        else:
+            prev.pop(key, None)
         dist = {k.split(":")[0] + ":" + k.split(":")[1]: 0.0 for k in opp}  # merge "move:x:mega" into "move:x"
         for k, p in opp.items():
             key = ":".join(k.split(":")[:2])
@@ -123,6 +129,7 @@ def main() -> None:
                     help="battle records (default: rebuilt from saved frames by replay_frames.py --records)")
     ap.add_argument("--br-weight", type=float, default=0.0)
     ap.add_argument("--tau", type=float, default=0.1)
+    ap.add_argument("--repeat", type=float, default=0.0)
     ap.add_argument("--verbose", action="store_true")
     ap.add_argument("--observed", action=argparse.BooleanOptionalAction, default=True,
                     help="blend in the sets seen in our other battles")

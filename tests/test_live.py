@@ -73,3 +73,20 @@ def test_mega_floette_substitute_and_yawn_reach_the_battle(session):
     assert {e.name for e in me.effects} >= {"SUBSTITUTE", "YAWN"}
     req = session.request()
     assert "canMegaEvo" not in req["active"][0]
+
+
+def test_last_move_and_repeat_share(session):
+    from pokesim.search.lookahead import aggregate
+
+    t = EventTranslator(session)
+    t.apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+             {"type": "switch", "side": "opp", "species": "Hippowdon"}, {"type": "turn"},
+             {"type": "move", "side": "opp", "move": "yawn"}, {"type": "turn"}])
+    assert session.last_move() == "move:yawn"
+    results = [{"p1": ["move:a", "move:b"], "p2": ["move:yawn", "move:earthquake"],
+                "payoff": [[0.1, -0.5], [0.2, -0.4]]}]
+    plain = aggregate(results, {}).opponent
+    rep = aggregate(results, {"repeat": 0.3}, "move:yawn").opponent
+    assert rep["move:yawn"] == pytest.approx(0.7 * plain["move:yawn"] + 0.3)
+    t.apply([{"type": "switch", "side": "opp", "species": "Garchomp"}])
+    assert session.last_move() is None

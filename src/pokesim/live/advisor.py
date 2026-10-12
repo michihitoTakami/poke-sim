@@ -48,7 +48,8 @@ def action_label(action: int, battle: Battle) -> str | None:
 
 # how the opponent's next action is predicted (pokesim.search.lookahead.opponent_mix); chosen on our own records
 # with scripts/eval_records.py
-OPPONENT_MODEL = {"br_weight": 0.0, "tau": 0.1}
+# 166 decisions in 14 battles (2026-10-13): top-1 32% -> 42%, top-3 63% -> 69%, mean log-lik -2.65 -> -2.09
+OPPONENT_MODEL = {"br_weight": 0.75, "tau": 0.7, "repeat": 0.3}
 
 
 class Advisor:
@@ -84,14 +85,15 @@ class Advisor:
             value = float(self.model.policy.predict_values(self.model.policy.obs_to_tensor(obs)[0])[0, 0])
         return out, float(np.clip((value / self.victory + 1) / 2, 0, 1))
 
-    def advise(self, battle: Battle) -> Suggestion:
+    def advise(self, battle: Battle, last_move: str | None = None) -> Suggestion:
+        """last_move: the opponent active's previous move ("move:<id>"), see BattleSession.last_move."""
         start = time.perf_counter()
         policy, win = self._policy(battle)
         ranked, opponent = [], []
         can_search = self.engine and not battle.force_switch and battle.active_pokemon \
             and battle.opponent_active_pokemon
         if can_search:
-            advice = self.engine.advise(battle, self.own_sets)
+            advice = self.engine.advise(battle, self.own_sets, last_move)
             mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
             ranked = [(lab, p, v) for lab, p, v in advice.ranked()
                       if (a := label_to_action(lab, battle)) is not None and mask[a]]

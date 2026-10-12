@@ -163,6 +163,16 @@ class BattleSession:
             req["active"] = [active]
         return req
 
+    def last_move(self, role: str | None = None) -> str | None:
+        """'move:<id>' last used by a side's active Pokémon since it came in (default: the opponent)."""
+        role = role or self.opp_role
+        for line in reversed(self.log):
+            if line.startswith((f"|switch|{role}a", f"|drag|{role}a")):
+                return None
+            if line.startswith(f"|move|{role}a") and "[from]" not in line:
+                return "move:" + line.split("|")[3].lower().replace(" ", "").replace("-", "")
+        return None
+
     def decision(self, force_switch: bool = False) -> Battle:
         """Refresh our side from the team file and return the battle, ready for a decision."""
         self.battle.parse_request(self.request(force_switch=force_switch))
