@@ -11,13 +11,14 @@ API:   POST /api/preview/recognize {image: base64}   -> recognised opponent 6 wi
        GET  /api/state, /api/options/...              WS /ws (state pushes)
 
 Usage: uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_any.zip [--port 8100]
-         [--obs-source "Capture Card" --obs-password ...]   # watch OBS for the team preview
+         [--obs-source "Capture Card"]  (password from $OBS_PASSWORD)   # watch OBS for the team preview
 For practice, reviewing games and commentary: official tournaments forbid outside help during battles.
 """
 import argparse
 import asyncio
 import base64
 import json
+import os
 import time
 from pathlib import Path
 
@@ -142,11 +143,12 @@ class Live:
         await self.broadcast()
         return self.preview
 
-    async def watch_obs(self, frames, fps: float) -> None:
-        """Poll OBS; on a newly seen team preview, recognise it and start the lineup suggestion."""
+    async def watch_obs(self, frames, fps: float, record: Path | None = None) -> None:
+        """Poll OBS; on a newly seen team preview, recognise it and start the lineup suggestion.
+        With `record`, also save frames that differ from the last saved one (screen samples for message/HP reading)."""
         from pokesim.vision.obs_client import is_team_preview
 
-        armed, last_seen = True, 0.0
+        armed, last_seen, last_saved = True, 0.0, None
         while True:
             try:
                 frame = await asyncio.to_thread(frames.grab)
@@ -155,6 +157,14 @@ class Live:
                 await asyncio.sleep(3)
                 continue
             now = time.time()
+            if record is not None and frame is not None:
+                small = cv2.resize(frame, (96, 54), interpolation=cv2.INTER_AREA).astype(np.int16)
+                if last_saved is None or np.abs(small - last_saved).mean() > 4:
+                    last_saved = small
+                    day = record / time.strftime("%Y%m%d")
+                    day.mkdir(parents=True, exist_ok=True)
+                    await asyncio.to_thread(cv2.imwrite, str(day / f"{now:.1f}.jpg"), frame,
+                                            [cv2.IMWRITE_JPEG_QUALITY, 90])
             if frame is not None and await asyncio.to_thread(is_team_preview, frame):
                 last_seen = now
                 if armed:
@@ -188,7 +198,7 @@ def create_app(live: Live, obs: dict | None = None) -> FastAPI:
             from pokesim.vision.obs_client import ObsFrames
 
             frames = ObsFrames(obs["source"], obs["host"], obs["port"], obs["password"])
-            app.state.obs_task = asyncio.create_task(live.watch_obs(frames, obs["fps"]))
+            app.state.obs_task = asyncio.create_task(live.watch_obs(frames, obs["fps"], obs["record"]))
 
     @app.get("/")
     def control():
@@ -337,14 +347,15 @@ def main() -> None:
     parser.add_argument("--obs-source", help="OBS capture source name: watch it for the team preview")
     parser.add_argument("--obs-host", default="localhost")
     parser.add_argument("--obs-port", type=int, default=4455)
-    parser.add_argument("--obs-password", default="")
+    parser.add_argument("--obs-password", default=os.environ.get("OBS_PASSWORD", ""), help="default: $OBS_PASSWORD")
     parser.add_argument("--obs-fps", type=float, default=2.0)
+    parser.add_argument("--obs-record", type=Path, help="save changed frames here (e.g. data/raw/obs_frames)")
     args = parser.parse_args()
     live = Live(Path(args.team), args.policy, lookahead=not args.no_lookahead)
     obs = None
     if args.obs_source:
         obs = {"source": args.obs_source, "host": args.obs_host, "port": args.obs_port,
-               "password": args.obs_password, "fps": args.obs_fps}
+               "password": args.obs_password, "fps": args.obs_fps, "record": args.obs_record}
     uvicorn.run(create_app(live, obs), host="127.0.0.1", port=args.port)
 
 
