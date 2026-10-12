@@ -1,6 +1,7 @@
 """Opponents' sets seen in our own battles -> data/processed/observed_sets.json, for the set sampler.
 
-From each battle record's protocol log (data/raw/live/logs, and records rebuilt from saved frames): per species,
+From each battle record's protocol log (data/raw/live/logs, records rebuilt from saved frames, Showdown ladder
+battles from scripts/ladder.py): per species,
 in how many battles it was in the preview, was brought, led; which moves, items, abilities it revealed and whether
 it Mega Evolved. pokesim.search.lookahead.SetSampler blends these into the published set data, so moves the
 articles never list (Curse Mimikyu, Stealth Rock Archaludon) become possible and frequent ones gain weight.
@@ -15,7 +16,7 @@ from pokesim.config import RAW_DIR, ROOT
 from pokesim.rl.myteam import to_id
 
 OUT = ROOT / "data" / "processed" / "observed_sets.json"
-SOURCES = [RAW_DIR / "live" / "logs", ROOT / "data" / "processed" / "replayed"]
+SOURCES = [RAW_DIR / "live" / "logs", ROOT / "data" / "processed" / "replayed", RAW_DIR / "ladder"]
 
 
 def _minutes(rec: dict) -> int:
