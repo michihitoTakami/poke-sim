@@ -18,12 +18,12 @@ from pokesim.vision.preview import CARD_X0, CARD_X1, card_mask, find_cards, norm
 
 
 def is_team_preview(frame: np.ndarray) -> bool:
-    """The left margins of all 6 opponent cards are card-coloured, and the pink name banner sits above them."""
+    """The left margins of the opponent cards are card-coloured (at least 4 of 6: with the strength display on, a
+    warning icon covers part of some margins), and the pink name banner sits above them."""
     img = normalize(frame)
     mask = card_mask(img)
-    for y0, y1 in find_cards(img):
-        if mask[y0 + 10:y1 - 10, CARD_X0 + 6:CARD_X0 + 50].mean() < 0.5:
-            return False
+    if sum(mask[y0 + 10:y1 - 10, CARD_X0 + 6:CARD_X0 + 50].mean() >= 0.5 for y0, y1 in find_cards(img)) < 4:
+        return False
     hsv = cv2.cvtColor(img[100:140, CARD_X0 + 20:CARD_X1 - 20], cv2.COLOR_BGR2HSV)
     banner = ((hsv[..., 0] >= 158) & (hsv[..., 0] <= 178) & (hsv[..., 1] > 110) & (hsv[..., 2] > 140)).mean()
     return banner > 0.4
