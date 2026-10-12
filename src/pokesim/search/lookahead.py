@@ -78,16 +78,39 @@ def solve_zero_sum(payoff: np.ndarray, iters: int = 3000) -> tuple[np.ndarray, n
     return r_sum / r_sum.sum(), c_sum / c_sum.sum()
 
 
+OBSERVED_WEIGHT = 5.0   # one battle of ours = this many published teams
+UTILITY_PSEUDO = 0.03   # share of teams given to each learnable utility move
+UTILITY_MOVES = {"stealthrock", "spikes", "toxicspikes", "stickyweb", "yawn", "curse", "substitute", "protect",
+                 "taunt", "encore", "willowisp", "toxic", "thunderwave", "glare", "roar", "whirlwind", "dragontail",
+                 "haze", "clearsmog", "trick", "uturn", "voltswitch", "flipturn", "partingshot", "knockoff",
+                 "rapidspin", "defog", "recover", "roost", "slackoff", "synthesis", "moonlight", "painsplit",
+                 "leechseed", "swordsdance", "nastyplot", "calmmind", "dragondance", "bulkup", "irondefense",
+                 "trickroom", "tailwind", "destinybond", "perishsong", "disable", "suckerpunch", "fakeout",
+                 "nuzzle", "healbell", "reflect", "lightscreen", "batonpass", "rest", "sleeptalk"}
+
+
+def load_observed() -> dict:
+    try:
+        from pokesim.live.observed import load
+
+        return load()
+    except Exception:  # noqa: BLE001 - no records yet
+        return {}
+
+
 class SetSampler:
     """Samples plausible full sets for an opponent's Pokémon given what has been revealed."""
 
-    def __init__(self, seasons: list[str], seed: int = 0):
+    def __init__(self, seasons: list[str], seed: int = 0, observed: dict | None = None,
+                 observed_weight: float = OBSERVED_WEIGHT, utility: float = UTILITY_PSEUDO):
+        self.observed_weight, self.utility = observed_weight, utility
         articles = {x.species_id: x for x in summarize(seasons)}
         smogon = smogon_summaries()
         self.summary: dict[str, SpeciesSummary] = {}
         for sid in set(articles) | set(smogon):
             cands = [t[sid] for t in (articles, smogon) if sid in t]
             self.summary[sid] = next((c for c in cands if c.teams >= 3), cands[0])
+        self.observed = self._blend_observed(observed if observed is not None else load_observed())
         with Session() as s:
             self.species = {sp.id: sp for sp in s.scalars(select(Species))}
             self.moves = {m.id: m for m in s.scalars(select(Move))}
@@ -96,6 +119,29 @@ class SetSampler:
             for sid, mid in s.execute(select(Learnset.species_id, Learnset.move_id)):
                 self.learnsets.setdefault(sid, set()).add(mid)
         self.rng = random.Random(seed)
+
+    def _blend_observed(self, observed: dict) -> dict:
+        """Sets seen in our own battles count as `observed_weight` teams each (they are the current ladder); species
+        only we have seen get a summary of their own."""
+        for sid, obs in observed.items():
+            if not obs.get("brought"):
+                continue
+            sm = self.summary.setdefault(sid, SpeciesSummary(species_id=sid))
+            w = self.observed_weight
+            sm.teams += round(w * obs["brought"])
+            for key in ("moves", "items", "abilities"):
+                for k, n in obs[key].items():
+                    getattr(sm, key)[k] += w * n
+        return observed
+
+    def _with_utility(self, base: str, sm: SpeciesSummary | None) -> dict[str, float]:
+        """Move weights: the summary plus a small share for common utility moves it can learn, so unlisted
+        Yawn / Curse / Substitute / Stealth Rock are possible instead of impossible."""
+        moves = dict(sm.moves) if sm else {}
+        teams = max(sm.teams if sm else 0, 1)
+        for m in UTILITY_MOVES & self.learnsets.get(base, set()):
+            moves[m] = moves.get(m, 0) + self.utility * teams
+        return moves
 
     def base_id(self, species_id: str) -> str:
         """Team-sheet species for an in-battle forme: megas and battle-only formes (Mimikyu-Busted) -> base."""
@@ -118,11 +164,12 @@ class SetSampler:
         sp, sm = self.species[base], self.summary.get(base)
         learnable = self.learnsets.get(base, set())
         out = [m for m in moves if m in learnable][:4]
-        while sm and len(out) < 4 and (m := self._weighted(sm.moves, exclude=set(out) | {"", "struggle"})):
+        weights = self._with_utility(base, sm)
+        while len(out) < 4 and (m := self._weighted(weights, exclude=set(out) | {"", "struggle"})):
             if m in learnable:
                 out.append(m)
             else:
-                sm.moves[m] = 0
+                weights[m] = 0
         if len(out) < 4:  # fallback: strongest STAB-weighted moves
             def power(mid: str) -> float:
                 mv = self.moves[mid]
@@ -181,8 +228,10 @@ def field_state(battle: Battle) -> dict:
 class Lookahead:
     """Runs the Node lookahead worker and turns battles into recommendations."""
 
-    def __init__(self, sampler: SetSampler, samples: int = 6, seeds: int = 2, rollout: int = 3):
+    def __init__(self, sampler: SetSampler, samples: int = 6, seeds: int = 2, rollout: int = 3,
+                 opponent_model: dict | None = None):
         self.sampler, self.n_samples, self.seeds, self.rollout = sampler, samples, seeds, rollout
+        self.opponent_model = opponent_model or {}
         self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
 
@@ -227,24 +276,45 @@ class Lookahead:
         return {"team": team, "mons": mons, "megaUsed": battle.opponent_used_mega_evolve,
                 "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
 
-    def advise(self, battle: Battle, own_sets: dict[str, dict]) -> Advice:
+    def query(self, battle: Battle, own_sets: dict[str, dict]) -> list[dict]:
+        """Payoff matrices (our options x the opponent's) for sampled opponent sets."""
         own = self.own_side(battle, own_sets)
         field = field_state(battle)
         samples = [{"p1": own, "p2": self.opponent_side(battle), "field": field} for _ in range(self.n_samples)]
-        results = self._query({"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout,
-                               "samples": samples})["results"]
-        labels = results[0]["p1"]
-        prob, value = np.zeros(len(labels)), np.zeros(len(labels))
-        opponent: dict[str, float] = {}
-        for res in results:
-            payoff = np.array(res["payoff"])
-            idx = [res["p1"].index(lab) for lab in labels]  # our options are the same in every sample
-            x, y = solve_zero_sum(payoff[idx])
-            prob += x / len(results)
-            value += payoff[idx] @ y / len(results)
-            for lab, q in zip(res["p2"], y):  # the opponent's options depend on its sampled set
-                opponent[lab] = opponent.get(lab, 0.0) + float(q) / len(results)
-        return Advice(labels, prob, value, opponent)
+        return self._query({"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout,
+                            "samples": samples})["results"]
+
+    def advise(self, battle: Battle, own_sets: dict[str, dict]) -> Advice:
+        return aggregate(self.query(battle, own_sets), self.opponent_model)
+
+
+def opponent_mix(payoff: np.ndarray, x: np.ndarray, y: np.ndarray, model: dict) -> np.ndarray:
+    """The opponent's predicted action distribution in one sample.
+    eq      the equilibrium mix y (assumes a perfect opponent; tends to over-predict switches)
+    br      softmax best response to our equilibrium mix x: players pick what looks best against what we do
+    The prediction mixes them: (1 - w) * eq + w * br."""
+    w, tau = model.get("br_weight", 0.0), model.get("tau", 0.1)
+    if w <= 0:
+        return y
+    u = -(x @ payoff)  # the opponent's payoff of each option against our mix
+    br = np.exp((u - u.max()) / tau)
+    return (1 - w) * y + w * br / br.sum()
+
+
+def aggregate(results: list[dict], opponent_model: dict | None = None) -> Advice:
+    labels = results[0]["p1"]
+    prob, value = np.zeros(len(labels)), np.zeros(len(labels))
+    opponent: dict[str, float] = {}
+    for res in results:
+        payoff = np.array(res["payoff"])
+        idx = [res["p1"].index(lab) for lab in labels]  # our options are the same in every sample
+        x, y = solve_zero_sum(payoff[idx])
+        prob += x / len(results)
+        value += payoff[idx] @ y / len(results)
+        q = opponent_mix(payoff[idx], x, y, opponent_model or {})
+        for lab, p in zip(res["p2"], q):  # the opponent's options depend on its sampled set
+            opponent[lab] = opponent.get(lab, 0.0) + float(p) / len(results)
+    return Advice(labels, prob, value, opponent)
 
 
 def label_to_action(label: str, battle: Battle) -> int | None:

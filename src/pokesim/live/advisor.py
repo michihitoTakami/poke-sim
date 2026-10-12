@@ -46,14 +46,20 @@ def action_label(action: int, battle: Battle) -> str | None:
     return f"move:{moves[slot]}" + (":mega" if action >= 10 else "")
 
 
+# how the opponent's next action is predicted (pokesim.search.lookahead.opponent_mix); chosen on our own records
+# with scripts/eval_records.py
+OPPONENT_MODEL = {"br_weight": 0.0, "tau": 0.1}
+
+
 class Advisor:
     def __init__(self, sets: list[dict], policy: str | None = None, lookahead: bool = True,
                  seasons: tuple[str, ...] = ("M-6",), samples: int = 6, seeds: int = 2, rollout: int = 3,
-                 reward: str = "sparse"):
+                 reward: str = "sparse", opponent_model: dict | None = None):
         self.extra = TeamFeatures([s["species"] for s in sets])
         self.model = MaskablePPO.load(policy, device="cpu") if policy else None
         self.victory = REWARDS[reward]["victory_value"]
-        self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout) if lookahead else None
+        model = OPPONENT_MODEL if opponent_model is None else opponent_model
+        self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout, model) if lookahead else None
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
 

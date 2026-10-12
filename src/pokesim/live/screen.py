@@ -112,6 +112,8 @@ class Vocab:
             return out
 
         self.me_names, self.opp_names = names(self.me), names(self.opp)
+        # every species, for an opponent the team preview misread (Mega formes are named by their base in messages)
+        self.all_species = {norm(v): k for k, v in self.species_ja.items() if "mega" not in k and v}
         self.all_moves = {norm(v): k for k, v in self.moves_ja.items()}
         self.items = {norm(v): k for k, v in self.items_ja.items()}
         self.abilities = {norm(v): k for k, v in self.abilities_ja.items()}
@@ -144,6 +146,10 @@ class MessageParser:
         alt, alt_score = best(text, other, 0.75)
         if alt and alt_score > score + 0.15:
             return alt, "me" if side == "opp" else "opp"
+        if side == "opp" and score < 0.75:  # not one of the recognised 6: the preview may be wrong
+            anyone, any_score = best(text, self.v.all_species, 0.8)
+            if anyone and any_score > score + 0.1:
+                return anyone, side
         return sid, side
 
     def parse(self, raw: str) -> list[dict]:

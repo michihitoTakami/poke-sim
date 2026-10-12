@@ -84,3 +84,11 @@ def test_parse_volatile_effects():
     assert p.parse("ペンドラーの みか 身代わりは 消えてしまつた")[0]["type"] == "end"
     assert p.parse("ペンドラーの 眠気を 誘った!")[0]["effect"] == "move: Yawn"
     assert p.parse("相手の ゲンガーは 混乱した!")[0]["side"] == "opp"
+
+
+def test_opponent_outside_the_preview():
+    v = vocab()
+    v.species_ja["blastoise"] = "カメックス"
+    v.__post_init__()
+    p = MessageParser(v)
+    assert p.parse("トレーナーは カメックスを 繰り出した!")[0]["species"] == "blastoise"
