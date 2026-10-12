@@ -10,7 +10,7 @@ import json
 import random
 import re
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 from poke_env.battle import Battle, Pokemon
@@ -44,6 +44,7 @@ class Advice:
     labels: list[str]  # "move:<id>", "move:<id>:mega", "switch:<species id>"
     prob: np.ndarray
     value: np.ndarray
+    opponent: dict[str, float] = field(default_factory=dict)  # opponent's equilibrium mix, averaged over samples
 
     def ranked(self) -> list[tuple[str, float, float]]:
         order = np.argsort(-self.prob)
@@ -223,13 +224,16 @@ class Lookahead:
                                "samples": samples})["results"]
         labels = results[0]["p1"]
         prob, value = np.zeros(len(labels)), np.zeros(len(labels))
+        opponent: dict[str, float] = {}
         for res in results:
             payoff = np.array(res["payoff"])
             idx = [res["p1"].index(lab) for lab in labels]  # our options are the same in every sample
             x, y = solve_zero_sum(payoff[idx])
             prob += x / len(results)
             value += payoff[idx] @ y / len(results)
-        return Advice(labels, prob, value)
+            for lab, q in zip(res["p2"], y):  # the opponent's options depend on its sampled set
+                opponent[lab] = opponent.get(lab, 0.0) + float(q) / len(results)
+        return Advice(labels, prob, value, opponent)
 
 
 def label_to_action(label: str, battle: Battle) -> int | None:
