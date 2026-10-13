@@ -17,6 +17,7 @@ from poke_env.player import SimpleHeuristicsPlayer
 from pokesim.config import FORMAT, ROOT
 from pokesim.rl.baton import BatonScript, PolicyPilot, compress, disruptions, my_actions, stint
 from pokesim.rl.myteam import FixedTeam, counter_preview, load_my_team
+from pokesim.rl.opponents import LeaguePlayer
 from pokesim.search.player import LookaheadPlayer
 from pokesim.sim.pool import TeamPool, load_teams
 
@@ -55,7 +56,8 @@ async def main() -> None:
     parser.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     parser.add_argument("--lineup", nargs=3, default=["Scolipede", "Gholdengo", "Salamence"])
     parser.add_argument("--battles", type=int, default=60)
-    parser.add_argument("--opponent", default="lookahead", choices=["lookahead", "heuristic"])
+    parser.add_argument("--opponent", default="lookahead", choices=["lookahead", "heuristic", "policy"])
+    parser.add_argument("--opp-policy", help="the opponent's saved policy for --opponent policy")
     parser.add_argument("--pool", default="all")
     parser.add_argument("--plan", default="pass6", choices=["pass6", "sub"],
                         help="pass6: Iron Defense to +6 then pass; sub: Iron Defense once + Substitute, pass both, "
@@ -78,6 +80,9 @@ async def main() -> None:
     if args.opponent == "lookahead":
         opp = LookaheadPlayer(battle_format=FORMAT, team=TeamPool(teams, 7), teams=teams, seasons=["M-6"],
                               account_configuration=AccountConfiguration(f"opp_{tag}", None))
+    elif args.opponent == "policy":
+        opp = LeaguePlayer(battle_format=FORMAT, team=TeamPool(teams, 7), snapshots=[args.opp_policy], p_heuristic=0.0,
+                           account_configuration=AccountConfiguration(f"opp_{tag}", None))
     else:
         opp = SimpleHeuristicsPlayer(battle_format=FORMAT, team=TeamPool(teams, 7),
                                      account_configuration=AccountConfiguration(f"opp_{tag}", None))
@@ -97,6 +102,8 @@ async def main() -> None:
     n = len(me.battles)
     won = me.n_won_battles
     who = f"policy {args.policy}" if args.policy else args.plan
+    if args.opponent == "policy":
+        args.opponent = f"policy {args.opp_policy}"
     print(f"[{who}] {' / '.join(args.lineup)} vs {args.opponent} (counter-pick {args.counter_pick:.0%}): "
           f"{won}/{n} ({won / n:.0%})")
     for case, results in by_case.items():
