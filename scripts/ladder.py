@@ -85,7 +85,9 @@ class AdvisorPlayer(Player):
     def choose_move(self, battle):
         mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
         try:
-            advice = self.advisor.advise(battle, self.last_opponent_move(battle))
+            advice = self.advisor.advise(battle, self.last_opponent_move(battle),
+                                         self.logs.get(battle.battle_tag, []),
+                                         battle.player_role)
             for label, _ in advice.actions:
                 action = label_to_action(label, battle)
                 if action is not None and mask[action]:

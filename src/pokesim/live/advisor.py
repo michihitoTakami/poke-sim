@@ -5,9 +5,12 @@ Sources, combined when both are available:
 - the fixed-team policy (pokesim.rl.train --my-team): action probabilities and its value head (as a rough win chance);
 - the lookahead (pokesim.search.lookahead): equilibrium mix over our options and the opponent's options, averaged
   over sets sampled for the opponent from usage data and everything revealed so far.
+The opponent's next action mixes the search's prediction with a policy cloned from human players
+(pokesim.live.opponent), which needs the battle's protocol lines (`log`).
 """
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -50,12 +53,15 @@ def action_label(action: int, battle: Battle) -> str | None:
 # with scripts/eval_records.py
 # 166 decisions in 14 battles (2026-10-13): top-1 32% -> 42%, top-3 63% -> 69%, mean log-lik -2.65 -> -2.09
 OPPONENT_MODEL = {"br_weight": 0.75, "tau": 0.7, "repeat": 0.3}
+# share of the cloned human policy in the opponent prediction (scripts/eval_records.py score --bc-weight)
+OPPONENT_POLICY_WEIGHT = 0.5
 
 
 class Advisor:
     def __init__(self, sets: list[dict], policy: str | None = None, lookahead: bool = True,
                  seasons: tuple[str, ...] = ("M-6",), samples: int = 6, seeds: int = 2, rollout: int = 3,
-                 reward: str = "sparse", opponent_model: dict | None = None):
+                 reward: str = "sparse", opponent_model: dict | None = None,
+                 opponent_policy: str | Path | None = "default"):
         self.extra = TeamFeatures([s["species"] for s in sets])
         self.model = MaskablePPO.load(policy, device="cpu") if policy else None
         self.victory = REWARDS[reward]["victory_value"]
@@ -63,6 +69,13 @@ class Advisor:
         self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout, model) if lookahead else None
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
+        self.opponent_policy = None
+        if opponent_policy:
+            from pokesim.live.opponent import DEFAULT_POLICY, OpponentPolicy
+
+            path = DEFAULT_POLICY if opponent_policy == "default" else Path(opponent_policy)
+            if Path(path).exists():
+                self.opponent_policy = OpponentPolicy(path)
 
     def close(self) -> None:
         if self.engine:
@@ -85,8 +98,10 @@ class Advisor:
             value = float(self.model.policy.predict_values(self.model.policy.obs_to_tensor(obs)[0])[0, 0])
         return out, float(np.clip((value / self.victory + 1) / 2, 0, 1))
 
-    def advise(self, battle: Battle, last_move: str | None = None) -> Suggestion:
-        """last_move: the opponent active's previous move ("move:<id>"), see BattleSession.last_move."""
+    def advise(self, battle: Battle, last_move: str | None = None, log: list[str] | None = None,
+               our_role: str = "p1") -> Suggestion:
+        """last_move: the opponent active's previous move ("move:<id>"), see BattleSession.last_move.
+        log: the battle's protocol lines so far (BattleSession.log), for the cloned opponent policy."""
         start = time.perf_counter()
         policy, win = self._policy(battle)
         ranked, opponent = [], []
@@ -106,4 +121,21 @@ class Advisor:
         for lab, p in policy.items():
             combined[lab] = combined.get(lab, 0.0) + w * p
         actions = sorted(combined.items(), key=lambda kv: -kv[1])
+        if self.opponent_policy is not None and log and battle.opponent_active_pokemon is not None:
+            opponent = mix_opponent(opponent, self.opponent_policy.predict(log, our_role))
         return Suggestion(actions, win, opponent, policy, ranked, time.perf_counter() - start)
+
+
+def mix_opponent(search: list[tuple[str, float]], cloned: list[tuple[str, float]],
+                 w: float = OPPONENT_POLICY_WEIGHT) -> list[tuple[str, float]]:
+    """Share w for the cloned policy (all of it when the search has nothing); Mega variants merged."""
+    if not cloned:
+        return search
+    w = w if search else 1.0
+    out: dict[str, float] = {}
+    for lab, p in search:
+        key = ":".join(lab.split(":")[:2])
+        out[key] = out.get(key, 0.0) + (1 - w) * p
+    for lab, p in cloned:
+        out[lab] = out.get(lab, 0.0) + w * p
+    return sorted(out.items(), key=lambda kv: -kv[1])

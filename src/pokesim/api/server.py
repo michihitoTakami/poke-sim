@@ -265,7 +265,8 @@ class Live:
         if battle.finished:
             self.suggestion = None
             return
-        self.suggestion = await asyncio.to_thread(self.advisor.advise, battle, self.session.last_move())
+        self.suggestion = await asyncio.to_thread(self.advisor.advise, battle, self.session.last_move(),
+                                                 list(self.session.log))
         self.history.append({"turn": battle.turn, "force_switch": force_switch,
                              "actions": self.suggestion.actions[:5], "opponent": self.suggestion.opponent[:5],
                              "win_prob": self.suggestion.win_prob})

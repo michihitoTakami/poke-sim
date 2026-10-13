@@ -147,22 +147,14 @@ def base_species_id(details: str, species: dict) -> str:
     return sid
 
 
-def decisions(log: str, role: str, sides: Sides, probe=None) -> tuple[list[Decision], bool | None]:
-    """All decisions `role` made in a battle log (full Showdown log text), and whether that side won.
-    probe(battle, own_sets): called at each kept decision (e.g. another player's choice) -> Decision.extra."""
-    species = sides.species
-    lines = [ln for ln in log.split("\n") if ln.startswith("|")]
+def open_session(lines: list[str], role: str, sets: list[dict], species: dict) -> tuple[BattleSession, list[str]]:
+    """A session for `role` playing `sets` (team preview order) at team preview, and the battle lines to feed it
+    (nicknames of that side renamed). The lineup is the side's Pokémon in order of appearance."""
     opp_role = "p2" if role == "p1" else "p1"
-    winner_name = next((ln.split("|")[2] for ln in lines if ln.startswith("|win|")), None)
-    names = {ln.split("|")[2]: ln.split("|")[3] for ln in lines if ln.startswith("|player|") and
-             len(ln.split("|")) > 3 and ln.split("|")[3]}
-    won = None if winner_name is None else winner_name == names.get(role, role)
-    sets = sides.sets(log, role)
-    revealed = sides.revealed(log, role)
     session = BattleSession(sets, role=role)
     set_names = {to_id(s["species"]): i["name"] for s, i in zip(sets, session.info)}
     opp_preview = [ln.split("|")[3] for ln in lines if ln.startswith(f"|poke|{opp_role}|")]
-    session.preview([d.split(",")[0] for d in opp_preview], [d for d in opp_preview])
+    session.preview([d.split(",")[0] for d in opp_preview], opp_preview)
     lineup = []
     for ln in lines:
         if ln.startswith((f"|switch|{role}", f"|drag|{role}")):
@@ -172,8 +164,22 @@ def decisions(log: str, role: str, sides: Sides, probe=None) -> tuple[list[Decis
     ids = [to_id(s["species"]) for s in sets]
     lineup = [s for s in lineup if s in ids] + [s for s in ids if s not in lineup]
     session.select([ids.index(s) for s in lineup[:3]])
-    body = [ln for ln in lines if ln.split("|")[1] not in SKIP]
-    body = canonical(body, role, set_names, species)
+    body = [ln for ln in lines if len(ln.split("|")) > 1 and ln.split("|")[1] not in SKIP]
+    return session, canonical(body, role, set_names, species)
+
+
+def decisions(log: str, role: str, sides: Sides, probe=None) -> tuple[list[Decision], bool | None]:
+    """All decisions `role` made in a battle log (full Showdown log text), and whether that side won.
+    probe(battle, own_sets): called at each kept decision (e.g. another player's choice) -> Decision.extra."""
+    species = sides.species
+    lines = [ln for ln in log.split("\n") if ln.startswith("|")]
+    winner_name = next((ln.split("|")[2] for ln in lines if ln.startswith("|win|")), None)
+    names = {ln.split("|")[2]: ln.split("|")[3] for ln in lines if ln.startswith("|player|") and
+             len(ln.split("|")) > 3 and ln.split("|")[3]}
+    won = None if winner_name is None else winner_name == names.get(role, role)
+    sets = sides.sets(log, role)
+    revealed = sides.revealed(log, role)
+    session, body = open_session(lines, role, sets, species)
     out: list[Decision] = []
     in_turn, acted, megas = False, False, set()
     turn = 0
