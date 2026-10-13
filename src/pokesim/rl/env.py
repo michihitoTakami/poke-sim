@@ -23,6 +23,7 @@ N_ACTIONS = SinglesEnv.get_action_space_size(9)
 REWARDS = {
     "dense": {"fainted_value": 2.0, "hp_value": 1.0, "victory_value": 15.0},
     "sparse": {"fainted_value": 1.0, "hp_value": 0.25, "victory_value": 20.0},
+    "win": {"fainted_value": 0.05, "hp_value": 0.0125, "victory_value": 1.0},  # sparse / 20 (value head in ±1)
 }
 
 
