@@ -11,8 +11,12 @@
   uv run python scripts/ladder.py --local --battles 2
 
 Team preview: the lineup ranked best by the matchup model for the opponent's 6. Each turn: the advisor's top
-legal action. Records go to data/raw/ladder/<time>.json in the format of data/raw/live/logs (opponent preview,
-lineup, protocol log, result), so pokesim.live.observed and scripts/eval_records.py can use them.
+legal action, or with --sample an action drawn from its distribution (the seed and the chosen action's probability
+are saved: a mixed strategy played as argmax is no longer mixed). --planner shadow|on runs the common-strategy
+planner (pokesim.search.planner) next to / instead of the current advice. Each record says which code, policy and
+lineup table played (pokesim.runtime.bundle).
+Records go to data/raw/ladder/<time>.json in the format of data/raw/live/logs (opponent preview, lineup, protocol
+log, result), so pokesim.live.observed and scripts/eval_records.py can use them.
 Showdown is not the Switch game: mechanics follow Showdown's Champions format and opponents are Showdown players.
 """
 import argparse
@@ -36,6 +40,7 @@ from pokesim.live.advisor import Advisor
 from pokesim.live.selection import MatchupModel, PickModel
 from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, to_id
 from pokesim.rl.opponents import LeaguePlayer
+from pokesim.runtime.bundle import describe
 from pokesim.search.lookahead import label_to_action
 from pokesim.sim.pool import TeamPool, load_teams
 
@@ -59,9 +64,12 @@ class AdvisorPlayer(Player):
     """With several policies, battles alternate between them (A/B comparison on the same ladder)."""
 
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
-                 **kwargs):
+                 planner: dict | None = None, sample: bool = False, seed: int | None = None, **kwargs):
         self.sets, self.out = sets, out
-        self.advisor = Advisor(sets, policy=policies[0], combine=combine)
+        self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner)
+        self.planner, self.sample = planner, sample
+        self.seed = seed if seed is not None else random.SystemRandom().randrange(2 ** 31)
+        self.rng = random.Random(self.seed)
         roster = [s["species"] for s in sets]
         self.policies = {policies[0]: (self.advisor.model, self.advisor.extra)}
         for path in policies[1:]:
@@ -70,6 +78,9 @@ class AdvisorPlayer(Player):
         self.assigned: dict[str, str] = {}  # battle tag -> policy path
         self.advice: dict[str, list[dict]] = {}  # battle tag -> per-decision advice
         self.picks, self.matchups = PickModel(), MatchupModel()
+        for path in policies:
+            if warning := self.matchups.check(path):
+                print(f"lineup table vs {Path(path).name}:", warning, flush=True)
         self.lineups: dict[str, list[str]] = {}
         self.logs: dict[str, list[str]] = {}  # battle tag -> protocol lines
         super().__init__(team=FixedTeam(sets), **kwargs)
@@ -120,12 +131,18 @@ class AdvisorPlayer(Player):
             entry.update({"actions": rounded(advice.actions[:5]), "win": advice.win_prob,
                           "policy": rounded(sorted(advice.policy.items(), key=lambda kv: -kv[1])[:3]),
                           "lookahead": [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.lookahead[:3]],
-                          "opponent": rounded(advice.opponent[:4]), "secs": round(advice.elapsed, 2)})
-            for label, _ in advice.actions:
-                action = label_to_action(label, battle)
-                if action is not None and mask[action]:
-                    entry["chosen"] = label
-                    return SinglesEnv.action_to_order(np.int64(action), battle, strict=False)
+                          "opponent": rounded(advice.opponent[:4]), "secs": round(advice.elapsed, 2),
+                          "status": advice.status})
+            if advice.shadow:
+                entry["shadow"] = [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.shadow[:5]]
+            legal = [(label, p, a) for label, p in advice.actions
+                     if (a := label_to_action(label, battle)) is not None and mask[a]]
+            if legal:
+                label, p, action = legal[0]
+                if self.sample and sum(q for _, q, _ in legal) > 0:
+                    label, p, action = self.rng.choices(legal, weights=[q for _, q, _ in legal])[0]
+                entry.update({"chosen": label, "chosen_p": round(float(p), 4)})
+                return SinglesEnv.action_to_order(np.int64(action), battle, strict=False)
         except Exception as e:  # noqa: BLE001 - never stall a live battle
             print("advice failed:", repr(e)[:200], flush=True)
             entry["error"] = repr(e)[:200]
@@ -146,7 +163,9 @@ class AdvisorPlayer(Player):
                   "advice": self.advice.pop(battle.battle_tag, []),
                   "policy": Path(self.assigned.get(battle.battle_tag, "")).stem,
                   "source": f"showdown {battle.battle_tag}", "opponent": battle.opponent_username,
-                  "rating": getattr(battle, "rating", None)}
+                  "rating": getattr(battle, "rating", None),
+                  "versions": describe(self.assigned.get(battle.battle_tag), self.matchups.meta,
+                                       planner=self.planner, sample=self.sample, seed=self.seed)}
         (self.out / f"{stamp}-{battle.battle_tag.split('-')[-1]}.json").write_text(
             json.dumps(record, ensure_ascii=False, indent=1))
         print(f"{battle.battle_tag}: {record['result']} vs {battle.opponent_username} [{record['policy']}]  "
@@ -167,9 +186,11 @@ def rounded(pairs) -> list:
 async def run(args) -> None:
     sets = json.loads(Path(args.team).read_text())
     combine = json.loads(args.combine) if args.combine else None
+    planner = None if args.planner == "off" else {"mode": args.planner}
+    play = {"combine": combine, "planner": planner, "sample": args.sample, "seed": args.seed}
     if args.local:
         tag = uuid.uuid4().hex[:6]
-        me = AdvisorPlayer(sets, args.policy, out=Path(args.out), combine=combine, battle_format=FORMAT,
+        me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
                            server_configuration=LocalhostServerConfiguration, max_concurrent_battles=1,
                            account_configuration=AccountConfiguration(f"adv_{tag}", None))
         pool = TeamPool(load_teams("observed"), 0)
@@ -188,7 +209,7 @@ async def run(args) -> None:
     cred = credentials()
     if cred is None:
         raise SystemExit(f"no Showdown account: put PS_USERNAME / PS_PASSWORD in {CREDENTIALS}")
-    me = AdvisorPlayer(sets, args.policy, out=Path(args.out), combine=combine, battle_format=FORMAT,
+    me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
                        account_configuration=AccountConfiguration(*cred),
                        server_configuration=ShowdownServerConfiguration, max_concurrent_battles=1,
                        start_timer_on_battle_start=True)
@@ -211,6 +232,10 @@ def main() -> None:
     ap.add_argument("--local", action="store_true", help="local server (localhost:8000) against a random player")
     ap.add_argument("--local-opponent", help="with --local: a saved opponent policy instead (counter-picks 70%%)")
     ap.add_argument("--combine", help='JSON overriding the advisor\'s COMBINE, e.g. \'{"mode": "linear"}\'')
+    ap.add_argument("--planner", choices=["off", "shadow", "on"], default="off",
+                    help="common-strategy planner: shadow records it next to the current advice, on plays it")
+    ap.add_argument("--sample", action="store_true", help="draw the action from the advice instead of its top")
+    ap.add_argument("--seed", type=int, help="seed for --sample (default: random, saved in each record)")
     asyncio.run(run(ap.parse_args()))
 
 

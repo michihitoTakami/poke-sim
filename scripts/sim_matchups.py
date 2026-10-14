@@ -2,8 +2,11 @@
 the per-lineup matchup model used for team preview suggestions (pokesim.live.selection.MatchupModel).
 
   record: appends one JSON line per game to data/processed/matchups.jsonl:
-          {"lineup": "lead,second,third", "opponent": [species brought and seen], "won": bool}
+          {"lineup": "lead,second,third", "opponent": [species brought and seen], "won": bool,
+           "policy_sha": the policy file's hash, "seed": ...}
   fit:    per lineup, L2-regularised logistic regression of the result on which opponent species were brought.
+          Only games played by one policy (--policy, default: the most common in the data); the model's `meta`
+          records which, so the advisor can tell a table fitted for another policy.
 
 Usage:
   uv run python scripts/sim_matchups.py record --policy checkpoints/ppo_baton_any.zip --battles 6000
@@ -25,6 +28,7 @@ from pokesim.live.selection import MATCHUP_MODEL
 from pokesim.rl.baton import PolicyPilot
 from pokesim.rl.bc import CounterPickHeuristic
 from pokesim.rl.myteam import FixedTeam, load_my_team, to_id
+from pokesim.runtime.bundle import file_hash
 from pokesim.sim.pool import TeamPool, load_teams
 
 DATA = PROCESSED_DIR / "matchups.jsonl"
@@ -68,6 +72,7 @@ async def record(args) -> None:
         pairs.append((me, opp))
     await asyncio.gather(*(me.battle_against(opp, n_battles=args.battles // args.pairs) for me, opp in pairs))
     n = 0
+    sha = file_hash(args.policy)
     with DATA.open("a") as f:
         for me, _ in pairs:
             for tag, battle in me.battles.items():
@@ -75,7 +80,7 @@ async def record(args) -> None:
                     continue
                 opponent = sorted({base_id(m.species) for m in battle.opponent_team.values()})
                 f.write(json.dumps({"lineup": ",".join(me.lineups[tag]), "opponent": opponent,
-                                    "won": bool(battle.won)}) + "\n")
+                                    "won": bool(battle.won), "policy_sha": sha, "seed": args.seed}) + "\n")
                 n += 1
     wins = sum(me.n_won_battles for me, _ in pairs)
     print(f"recorded {n} games ({wins} won) to {DATA}")
@@ -124,16 +129,31 @@ def held_out_loss(games: dict[str, list[dict]], l2: float) -> float:
 
 
 def fit(args) -> None:
+    import hashlib
+    import time
+    from collections import Counter
+
+    text = DATA.read_text()
+    rows = [json.loads(line) for line in text.splitlines()]
+    policies = Counter(g.get("policy_sha") for g in rows)
+    sha = file_hash(args.policy) if args.policy else policies.most_common(1)[0][0]
+    if len(policies) > 1:
+        print("games by policy:", dict(policies), "-> fitting on", sha)
     games = defaultdict(list)
-    for line in DATA.read_text().splitlines():
-        g = json.loads(line)
-        games[g["lineup"]].append(g)
+    for g in rows:
+        if g.get("policy_sha") == sha:
+            games[g["lineup"]].append(g)
+    if not games:
+        raise SystemExit(f"no games played by policy {sha}")
     l2 = args.l2
     if l2 is None:  # choose the regularisation by held-out log-loss
         losses = {c: held_out_loss(games, c) for c in (0.1, 0.3, 1, 3, 10)}
         l2 = min(losses, key=losses.get)
         print("held-out log-loss by l2:", {k: round(v, 4) for k, v in losses.items()}, "-> l2 =", l2)
-    model = {"lineups": {}, "l2": l2}
+    model = {"lineups": {}, "l2": l2,
+             "meta": {"policy_sha": sha, "policies": {str(k): v for k, v in policies.items()},
+                      "data_sha": hashlib.sha256(text.encode()).hexdigest()[:16],
+                      "games": sum(len(r) for r in games.values()), "fitted": time.strftime("%Y-%m-%d %H:%M")}}
     for lineup, rows in sorted(games.items()):
         species = sorted({s for g in rows for s in g["opponent"]})
         index = {s: i + 1 for i, s in enumerate(species)}
@@ -168,6 +188,8 @@ def main() -> None:
     rec.add_argument("--seed", type=int, default=0)
     ft = sub.add_parser("fit")
     ft.add_argument("--l2", type=float, help="regularisation (default: chosen by held-out log-loss)")
+    ft.add_argument("--policy", help="fit on the games of this policy (default: the most common in the data; games "
+                                     "recorded before versions were saved count as policy None)")
     args = parser.parse_args()
     if args.cmd == "record":
         asyncio.run(record(args))

@@ -15,8 +15,6 @@ from dataclasses import dataclass, field
 import numpy as np
 from poke_env.battle import Battle, Pokemon
 from poke_env.data import GenData
-
-from pokesim.sim.formes import current_forme
 from sqlalchemy import select
 
 from pokesim.config import FORMAT, ROOT, SHOWDOWN_DIR
@@ -24,6 +22,7 @@ from pokesim.data.smogon_stats import smogon_summaries
 from pokesim.data.summarize_sets import SpeciesSummary, summarize
 from pokesim.db.models import Item, Learnset, Move, Species
 from pokesim.db.session import Session
+from pokesim.sim.formes import current_forme
 
 STATS = ["hp", "atk", "def", "spa", "spd", "spe"]
 WEATHER_IDS = {"RAINDANCE": "raindance", "SUNNYDAY": "sunnyday", "SANDSTORM": "sandstorm", "SNOWSCAPE": "snowscape",
@@ -62,6 +61,8 @@ class Advice:
     prob: np.ndarray
     value: np.ndarray
     opponent: dict[str, float] = field(default_factory=dict)  # opponent's equilibrium mix, averaged over samples
+    status: dict = field(default_factory=dict)  # how it was computed: failed branches, solver, ...
+    worst: np.ndarray | None = None  # per action, the weighted worst case over the opponent's options (planner)
 
     def ranked(self) -> list[tuple[str, float, float]]:
         order = np.argsort(-self.prob)
@@ -199,7 +200,7 @@ class SetSampler:
 
 
 def mon_state(mon: Pokemon, active: bool) -> dict:
-    out = {"hp": 0.0 if mon.fainted else mon.current_hp_fraction}
+    out = {"hp": 0.0 if mon.fainted else mon.current_hp_fraction, "mega": mega_evolved(mon)}
     entry = GenData.from_gen(9).pokedex.get(current_forme(mon), {})
     if entry.get("battleOnly") and not mega_evolved(mon):  # e.g. Mimikyu-Busted (no Disguise left), Aegislash-Blade
         out["forme"] = entry["name"]
@@ -215,7 +216,6 @@ def mon_state(mon: Pokemon, active: bool) -> dict:
             out["encore"] = mon.last_move.id  # locked into its last move
         if mon.protect_counter:  # consecutive Protect / Detect / Endure: the next one succeeds 1 in 3^n
             out["stall"] = mon.protect_counter
-        out["mega"] = mega_evolved(mon)
     return out
 
 
@@ -245,8 +245,9 @@ class Lookahead:
     """Runs the Node lookahead worker and turns battles into recommendations."""
 
     def __init__(self, sampler: SetSampler, samples: int = 6, seeds: int = 2, rollout: int = 3,
-                 opponent_model: dict | None = None):
+                 opponent_model: dict | None = None, win_decay: float | None = None):
         self.sampler, self.n_samples, self.seeds, self.rollout = sampler, samples, seeds, rollout
+        self.win_decay = win_decay  # None: the worker's default (a quicker win scores higher)
         self.opponent_model = opponent_model or {}
         self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
@@ -261,16 +262,26 @@ class Lookahead:
             raise RuntimeError(reply["error"])
         return reply
 
-    def own_side(self, battle: Battle, own_sets: dict[str, dict]) -> dict:
+    def own_side(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None) -> dict:
+        """Keep the outgoing active first; the worker executes incoming's actual switch-in transition."""
         active = battle.active_pokemon
-        bench = [m for m in battle.team.values() if m is not active and (m.fainted or m in battle.available_switches)]
-        if not battle.available_switches and not battle.trapped:
+        if active is None:
+            raise ValueError("switch reconstruction needs the outgoing active")
+        brought = [m for m in battle.team.values() if m.fainted or m.active or m in battle.available_switches]
+        bench = [m for m in brought if m is not active]
+        if not battle.available_switches and not battle.trapped and incoming is None:
             bench = [m for m in battle.team.values() if m is not active][:2]
         mons = [active] + bench[:2]
-        return {"team": [own_sets[self.sampler.base_id(m.species)] for m in mons],
-                "mons": [mon_state(m, i == 0) for i, m in enumerate(mons)],
+        states = [mon_state(m, i == 0) for i, m in enumerate(mons)]
+        out = {"team": [own_sets[self.sampler.base_id(m.species)] for m in mons],
+                "mons": states,
                 "megaUsed": battle.used_mega_evolve, "conditions": side_conditions(battle.side_conditions,
                                                                                     battle.turn)}
+        if incoming is not None:
+            out["incoming"] = mons.index(incoming)
+            if not active.fainted and active.last_move is not None and active.last_move.id == "batonpass":
+                out["switchMove"] = "batonpass"
+        return out
 
     def opponent_side(self, battle: Battle) -> dict:
         active = battle.opponent_active_pokemon
@@ -292,16 +303,59 @@ class Lookahead:
         return {"team": team, "mons": mons, "megaUsed": battle.opponent_used_mega_evolve,
                 "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
 
-    def query(self, battle: Battle, own_sets: dict[str, dict]) -> list[dict]:
+    def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None) -> list[dict]:
         """Payoff matrices (our options x the opponent's) for sampled opponent sets."""
-        own = self.own_side(battle, own_sets)
+        own = self.own_side(battle, own_sets, incoming)
         field = field_state(battle)
         samples = [{"p1": own, "p2": self.opponent_side(battle), "field": field} for _ in range(self.n_samples)]
-        return self._query({"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout,
-                            "samples": samples})["results"]
+        request = {"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout, "samples": samples}
+        if self.win_decay is not None:
+            request["winDecay"] = self.win_decay
+        return self._query(request)["results"]
 
     def advise(self, battle: Battle, own_sets: dict[str, dict], last_move: str | None = None) -> Advice:
         return aggregate(self.query(battle, own_sets), self.opponent_model, last_move)
+
+    def advise_switch(self, battle: Battle, own_sets: dict[str, dict], last_move: str | None = None,
+                      solve=None) -> Advice:
+        """A switch we must make (after a faint, U-turn, Baton Pass, ...): each Pokémon we can send in is scored by
+        the position it starts, the value of our mix there (solve(battle, own_sets, last_move, incoming) -> Advice;
+        default: the legacy aggregate). The opponent does not choose at the same time, so the best one gets all the
+        weight. After our own U-turn the opponent may still have its move this turn; the position is the start of
+        the next turn (an approximation)."""
+        labels, values, status = [], [], {"switch": {}}
+        if len(battle.available_switches) == 1:  # nothing to compare
+            mon = battle.available_switches[0]
+            return Advice([f"switch:{to_id(mon.species)}"], np.ones(1), np.zeros(1), {}, status={"only_option": True})
+        for mon in battle.available_switches:
+            if solve is None:
+                adv = aggregate(self.query(battle, own_sets, mon), self.opponent_model, last_move)
+            else:
+                adv = solve(battle, own_sets, last_move, mon)
+            labels.append(f"switch:{to_id(mon.species)}")
+            values.append(float(adv.status.get("objective", adv.prob @ adv.value)))
+            status["switch"][labels[-1]] = adv.status
+        if not labels:
+            raise ValueError("no switch available")
+        prob = np.zeros(len(labels))
+        prob[int(np.argmax(values))] = 1.0
+        return Advice(labels, prob, np.array(values), {}, status=status)
+
+
+def clean(result: dict) -> tuple[np.ndarray, list[str], int]:
+    """A lookahead result's payoff with failed branches handled: an opponent option that failed in every pairing is
+    dropped (it is not possible in that world); any other failed cell takes the worst value of its column (we do
+    not count a failure in our favour). Returns (payoff, opponent labels, number of failed cells)."""
+    payoff = np.array([[np.nan if v is None else v for v in row] for row in result["payoff"]], dtype=float)
+    labels = list(result["p2"])
+    failed = int(np.isnan(payoff).sum())
+    keep = ~np.isnan(payoff).all(axis=0)
+    if not keep.any():
+        raise ValueError("every branch failed")
+    payoff, labels = payoff[:, keep], [lab for lab, k in zip(labels, keep) if k]
+    col_min = np.nanmin(payoff, axis=0)
+    payoff = np.where(np.isnan(payoff), col_min[None, :], payoff)
+    return payoff, labels, failed
 
 
 def opponent_mix(payoff: np.ndarray, x: np.ndarray, y: np.ndarray, model: dict) -> np.ndarray:
@@ -323,20 +377,31 @@ def aggregate(results: list[dict], opponent_model: dict | None = None, last_move
     labels = results[0]["p1"]
     prob, value = np.zeros(len(labels)), np.zeros(len(labels))
     opponent: dict[str, float] = {}
+    worlds = []
+    failed_cells = 0
     for res in results:
-        payoff = np.array(res["payoff"])
-        idx = [res["p1"].index(lab) for lab in labels]  # our options are the same in every sample
-        x, y = solve_zero_sum(payoff[idx])
-        prob += x / len(results)
-        value += payoff[idx] @ y / len(results)
-        q = opponent_mix(payoff[idx], x, y, opponent_model or {})
-        for lab, p in zip(res["p2"], q):  # the opponent's options depend on its sampled set
-            opponent[lab] = opponent.get(lab, 0.0) + float(p) / len(results)
+        try:
+            payoff, opp, failed = clean(res)
+        except ValueError:  # every branch of this sample failed: leave it out
+            continue
+        failed_cells += failed
+        worlds.append((payoff[[res["p1"].index(lab) for lab in labels]], opp))  # our options are common
+    if not worlds:
+        raise ValueError("every sampled world failed")
+    for payoff, opp in worlds:
+        x, y = solve_zero_sum(payoff)
+        prob += x / len(worlds)
+        value += payoff @ y / len(worlds)
+        q = opponent_mix(payoff, x, y, opponent_model or {})
+        for lab, p in zip(opp, q):  # the opponent's options depend on its sampled set
+            opponent[lab] = opponent.get(lab, 0.0) + float(p) / len(worlds)
     repeat = (opponent_model or {}).get("repeat", 0.0)
     if repeat > 0 and last_move and any(k.split(":")[:2] == last_move.split(":")[:2] for k in opponent):
         opponent = {k: (1 - repeat) * p for k, p in opponent.items()}
         opponent[last_move] = opponent.get(last_move, 0.0) + repeat
-    return Advice(labels, prob, value, opponent)
+    return Advice(labels, prob, value, opponent,
+                  status={"worlds": len(worlds), "failed_worlds": len(results) - len(worlds),
+                          "failed_cells": failed_cells})
 
 
 def label_to_action(label: str, battle: Battle) -> int | None:

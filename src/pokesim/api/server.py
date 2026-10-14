@@ -37,6 +37,7 @@ from pokesim.live.screen import ScreenTracker, Vocab
 from pokesim.live.selection import MatchupModel, PickModel
 from pokesim.live.session import BattleSession
 from pokesim.rl.myteam import to_id
+from pokesim.runtime.bundle import describe
 
 WEB = ROOT / "web"
 LOG_DIR = RAW_DIR / "live/logs"
@@ -52,12 +53,16 @@ def ja_names() -> dict[str, str]:
 
 
 class Live:
-    def __init__(self, team: Path, policy: str | None, lookahead: bool = True):
+    def __init__(self, team: Path, policy: str | None, lookahead: bool = True, planner: dict | None = None):
         self.sets = json.loads(Path(team).read_text())
         self.roster = [s["species"] for s in self.sets]
+        self.policy = policy
         self.ja = ja_names()
-        self.advisor = Advisor(self.sets, policy=policy, lookahead=lookahead)
+        self.advisor = Advisor(self.sets, policy=policy, lookahead=lookahead, planner=planner)
         self.picks_model, self.matchups = PickModel(), MatchupModel()
+        self.matchup_warning = self.matchups.check(policy)
+        if self.matchup_warning:
+            print("lineup table:", self.matchup_warning, flush=True)
         self.reader = None  # PreviewReader, loaded on first use (GPU model)
         self.screen = None  # ScreenReader (OCR), loaded on the first battle frame
         self.read_screen = True
@@ -114,7 +119,8 @@ class Live:
             out["advice"] = {"actions": [{"id": a, "label": self.label(a), "p": round(p, 3)} for a, p in s.actions[:6]],
                              "opponent": [{"id": a, "label": self.label(a), "p": round(p, 3)}
                                           for a, p in s.opponent[:6]],
-                             "win_prob": s.win_prob, "elapsed": round(s.elapsed, 2)}
+                             "win_prob": s.win_prob, "win_kind": s.win_kind, "elapsed": round(s.elapsed, 2),
+                             "status": s.status}
         return out
 
     async def broadcast(self) -> None:
@@ -265,11 +271,17 @@ class Live:
         if battle.finished:
             self.suggestion = None
             return
-        self.suggestion = await asyncio.to_thread(self.advisor.advise, battle, self.session.last_move(),
-                                                 list(self.session.log))
+        seen = len(self.session.log)
+        suggestion = await asyncio.to_thread(self.advisor.advise, battle, self.session.last_move(),
+                                             list(self.session.log))
+        if len(self.session.log) != seen:  # the battle moved on while we searched: advice for an old position
+            print("advice dropped: the position changed during the search", flush=True)
+            return
+        self.suggestion = suggestion
         self.history.append({"turn": battle.turn, "force_switch": force_switch,
-                             "actions": self.suggestion.actions[:5], "opponent": self.suggestion.opponent[:5],
-                             "win_prob": self.suggestion.win_prob})
+                             "actions": suggestion.actions[:5], "opponent": suggestion.opponent[:5],
+                             "win_prob": suggestion.win_prob, "status": suggestion.status,
+                             "shadow": [(lab, round(p, 3), round(v, 3)) for lab, p, v in suggestion.shadow[:5]]})
 
 
 def create_app(live: Live, obs: dict | None = None) -> FastAPI:
@@ -399,7 +411,8 @@ def save_record(live: Live, result: str | None) -> Path:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     stamp = time.strftime("%Y%m%d-%H%M%S", time.localtime(live.started))
     record = {"started": stamp, "result": result, "team": live.roster, "preview": live.preview,
-              "lineup": live.lineup, "log": live.session.log, "advice": live.history}
+              "lineup": live.lineup, "log": live.session.log, "advice": live.history,
+              "versions": describe(live.policy, live.matchups.meta, planner=live.advisor.planner)}
     path = LOG_DIR / f"{stamp}.json"
     path.write_text(json.dumps(record, ensure_ascii=False, indent=1))
     try:
@@ -436,6 +449,9 @@ def main() -> None:
     parser.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     parser.add_argument("--policy", help="fixed-team policy checkpoint (trained with this team order)")
     parser.add_argument("--no-lookahead", action="store_true")
+    parser.add_argument("--planner", choices=["off", "shadow", "on"], default="off",
+                        help="common-strategy planner (pokesim.search.planner): shadow records it next to the "
+                             "current advice, on acts on it")
     parser.add_argument("--no-screen", action="store_true", help="OBS: only the team preview, enter turns by hand")
     parser.add_argument("--port", type=int, default=8100)
     parser.add_argument("--obs-source", help="OBS capture source name: watch it for the team preview")
@@ -446,7 +462,8 @@ def main() -> None:
     parser.add_argument("--obs-fps", type=float, default=4.0)
     parser.add_argument("--obs-record", type=Path, help="save changed frames here (e.g. data/raw/obs_frames)")
     args = parser.parse_args()
-    live = Live(Path(args.team), args.policy, lookahead=not args.no_lookahead)
+    planner = None if args.planner == "off" else {"mode": args.planner}
+    live = Live(Path(args.team), args.policy, lookahead=not args.no_lookahead, planner=planner)
     live.read_screen = not args.no_screen
     obs = None
     if args.obs_source:

@@ -63,3 +63,14 @@ uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_v2.zip \
   選出を登録しなくても、出てきたポケモンから自動で登録・修正します。
 - 保存した画面で読み取りを確認: `uv run python scripts/replay_frames.py /data/poke-sim/obs_frames/20261013 [--apply]`
 - 試合後: 勝敗のメッセージを読み取ると自動で（手入力時は勝ち/負けボタンで）`data/raw/live/logs/` と DB（`my_battles`, `preview_records`）に記録されます。
+  記録には使ったコード・方策・選出表の版（`versions`）が入ります。選出表が別の方策用に作られたものなら起動時に警告します。
+
+## 判断の評価基盤（[改善設計](docs/competitive-improvement-design.md) の S1/S2 と S3 の一部）
+```bash
+uv run python -m pokesim.data.curate_battles     # 対戦台帳 data/curated/{battles,decisions}.jsonl + manifest.json（live/再構成の重複は統合、曖昧なものは merge_pending）
+uv run python -m pokesim.data.split_manifest     # train/development/calibration と前向き test の分割（一度作ったら固定。--force で作り直し）
+uv run python -m pokesim.rl.human fit --records data/processed/human_records.npz --split-manifest data/curated/split_manifest.json ...
+# 共通戦略プランナー（型を知らない自分が全サンプルで同じ手を使う前提で解く）: shadow は現行の推奨と並べて記録、on はそれで行動
+uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_v2.zip --planner shadow
+uv run python scripts/ladder.py --battles 30 --planner shadow [--sample]   # --sample: 推奨分布から抽選（seed と選択確率を記録）
+```

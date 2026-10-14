@@ -90,3 +90,84 @@ def test_last_move_and_repeat_share(session):
     assert rep["move:yawn"] == pytest.approx(0.7 * plain["move:yawn"] + 0.3)
     t.apply([{"type": "switch", "side": "opp", "species": "Garchomp"}])
     assert session.last_move() is None
+
+
+def test_choice_lock_ends_when_it_switches_out():
+    sets = load_my_team(TEAM, ["Scolipede", "Floette-Eternal", "Gholdengo"])
+    sets = [dict(s, item="Choice Specs") if s["species"] == "Gholdengo" else s for s in sets]
+    s = BattleSession(sets)
+    s.preview(["Garchomp", "Primarina", "Ninetales-Alola", "Hippowdon", "Gyarados", "Kingambit"])
+    s.select([0, 1, 2])
+    t = EventTranslator(s)
+    t.apply([{"type": "switch", "side": "me", "species": "Gholdengo"},
+             {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"},
+             {"type": "move", "side": "me", "move": "shadowball"}, {"type": "turn"}])
+    assert [m.id for m in s.decision().available_moves] == ["shadowball"]
+    t.apply([{"type": "switch", "side": "me", "species": "Scolipede"}, {"type": "turn"},
+             {"type": "switch", "side": "me", "species": "Gholdengo"}, {"type": "turn"}])
+    assert len(s.decision().available_moves) == 4  # a new stint: no lock until it moves again
+
+
+def test_a_failed_search_falls_back_instead_of_losing_the_turn(session):
+    from pokesim.live.advisor import Advisor
+
+    class Broken:
+        opponent_model: dict = {}
+
+        def query(self, *args):
+            raise RuntimeError("node worker died")
+
+    t = EventTranslator(session)
+    t.apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+             {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"}])
+    advisor = Advisor(session.sets, policy=None, lookahead=False, opponent_policy=None, planner={"mode": "on"})
+    advisor.engine = Broken()
+    sug = advisor.advise(session.decision())
+    assert "node worker died" in sug.status["fallback"]
+    assert sug.actions == []  # no policy loaded either: the caller picks a legal move
+
+
+def test_shadow_failure_preserves_the_legacy_recommendation(session, monkeypatch):
+    from types import SimpleNamespace
+
+    import numpy as np
+
+    from pokesim.live.advisor import Advisor
+    from pokesim.search.lookahead import Advice
+
+    EventTranslator(session).apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+                                   {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"}])
+    advisor = Advisor(session.sets, policy=None, lookahead=False, opponent_policy=None, planner={"mode": "shadow"})
+    advisor.engine = SimpleNamespace()
+
+    def search(*args, planned=False, **kwargs):
+        if planned:
+            raise RuntimeError("shadow failed")
+        return Advice(["move:protect"], np.array([1.0]), np.array([1.0]))
+
+    monkeypatch.setattr(advisor, "_search", search)
+    sug = advisor.advise(session.decision())
+    assert sug.actions == [("move:protect", 1.0)]
+    assert "shadow failed" in sug.status["shadow"]["error"]
+    assert "fallback" not in sug.status
+
+
+def test_switch_request_keeps_the_outgoing_state_for_the_simulator(session):
+    from types import SimpleNamespace
+
+    from pokesim.rl.myteam import to_id
+    from pokesim.search.lookahead import Lookahead
+
+    EventTranslator(session).apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+                                   {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"},
+                                   {"type": "boost", "side": "me", "stat": "def", "amount": 2},
+                                   {"type": "move", "side": "me", "move": "batonpass"}])
+    battle = session.decision(force_switch=True)
+    incoming = battle.available_switches[0]
+    engine = Lookahead.__new__(Lookahead)
+    engine.sampler = SimpleNamespace(base_id=lambda sid: sid)
+    own = engine.own_side(battle, {to_id(s["species"]): s for s in session.sets}, incoming)
+    assert own["team"][0]["species"] == "Scolipede"
+    assert to_id(own["team"][own["incoming"]]["species"]) == incoming.species
+    assert own["mons"][0]["boosts"]["def"] == 2
+    assert own["switchMove"] == "batonpass"

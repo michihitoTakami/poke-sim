@@ -3,11 +3,15 @@
 // Long-running: reads one JSON request per stdin line, writes one JSON response per line.
 //
 // Usage: node lookahead.js <showdown_dir>
-// Request:  {"format", "seeds": n, "rollout": turns, "samples": [{"p1": SIDE, "p2": SIDE, "field": FIELD}, ...]}
+// Request:  {"format", "seeds": n, "rollout": turns, "winDecay": per turn (default 0.05; 0 = a win is a win whenever it
+//            comes), "samples": [{"p1": SIDE, "p2": SIDE, "field": FIELD}, ...]}
 //   SIDE  = {"team": [packed-able sets, active first], "mons": [{"hp": 0..1, "status", "boosts", "volatiles", "stall", "perish", "encore", "forme",
 //            "mega": bool}], "megaUsed": bool, "conditions": {"stealthrock": 1, "reflect": turns, ...}}
 //   FIELD = {"weather", "weatherTurns", "terrain", "terrainTurns", "trickroom": turns}
-// Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]]}, ...]} (payoff from p1's view)
+//   SIDE may include incoming (zero-based bench index) and switchMove (Baton Pass): execute its entry after restoring.
+// Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]], "invalid": [[...]]}, ...]}
+//   payoff from p1's view, averaged over the seeds whose branch ran; null when none did. invalid: per pair, how many
+//   seeds failed (an illegal pairing, e.g. a sampled move the request rejects): a failure is not scored as a result.
 const path = require('path');
 const readline = require('readline');
 const dir = process.argv[2];
@@ -27,7 +31,11 @@ function setUp(sample, format, seed) {
     const side = battle[sideId], spec = sample[sideId];
     side.pokemon.forEach((mon, i) => {
       const s = spec.mons[i] || {};
-      if (i === 0 && s.mega && mon.canMegaEvo) battle.actions.runMegaEvo(mon);
+      if (s.mega) {
+        // A previously evolved bench member remains Mega when it comes back in, even after the right was used.
+        mon.canMegaEvo = battle.actions.canMegaEvo(mon);
+        if (mon.canMegaEvo) battle.actions.runMegaEvo(mon);
+      }
       if (spec.megaUsed) mon.canMegaEvo = null;
       if (s.forme) mon.formeChange(s.forme, null, true);  // battle-only forme it is in (Mimikyu-Busted, ...)
       if (s.hp !== undefined && s.hp <= 0) {
@@ -80,7 +88,21 @@ function setUp(sample, format, seed) {
     battle.field.addPseudoWeather('trickroom', 'debug');
     battle.field.pseudoWeather.trickroom.duration = f.trickroom;
   }
-  battle.makeRequest('move');
+  for (const sideId of ['p1', 'p2']) {
+    const spec = sample[sideId];
+    if (spec.incoming === undefined) continue;
+    const incoming = battle[sideId].pokemon[spec.incoming];
+    const source = spec.switchMove ? battle.dex.moves.get(spec.switchMove) : null;
+    if (!battle.actions.switchIn(incoming, 0, source)) throw new Error('Incoming switch rejected');
+    // Execute the simulator's entry events (hazards, abilities, items and Baton Pass), without playing a turn.
+    while (!battle.ended && battle.queue.peek()?.choice === 'runSwitch') {
+      battle.runAction(battle.queue.shift());
+    }
+  }
+  if (!battle.ended) {
+    battle.checkFainted();
+    battle.makeRequest(battle.sides.some(side => side.active.some(mon => mon.switchFlag)) ? 'switch' : 'move');
+  }
   return battle;
 }
 
@@ -144,26 +166,39 @@ function material(side) {
   return side.pokemon.reduce((acc, mon) => acc + (mon.fainted ? 0 : mon.hp / mon.maxhp), 0);
 }
 
-function score(battle, startTurn) {
+function score(battle, startTurn, winDecay = WIN_DECAY) {
   let v = material(battle.p1) - material(battle.p2);
   if (battle.ended) {
-    const bonus = WIN_BONUS * Math.max(0.5, 1 - WIN_DECAY * (battle.turn - startTurn));
+    const bonus = WIN_BONUS * Math.max(0.5, 1 - winDecay * (battle.turn - startTurn));
     v += battle.winner === 'p1' ? bonus : battle.winner === 'p2' ? -bonus : 0;
   }
   return v;
 }
 
 function step(battle, c1, c2) {
-  for (const [side, c] of [[battle.p1, c1], [battle.p2, c2]]) {
-    if (side.activeRequest && !side.activeRequest.wait && c !== 'pass') battle.choose(side.id, c);
+  if (battle.ended) return;
+  const before = [battle.turn, battle.requestState, battle.log.length, battle.queue.list.length];
+  let submitted = false;
+  const pending = [[battle.p1, c1], [battle.p2, c2]].filter(([side]) => side.activeRequest && !side.activeRequest.wait);
+  for (const [side, c] of pending) {
+    if (c === 'pass' || !battle.choose(side.id, c)) {
+      throw new Error(`Choice rejected: ${side.id} ${c}: ${side.choice.error}`);
+    }
+    submitted = true;
   }
+  const after = [battle.turn, battle.requestState, battle.log.length, battle.queue.list.length];
+  if (!submitted || before.every((v, i) => v === after[i])) throw new Error('Branch made no progress');
 }
 
-function evaluate(sample, format, seeds, rollout) {
+function evaluate(sample, format, seeds, rollout, winDecay) {
   const base = setUp(sample, format, 1);
+  if (base.ended) {
+    return {p1: ['pass'], p2: ['pass'], payoff: [[score(base, base.turn, winDecay)]], invalid: [[0]]};
+  }
   const p1 = choices(base, base.p1), p2 = choices(base, base.p2);
   const snapshot = JSON.stringify(State.serializeBattle(base));
-  const payoff = p1.map(() => p2.map(() => 0));
+  const total = p1.map(() => p2.map(() => 0));
+  const invalid = p1.map(() => p2.map(() => 0));
   for (let s = 0; s < seeds; s++) {
     for (let i = 0; i < p1.length; i++) {
       for (let j = 0; j < p2.length; j++) {
@@ -171,18 +206,22 @@ function evaluate(sample, format, seeds, rollout) {
         battle.resetRNG([s * 4 + 11, s * 4 + 12, s * 4 + 13, s * 4 + 14]);
         try {
           step(battle, p1[i][0], p2[j][0]);
-          for (let turns = 0, guard = 0; !battle.ended && turns < rollout && guard < rollout * 3; guard++) {
+          let turns = 0;
+          for (let guard = 0; !battle.ended && turns < rollout && guard < rollout * 3; guard++) {
             if (battle.requestState === 'move') turns++;
             step(battle, greedy(battle, battle.p1), greedy(battle, battle.p2));
           }
+          if (!battle.ended && turns < rollout) throw new Error('Rollout did not finish');
         } catch (e) {
-          // an illegal pairing (e.g. a sampled move the request rejects) scores as no progress
+          invalid[i][j]++;  // an illegal pairing (e.g. a sampled move the request rejects): no result
+          continue;
         }
-        payoff[i][j] += score(battle, base.turn) / seeds;
+        total[i][j] += score(battle, base.turn, winDecay);
       }
     }
   }
-  return { p1: p1.map(x => x[1]), p2: p2.map(x => x[1]), payoff };
+  const payoff = total.map((row, i) => row.map((v, j) => invalid[i][j] < seeds ? v / (seeds - invalid[i][j]) : null));
+  return { p1: p1.map(x => x[1]), p2: p2.map(x => x[1]), payoff, invalid };
 }
 
 const rl = readline.createInterface({ input: process.stdin });
@@ -190,7 +229,7 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = { results: req.samples.map(s => evaluate(s, req.format, req.seeds ?? 2, req.rollout ?? 3)) };
+    reply = { results: req.samples.map(s => evaluate(s, req.format, req.seeds ?? 2, req.rollout ?? 3, req.winDecay ?? WIN_DECAY)) };
   } catch (e) {
     reply = { error: String(e && e.stack || e) };
   }
