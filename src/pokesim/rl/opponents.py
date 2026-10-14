@@ -30,7 +30,7 @@ class LeaguePlayer(Player):
     the heuristic bot with probability `p_heuristic`, else a random snapshot."""
 
     def __init__(self, *args, snapshots: list[str | Path] = (), p_heuristic: float = 0.5, seed: int = 0,
-                 p_lookahead: float = 0.0, teams: list[dict] | None = None, **kwargs):
+                 p_lookahead: float = 0.0, teams: list[dict] | None = None, prior_bundle: dict | None = None, **kwargs):
         super().__init__(*args, **kwargs)
         fmt = kwargs.get("battle_format")
         self.heuristic = SimpleHeuristicsPlayer(battle_format=fmt, start_listening=False)
@@ -38,9 +38,11 @@ class LeaguePlayer(Player):
         self.p_heuristic = p_heuristic if self.policies else 1.0
         self.p_lookahead, self.lookahead = p_lookahead, None
         if p_lookahead > 0:
+            from pokesim.data.prior_bundle import sampler
             from pokesim.search.player import LookaheadPlayer
 
-            self.lookahead = LookaheadPlayer(battle_format=fmt, teams=teams, seasons=["M-6"], start_listening=False)
+            self.lookahead = LookaheadPlayer(battle_format=fmt, teams=teams, seasons=["M-6"], start_listening=False,
+                                            sampler=sampler(prior_bundle) if prior_bundle is not None else None)
         self.rng = random.Random(seed)
         self.assigned: dict[str, object] = {}
 

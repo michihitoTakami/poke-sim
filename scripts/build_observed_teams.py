@@ -10,12 +10,11 @@ times, so `--season mix` draws real opponents often without forgetting the wider
 import argparse
 import json
 import subprocess
+from pathlib import Path
 
 from pokesim.config import FORMAT, PROCESSED_DIR, ROOT, SHOWDOWN_DIR
-from pokesim.live.observed import OUT as OBSERVED
-from pokesim.live.observed import collect, load_records
+from pokesim.live.observed import collect
 from pokesim.rl.myteam import to_id
-from pokesim.search.lookahead import SetSampler
 
 
 def validate(teams: list[list[dict]]) -> list[dict]:
@@ -26,18 +25,22 @@ def validate(teams: list[list[dict]]) -> list[dict]:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
+    from pokesim.data.dataset import add_scope_args, scope_from, write_metadata
+    from pokesim.data.prior_bundle import DEFAULT, load_bundle
+    from pokesim.data.prior_bundle import sampler as frozen_sampler
+
+    add_scope_args(ap)
+    ap.add_argument("--prior-bundle", type=Path, default=DEFAULT)
+    ap.add_argument("--out-dir", type=Path, default=PROCESSED_DIR / "scoped")
     ap.add_argument("--samples", type=int, default=6, help="teams sampled per battle")
     ap.add_argument("--weight", type=int, default=3, help="copies of each observed team in teams_mix.json")
     args = ap.parse_args()
 
-    records = load_records()
-    observed = collect(records)
-    OBSERVED.write_text(json.dumps({k: {**v, "moves": dict(v["moves"]), "items": dict(v["items"]),
-                                        "abilities": dict(v["abilities"])} for k, v in sorted(observed.items())},
-                                   ensure_ascii=False, indent=1))
-    sampler = SetSampler(["M-6"], observed=observed)
+    scope = scope_from(args)
+    records = scope.records("train")
+    sampler = frozen_sampler(load_bundle(args.prior_bundle, scope))
     candidates, meta = [], []
-    for rec in records:
+    for battle_id, rec in records:
         seen = collect([rec])
         species = [to_id(s) for s in rec["preview"]["species"]]
         for k in range(args.samples):
@@ -53,14 +56,23 @@ def main() -> None:
                 if len(items) == len(set(items)) and len(megas) <= 1:
                     break
             candidates.append(team)
-            meta.append({"battle": rec["started"], "sample": k, "result": rec.get("result")})
+            meta.append({"battle": battle_id, "sample": k, "result": rec.get("result")})
     results = validate(candidates)
     teams = [{**m, "sets": t, "packed": r["packed"]} for m, t, r in zip(meta, candidates, results) if r["ok"]]
     rejected = [r["problems"][:2] for r in results if not r["ok"]]
-    (PROCESSED_DIR / "teams_observed.json").write_text(json.dumps(teams, ensure_ascii=False, indent=1))
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    observed_path = args.out_dir / "teams_observed.json"
+    observed_path.write_text(json.dumps(teams, ensure_ascii=False, indent=1))
     pool = json.loads((PROCESSED_DIR / "teams_all.json").read_text())
     mix = pool + teams * args.weight
-    (PROCESSED_DIR / "teams_mix.json").write_text(json.dumps(mix, ensure_ascii=False))
+    mix_path = args.out_dir / "teams_mix.json"
+    mix_path.write_text(json.dumps(mix, ensure_ascii=False))
+    from pokesim.runtime.bundle import file_hash
+
+    metadata = dict(scope.metadata("train"), prior_bundle_sha=file_hash(args.prior_bundle),
+                    public_pool_sha=file_hash(PROCESSED_DIR / "teams_all.json"))
+    write_metadata(observed_path, metadata)
+    write_metadata(mix_path, metadata)
     print(f"{len(records)} battles -> {len(teams)}/{len(candidates)} legal observed teams; "
           f"teams_mix.json = {len(pool)} pool + {len(teams)} x {args.weight} observed")
     for problem in rejected[:5]:

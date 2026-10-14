@@ -106,7 +106,9 @@ def entry(kind: str, path: Path, rec: dict) -> Battle:
                   team_hash=team_hash(rec.get("team")), lineup=rec.get("lineup"), opponent_preview=preview,
                   opponent=opponent, opponent_group=f"showdown:{opponent}" if source == "showdown" and opponent
                   else None, rating=rec.get("rating"), policy=rec.get("policy"), versions=rec.get("versions"),
-                  turns=turns, quality=quality)
+                  turns=turns, quality=quality,
+                  opponent_kind=rec.get("opponent_kind", "unknown") if rec.get("opponent_kind") in
+                  {"human_confirmed", "bot_confirmed"} else "unknown")
 
 
 def same_battle(a: tuple[Battle, dict], b: tuple[Battle, dict]) -> str | None:

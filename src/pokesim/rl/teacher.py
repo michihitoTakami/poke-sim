@@ -6,8 +6,8 @@ with our real sets and, at every turn decision, runs the lookahead with many set
 policy observation (embed + TeamFeatures with items and threats), the action mask, the lookahead's equilibrium
 mix and the value of each action (a win counts 3, a Pokemon's HP 1), and what we played.
 
-The opponent's set priors only blend in sets seen in our battles played before the one being replayed
-(--observed-scope before; "all" is the old setting, which lets a battle see its own and later opponents' sets).
+The opponent's set priors are frozen on the manifest's train records. The default target is development.
+Values use the terminal planner's ranking units, not calibrated win probabilities or the old HP/+3 scale.
 
 report: for saved policies, how often their top choice is the lookahead's best action, and how often it is a
 blunder (value more than --margin below the best), on those positions.
@@ -18,6 +18,7 @@ blunder (value more than --margin below the best), on those positions.
 import argparse
 import json
 import time
+from pathlib import Path
 
 import numpy as np
 from poke_env.environment import SinglesEnv
@@ -27,17 +28,17 @@ from pokesim.live.advisor import OPPONENT_MODEL
 from pokesim.rl.features import embed
 from pokesim.rl.human import Sides, decisions, record_logs
 from pokesim.rl.myteam import TeamFeatures, to_id
-from pokesim.search.lookahead import Lookahead, SetSampler, label_to_action
+from pokesim.search.lookahead import Lookahead, label_to_action
 
-OUT = PROCESSED_DIR / "teacher.npz"
+OUT = PROCESSED_DIR / "scoped/teacher.npz"
 N_ACTIONS = 26
 
 
 class OurSides(Sides):
     """Our side (p1) plays our real sets; the opponent's side as in Sides."""
 
-    def __init__(self, team: list[dict], seed: int = 0):
-        super().__init__(seed)
+    def __init__(self, team: list[dict], seed: int = 0, sampler=None):
+        super().__init__(seed, sampler=sampler)
         self.team = {to_id(s["species"]): s for s in team}
 
     def sets(self, log: str, role: str) -> list[dict]:
@@ -52,23 +53,21 @@ class OurSides(Sides):
 
 
 def build(args) -> None:
+    from pokesim.data.dataset import scope_from, write_metadata
+    from pokesim.data.prior_bundle import load_bundle, sampler
+    from pokesim.live.advisor import PLANNER, PLANNER_SEARCH
+    from pokesim.runtime.bundle import file_hash
+    from pokesim.search.planner import plan
+
+    scope = scope_from(args)
+    bundle = load_bundle(args.prior_bundle, scope)
     team = json.loads(open(args.team).read())
     roster = [s["species"] for s in team]
-    extra = TeamFeatures(roster, items=True, threats=True)
-    from pokesim.live.observed import collect, load_records
-
-    records = load_records() if args.observed_scope == "before" else []
-
-    def sampler_before(stem: str) -> SetSampler:
-        if args.observed_scope == "all":
-            return SetSampler(["M-6"])
-        started = stem.split("/")[-1][:15]
-        earlier = [r for r in records if r.get("started", "") < started]
-        return SetSampler(["M-6"], observed=collect(earlier))
-
-    engine = Lookahead(SetSampler(["M-6"], observed={}), args.samples, args.seeds, args.rollout, OPPONENT_MODEL)
+    extra = TeamFeatures(roster, items=True, threats=True, prior_bundle=bundle)
+    settings = dict(PLANNER_SEARCH, seeds=args.seeds, rollout=args.rollout, deadlineMs=None)
+    engine = Lookahead(sampler(bundle), args.samples, args.seeds, args.rollout, OPPONENT_MODEL, search=settings)
     own = {engine.sampler.base_id(to_id(s["species"])): s for s in team}
-    sides = OurSides(team)
+    sides = OurSides(team, sampler=sampler(bundle))
     rows = {k: [] for k in ("obs", "masks", "prob", "value", "played", "battle", "turn")}
     start = time.time()
 
@@ -76,7 +75,7 @@ def build(args) -> None:
         if battle.force_switch or not battle.active_pokemon or not battle.opponent_active_pokemon:
             return None
         mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
-        advice = engine.advise(battle, own)
+        advice = plan(engine.query(battle, own), OPPONENT_MODEL, rho=PLANNER["rho"])
         prob, value = np.zeros(N_ACTIONS, np.float32), np.full(N_ACTIONS, np.nan, np.float32)
         for label, p, v in advice.ranked():
             a = label_to_action(label, battle)
@@ -87,9 +86,12 @@ def build(args) -> None:
             return None
         return np.concatenate([embed(battle), extra(battle)]), mask, prob, value
 
-    logs = record_logs()
+    logs = record_logs(records=scope.records(args.split))
+    if not logs:
+        engine.close()
+        raise ValueError(f"no eligible {args.split} records")
+    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     for k, (stem, log) in enumerate(logs):
-        engine.sampler = sampler_before(stem)
         try:
             ds, _ = decisions(log, "p1", sides, probe=probe, keep_failed=True)
         except Exception as e:  # noqa: BLE001 - a record our session cannot follow
@@ -105,14 +107,22 @@ def build(args) -> None:
         print(f"[{k + 1}/{len(logs)}] {stem}: {len(rows['obs'])} positions, {time.time() - start:.0f}s", flush=True)
         np.savez_compressed(args.out, **{k: np.array(v) for k, v in rows.items()})
     engine.close()
+    write_metadata(Path(args.out), dict(scope.metadata("train"), target_split=args.split,
+                   target_records=scope.metadata(args.split)["records"], search=settings,
+                   prior_bundle_sha=file_hash(args.prior_bundle)))
     print(f"wrote {len(rows['obs'])} positions to {args.out}")
 
 
 def report(args) -> None:
     from sb3_contrib import MaskablePPO
 
+    from pokesim.data.dataset import scope_from, validate_artifact
     from pokesim.rl.advise import action_probs
 
+    scope = scope_from(args)
+    meta = validate_artifact(Path(args.data), scope)
+    if meta.get("target_records") != scope.metadata(meta["target_split"])["records"]:
+        raise ValueError("teacher target records changed: rebuild it")
     data = np.load(args.data)
     value, masks = data["value"], data["masks"]
     best = np.nanmax(value, axis=1)
@@ -146,12 +156,17 @@ def main() -> None:
     b.add_argument("--seeds", type=int, default=3)
     b.add_argument("--rollout", type=int, default=3)
     b.add_argument("--out", default=str(OUT))
-    b.add_argument("--observed-scope", choices=["before", "none", "all"], default="before",
-                   help="sets seen in our battles: before = only battles played earlier; all = every battle")
+    from pokesim.data.dataset import add_scope_args
+    from pokesim.data.prior_bundle import DEFAULT
+
+    add_scope_args(b)
+    b.add_argument("--prior-bundle", type=Path, default=DEFAULT)
+    b.add_argument("--split", choices=["train", "development", "test"], default="development")
     r = sub.add_parser("report")
+    add_scope_args(r)
     r.add_argument("policies", nargs="*")
     r.add_argument("--data", default=str(OUT))
-    r.add_argument("--margin", type=float, default=1.0)
+    r.add_argument("--margin", type=float, default=0.15, help="planner ranking gap; not win probability")
     args = ap.parse_args()
     build(args) if args.cmd == "build" else report(args)
 

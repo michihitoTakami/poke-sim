@@ -16,6 +16,7 @@ The mask leaves out moves the log never showed (see honest_mask).
   uv run python -m pokesim.rl.human fit --init checkpoints/bc_human.zip --records data/processed/human_records.npz \
       --out checkpoints/bc_ours --epochs 10 --lr 1e-4
 """
+
 import argparse
 import hashlib
 import json
@@ -43,9 +44,40 @@ RECORDS = PROCESSED_DIR / "replayed"
 # and Switch battles only read live (data/raw/live/logs) when no rebuilt record exists for them
 RECORD_SOURCES = [RECORDS, RAW_DIR / "ladder"]
 LIVE_LOGS = RAW_DIR / "live" / "logs"
-SKIP = {"player", "poke", "clearpoke", "teampreview", "teamsize", "gen", "tier", "rule", "gametype", "badge",
-        "uhtml", "j", "l", "c", "raw", "inactive", "inactiveoff", "t:", "rated", "start", "win", "tie", "html",
-        "title", "timestamp", "seed", "n", "chat", "debug", "message", "bigerror", "error"}
+SKIP = {
+    "player",
+    "poke",
+    "clearpoke",
+    "teampreview",
+    "teamsize",
+    "gen",
+    "tier",
+    "rule",
+    "gametype",
+    "badge",
+    "uhtml",
+    "j",
+    "l",
+    "c",
+    "raw",
+    "inactive",
+    "inactiveoff",
+    "t:",
+    "rated",
+    "start",
+    "win",
+    "tie",
+    "html",
+    "title",
+    "timestamp",
+    "seed",
+    "n",
+    "chat",
+    "debug",
+    "message",
+    "bigerror",
+    "error",
+}
 
 
 @dataclass
@@ -64,8 +96,8 @@ class Decision:
 class Sides:
     """Fills the unrevealed parts of each side's sets from the set data (one sampler shared by all battles)."""
 
-    def __init__(self, seed: int = 0):
-        self.sampler = SetSampler(["M-6"], seed=seed, observed={})
+    def __init__(self, seed: int = 0, sampler=None):
+        self.sampler = SetSampler(["M-6"], seed=seed, observed={}) if sampler is None else sampler
         with Session() as s:
             self.species = {sp.id: sp for sp in s.scalars(select(Species))}
 
@@ -80,8 +112,11 @@ class Sides:
             mon = side.mons.get(sid)
             if sid not in self.sampler.species:
                 raise KeyError(sid)
-            out.append(self.sampler.sample(sid, mon.moves if mon else [], mon.item if mon else None,
-                                           mon.ability if mon else None))
+            out.append(
+                self.sampler.sample(
+                    sid, mon.moves if mon else [], mon.item if mon else None, mon.ability if mon else None
+                )
+            )
         return out
 
 
@@ -101,8 +136,9 @@ def canonical(lines: list[str], role: str, names: dict[str, str], species: dict)
             if sid in names:
                 nick[parts[2].split(": ", 1)[1]] = names[sid]
         if nick:
-            line = re.sub(rf"({role}[a-z]?): ([^|]+)", lambda m: f"{m.group(1)}: {nick.get(m.group(2), m.group(2))}",
-                          line)
+            line = re.sub(
+                rf"({role}[a-z]?): ([^|]+)", lambda m: f"{m.group(1)}: {nick.get(m.group(2), m.group(2))}", line
+            )
         out.append(line)
     return out
 
@@ -110,8 +146,14 @@ def canonical(lines: list[str], role: str, names: dict[str, str], species: dict)
 def to_action(battle, label: str) -> int | None:
     kind, _, rest = label.partition(":")
     if kind == "switch":
-        mon = next((m for m in battle.available_switches if to_id(m.species).startswith(rest)
-                    or rest.startswith(to_id(m.species))), None)
+        mon = next(
+            (
+                m
+                for m in battle.available_switches
+                if to_id(m.species).startswith(rest) or rest.startswith(to_id(m.species))
+            ),
+            None,
+        )
         order = Player.create_order(mon) if mon else None
     else:
         mid, _, mega = rest.partition(":")
@@ -204,8 +246,9 @@ def turn_choice(body: list[str], start: int, role: str, keep_failed: bool = Fals
     return None
 
 
-def decisions(log: str, role: str, sides: Sides, probe=None,
-              keep_failed: bool = False) -> tuple[list[Decision], bool | None]:
+def decisions(
+    log: str, role: str, sides: Sides, probe=None, keep_failed: bool = False
+) -> tuple[list[Decision], bool | None]:
     """All decisions `role` made in a battle log (full Showdown log text), and whether that side won.
     probe(battle, own_sets): called at each kept decision (e.g. another player's choice) -> Decision.extra.
     keep_failed: also keep moves that failed (`[still]` followed by -fail, e.g. a repeated Protect).
@@ -216,8 +259,11 @@ def decisions(log: str, role: str, sides: Sides, probe=None,
     species = sides.species
     lines = [ln for ln in log.split("\n") if ln.startswith("|")]
     winner_name = next((ln.split("|")[2] for ln in lines if ln.startswith("|win|")), None)
-    names = {ln.split("|")[2]: ln.split("|")[3] for ln in lines if ln.startswith("|player|") and
-             len(ln.split("|")) > 3 and ln.split("|")[3]}
+    names = {
+        ln.split("|")[2]: ln.split("|")[3]
+        for ln in lines
+        if ln.startswith("|player|") and len(ln.split("|")) > 3 and ln.split("|")[3]
+    }
     won = None if winner_name is None else winner_name == names.get(role, role)
     sets = sides.sets(log, role)
     revealed = sides.revealed(log, role)
@@ -236,8 +282,19 @@ def decisions(log: str, role: str, sides: Sides, probe=None,
         if mask[action]:
             last = session.last_move(role) if not force else None
             last_action = to_action(battle, last) if last else None
-            out.append(Decision(embed(battle), mask, action, label, "force" if force else "turn", turn,
-                                last, last_action, probe(battle, sets) if probe else None))
+            out.append(
+                Decision(
+                    embed(battle),
+                    mask,
+                    action,
+                    label,
+                    "force" if force else "turn",
+                    turn,
+                    last,
+                    last_action,
+                    probe(battle, sets) if probe else None,
+                )
+            )
 
     in_turn, acted = False, False
     turn = 0
@@ -295,32 +352,57 @@ def record_paths() -> list[Path]:
     return paths
 
 
-def record_logs(paths: list[Path] | None = None) -> list[tuple[str, str]]:
+def record_logs(
+    paths: list[Path] | None = None, records: list[tuple[str, dict]] | None = None
+) -> list[tuple[str, str]]:
     """Our records as logs with the opponent (p2) preview, in the replay's text form; ids are <source>/<stem>."""
     out = []
-    for p in record_paths() if paths is None else paths:
-        rec = json.loads(p.read_text())
+    inputs = records
+    if inputs is None:
+        inputs = [
+            (f"{p.parent.name}/{p.stem}", json.loads(p.read_text()))
+            for p in (record_paths() if paths is None else paths)
+        ]
+    for key, rec in inputs:
         if not rec.get("log") or not rec.get("preview"):
             continue
         lines = [ln for ln in rec["log"] if not ln.startswith("|poke|p2|")]
         at = next((i for i, ln in enumerate(lines) if ln.startswith("|poke|p1|")), 0)
         lines[at:at] = [f"|poke|p2|{s}, L50|" for s in rec["preview"]["species"]]
         if rec.get("result") in ("win", "loss") and not any(ln.startswith("|win|") for ln in lines):
-            names = {ln.split("|")[2]: ln.split("|")[3] for ln in lines
-                     if ln.startswith("|player|") and len(ln.split("|")) > 3 and ln.split("|")[3]}
+            names = {
+                ln.split("|")[2]: ln.split("|")[3]
+                for ln in lines
+                if ln.startswith("|player|") and len(ln.split("|")) > 3 and ln.split("|")[3]
+            }
             winner = "p1" if rec["result"] == "win" else "p2"
             lines.append("|win|" + names.get(winner, winner))
-        out.append((f"{p.parent.name}/{p.stem}", "\n".join(lines)))
+        out.append((key, "\n".join(lines)))
     return out
 
 
 def build(args) -> None:
-    sides = Sides(seed=0)
+    from pokesim.data.dataset import require_training_rows, scope_from, write_metadata
+    from pokesim.data.prior_bundle import load_bundle, sampler
+
+    scope = scope_from(args)
+    bundle = load_bundle(args.prior_bundle, scope)
+    sides = Sides(seed=0, sampler=sampler(bundle))
     gamma = 0.97
 
-    def dump(items, roles, path):
-        rows = {"obs": [], "masks": [], "actions": [], "returns": [], "known": [], "battle": [], "kind": [],
-                "label": [], "last": [], "turn": []}
+    def dump(items, roles, path, metadata):
+        rows = {
+            "obs": [],
+            "masks": [],
+            "actions": [],
+            "returns": [],
+            "known": [],
+            "battle": [],
+            "kind": [],
+            "label": [],
+            "last": [],
+            "turn": [],
+        }
         bad = 0
         for stem, log in items:
             for role in roles:
@@ -342,46 +424,77 @@ def build(args) -> None:
                     rows["label"].append(d.label)
                     rows["last"].append(d.last_move or "")
                     rows["turn"].append(d.turn)
-        np.savez_compressed(path, obs=np.array(rows["obs"], dtype=np.float32), masks=np.array(rows["masks"]),
-                            actions=np.array(rows["actions"]), returns=np.array(rows["returns"], dtype=np.float32),
-                            known=np.array(rows["known"], dtype=bool),
-                            battle=np.array(rows["battle"]), kind=np.array(rows["kind"]),
-                            label=np.array(rows["label"]), last=np.array(rows["last"]), turn=np.array(rows["turn"]))
+        path.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            path,
+            obs=np.array(rows["obs"], dtype=np.float32),
+            masks=np.array(rows["masks"]),
+            actions=np.array(rows["actions"]),
+            returns=np.array(rows["returns"], dtype=np.float32),
+            known=np.array(rows["known"], dtype=bool),
+            battle=np.array(rows["battle"]),
+            kind=np.array(rows["kind"]),
+            label=np.array(rows["label"]),
+            last=np.array(rows["last"]),
+            turn=np.array(rows["turn"]),
+        )
         n_turn = sum(k == "turn" for k in rows["kind"])
-        print(f"{path}: {len(rows['actions'])} decisions ({n_turn} turn, {len(rows['actions']) - n_turn} forced) "
-              f"from {len(set(rows['battle']))} sides; {bad} sides skipped", flush=True)
+        print(
+            f"{path}: {len(rows['actions'])} decisions ({n_turn} turn, {len(rows['actions']) - n_turn} forced) "
+            f"from {len(set(rows['battle']))} sides; {bad} sides skipped",
+            flush=True,
+        )
+        from pokesim.runtime.bundle import file_hash
 
-    dump(record_logs(), ["p2"], PROCESSED_DIR / "human_records.npz")
+        write_metadata(path, dict(metadata, prior_bundle_sha=file_hash(args.prior_bundle), skipped_sides=bad))
+        return np.array(rows["battle"])
+
+    records = scope.records("train") + scope.records("development")
+    meta = dict(
+        scope.metadata("train"), split="train+development", development_records=scope.metadata("development")["records"]
+    )
+    ids = dump(record_logs(records=records), ["p2"], args.records_out, meta)
+    require_training_rows(scope.indices(ids, "train"), scope.indices(ids, "development"))
     if args.records_only:
         return
     replays = replay_logs()
     if args.limit:
-        replays = replays[:args.limit]
-    dump(replays, ["p1", "p2"], PROCESSED_DIR / "human_replays.npz")
+        replays = replays[: args.limit]
+    # Our ladder battles must not appear again through the public replay corpus with another split identity.
+    own_tags = set()
+    for b in scope.battles:
+        if b.source == "showdown":
+            tag = b.battle_id.removeprefix("showdown:battle-")
+            match = re.match(r"(.+?-\d+)(?:-|$)", tag)
+            if match:
+                own_tags.add(match[1])
+    replays = [(key, log) for key, log in replays if key.removeprefix("battle-") not in own_tags]
+    dump(replays, ["p1", "p2"], args.replays_out, dict(scope.metadata("train"), split="public_replay_hash"))
 
 
 def split(battles: np.ndarray, test: float = 0.15) -> tuple[np.ndarray, np.ndarray]:
     """Train / test indices with whole replays on one side (both players of a replay together). By a hash of the
     replay id, so a replay stays on its side as more are downloaded."""
-    held = {b: int(hashlib.sha1(b.split(":")[0].encode()).hexdigest()[:8], 16) / 16 ** 8 < test
-            for b in set(battles)}
+    held = {b: int(hashlib.sha1(b.split(":")[0].encode()).hexdigest()[:8], 16) / 16**8 < test for b in set(battles)}
     is_test = np.array([held[b] for b in battles])
     return np.where(~is_test)[0], np.where(is_test)[0]
 
 
-def manifest_split(battles: np.ndarray, manifest: str) -> tuple[np.ndarray, np.ndarray]:
+def manifest_split(battles: np.ndarray, manifest: str, ledger=None) -> tuple[np.ndarray, np.ndarray]:
     """Train / held-out indices of our records from the shared split (pokesim.data.split_manifest): train battles
     to train on, development battles to choose the epoch; calibration, test, purged and unknown battles are left out
     of both."""
-    from pokesim.data.curate_battles import load
-    from pokesim.data.split_manifest import Splits
+    from pokesim.data.curate_battles import CURATED
+    from pokesim.data.dataset import DatasetScope, require_training_rows
 
-    splits, ledger = Splits(Path(manifest)), load()
-    train, dev = splits.record_keys(ledger, "train"), splits.record_keys(ledger, "development")
-    keys = np.array([b.rsplit(":", 1)[0] for b in battles])
-    tr, te = np.flatnonzero(np.isin(keys, list(train))), np.flatnonzero(np.isin(keys, list(dev)))
-    print(f"split manifest: {len(tr)} train / {len(te)} development decisions, "
-          f"{len(keys) - len(tr) - len(te)} left out (calibration / test / purged / not in the ledger)", flush=True)
+    scope = DatasetScope(ledger or CURATED / "battles.jsonl", Path(manifest))
+    tr, te = scope.indices(battles, "train"), scope.indices(battles, "development")
+    require_training_rows(tr, te)
+    print(
+        f"split manifest: {len(tr)} train / {len(te)} development decisions, "
+        f"{len(battles) - len(tr) - len(te)} left out (calibration / test / purged / not in the ledger)",
+        flush=True,
+    )
     return tr, te
 
 
@@ -394,6 +507,14 @@ def known(data) -> np.ndarray:
 
 
 def fit(args) -> None:
+    from pokesim.data.dataset import scope_from, validate_artifact
+
+    scope = scope_from(args)
+    data_meta = validate_artifact(Path(args.data), scope)
+    if args.records:
+        records_meta = validate_artifact(Path(args.records), scope)
+        if records_meta.get("prior_bundle_sha") != data_meta.get("prior_bundle_sha"):
+            raise ValueError("training artifacts use different prior bundles")
     import torch
     from sb3_contrib import MaskablePPO
 
@@ -402,20 +523,26 @@ def fit(args) -> None:
 
     data = {k: v for k, v in np.load(args.data).items()}
     data["known"] = known(data)
-    tr, te = split(data["battle"])
+    if data_meta["split"] == "train+development":
+        if args.records:
+            raise ValueError("use real-battle data either as --data or --records, not both")
+        tr, te = manifest_split(data["battle"], args.split_manifest, args.ledger)
+    elif data_meta["split"] == "public_replay_hash":
+        tr, te = split(data["battle"])
+    else:
+        raise ValueError("unsupported training artifact split")
     te_rec = np.array([], dtype=int)
     if args.records:  # our opponents: held out by battle, the rest repeated --records-weight times
         rec = np.load(args.records)
-        if args.split_manifest:
-            rtr, rte = manifest_split(rec["battle"], args.split_manifest)
-        else:
-            rtr, rte = split(rec["battle"], test=args.records_test)
+        rtr, rte = manifest_split(rec["battle"], args.split_manifest, args.ledger)
         n = len(data["actions"])
         for k in ("obs", "masks", "actions", "returns", "known"):
             data[k] = np.concatenate([data[k], known(rec) if k == "known" else rec[k]])
         tr = np.concatenate([tr] + [rtr + n] * args.records_weight)
         te_rec = rte + n
         print(f"records: {len(rtr)} train decisions (x{args.records_weight}), {len(rte)} held out", flush=True)
+    if not len(tr) or not len(te):
+        raise ValueError("training and validation decisions must both be nonempty")
     obs, masks = torch.tensor(data["obs"]), data["masks"]
     actions, rets = torch.tensor(data["actions"]), torch.tensor(data["returns"])
     has_result = torch.tensor(data["known"])
@@ -440,13 +567,18 @@ def fit(args) -> None:
     best, best_state = -1e9, None
     if len(te_rec):
         policy.eval()
-        print("before: held-out replays top-1 {:.1%} log-lik {:.2f} | held-out records top-1 {:.1%} log-lik {:.2f}"
-              .format(*evaluate(te), *evaluate(te_rec)), flush=True)
+        print(
+            ("before: held-out replays top-1 {:.1%} log-lik {:.2f} | "
+             "held-out records top-1 {:.1%} log-lik {:.2f}").format(
+                *evaluate(te), *evaluate(te_rec)
+            ),
+            flush=True,
+        )
     for epoch in range(args.epochs):
         policy.train()
         order = tr[np.random.permutation(len(tr))]
         for i in range(0, len(order), args.batch):
-            idx = order[i:i + args.batch]
+            idx = order[i : i + args.batch]
             o = obs[idx].to(device)
             dist = policy.get_distribution(o, action_masks=masks[idx])
             logp = dist.log_prob(actions[idx].to(device))
@@ -469,6 +601,13 @@ def fit(args) -> None:
             best, best_state = ll, {k: v.clone() for k, v in policy.state_dict().items()}
     policy.load_state_dict(best_state)
     model.save(args.out)
+    from pokesim.data.dataset import write_metadata
+    from pokesim.runtime.bundle import file_hash
+
+    output = Path(args.out if str(args.out).endswith(".zip") else str(args.out) + ".zip")
+    write_metadata(output, dict(scope.metadata("train"), prior_bundle_sha=data_meta["prior_bundle_sha"],
+                                data_sha=file_hash(args.data), records_data_sha=file_hash(args.records),
+                                development_records=scope.metadata("development")["records"]))
     print(f"saved {args.out}.zip (best held-out log-lik {best:.2f})")
 
 
@@ -478,8 +617,15 @@ def main() -> None:
     b = sub.add_parser("build")
     b.add_argument("--limit", type=int, default=0)
     b.add_argument("--records-only", action="store_true", help="only rebuild human_records.npz")
+    from pokesim.data.dataset import add_scope_args
+    from pokesim.data.prior_bundle import DEFAULT
+
+    add_scope_args(b)
+    b.add_argument("--prior-bundle", type=Path, default=DEFAULT)
+    b.add_argument("--records-out", type=Path, default=PROCESSED_DIR / "scoped/human_records.npz")
+    b.add_argument("--replays-out", type=Path, default=PROCESSED_DIR / "scoped/human_replays.npz")
     f = sub.add_parser("fit")
-    f.add_argument("--data", default=str(PROCESSED_DIR / "human_replays.npz"))
+    f.add_argument("--data", default=str(PROCESSED_DIR / "scoped/human_replays.npz"))
     f.add_argument("--init", help="start from this policy (e.g. checkpoints/ppo_m6_league3m.zip)")
     f.add_argument("--out", default="checkpoints/bc_human")
     f.add_argument("--epochs", type=int, default=30)
@@ -487,12 +633,14 @@ def main() -> None:
     f.add_argument("--lr", type=float, default=3e-4)
     f.add_argument("--weight-decay", type=float, default=1e-4)
     f.add_argument("--vf-coef", type=float, default=0.1)
-    f.add_argument("--records", help="also train on our opponents (data/processed/human_records.npz); the best "
-                                     "epoch is then chosen on its held-out battles")
+    f.add_argument(
+        "--records",
+        help="also train on our opponents (data/processed/human_records.npz); the best "
+        "epoch is then chosen on its held-out battles",
+    )
     f.add_argument("--records-weight", type=int, default=10)
     f.add_argument("--records-test", type=float, default=0.25)
-    f.add_argument("--split-manifest", help="hold out our records by the shared split (data/curated/"
-                                            "split_manifest.json) instead of a hash share")
+    add_scope_args(f)
     args = ap.parse_args()
     build(args) if args.cmd == "build" else fit(args)
 

@@ -110,9 +110,10 @@ class BatonScript(Player):
 class PolicyPilot(BatonScript):
     """Plays a trained fixed-team policy (pokesim.rl.train --my-team) instead of the script; keeps the logging."""
 
-    def __init__(self, *args, policy: str, roster: list[str], deterministic: bool = True, **kwargs):
+    def __init__(self, *args, policy: str, roster: list[str], deterministic: bool = True,
+                 prior_bundle: dict | None = None, **kwargs):
         self.model = MaskablePPO.load(policy, device="cpu")
-        self.extra, self.deterministic = TeamFeatures.for_model(self.model, roster), deterministic
+        self.extra, self.deterministic = TeamFeatures.for_model(self.model, roster, prior_bundle), deterministic
         super().__init__(*args, **kwargs)
 
     def choose_move(self, battle):

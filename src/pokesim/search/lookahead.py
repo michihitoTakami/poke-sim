@@ -109,14 +109,16 @@ class SetSampler:
     """Samples plausible full sets for an opponent's Pokémon given what has been revealed."""
 
     def __init__(self, seasons: list[str], seed: int = 0, observed: dict | None = None,
-                 observed_weight: float = OBSERVED_WEIGHT, utility: float = UTILITY_PSEUDO):
+                 observed_weight: float = OBSERVED_WEIGHT, utility: float = UTILITY_PSEUDO,
+                 summary: dict[str, SpeciesSummary] | None = None):
         self.observed_weight, self.utility = observed_weight, utility
-        articles = {x.species_id: x for x in summarize(seasons)}
-        smogon = smogon_summaries()
-        self.summary: dict[str, SpeciesSummary] = {}
-        for sid in set(articles) | set(smogon):
-            cands = [t[sid] for t in (articles, smogon) if sid in t]
-            self.summary[sid] = next((c for c in cands if c.teams >= 3), cands[0])
+        self.summary: dict[str, SpeciesSummary] = {} if summary is None else summary
+        if summary is None:
+            articles = {x.species_id: x for x in summarize(seasons)}
+            smogon = smogon_summaries()
+            for sid in set(articles) | set(smogon):
+                cands = [t[sid] for t in (articles, smogon) if sid in t]
+                self.summary[sid] = next((c for c in cands if c.teams >= 3), cands[0])
         self.observed = self._blend_observed(observed if observed is not None else load_observed())
         with Session() as s:
             self.species = {sp.id: sp for sp in s.scalars(select(Species))}
