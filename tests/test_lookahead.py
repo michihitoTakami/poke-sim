@@ -2,6 +2,7 @@ import json
 import subprocess
 
 import numpy as np
+import pytest
 
 from pokesim.config import ROOT, SHOWDOWN_DIR
 from pokesim.search.lookahead import solve_zero_sum
@@ -41,6 +42,25 @@ def test_finishing_a_low_hp_foe_beats_protect():
     assert res["p2"][-1].startswith("move:")  # no switch options: both bench mons fainted
     value = dict(zip(res["p1"], np.array(res["payoff"]).mean(axis=1)))
     assert value["move:earthquake"] > value["move:protect"] + 2  # the win bonus
+    assert np.array(res["invalid"]).sum() == 0  # every branch ran
+
+
+def test_win_decay_zero_scores_a_win_the_same_whenever_it_comes():
+    sample = {"p1": {"team": [CHOMP, ROTOM, HIPPO], "mons": [{"hp": 1.0, "boosts": {"atk": 2}}]},
+              "p2": {"team": [HIPPO, ROTOM, CHOMP], "mons": [{"hp": 0.1}, {"hp": 0}, {"hp": 0}]}, "field": {}}
+
+    def gap(decay):
+        req = {"format": "gen9championsbssregmc", "seeds": 1, "rollout": 3, "samples": [sample]}
+        if decay is not None:
+            req["winDecay"] = decay
+        out = subprocess.run(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
+                             input=json.dumps(req) + "\n", capture_output=True, text=True, check=True).stdout
+        res = json.loads(out)["results"][0]
+        value = dict(zip(res["p1"], np.array(res["payoff"]).mean(axis=1)))
+        return value["move:earthquake"] - value["move:protect"]
+
+    # both win (Protect a turn later): the default decay prefers the quicker win by 3 * 0.05, decay 0 does not
+    assert gap(None) - gap(0) == pytest.approx(0.15, abs=0.01)
 
 
 def test_levitate_switch_absorbs_earthquake():

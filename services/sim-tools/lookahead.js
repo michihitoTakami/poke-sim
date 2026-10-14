@@ -3,11 +3,14 @@
 // Long-running: reads one JSON request per stdin line, writes one JSON response per line.
 //
 // Usage: node lookahead.js <showdown_dir>
-// Request:  {"format", "seeds": n, "rollout": turns, "samples": [{"p1": SIDE, "p2": SIDE, "field": FIELD}, ...]}
+// Request:  {"format", "seeds": n, "rollout": turns, "winDecay": per turn (default 0.05; 0 = a win is a win whenever it
+//            comes), "samples": [{"p1": SIDE, "p2": SIDE, "field": FIELD}, ...]}
 //   SIDE  = {"team": [packed-able sets, active first], "mons": [{"hp": 0..1, "status", "boosts", "volatiles", "stall", "perish", "encore", "forme",
 //            "mega": bool}], "megaUsed": bool, "conditions": {"stealthrock": 1, "reflect": turns, ...}}
 //   FIELD = {"weather", "weatherTurns", "terrain", "terrainTurns", "trickroom": turns}
-// Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]]}, ...]} (payoff from p1's view)
+// Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]], "invalid": [[...]]}, ...]}
+//   payoff from p1's view, averaged over the seeds whose branch ran; null when none did. invalid: per pair, how many
+//   seeds failed (an illegal pairing, e.g. a sampled move the request rejects): a failure is not scored as a result.
 const path = require('path');
 const readline = require('readline');
 const dir = process.argv[2];
@@ -144,10 +147,10 @@ function material(side) {
   return side.pokemon.reduce((acc, mon) => acc + (mon.fainted ? 0 : mon.hp / mon.maxhp), 0);
 }
 
-function score(battle, startTurn) {
+function score(battle, startTurn, winDecay = WIN_DECAY) {
   let v = material(battle.p1) - material(battle.p2);
   if (battle.ended) {
-    const bonus = WIN_BONUS * Math.max(0.5, 1 - WIN_DECAY * (battle.turn - startTurn));
+    const bonus = WIN_BONUS * Math.max(0.5, 1 - winDecay * (battle.turn - startTurn));
     v += battle.winner === 'p1' ? bonus : battle.winner === 'p2' ? -bonus : 0;
   }
   return v;
@@ -159,11 +162,12 @@ function step(battle, c1, c2) {
   }
 }
 
-function evaluate(sample, format, seeds, rollout) {
+function evaluate(sample, format, seeds, rollout, winDecay) {
   const base = setUp(sample, format, 1);
   const p1 = choices(base, base.p1), p2 = choices(base, base.p2);
   const snapshot = JSON.stringify(State.serializeBattle(base));
-  const payoff = p1.map(() => p2.map(() => 0));
+  const total = p1.map(() => p2.map(() => 0));
+  const invalid = p1.map(() => p2.map(() => 0));
   for (let s = 0; s < seeds; s++) {
     for (let i = 0; i < p1.length; i++) {
       for (let j = 0; j < p2.length; j++) {
@@ -176,13 +180,15 @@ function evaluate(sample, format, seeds, rollout) {
             step(battle, greedy(battle, battle.p1), greedy(battle, battle.p2));
           }
         } catch (e) {
-          // an illegal pairing (e.g. a sampled move the request rejects) scores as no progress
+          invalid[i][j]++;  // an illegal pairing (e.g. a sampled move the request rejects): no result
+          continue;
         }
-        payoff[i][j] += score(battle, base.turn) / seeds;
+        total[i][j] += score(battle, base.turn, winDecay);
       }
     }
   }
-  return { p1: p1.map(x => x[1]), p2: p2.map(x => x[1]), payoff };
+  const payoff = total.map((row, i) => row.map((v, j) => invalid[i][j] < seeds ? v / (seeds - invalid[i][j]) : null));
+  return { p1: p1.map(x => x[1]), p2: p2.map(x => x[1]), payoff, invalid };
 }
 
 const rl = readline.createInterface({ input: process.stdin });
@@ -190,7 +196,7 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = { results: req.samples.map(s => evaluate(s, req.format, req.seeds ?? 2, req.rollout ?? 3)) };
+    reply = { results: req.samples.map(s => evaluate(s, req.format, req.seeds ?? 2, req.rollout ?? 3, req.winDecay ?? WIN_DECAY)) };
   } catch (e) {
     reply = { error: String(e && e.stack || e) };
   }

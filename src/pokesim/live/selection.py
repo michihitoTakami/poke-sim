@@ -100,11 +100,28 @@ class PickModel:
 class MatchupModel:
     """logit P(win) = bias[lineup] + sum over brought opponent members of effect[lineup][species] (fitted offline).
 
-    A lineup key is "lead,second,third" (our species ids). Unknown species fall back to the lineup's mean effect."""
+    A lineup key is "lead,second,third" (our species ids). Unknown species fall back to the lineup's mean effect.
+    `meta` says what the table was fitted from (scripts/sim_matchups.py fit): the policy that played the simulated
+    games (policy_sha), the data file and when. A table fitted for another policy is a reference only."""
 
     def __init__(self, path: Path = MATCHUP_MODEL):
         data = json.loads(path.read_text()) if path.exists() else {"lineups": {}}
         self.lineups: dict[str, dict] = data["lineups"]
+        self.meta: dict = data.get("meta", {})
+
+    def check(self, policy: str | Path | None) -> str | None:
+        """Why the table may not fit the policy that will play (None when it does, or there is no policy)."""
+        from pokesim.runtime.bundle import file_hash
+
+        if not policy or not self.lineups:
+            return None
+        sha = file_hash(policy)
+        fitted = self.meta.get("policy_sha")
+        if fitted is None:
+            return "fitted before policy versions were recorded: its win chances are for an unknown policy"
+        if fitted != sha:
+            return f"fitted for policy {fitted}, playing {sha}: its win chances are a reference only"
+        return None
 
     def win_prob(self, lineup: str, picks: OpponentPicks) -> float | None:
         m = self.lineups.get(lineup)

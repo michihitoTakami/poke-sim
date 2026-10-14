@@ -1,0 +1,127 @@
+"""One strategy for every sampled world: the lookahead's root decision when we do not know the opponent's sets.
+
+The legacy aggregate (pokesim.search.lookahead.aggregate) solves each sampled world's matrix game on its own and
+averages the solutions. That mixes strategies that each assume we know the world: "attack if it is set A, set up if
+it is set B" averages to half attack / half set up, which can be bad in both worlds while a third action is safe in
+both. Here our mix x is shared by all worlds (we see the same thing in each), and solved as one linear program:
+
+  maximize over x:  (1 - rho) * sum_g w_g x^T Q_g q_g  +  rho * sum_g w_g min_b x^T Q_g[:, b]
+
+Q_g is world g's payoff matrix (our options x the opponent's), w_g its weight, q_g the predicted opponent mix in it
+(fixed before solving: the opponent model's prediction, optionally mixed with a policy cloned from people). rho is
+how much we guard against the prediction being wrong: each world's worst case is taken over the opponent's options
+in that world (the opponent knows its own set, so its options differ by world). rho = 0 trusts the prediction,
+rho = 1 is the worst case in every world.
+
+Each world is its own group for the worst case: our sets are the same in all of them, so worlds only differ in what
+the opponent knows anyway.
+"""
+from dataclasses import dataclass, field
+
+import numpy as np
+from scipy.optimize import linprog
+
+from pokesim.search.lookahead import Advice, clean, opponent_mix, solve_zero_sum
+
+RHO = 0.3  # initial guard against a wrong prediction; to be set on development data, not on test results
+
+
+@dataclass
+class World:
+    payoff: np.ndarray  # our options (common order) x this world's opponent options
+    opponent: list[str]  # this world's opponent labels
+    weight: float = 1.0
+    predicted: np.ndarray | None = None  # opponent mix in this world (fixed before solving)
+
+
+@dataclass
+class Solution:
+    prob: np.ndarray  # our common mix
+    expected: np.ndarray  # per action: sum_g w_g Q_g q_g (against the prediction)
+    worst: np.ndarray  # per action: sum_g w_g min_b Q_g[a, b]
+    status: dict = field(default_factory=dict)
+
+
+def solve_common(worlds: list[World], rho: float = RHO) -> Solution:
+    """The common mix maximizing the objective above (scipy's HiGHS LP). Falls back to the best action against the
+    prediction when the solver fails."""
+    n = worlds[0].payoff.shape[0]
+    w = np.array([wd.weight for wd in worlds], dtype=float)
+    w = w / w.sum()
+    expected = sum(wg * wd.payoff @ wd.predicted for wg, wd in zip(w, worlds))
+    worst = sum(wg * wd.payoff.min(axis=1) for wg, wd in zip(w, worlds))
+    g = len(worlds)
+    # variables: x (n), t (g); linprog minimizes
+    c = -np.concatenate([(1 - rho) * expected, rho * w])
+    rows = []
+    for k, wd in enumerate(worlds):
+        for b in range(wd.payoff.shape[1]):  # t_k - x^T Q_k[:, b] <= 0
+            row = np.zeros(n + g)
+            row[:n] = -wd.payoff[:, b]
+            row[n + k] = 1.0
+            rows.append(row)
+    a_eq = np.concatenate([np.ones(n), np.zeros(g)])[None, :]
+    bounds = [(0, 1)] * n + [(None, None)] * g
+    res = linprog(c, A_ub=np.array(rows), b_ub=np.zeros(len(rows)), A_eq=a_eq, b_eq=[1.0], bounds=bounds,
+                  method="highs")
+    if res.success:
+        x = np.clip(res.x[:n], 0, None)
+        x = x / x.sum()
+        status = {"solver": "highs", "objective": float(-res.fun)}
+    else:
+        x = np.zeros(n)
+        x[int(np.argmax(expected))] = 1.0
+        status = {"solver": "fallback", "reason": res.message}
+    return Solution(x, expected, worst, status)
+
+
+def base_label(label: str) -> str:
+    return ":".join(label.split(":")[:2])
+
+
+def predict(payoff: np.ndarray, labels: list[str], opponent_model: dict, last_move: str | None,
+            cloned: dict[str, float] | None, cloned_weight: float) -> np.ndarray:
+    """The opponent's mix in one world, fixed before planning: the search's prediction (equilibrium / softmax best
+    response to our equilibrium, see opponent_mix), a share for repeating its last move, then a share for the
+    cloned human policy (its labels have no Mega variants: split over them)."""
+    x, y = solve_zero_sum(payoff)
+    q = opponent_mix(payoff, x, y, opponent_model)
+    repeat = opponent_model.get("repeat", 0.0)
+    if repeat > 0 and last_move in labels:
+        q = (1 - repeat) * q
+        q[labels.index(last_move)] += repeat
+    if cloned:
+        bases = [base_label(lab) for lab in labels]
+        bc = np.array([cloned.get(b, 0.0) / bases.count(b) for b in bases])
+        if bc.sum() > 0:
+            q = (1 - cloned_weight) * q + cloned_weight * bc / bc.sum()
+    return q / q.sum()
+
+
+def plan(results: list[dict], opponent_model: dict | None = None, last_move: str | None = None,
+         rho: float = RHO, cloned: dict[str, float] | None = None, cloned_weight: float = 0.5) -> Advice:
+    """Advice from the lookahead's sampled worlds with one common mix (see the module docstring).
+    value[a] is the expected score against the predicted opponent; the opponent dict the predicted mix averaged
+    over worlds. Worlds where every branch failed are left out and counted in status."""
+    labels = results[0]["p1"]
+    worlds, failed_cells, failed_worlds = [], 0, 0
+    for res in results:
+        try:
+            payoff, opp, failed = clean(res)
+        except ValueError:
+            failed_worlds += 1
+            continue
+        idx = [res["p1"].index(lab) for lab in labels]  # our options are the same in every world
+        payoff = payoff[idx]
+        q = predict(payoff, opp, opponent_model or {}, last_move, cloned, cloned_weight)
+        worlds.append(World(payoff, opp, 1.0, q))
+        failed_cells += failed
+    if not worlds:
+        raise ValueError("every sampled world failed")
+    sol = solve_common(worlds, rho)
+    opponent: dict[str, float] = {}
+    for wd in worlds:
+        for lab, p in zip(wd.opponent, wd.predicted):
+            opponent[lab] = opponent.get(lab, 0.0) + float(p) / len(worlds)
+    status = dict(sol.status, rho=rho, worlds=len(worlds), failed_worlds=failed_worlds, failed_cells=failed_cells)
+    return Advice(labels, sol.prob, sol.expected, opponent, status=status, worst=sol.worst)

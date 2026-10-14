@@ -7,6 +7,12 @@ Sources, combined when both are available:
   over sets sampled for the opponent from usage data and everything revealed so far.
 The opponent's next action mixes the search's prediction with a policy cloned from human players
 (pokesim.live.opponent), which needs the battle's protocol lines (`log`).
+
+Planner (feature flag, `planner={"mode": "shadow" | "on", "rho": ...}`): the lookahead's worlds are solved for one
+common mix (pokesim.search.planner) with the opponent prediction, cloned policy included, fixed before solving.
+"shadow" computes it next to the legacy advice (Suggestion.shadow) without acting on it; "on" acts on it, the
+policy only as the fallback. A forced switch is searched too (each Pokémon we can send in, by the position it
+starts), and a failed search falls back to the policy (Suggestion.status["fallback"]).
 """
 import time
 from dataclasses import dataclass, field
@@ -22,7 +28,7 @@ from pokesim.rl.advise import action_probs
 from pokesim.rl.env import REWARDS
 from pokesim.rl.features import embed
 from pokesim.rl.myteam import TeamFeatures, to_id
-from pokesim.search.lookahead import Lookahead, SetSampler, label_to_action
+from pokesim.search.lookahead import Lookahead, SetSampler, aggregate, label_to_action
 
 POLICY_WEIGHT = 0.5  # share of the policy in the combined recommendation
 # How the policy and the lookahead are combined (see combine()). "linear" was the plain average of the two
@@ -38,6 +44,11 @@ class Suggestion:
     policy: dict[str, float] = field(default_factory=dict)
     lookahead: list[tuple[str, float, float]] = field(default_factory=list)  # (label, prob, value)
     elapsed: float = 0.0
+    # win_prob is the PPO critic mapped to [0, 1]: its rewards include HP / faint shaping and discounting, so it is
+    # not a calibrated win probability
+    win_kind: str = "policy value (uncalibrated)"
+    status: dict = field(default_factory=dict)  # mode, fallback reason, failed branches, solver
+    shadow: list[tuple[str, float, float]] = field(default_factory=list)  # planner advice in shadow mode
 
 
 def action_label(action: int, battle: Battle) -> str | None:
@@ -58,20 +69,27 @@ def action_label(action: int, battle: Battle) -> str | None:
 OPPONENT_MODEL = {"br_weight": 0.75, "tau": 0.7, "repeat": 0.3}
 # share of the cloned human policy in the opponent prediction (scripts/eval_records.py score --bc-weight)
 OPPONENT_POLICY_WEIGHT = 0.5
+# planner defaults (pokesim.search.planner): rho guards against a wrong opponent prediction; win_decay 0 scores a
+# win the same whenever it comes ("on" only); initial values, to be set on development data
+PLANNER = {"mode": "shadow", "rho": 0.3, "cloned_weight": OPPONENT_POLICY_WEIGHT, "win_decay": 0.0}
 
 
 class Advisor:
     def __init__(self, sets: list[dict], policy: str | None = None, lookahead: bool = True,
                  seasons: tuple[str, ...] = ("M-6",), samples: int = 6, seeds: int = 2, rollout: int = 3,
                  reward: str = "sparse", opponent_model: dict | None = None,
-                 opponent_policy: str | Path | None = "default", combine: dict | None = None):
+                 opponent_policy: str | Path | None = "default", combine: dict | None = None,
+                 planner: dict | None = None):
         self.model = MaskablePPO.load(policy, device="cpu") if policy else None
         roster = [s["species"] for s in sets]
         self.extra = TeamFeatures.for_model(self.model, roster) if self.model else TeamFeatures(roster)
         self.victory = REWARDS[reward]["victory_value"]
         self.combine = dict(COMBINE, **(combine or {}))
+        self.planner = dict(PLANNER, **planner) if planner else None
         model = OPPONENT_MODEL if opponent_model is None else opponent_model
-        self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout, model) if lookahead else None
+        win_decay = self.planner.get("win_decay") if self.planner and self.planner["mode"] == "on" else None
+        self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout, model,
+                                win_decay=win_decay) if lookahead else None
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
         self.opponent_policy = None
@@ -109,19 +127,68 @@ class Advisor:
         log: the battle's protocol lines so far (BattleSession.log), for the cloned opponent policy."""
         start = time.perf_counter()
         policy, win = self._policy(battle)
-        ranked, opponent = [], []
-        can_search = self.engine and not battle.force_switch and battle.active_pokemon \
-            and battle.opponent_active_pokemon
-        if can_search:
-            advice = self.engine.advise(battle, self.own_sets, last_move)
-            mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
-            ranked = [(lab, p, v) for lab, p, v in advice.ranked()
-                      if (a := label_to_action(lab, battle)) is not None and mask[a]]
-            opponent = sorted(advice.opponent.items(), key=lambda kv: -kv[1])
-        actions = combine(policy, ranked, **self.combine)
+        ranked, opponent, shadow = [], [], []
+        mode = self.planner["mode"] if self.planner else "legacy"
+        status: dict = {"mode": mode}
+        cloned = []
         if self.opponent_policy is not None and log and battle.opponent_active_pokemon is not None:
-            opponent = mix_opponent(opponent, self.opponent_policy.predict(log, our_role))
-        return Suggestion(actions, win, opponent, policy, ranked, time.perf_counter() - start)
+            cloned = self.opponent_policy.predict(log, our_role)
+        opp_active = battle.opponent_active_pokemon
+        can_search = self.engine and opp_active is not None and not opp_active.fainted and \
+            (battle.active_pokemon is not None or battle.force_switch)
+        mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
+
+        def legal(advice):
+            return [(lab, p, v) for lab, p, v in advice.ranked()
+                    if (a := label_to_action(lab, battle)) is not None and mask[a]]
+
+        if can_search:
+            try:
+                cache: dict = {}
+                advice = self._search(battle, last_move, dict(cloned), planned=mode == "on", cache=cache)
+                ranked = legal(advice)
+                opponent = sorted(advice.opponent.items(), key=lambda kv: -kv[1])
+                status["search"] = advice.status
+                if mode == "shadow":
+                    planned = self._search(battle, last_move, dict(cloned), planned=True, cache=cache)
+                    shadow = legal(planned)
+                    status["shadow"] = planned.status
+            except Exception as e:  # noqa: BLE001 - a failed search must not lose the turn: the policy decides
+                ranked = []
+                status["fallback"] = f"search failed: {e!r}"[:200]
+        if mode == "on" and ranked:  # the plan decides; the policy is only the fallback
+            total = sum(p for _, p, _ in ranked)
+            actions = sorted(((lab, p / total) for lab, p, _ in ranked), key=lambda kv: -kv[1]) if total > 0 \
+                else combine({}, ranked, **self.combine)
+        else:
+            actions = combine(policy, ranked, **self.combine)
+        if mode != "on" and cloned:
+            opponent = mix_opponent(opponent, cloned)
+        if not actions and not status.get("fallback") and not policy:
+            status["fallback"] = "no advice"
+        return Suggestion(actions, win, opponent, policy, ranked, time.perf_counter() - start, status=status,
+                          shadow=shadow)
+
+    def _search(self, battle: Battle, last_move: str | None, cloned: dict[str, float], planned: bool,
+                cache: dict | None = None):
+        """The legacy aggregate or the planner (planned) on the lookahead's worlds; cache keeps the worlds of one
+        position (by incoming Pokémon) so shadow mode solves the same worlds both ways."""
+        from pokesim.search.planner import plan
+
+        engine = self.engine
+        cache = {} if cache is None else cache
+
+        def solve(b, own, last, incoming=None):
+            key = None if incoming is None else incoming.species
+            if key not in cache:
+                cache[key] = engine.query(b, own, incoming)
+            if planned:
+                return plan(cache[key], engine.opponent_model, last, self.planner["rho"], cloned or None,
+                            self.planner["cloned_weight"])
+            return aggregate(cache[key], engine.opponent_model, last)
+        if battle.force_switch or battle.active_pokemon is None or battle.active_pokemon.fainted:
+            return engine.advise_switch(battle, self.own_sets, last_move, solve)
+        return solve(battle, self.own_sets, last_move)
 
 
 def combine(policy: dict[str, float], ranked: list[tuple[str, float, float]], mode: str = "product",

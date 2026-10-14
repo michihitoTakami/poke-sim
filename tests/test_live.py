@@ -107,3 +107,21 @@ def test_choice_lock_ends_when_it_switches_out():
              {"type": "switch", "side": "me", "species": "Gholdengo"}, {"type": "turn"}])
     assert len(s.decision().available_moves) == 4  # a new stint: no lock until it moves again
 
+
+def test_a_failed_search_falls_back_instead_of_losing_the_turn(session):
+    from pokesim.live.advisor import Advisor
+
+    class Broken:
+        opponent_model: dict = {}
+
+        def query(self, *args):
+            raise RuntimeError("node worker died")
+
+    t = EventTranslator(session)
+    t.apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+             {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"}])
+    advisor = Advisor(session.sets, policy=None, lookahead=False, opponent_policy=None, planner={"mode": "on"})
+    advisor.engine = Broken()
+    sug = advisor.advise(session.decision())
+    assert "node worker died" in sug.status["fallback"]
+    assert sug.actions == []  # no policy loaded either: the caller picks a legal move
