@@ -119,3 +119,19 @@ def test_a_deadline_stops_between_passes_for_every_sample():
     d, planned = done.pop()
     assert 1 <= d < planned == 100
     assert all(v is not None for r in results for row in r["payoff"] for v in row)
+    assert d % 2 == 0  # complete cycles: neither policy disappears when the deadline is short
+    assert all(set(r["byContinuation"]) == {"greedy", "tactical"} for r in results)
+
+
+def test_damage_source_respects_type_conversion_and_ability_immunities():
+    gengar = dict(CHOMP, species="Gengar", ability="Cursed Body", item="Gengarite",
+                  moves=["Shadow Ball", "Sludge Bomb", "Protect", "Will-O-Wisp"])
+    mence = dict(CHOMP, species="Salamence", ability="Intimidate", item="Salamencite",
+                 moves=["Double-Edge", "Protect", "Roost", "Dragon Dance"])
+    sample = {"p1": {"team": [PASSER, mence], "mons": [{"hp": 1}, {"hp": 1, "mega": True}], "megaUsed": True},
+              "p2": {"team": [gengar], "mons": [{"hp": 1}]}, "field": {}}
+    assert run("const b=setUp(sample,format,1); console.log(JSON.stringify(hasDamageSource(b,b.p1)));", sample)
+    sample["p1"] = {"team": [dict(CHOMP, moves=["Earthquake", "Protect", "Swords Dance", "Substitute"])],
+                    "mons": [{"hp": 1}]}
+    sample["p2"] = {"team": [dict(gengar, ability="Levitate")], "mons": [{"hp": 1}]}
+    assert not run("const b=setUp(sample,format,1); console.log(JSON.stringify(hasDamageSource(b,b.p1)));", sample)

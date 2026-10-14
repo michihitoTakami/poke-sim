@@ -86,15 +86,9 @@ class Advisor:
                  seasons: tuple[str, ...] = ("M-6",), samples: int = 6, seeds: int = 2, rollout: int = 3,
                  reward: str = "sparse", opponent_model: dict | None = None,
                  opponent_policy: str | Path | None = "default", combine: dict | None = None,
-                 planner: dict | None = None, source: str | None = None):
+                 planner: dict | None = None, source: str | None = None, sample: bool = False):
         """source: where the advice is used ("switch" / "showdown"), for the win calibration."""
         self.model = MaskablePPO.load(policy, device="cpu") if policy else None
-        self.calibration = None
-        if policy:
-            from pokesim.evaluation.calibration import Calibrations
-            from pokesim.runtime.bundle import file_hash
-
-            self.calibration = Calibrations().get(source, file_hash(policy))
         roster = [s["species"] for s in sets]
         self.extra = TeamFeatures.for_model(self.model, roster) if self.model else TeamFeatures(roster)
         self.victory = REWARDS[reward]["victory_value"]
@@ -102,6 +96,15 @@ class Advisor:
         self.planner = dict(PLANNER, **planner) if planner else None
         if self.planner:
             self.planner["search"] = dict(PLANNER_SEARCH, **self.planner.get("search", {}))
+        from pokesim.evaluation.calibration import Calibrations, continuation_context
+        from pokesim.runtime.bundle import file_hash
+
+        self.calibrations = Calibrations()
+        self.calibration_context = continuation_context(
+            sets, self.planner if self.planner and self.planner["mode"] == "on" else None,
+            self.combine, reward, lookahead, sample)
+        self.calibration = (self.calibrations.get(source, file_hash(policy), self.calibration_context)
+                            if policy else None)
         model = OPPONENT_MODEL if opponent_model is None else opponent_model
         search = self.planner["search"] if self.planner and self.planner["mode"] == "on" else None
         self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout, model,
@@ -143,10 +146,13 @@ class Advisor:
         log: the battle's protocol lines so far (BattleSession.log), for the cloned opponent policy."""
         start = time.perf_counter()
         policy, win_raw = self._policy(battle)
-        win = self.calibration.apply(win_raw) if self.calibration else None
+        # This calibration was validated only at the first normal decision, not on arbitrary later positions.
+        supported_point = battle.turn == 1 and not battle.force_switch
+        win = self.calibration.apply(win_raw) if self.calibration and supported_point else None
         ranked, opponent, shadow = [], [], []
         mode = self.planner["mode"] if self.planner else "legacy"
         status: dict = {"mode": mode}
+        status["calibration"] = {"supported_point": supported_point, "context": self.calibration_context}
         cloned = []
         if self.opponent_policy is not None and log and battle.opponent_active_pokemon is not None:
             cloned = self.opponent_policy.predict(log, our_role)

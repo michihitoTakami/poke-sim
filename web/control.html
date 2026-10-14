@@ -192,7 +192,7 @@ function render(s) {
   const a = s.advice;
   const bars = list => list.map(x => `<div class="row"><span style="width:170px">${x.label}</span><span style="width:44px">${pct(x.p)}</span><div class="bar" style="width:${Math.round(x.p * 160)}px"></div></div>`).join('');
   const win = a && (a.win_prob != null ? `推定勝率: ${pct(a.win_prob)}（較正済み）`
-    : `推定勝率: -（較正データ不足）${a.win_raw != null ? ` ・ 方策の評価値 ${pct(a.win_raw)}（勝率ではありません）` : ''}`);
+    : `推定勝率: -（${a.status?.calibration?.supported_point === false ? 'この判断時点の較正なし' : '較正データ不足'}）${a.win_raw != null ? ` ・ 方策の評価値 ${pct(a.win_raw)}（勝率ではありません）` : ''}`);
   const wp = a && a.win_path;
   const path = wp && !wp.error && (wp.no_source ? '<div class="warn">相手の残りにダメージを与えられるポケモンがいません</div>'
     : wp.last_source ? `<div class="warn">攻撃できる残りは ${wp.sources.join('・')} だけです</div>` : '');

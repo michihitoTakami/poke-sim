@@ -4,7 +4,7 @@ from pokesim.config import ROOT
 from pokesim.live.events import EventTranslator
 from pokesim.live.session import BattleSession
 from pokesim.rl.myteam import load_my_team
-from pokesim.team.roles import roles, win_path
+from pokesim.team.roles import hits, roles, win_path
 
 TEAM = ROOT / "data/my_teams/baton.json"
 
@@ -44,3 +44,39 @@ def test_one_attacker_left_is_flagged():
                      {"type": "turn"}])
     path = win_path(b)
     assert path.last_source and path.sources == ["gholdengo"]
+
+
+def test_hits_uses_attackers_type_changes_and_immunity_bypass():
+    from poke_env.battle import Pokemon
+
+    attacker = Pokemon(species="salamencemega", gen=9)
+    attacker.temporary_ability = "aerilate"
+    ghost = Pokemon(species="gengar", gen=9)
+    ghost._ability = "cursedbody"
+    assert hits("doubleedge", ghost, attacker)
+    attacker.temporary_ability = "intimidate"
+    assert not hits("doubleedge", ghost, attacker)
+    attacker.temporary_ability = "scrappy"
+    assert hits("doubleedge", ghost, attacker)
+    assert hits("doubleedge", Pokemon(species="dusclops", gen=9), attacker)
+    ground = Pokemon(species="garchomp", gen=9)
+    ground._ability = "roughskin"
+    ghost._ability = "levitate"
+    assert not hits("earthquake", ghost, ground)
+    ground._ability = "moldbreaker"
+    assert hits("earthquake", ghost, ground)
+
+
+def test_trapping_does_not_hide_selected_bench_attackers():
+    from poke_env.battle import Pokemon
+
+    b = battle_with(["Scolipede", "Floette-Eternal", "Gholdengo"],
+                    [{"type": "switch", "side": "me", "species": "Scolipede"},
+                     {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"}])
+    # Preview objects may still be present; the request identifies the actual three, regardless of switch legality.
+    b.team["p1: Umbreon"] = Pokemon(species="umbreon", gen=9)
+    b._available_switches = []
+    b._trapped = True
+    path = win_path(b)
+    assert not path.no_source
+    assert set(path.sources) == {"floetteeternal", "gholdengo"}

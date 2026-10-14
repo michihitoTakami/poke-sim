@@ -14,10 +14,11 @@ These are warnings for the advice and diagnostics for losses, not rules: sacrifi
 """
 from dataclasses import dataclass, field
 
-from poke_env.battle import Battle, Pokemon, PokemonType
+from poke_env.battle import Battle, Move, Pokemon
 from poke_env.data import GenData
 
 from pokesim.rl.myteam import to_id
+from pokesim.sim.effectiveness import effectiveness
 
 
 def move_data(move_id: str) -> dict:
@@ -44,16 +45,13 @@ def roles(sets: list[dict]) -> dict[str, set[str]]:
     return out
 
 
-def hits(move_id: str, defender: Pokemon) -> bool:
-    """Whether a damaging move can hurt the defender as far as we know (type chart, revealed Levitate / Balloon)."""
+def hits(move_id: str, defender: Pokemon, attacker: Pokemon | None = None) -> bool:
+    """Possible damage with the shared ability/item-aware type calculation; unknown abilities stay possible."""
     m = move_data(move_id)
     if m.get("category") not in ("Physical", "Special"):
         return False
-    mtype = (m.get("type") or "").lower()
-    if mtype == "ground" and (defender.ability == "levitate" or defender.item == "airballoon"):
-        return False
     try:
-        return defender.damage_multiplier(PokemonType.from_name(mtype)) > 0
+        return effectiveness(Move(to_id(move_id), gen=9), attacker, defender).multiplier > 0
     except (ValueError, KeyError):
         return True
 
@@ -79,22 +77,26 @@ class WinPath:
 
 def win_path(battle: Battle) -> WinPath:
     # battle.team can still list all six from team preview: the brought ones are the active and the switches
-    # (a trapped active has no switches listed; its bench is then not counted)
+    # Requests identify brought members even if a trapped active currently has no legal switches.
     ours = [m for m in battle.team.values() if not m.fainted]
     if len(battle.team) > 3:
-        ours = [m for m in ours if m.active or m in battle.available_switches]
+        selected = {p["ident"] for p in battle.last_request.get("side", {}).get("pokemon", [])}
+        if selected and len(selected) <= 3:
+            ours = [mon for ident, mon in battle.team.items() if ident in selected and not mon.fainted]
+        else:
+            ours = [m for m in ours if m.active or m in battle.available_switches]
     foes = [m for m in battle.opponent_team.values() if not m.fainted]
     revealed = len(battle.opponent_team)
     unseen = max(0, min(3, len(battle.teampreview_opponent_team) or 3) - revealed)
     sources, blocked = [], {}
     for mon in ours:
         usable = [mid for mid, mv in mon.moves.items() if (mv.current_pp is None or mv.current_pp > 0)]
-        if any(hits(mid, foe) for mid in usable for foe in foes) or (unseen and any(
+        if any(hits(mid, foe, mon) for mid in usable for foe in foes) or (unseen and any(
                 move_data(mid).get("category") in ("Physical", "Special") for mid in usable)):
             sources.append(mon.species)
     for foe in foes:
         cannot = [mon.species for mon in ours
-                  if not any(hits(mid, foe) for mid, mv in mon.moves.items()
+                  if not any(hits(mid, foe, mon) for mid, mv in mon.moves.items()
                              if mv.current_pp is None or mv.current_pp > 0)]
         if cannot:
             blocked[foe.species] = cannot

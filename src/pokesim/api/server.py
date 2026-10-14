@@ -11,7 +11,8 @@ API:   POST /api/preview/recognize {image: base64}   -> recognised opponent 6 wi
        GET  /api/state, /api/options/...              WS /ws (state pushes)
 
 Usage: uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_v2.zip [--port 8100]
-         [--obs-source "Capture Card"]  (password: $OBS_PASSWORD or ~/.config/poke-sim/obs.env)   # watch OBS: team preview, then the battle
+         [--obs-source "Capture Card"]  (password: $OBS_PASSWORD or ~/.config/poke-sim/obs.env)
+         # watch OBS: team preview, then the battle
 With OBS, the battle screen is read during the game (pokesim.vision.battle + pokesim.live.screen): messages, HP and
 the command prompt become turn events and advice without manual input (--no-screen to turn it off).
 For practice, reviewing games and commentary: official tournaments forbid outside help during battles.
@@ -421,7 +422,8 @@ def save_record(live: Live, result: str | None) -> Path:
     stamp = time.strftime("%Y%m%d-%H%M%S", time.localtime(live.started))
     record = {"started": stamp, "result": result, "team": live.roster, "preview": live.preview,
               "lineup": live.lineup, "log": live.session.log, "advice": live.history,
-              "versions": describe(live.policy, live.matchups.meta, planner=live.advisor.planner)}
+              "versions": describe(live.policy, live.matchups.meta, planner=live.advisor.planner,
+                                   calibration_context=live.advisor.calibration_context)}
     path = LOG_DIR / f"{stamp}.json"
     path.write_text(json.dumps(record, ensure_ascii=False, indent=1))
     try:

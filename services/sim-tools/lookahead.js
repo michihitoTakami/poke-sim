@@ -27,7 +27,8 @@
 //   pair, how many runs failed (an illegal pairing, e.g. a sampled move the request rejects): a failure is not
 //   scored as a result. resolved: share of the runs that reached a real end of the battle. byContinuation: the
 //   payoff per continuation policy (how much they disagree). passes: [done, planned] (see deadlineMs).
-// "deadlineMs" (optional): no new pass (one run per pair, see prepare) starts after this budget; the first always runs.
+// "deadlineMs" (optional): no new cycle (all continuation policies, one run per pair each) starts after this
+// soft budget; the first complete cycle always runs so a timeout cannot silently remove the tactical policy.
 const path = require('path');
 const readline = require('readline');
 const dir = process.argv[2];
@@ -243,13 +244,40 @@ function tactical(battle, side) {
 
 const CONTINUATIONS = {greedy, tactical};
 
-// A remaining Pokemon with a damaging move (PP left) that some remaining foe is not immune to by type.
+// Damage-source possibility, not a KO prediction. Include type-changing and immunity abilities in sampled worlds.
+function canHurt(battle, source, target, moveId) {
+  const move = battle.dex.getActiveMove(moveId);
+  if (move.category === 'Status') return false;
+  // Bench capabilities describe the Pokemon after entering, rather than its currently inactive ability.
+  const ability = mon => mon.isActive && mon.ignoringAbility() ? '' : mon.ability;
+  const attackAbility = ability(source), defendAbility = ability(target);
+  const changedType = {aerilate: 'Flying', pixilate: 'Fairy', refrigerate: 'Ice', galvanize: 'Electric'};
+  if (move.type === 'Normal' && changedType[attackAbility]) move.type = changedType[attackAbility];
+  if (attackAbility === 'normalize') move.type = 'Normal';
+  if (attackAbility === 'liquidvoice' && move.flags.sound) move.type = 'Water';
+  let types = target.getTypes();
+  if (['Normal', 'Fighting'].includes(move.type) && ['scrappy', 'mindseye'].includes(attackAbility)) {
+    types = types.filter(t => t !== 'Ghost');
+  }
+  if (!battle.dex.getImmunity(move.type, types)) return false;
+  if (move.type === 'Ground' && (target.isActive ? target.hasItem('airballoon') : target.item === 'airballoon')) return false;
+  if (['moldbreaker', 'teravolt', 'turboblaze'].includes(attackAbility)) return true;
+  const immune = {Ground: ['levitate', 'eartheater'], Fire: ['flashfire', 'wellbakedbody'],
+    Water: ['waterabsorb', 'stormdrain', 'dryskin'], Electric: ['voltabsorb', 'lightningrod', 'motordrive'],
+    Grass: ['sapsipper']};
+  if ((immune[move.type] || []).includes(defendAbility)) return false;
+  if ((move.flags.sound && defendAbility === 'soundproof') ||
+      (move.flags.bullet && defendAbility === 'bulletproof') ||
+      (move.flags.wind && defendAbility === 'windrider')) return false;
+  if (defendAbility === 'wonderguard' && battle.dex.getEffectiveness(move.type, types) <= 0) return false;
+  return true;
+}
+
 function hasDamageSource(battle, side) {
   const foes = side.foe.pokemon.filter(mon => !mon.fainted);
   return side.pokemon.some(mon => !mon.fainted && mon.moveSlots.some(slot => {
     if (slot.pp <= 0) return false;
-    const move = battle.dex.moves.get(slot.id);
-    return move.category !== 'Status' && foes.some(foe => battle.dex.getImmunity(move.type, foe.getTypes()));
+    return foes.some(foe => canHurt(battle, mon, foe, slot.id));
   }));
 }
 
@@ -367,17 +395,18 @@ function evaluate(sample, format, seeds, rollout, winDecay, options = {}) {
   return finish(st);
 }
 
-// Every sample's first pass always runs; later passes start only before the deadline (deadlineMs after the request
-// arrived), all samples together, so a cut keeps the samples comparable.
+// A cycle includes all policies and samples. Stop only between complete cycles so the estimator stays balanced.
 function evaluateAll(req) {
   const options = {continuations: req.continuations, scoring: req.scoring, lostPathPenalty: req.lostPathPenalty};
   const start = Date.now();
   const states = req.samples.map(s => prepare(s, req.format, req.seeds ?? 2, req.rollout ?? 3,
                                               req.winDecay ?? WIN_DECAY, options));
-  const passes = Math.max(0, ...states.map(st => st.passes));
-  for (let k = 0; k < passes; k++) {
+  const cycles = Math.max(0, ...states.map(st => st.seeds));
+  for (let k = 0; k < cycles; k++) {
     if (k > 0 && req.deadlineMs && Date.now() - start > req.deadlineMs) break;
-    for (const st of states) runPass(st);
+    for (let policy = 0; policy < (options.continuations || ['greedy']).length; policy++) {
+      for (const st of states) runPass(st);
+    }
   }
   return {results: states.map(finish), elapsedMs: Date.now() - start};
 }
