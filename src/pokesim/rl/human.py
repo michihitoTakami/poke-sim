@@ -11,6 +11,10 @@ The mask leaves out moves the log never showed (see honest_mask).
 
   uv run python -m pokesim.rl.human build      # -> data/processed/human_replays.npz + human_records.npz
   uv run python -m pokesim.rl.human fit --init checkpoints/ppo_m6_league3m.zip --out checkpoints/bc_human
+  # fine-tune on the people we faced (Switch + Showdown ladder), held out by battle:
+  uv run python -m pokesim.rl.human build --records-only
+  uv run python -m pokesim.rl.human fit --init checkpoints/bc_human.zip --records data/processed/human_records.npz \
+      --out checkpoints/bc_ours --epochs 10 --lr 1e-4
 """
 import argparse
 import hashlib
@@ -35,6 +39,10 @@ from pokesim.search.lookahead import SetSampler
 
 REPLAYS = RAW_DIR / "replays"
 RECORDS = PROCESSED_DIR / "replayed"
+# our battles against people, us = p1: Switch battles rebuilt from saved frames, Showdown ladder (scripts/ladder.py),
+# and Switch battles only read live (data/raw/live/logs) when no rebuilt record exists for them
+RECORD_SOURCES = [RECORDS, RAW_DIR / "ladder"]
+LIVE_LOGS = RAW_DIR / "live" / "logs"
 SKIP = {"player", "poke", "clearpoke", "teampreview", "teamsize", "gen", "tier", "rule", "gametype", "badge",
         "uhtml", "j", "l", "c", "raw", "inactive", "inactiveoff", "t:", "rated", "start", "win", "tie", "html",
         "title", "timestamp", "seed", "n", "chat", "debug", "message", "bigerror", "error"}
@@ -233,19 +241,41 @@ def replay_logs() -> list[tuple[str, str]]:
     return out
 
 
-def record_logs(directory: Path = RECORDS) -> list[tuple[str, str]]:
-    """Our records as logs with the opponent (p2) preview, in the replay's text form."""
+def record_paths() -> list[Path]:
+    """Record files from RECORD_SOURCES, plus live-only logs more than 5 minutes from any rebuilt record."""
+    from datetime import datetime
+
+    def stamp(p: Path) -> datetime | None:
+        try:
+            return datetime.strptime(p.stem[:15], "%Y%m%d-%H%M%S")
+        except ValueError:
+            return None
+
+    paths = [p for d in RECORD_SOURCES for p in sorted(d.glob("*.json"))]
+    rebuilt = [t for p in sorted(RECORDS.glob("*.json")) if (t := stamp(p))]
+    for p in sorted(LIVE_LOGS.glob("*.json")):
+        t = stamp(p)
+        if t and all(abs((t - r).total_seconds()) > 300 for r in rebuilt):
+            paths.append(p)
+    return paths
+
+
+def record_logs(paths: list[Path] | None = None) -> list[tuple[str, str]]:
+    """Our records as logs with the opponent (p2) preview, in the replay's text form; ids are <source>/<stem>."""
     out = []
-    for p in sorted(directory.glob("*.json")):
+    for p in record_paths() if paths is None else paths:
         rec = json.loads(p.read_text())
         if not rec.get("log") or not rec.get("preview"):
             continue
         lines = [ln for ln in rec["log"] if not ln.startswith("|poke|p2|")]
         at = next((i for i, ln in enumerate(lines) if ln.startswith("|poke|p1|")), 0)
         lines[at:at] = [f"|poke|p2|{s}, L50|" for s in rec["preview"]["species"]]
-        if rec.get("result") in ("win", "loss"):
-            lines.append("|win|" + ("me" if rec["result"] == "win" else "opponent"))
-        out.append((p.stem, "\n".join(lines)))
+        if rec.get("result") in ("win", "loss") and not any(ln.startswith("|win|") for ln in lines):
+            names = {ln.split("|")[2]: ln.split("|")[3] for ln in lines
+                     if ln.startswith("|player|") and len(ln.split("|")) > 3 and ln.split("|")[3]}
+            winner = "p1" if rec["result"] == "win" else "p2"
+            lines.append("|win|" + names.get(winner, winner))
+        out.append((f"{p.parent.name}/{p.stem}", "\n".join(lines)))
     return out
 
 
@@ -285,6 +315,8 @@ def build(args) -> None:
               f"from {len(set(rows['battle']))} sides; {bad} sides skipped", flush=True)
 
     dump(record_logs(), ["p2"], PROCESSED_DIR / "human_records.npz")
+    if args.records_only:
+        return
     replays = replay_logs()
     if args.limit:
         replays = replays[:args.limit]
@@ -307,8 +339,18 @@ def fit(args) -> None:
     from pokesim.rl.bc import SpacesOnly
     from pokesim.rl.train import new_model
 
-    data = np.load(args.data)
+    data = {k: v for k, v in np.load(args.data).items()}
     tr, te = split(data["battle"])
+    te_rec = np.array([], dtype=int)
+    if args.records:  # our opponents: held out by battle, the rest repeated --records-weight times
+        rec = np.load(args.records)
+        rtr, rte = split(rec["battle"], test=args.records_test)
+        n = len(data["actions"])
+        for k in ("obs", "masks", "actions", "returns"):
+            data[k] = np.concatenate([data[k], rec[k]])
+        tr = np.concatenate([tr] + [rtr + n] * args.records_weight)
+        te_rec = rte + n
+        print(f"records: {len(rtr)} train decisions (x{args.records_weight}), {len(rte)} held out", flush=True)
     obs, masks = torch.tensor(data["obs"]), data["masks"]
     actions, rets = torch.tensor(data["actions"]), torch.tensor(data["returns"])
     if args.init:
@@ -330,6 +372,10 @@ def fit(args) -> None:
             return top1, ll
 
     best, best_state = -1e9, None
+    if len(te_rec):
+        policy.eval()
+        print("before: held-out replays top-1 {:.1%} log-lik {:.2f} | held-out records top-1 {:.1%} log-lik {:.2f}"
+              .format(*evaluate(te), *evaluate(te_rec)), flush=True)
     for epoch in range(args.epochs):
         policy.train()
         order = tr[np.random.permutation(len(tr))]
@@ -345,7 +391,12 @@ def fit(args) -> None:
             opt.step()
         policy.eval()
         top1, ll = evaluate(te)
-        print(f"epoch {epoch + 1}: held-out replays top-1 {top1:.1%}  log-lik {ll:.2f}", flush=True)
+        line = f"epoch {epoch + 1}: held-out replays top-1 {top1:.1%}  log-lik {ll:.2f}"
+        if len(te_rec):  # select on our opponents
+            top1_r, ll_r = evaluate(te_rec)
+            line += f" | held-out records top-1 {top1_r:.1%}  log-lik {ll_r:.2f}"
+            ll = ll_r
+        print(line, flush=True)
         if ll > best:
             best, best_state = ll, {k: v.clone() for k, v in policy.state_dict().items()}
     policy.load_state_dict(best_state)
@@ -358,6 +409,7 @@ def main() -> None:
     sub = ap.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("build")
     b.add_argument("--limit", type=int, default=0)
+    b.add_argument("--records-only", action="store_true", help="only rebuild human_records.npz")
     f = sub.add_parser("fit")
     f.add_argument("--data", default=str(PROCESSED_DIR / "human_replays.npz"))
     f.add_argument("--init", help="start from this policy (e.g. checkpoints/ppo_m6_league3m.zip)")
@@ -367,6 +419,10 @@ def main() -> None:
     f.add_argument("--lr", type=float, default=3e-4)
     f.add_argument("--weight-decay", type=float, default=1e-4)
     f.add_argument("--vf-coef", type=float, default=0.1)
+    f.add_argument("--records", help="also train on our opponents (data/processed/human_records.npz); the best "
+                                     "epoch is then chosen on its held-out battles")
+    f.add_argument("--records-weight", type=int, default=10)
+    f.add_argument("--records-test", type=float, default=0.25)
     args = ap.parse_args()
     build(args) if args.cmd == "build" else fit(args)
 
