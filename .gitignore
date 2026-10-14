@@ -4,6 +4,7 @@ __pycache__/
 external/
 data/raw/
 data/processed/
+data/curated/
 checkpoints/
 runs/
 node_modules/
