@@ -199,6 +199,8 @@ def mon_state(mon: Pokemon, active: bool) -> dict:
     if active:
         out["boosts"] = {k: v for k, v in mon.boosts.items() if k in BOOSTS and v}
         out["volatiles"] = [VOLATILE_IDS[e.name] for e in mon.effects if e.name in VOLATILE_IDS]
+        if mon.protect_counter:  # consecutive Protect / Detect / Endure: the next one succeeds 1 in 3^n
+            out["stall"] = mon.protect_counter
         out["mega"] = mega_evolved(mon)
     return out
 

@@ -4,7 +4,7 @@
 //
 // Usage: node lookahead.js <showdown_dir>
 // Request:  {"format", "seeds": n, "rollout": turns, "samples": [{"p1": SIDE, "p2": SIDE, "field": FIELD}, ...]}
-//   SIDE  = {"team": [packed-able sets, active first], "mons": [{"hp": 0..1, "status", "boosts", "volatiles",
+//   SIDE  = {"team": [packed-able sets, active first], "mons": [{"hp": 0..1, "status", "boosts", "volatiles", "stall",
 //            "mega": bool}], "megaUsed": bool, "conditions": {"stealthrock": 1, "reflect": turns, ...}}
 //   FIELD = {"weather", "weatherTurns", "terrain", "terrainTurns", "trickroom": turns}
 // Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]]}, ...]} (payoff from p1's view)
@@ -40,6 +40,10 @@ function setUp(sample, format, seed) {
         mon.clearBoosts();
         Object.assign(mon.boosts, s.boosts || {});
         for (const v of s.volatiles || []) mon.addVolatile(v);
+        if (s.stall) {  // Protect used s.stall turns in a row: success chance 1 / 3^stall
+          mon.addVolatile('stall');
+          if (mon.volatiles['stall']) mon.volatiles['stall'].counter = Math.min(729, 3 ** s.stall);
+        }
       }
     });
     for (const id of Object.keys(side.sideConditions)) side.removeSideCondition(id);
