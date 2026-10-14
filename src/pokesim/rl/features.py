@@ -20,6 +20,7 @@ from poke_env.battle import (
     Weather,
 )
 
+import pokesim.sim.formes  # noqa: F401 - remember forme changes
 from pokesim.sim import damage
 from pokesim.sim.effectiveness import effectiveness, type_vs_defender
 

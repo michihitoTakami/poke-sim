@@ -14,6 +14,9 @@ from dataclasses import dataclass, field
 
 import numpy as np
 from poke_env.battle import Battle, Pokemon
+from poke_env.data import GenData
+
+from pokesim.sim.formes import current_forme
 from sqlalchemy import select
 
 from pokesim.config import FORMAT, ROOT, SHOWDOWN_DIR
@@ -197,6 +200,9 @@ class SetSampler:
 
 def mon_state(mon: Pokemon, active: bool) -> dict:
     out = {"hp": 0.0 if mon.fainted else mon.current_hp_fraction}
+    entry = GenData.from_gen(9).pokedex.get(current_forme(mon), {})
+    if entry.get("battleOnly") and not mega_evolved(mon):  # e.g. Mimikyu-Busted (no Disguise left), Aegislash-Blade
+        out["forme"] = entry["name"]
     if mon.status and not mon.fainted:
         out["status"] = mon.status.name.lower()
     if active:

@@ -4,7 +4,7 @@
 //
 // Usage: node lookahead.js <showdown_dir>
 // Request:  {"format", "seeds": n, "rollout": turns, "samples": [{"p1": SIDE, "p2": SIDE, "field": FIELD}, ...]}
-//   SIDE  = {"team": [packed-able sets, active first], "mons": [{"hp": 0..1, "status", "boosts", "volatiles", "stall", "perish", "encore",
+//   SIDE  = {"team": [packed-able sets, active first], "mons": [{"hp": 0..1, "status", "boosts", "volatiles", "stall", "perish", "encore", "forme",
 //            "mega": bool}], "megaUsed": bool, "conditions": {"stealthrock": 1, "reflect": turns, ...}}
 //   FIELD = {"weather", "weatherTurns", "terrain", "terrainTurns", "trickroom": turns}
 // Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]]}, ...]} (payoff from p1's view)
@@ -29,6 +29,7 @@ function setUp(sample, format, seed) {
       const s = spec.mons[i] || {};
       if (i === 0 && s.mega && mon.canMegaEvo) battle.actions.runMegaEvo(mon);
       if (spec.megaUsed) mon.canMegaEvo = null;
+      if (s.forme) mon.formeChange(s.forme, null, true);  // battle-only forme it is in (Mimikyu-Busted, ...)
       if (s.hp !== undefined && s.hp <= 0) {
         mon.hp = 0; mon.fainted = true; mon.status = 'fnt'; side.pokemonLeft--;
         return;

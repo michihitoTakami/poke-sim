@@ -9,7 +9,8 @@ damaging moves with their usage share, the Mega forme with its stone's share whi
 - for each of our 6: the chance it knocks that member out (e.g. on the switch-in);
 plus, per kind of set-up counter (Encore, phazing, Taunt, Haze, Yawn), the chance the opponent has one that works on
 our active Pokémon (Good as Gold / Magic Bounce block status moves aimed at it, a Substitute blocks Yawn and Clear
-Smog; Haze and Dragon Tail still work), and volatile effects the base observation leaves out, for both active Pokémon (Curse and Perish Song, which Baton
+Smog; Haze and Dragon Tail still work), whether its first hit is absorbed (Disguise still up; Sturdy, Multiscale,
+Shadow Shield at full HP), and volatile effects the base observation leaves out, for both active Pokémon (Curse and Perish Song, which Baton
 Pass hands on, Aqua Ring, Ingrain, Focus Energy, Magnet Rise, No Retreat, trapping; ours also Heal Block, Torment,
 Disable).
 
@@ -25,6 +26,7 @@ from pokesim.config import PROCESSED_DIR
 from pokesim.rl.items import UNKNOWN, is_mega
 from pokesim.rl.myteam import COUNTER_GROUPS, to_id
 from pokesim.sim import damage
+from pokesim.sim.formes import current_forme
 
 PRIORS_PATH = PROCESSED_DIR / "threat_priors.json"
 SHARED_EFFECTS = ["CURSE", "AQUA_RING", "INGRAIN", "FOCUS_ENERGY", "MAGNET_RISE", "NO_RETREAT"]
@@ -36,7 +38,9 @@ N_OPP = len(SHARED_EFFECTS) + 3
 STATUS_BLOCKERS = {"goodasgold", "magicbounce"}
 SUB_BLOCKED = {"yawn", "clearsmog"}
 N_COUNTER = len(COUNTER_GROUPS) + 1
-SIZE = 4 + 6 + N_OWN + N_OPP + N_COUNTER
+SHIELD_ABILITIES = ["sturdy", "multiscale", "shadowshield"]  # survive / halve a hit at full HP
+N_SHIELD = 1 + len(SHIELD_ABILITIES)
+SIZE = 4 + 6 + N_OWN + N_OPP + N_COUNTER + N_SHIELD
 MAX_MOVES = 10  # likely damaging moves kept per species
 
 
@@ -72,8 +76,11 @@ def build_priors() -> dict[str, dict]:
                 mega[to_id(it.mega_stone)] = mega.get(to_id(it.mega_stone), 0.0) + v / items
         counters = {k: min(1.0, 4 * v / total) for k, v in sm.moves.items()
                     if total and any(k in g for g in COUNTER_GROUPS.values())}
+        ab_total = sum(v for k, v in sm.abilities.items() if k) or 1.0
+        shields = {k: sm.abilities.get(k, 0) / ab_total for k in SHIELD_ABILITIES}
         out[sid] = {"moves": {k: round(v, 3) for k, v in moves.items()},
                     "counter": {k: round(v, 3) for k, v in counters.items()},
+                    "shield": {k: round(v, 3) for k, v in shields.items() if v > 0},
                     "mega": {k: round(v, 3) for k, v in mega.items() if v >= 0.01}}
     return out
 
@@ -171,8 +178,20 @@ class ThreatFeatures:
         out.append(float(to_id(me.ability or "") in STATUS_BLOCKERS))
         return out
 
+    def shields(self, opp: Pokemon) -> list[float]:
+        """Disguise still up; chance of Sturdy / Multiscale / Shadow Shield working now (at full HP)."""
+        disguise = float(current_forme(opp) in ("mimikyu", "mimikyutotem"))
+        full = opp.current_hp_fraction >= 1.0
+        if opp.ability:
+            ab = to_id(opp.ability)
+            return [disguise] + [float(full and ab == k) for k in SHIELD_ABILITIES]
+        prior = self.priors.get(to_id(opp.base_species), {}).get("shield", {})
+        return [disguise] + [float(full) * prior.get(k, 0.0) for k in SHIELD_ABILITIES]
+
     def __call__(self, battle: AbstractBattle) -> np.ndarray:
         feats = np.zeros(self.size, dtype=np.float32)
+        if battle.opponent_active_pokemon is not None:
+            feats[-N_SHIELD:] = self.shields(battle.opponent_active_pokemon)
         n = 10 + N_OWN + N_OPP
         feats[10:10 + N_OWN] = self.effects(battle.active_pokemon, True)
         feats[10 + N_OWN:n] = self.effects(battle.opponent_active_pokemon, False)
