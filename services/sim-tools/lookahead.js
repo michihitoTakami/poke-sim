@@ -1,17 +1,34 @@
 // One-turn lookahead on the Showdown sim: rebuild a battle position, try every pair of choices (ours x theirs),
-// then play a few more turns with a greedy damage policy for both sides and score the result.
+// then play a few more turns with continuation policies for both sides and score the result.
 // Long-running: reads one JSON request per stdin line, writes one JSON response per line.
 //
 // Usage: node lookahead.js <showdown_dir>
 // Request:  {"format", "seeds": n, "rollout": turns, "winDecay": per turn (default 0.05; 0 = a win is a win whenever it
-//            comes), "samples": [{"p1": SIDE, "p2": SIDE, "field": FIELD}, ...]}
+//            comes), "continuations": ["greedy", "tactical"] (default ["greedy"]; each branch is played on with each),
+//            "scoring": "legacy" | "terminal", "lostPathPenalty": (default 0), "samples": [{"p1": SIDE, "p2": SIDE,
+//            "field": FIELD}, ...]}
+//   continuations: greedy = the highest expected damage, no Mega, no voluntary switch, status moves never chosen;
+//     tactical = also takes a KO, Mega Evolves, recovers, sets up while it is safe (up to +2), passes boosts or
+//     switches when the active cannot damage the foe.
+//   scoring: legacy = HP balance (each Pokemon 0..1) + 3 for a win (less the slower it comes);
+//     terminal = a real end is +-1 (0 for a tie), less 0.005 per turn it took (a tie-break among wins, at least
+//     0.95); a position still going is the HP balance scaled into (-0.5, 0.5) plus the lost-path term, kept
+//     within +-0.9, so it never outranks a real win. It is a stand-in, not a win probability (see "resolved").
+//   lostPathPenalty: subtracted when we have no damage source left (no remaining Pokemon with a damaging move the
+//     foe's remaining Pokemon are not immune to by type) while the foe still has one; added in the mirror case.
+//     Not a loss: Struggle, residual damage, Perish Song or a timer can still decide it.
 //   SIDE  = {"team": [packed-able sets, active first], "mons": [{"hp": 0..1, "status", "boosts", "volatiles", "stall", "perish", "encore", "forme",
 //            "mega": bool}], "megaUsed": bool, "conditions": {"stealthrock": 1, "reflect": turns, ...}}
 //   FIELD = {"weather", "weatherTurns", "terrain", "terrainTurns", "trickroom": turns}
 //   SIDE may include incoming (zero-based bench index) and switchMove (Baton Pass): execute its entry after restoring.
-// Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]], "invalid": [[...]]}, ...]}
-//   payoff from p1's view, averaged over the seeds whose branch ran; null when none did. invalid: per pair, how many
-//   seeds failed (an illegal pairing, e.g. a sampled move the request rejects): a failure is not scored as a result.
+// Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]], "invalid": [[...]],
+//              "resolved": [[...]], "byContinuation": {name: [[...]]}}, ...]}
+//   payoff from p1's view, averaged over the (seed, continuation) runs that ran; null when none did. invalid: per
+//   pair, how many runs failed (an illegal pairing, e.g. a sampled move the request rejects): a failure is not
+//   scored as a result. resolved: share of the runs that reached a real end of the battle. byContinuation: the
+//   payoff per continuation policy (how much they disagree). passes: [done, planned] (see deadlineMs).
+// "deadlineMs" (optional): no new cycle (all continuation policies, one run per pair each) starts after this
+// soft budget; the first complete cycle always runs so a timeout cannot silently remove the tactical policy.
 const path = require('path');
 const readline = require('readline');
 const dir = process.argv[2];
@@ -20,6 +37,9 @@ const { State } = require(path.resolve(dir, 'dist/sim/state'));
 
 const WIN_BONUS = 3;
 const WIN_DECAY = 0.05;  // per turn: a quicker win scores higher
+// terminal scoring: a win is 1 less TERMINAL_TIEBREAK per turn it takes (at least TERMINAL_FLOOR); a position still
+// going stays within +-TERMINAL_OPEN, below any win and above any loss
+const TERMINAL_TIEBREAK = 0.005, TERMINAL_FLOOR = 0.95, TERMINAL_OPEN = 0.9;
 
 function setUp(sample, format, seed) {
   const battle = new Battle({ formatid: format, seed: [seed, seed + 1, seed + 2, seed + 3] });
@@ -162,12 +182,126 @@ function greedy(battle, side) {
   return best;
 }
 
+function bestDamage(battle, source, target) {
+  return Math.max(0, ...source.moveSlots.filter(s => s.pp > 0).map(s => expectedDamage(battle, source, target, s.id)));
+}
+
+function selfBoosts(move) {
+  if (move.target === 'self' && move.boosts) return move.boosts;
+  return null;
+}
+
+// Tactical policy for rollouts: what a reasonable player does beyond "hit hardest" (see the header).
+function tactical(battle, side) {
+  const opts = choices(battle, side);
+  if (opts.length === 1) return opts[0][0];
+  const foe = side.foe.active[0];
+  if (!foe || foe.fainted) return opts[0][0];
+  const switchTo = choice => side.pokemon[Number(choice.split(' ')[1]) - 1];
+  const switches = opts.filter(([, label]) => label.startsWith('switch:'));
+  const bestSwitch = () => {
+    let best = null, bestScore = 0;
+    for (const [choice] of switches) {
+      const mon = switchTo(choice), score = bestDamage(battle, mon, foe) + mon.hp / mon.maxhp;
+      if (bestDamage(battle, mon, foe) > 0 && score > bestScore) { best = choice; bestScore = score; }
+    }
+    return best;
+  };
+  if (side.activeRequest.forceSwitch) return bestSwitch() || greedy(battle, side);
+  const me = side.active[0];
+  const moves = opts.filter(([, label]) => label.startsWith('move:') && !label.endsWith(':mega'))
+    .map(([choice, label]) => {
+      const move = battle.dex.moves.get(label.split(':')[1]);
+      return {choice, label, move, damage: expectedDamage(battle, me, foe, move.id)};
+    });
+  const mega = choice => {
+    const label = opts.find(([c]) => c === choice)[1];
+    const evolved = opts.find(([, l]) => l === `${label}:mega`);
+    return evolved ? evolved[0] : choice;
+  };
+  if (!moves.length) return bestSwitch() || opts[0][0];
+  const best = moves.reduce((a, b) => (b.damage > a.damage ? b : a));
+  const incoming = bestDamage(battle, foe, me);
+  const kos = moves.filter(m => m.damage >= foe.hp);
+  if (kos.length) return mega(kos.reduce((a, b) => (b.move.priority > a.move.priority ? b : a)).choice);
+  const heal = moves.find(m => (m.move.heal || m.move.flags.heal) && m.move.target === 'self');
+  if (heal && me.hp < me.maxhp / 2 && incoming < me.maxhp / 2) return mega(heal.choice);
+  if (best.damage <= 0) {  // nothing here hurts the foe: pass the boosts on or bring in an attacker
+    const pass = moves.find(m => m.move.id === 'batonpass');
+    const target = bestSwitch();
+    if (pass && target && Object.values(me.boosts).some(v => v > 0)) return mega(pass.choice);
+    if (target) return target;
+  }
+  const setup = moves.find(m => {
+    const boosts = selfBoosts(m.move);
+    return boosts && Object.entries(boosts).some(([stat, n]) => n > 0 && me.boosts[stat] < 2);
+  });
+  const safe = incoming * 2 < me.hp;
+  if (setup && (best.damage <= 0 || (safe && best.damage * 2 < foe.hp))) return mega(setup.choice);
+  if (best.damage <= 0) return mega((setup || moves[0]).choice);
+  return mega(best.choice);
+}
+
+const CONTINUATIONS = {greedy, tactical};
+
+// Damage-source possibility, not a KO prediction. Include type-changing and immunity abilities in sampled worlds.
+function canHurt(battle, source, target, moveId) {
+  const move = battle.dex.getActiveMove(moveId);
+  if (move.category === 'Status') return false;
+  // Bench capabilities describe the Pokemon after entering, rather than its currently inactive ability.
+  const ability = mon => mon.isActive && mon.ignoringAbility() ? '' : mon.ability;
+  const attackAbility = ability(source), defendAbility = ability(target);
+  const changedType = {aerilate: 'Flying', pixilate: 'Fairy', refrigerate: 'Ice', galvanize: 'Electric'};
+  if (move.type === 'Normal' && changedType[attackAbility]) move.type = changedType[attackAbility];
+  if (attackAbility === 'normalize') move.type = 'Normal';
+  if (attackAbility === 'liquidvoice' && move.flags.sound) move.type = 'Water';
+  let types = target.getTypes();
+  if (['Normal', 'Fighting'].includes(move.type) && ['scrappy', 'mindseye'].includes(attackAbility)) {
+    types = types.filter(t => t !== 'Ghost');
+  }
+  if (!battle.dex.getImmunity(move.type, types)) return false;
+  if (move.type === 'Ground' && (target.isActive ? target.hasItem('airballoon') : target.item === 'airballoon')) return false;
+  if (['moldbreaker', 'teravolt', 'turboblaze'].includes(attackAbility)) return true;
+  const immune = {Ground: ['levitate', 'eartheater'], Fire: ['flashfire', 'wellbakedbody'],
+    Water: ['waterabsorb', 'stormdrain', 'dryskin'], Electric: ['voltabsorb', 'lightningrod', 'motordrive'],
+    Grass: ['sapsipper']};
+  if ((immune[move.type] || []).includes(defendAbility)) return false;
+  if ((move.flags.sound && defendAbility === 'soundproof') ||
+      (move.flags.bullet && defendAbility === 'bulletproof') ||
+      (move.flags.wind && defendAbility === 'windrider')) return false;
+  if (defendAbility === 'wonderguard' && battle.dex.getEffectiveness(move.type, types) <= 0) return false;
+  return true;
+}
+
+function hasDamageSource(battle, side) {
+  const foes = side.foe.pokemon.filter(mon => !mon.fainted);
+  return side.pokemon.some(mon => !mon.fainted && mon.moveSlots.some(slot => {
+    if (slot.pp <= 0) return false;
+    return foes.some(foe => canHurt(battle, mon, foe, slot.id));
+  }));
+}
+
+function lostPath(battle) {
+  if (battle.ended) return 0;
+  const ours = hasDamageSource(battle, battle.p1), theirs = hasDamageSource(battle, battle.p2);
+  return ours === theirs ? 0 : ours ? 1 : -1;
+}
+
 function material(side) {
   return side.pokemon.reduce((acc, mon) => acc + (mon.fainted ? 0 : mon.hp / mon.maxhp), 0);
 }
 
-function score(battle, startTurn, winDecay = WIN_DECAY) {
-  let v = material(battle.p1) - material(battle.p2);
+function score(battle, startTurn, winDecay = WIN_DECAY, scoring = 'legacy', lostPathPenalty = 0) {
+  const balance = material(battle.p1) - material(battle.p2);
+  if (scoring === 'terminal') {
+    if (battle.ended) {  // a quicker end breaks ties between wins (or losses) but never reaches a position's score
+      const sooner = Math.max(TERMINAL_FLOOR, 1 - TERMINAL_TIEBREAK * (battle.turn - startTurn));
+      return battle.winner === 'p1' ? sooner : battle.winner === 'p2' ? -sooner : 0;
+    }
+    const v = Math.max(-0.5, Math.min(0.5, balance / 6)) + lostPathPenalty * lostPath(battle);
+    return Math.max(-TERMINAL_OPEN, Math.min(TERMINAL_OPEN, v));
+  }
+  let v = balance + lostPathPenalty * lostPath(battle);
   if (battle.ended) {
     const bonus = WIN_BONUS * Math.max(0.5, 1 - winDecay * (battle.turn - startTurn));
     v += battle.winner === 'p1' ? bonus : battle.winner === 'p2' ? -bonus : 0;
@@ -190,38 +324,91 @@ function step(battle, c1, c2) {
   if (!submitted || before.every((v, i) => v === after[i])) throw new Error('Branch made no progress');
 }
 
-function evaluate(sample, format, seeds, rollout, winDecay) {
+// A position's evaluation in passes: pass k plays every pair once with seed floor(k / continuations) and the k-th
+// continuation policy, so stopping between passes keeps every pair on the same runs.
+function prepare(sample, format, seeds, rollout, winDecay, options = {}) {
+  const scoring = options.scoring || 'legacy', penalty = options.lostPathPenalty || 0;
+  const names = options.continuations || ['greedy'];
+  for (const name of names) if (!CONTINUATIONS[name]) throw new Error(`unknown continuation ${name}`);
   const base = setUp(sample, format, 1);
-  if (base.ended) {
-    return {p1: ['pass'], p2: ['pass'], payoff: [[score(base, base.turn, winDecay)]], invalid: [[0]]};
-  }
-  const p1 = choices(base, base.p1), p2 = choices(base, base.p2);
-  const snapshot = JSON.stringify(State.serializeBattle(base));
-  const total = p1.map(() => p2.map(() => 0));
-  const invalid = p1.map(() => p2.map(() => 0));
-  for (let s = 0; s < seeds; s++) {
-    for (let i = 0; i < p1.length; i++) {
-      for (let j = 0; j < p2.length; j++) {
-        const battle = State.deserializeBattle(snapshot);
-        battle.resetRNG([s * 4 + 11, s * 4 + 12, s * 4 + 13, s * 4 + 14]);
-        try {
-          step(battle, p1[i][0], p2[j][0]);
-          let turns = 0;
-          for (let guard = 0; !battle.ended && turns < rollout && guard < rollout * 3; guard++) {
-            if (battle.requestState === 'move') turns++;
-            step(battle, greedy(battle, battle.p1), greedy(battle, battle.p2));
-          }
-          if (!battle.ended && turns < rollout) throw new Error('Rollout did not finish');
-        } catch (e) {
-          invalid[i][j]++;  // an illegal pairing (e.g. a sampled move the request rejects): no result
-          continue;
+  const st = {base, names, seeds, rollout, winDecay, scoring, penalty, passes: seeds * names.length, done: 0};
+  if (base.ended) return st;
+  st.p1 = choices(base, base.p1);
+  st.p2 = choices(base, base.p2);
+  st.snapshot = JSON.stringify(State.serializeBattle(base));
+  const grid = () => st.p1.map(() => st.p2.map(() => 0));
+  st.total = grid(); st.invalid = grid(); st.ended = grid();
+  st.per = Object.fromEntries(names.map(n => [n, {total: grid(), runs: grid()}]));
+  return st;
+}
+
+function runPass(st) {
+  if (st.base.ended || st.done >= st.passes) return;
+  const k = st.done, s = Math.floor(k / st.names.length), name = st.names[k % st.names.length];
+  const policy = CONTINUATIONS[name];
+  for (let i = 0; i < st.p1.length; i++) {
+    for (let j = 0; j < st.p2.length; j++) {
+      const battle = State.deserializeBattle(st.snapshot);
+      battle.resetRNG([s * 4 + 11, s * 4 + 12, s * 4 + 13, s * 4 + 14]);
+      try {
+        step(battle, st.p1[i][0], st.p2[j][0]);
+        let turns = 0;
+        for (let guard = 0; !battle.ended && turns < st.rollout && guard < st.rollout * 3; guard++) {
+          if (battle.requestState === 'move') turns++;
+          step(battle, policy(battle, battle.p1), policy(battle, battle.p2));
         }
-        total[i][j] += score(battle, base.turn, winDecay);
+        if (!battle.ended && turns < st.rollout) throw new Error('Rollout did not finish');
+      } catch (e) {
+        st.invalid[i][j]++;  // an illegal pairing (e.g. a sampled move the request rejects): no result
+        continue;
       }
+      const v = score(battle, st.base.turn, st.winDecay, st.scoring, st.penalty);
+      st.total[i][j] += v;
+      st.ended[i][j] += battle.ended ? 1 : 0;
+      st.per[name].total[i][j] += v;
+      st.per[name].runs[i][j]++;
     }
   }
-  const payoff = total.map((row, i) => row.map((v, j) => invalid[i][j] < seeds ? v / (seeds - invalid[i][j]) : null));
-  return { p1: p1.map(x => x[1]), p2: p2.map(x => x[1]), payoff, invalid };
+  st.done++;
+}
+
+function finish(st) {
+  if (st.base.ended) {
+    const v = score(st.base, st.base.turn, st.winDecay, st.scoring, st.penalty);
+    return {p1: ['pass'], p2: ['pass'], payoff: [[v]], invalid: [[0]], resolved: [[1]],
+            byContinuation: Object.fromEntries(st.names.map(n => [n, [[v]]])), passes: [1, 1]};
+  }
+  const mean = (t, n) => t.map((row, i) => row.map((v, j) => n(i, j) > 0 ? v / n(i, j) : null));
+  const ran = (i, j) => st.done - st.invalid[i][j];
+  const used = st.names.slice(0, Math.min(st.done, st.names.length));
+  return {
+    p1: st.p1.map(x => x[1]), p2: st.p2.map(x => x[1]), payoff: mean(st.total, ran), invalid: st.invalid,
+    resolved: mean(st.ended, ran),
+    byContinuation: Object.fromEntries(used.map(n => [n, mean(st.per[n].total, (i, j) => st.per[n].runs[i][j])])),
+    passes: [st.done, st.passes],
+  };
+}
+
+function evaluate(sample, format, seeds, rollout, winDecay, options = {}) {
+  const st = prepare(sample, format, seeds, rollout, winDecay, options);
+  while (!st.base.ended && st.done < st.passes) runPass(st);
+  return finish(st);
+}
+
+// A cycle includes all policies and samples. Stop only between complete cycles so the estimator stays balanced.
+function evaluateAll(req) {
+  const options = {continuations: req.continuations, scoring: req.scoring, lostPathPenalty: req.lostPathPenalty};
+  const start = Date.now();
+  const states = req.samples.map(s => prepare(s, req.format, req.seeds ?? 2, req.rollout ?? 3,
+                                              req.winDecay ?? WIN_DECAY, options));
+  const cycles = Math.max(0, ...states.map(st => st.seeds));
+  for (let k = 0; k < cycles; k++) {
+    if (k > 0 && req.deadlineMs && Date.now() - start > req.deadlineMs) break;
+    for (let policy = 0; policy < (options.continuations || ['greedy']).length; policy++) {
+      for (const st of states) runPass(st);
+    }
+  }
+  return {results: states.map(finish), elapsedMs: Date.now() - start};
 }
 
 const rl = readline.createInterface({ input: process.stdin });
@@ -229,7 +416,7 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = { results: req.samples.map(s => evaluate(s, req.format, req.seeds ?? 2, req.rollout ?? 3, req.winDecay ?? WIN_DECAY)) };
+    reply = evaluateAll(req);
   } catch (e) {
     reply = { error: String(e && e.stack || e) };
   }

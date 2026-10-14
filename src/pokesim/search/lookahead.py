@@ -245,9 +245,12 @@ class Lookahead:
     """Runs the Node lookahead worker and turns battles into recommendations."""
 
     def __init__(self, sampler: SetSampler, samples: int = 6, seeds: int = 2, rollout: int = 3,
-                 opponent_model: dict | None = None, win_decay: float | None = None):
+                 opponent_model: dict | None = None, win_decay: float | None = None, search: dict | None = None):
+        """search: worker settings for every query (see services/sim-tools/lookahead.js): continuations, scoring,
+        lostPathPenalty, deadlineMs, and seeds / rollout / winDecay overriding the arguments."""
         self.sampler, self.n_samples, self.seeds, self.rollout = sampler, samples, seeds, rollout
         self.win_decay = win_decay  # None: the worker's default (a quicker win scores higher)
+        self.search = dict(search or {})
         self.opponent_model = opponent_model or {}
         self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
@@ -303,14 +306,18 @@ class Lookahead:
         return {"team": team, "mons": mons, "megaUsed": battle.opponent_used_mega_evolve,
                 "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
 
-    def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None) -> list[dict]:
-        """Payoff matrices (our options x the opponent's) for sampled opponent sets."""
+    def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None,
+              search: dict | None = None) -> list[dict]:
+        """Payoff matrices (our options x the opponent's) for sampled opponent sets. search: settings for this query
+        only (as the constructor's)."""
         own = self.own_side(battle, own_sets, incoming)
         field = field_state(battle)
         samples = [{"p1": own, "p2": self.opponent_side(battle), "field": field} for _ in range(self.n_samples)]
         request = {"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout, "samples": samples}
         if self.win_decay is not None:
             request["winDecay"] = self.win_decay
+        request.update(self.search)
+        request.update(search or {})
         return self._query(request)["results"]
 
     def advise(self, battle: Battle, own_sets: dict[str, dict], last_move: str | None = None) -> Advice:

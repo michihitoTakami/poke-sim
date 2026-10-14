@@ -25,8 +25,8 @@ import json
 import os
 import random
 import re
-import uuid
 import time
+import uuid
 from pathlib import Path
 
 import numpy as np
@@ -40,7 +40,7 @@ from pokesim.live.advisor import Advisor
 from pokesim.live.selection import MatchupModel, PickModel
 from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, to_id
 from pokesim.rl.opponents import LeaguePlayer
-from pokesim.runtime.bundle import describe
+from pokesim.runtime.bundle import describe, file_hash
 from pokesim.search.lookahead import label_to_action
 from pokesim.sim.pool import TeamPool, load_teams
 
@@ -66,15 +66,19 @@ class AdvisorPlayer(Player):
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
                  planner: dict | None = None, sample: bool = False, seed: int | None = None, **kwargs):
         self.sets, self.out = sets, out
-        self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner)
+        self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner,
+                               source="showdown", sample=sample)
         self.planner, self.sample = planner, sample
         self.seed = seed if seed is not None else random.SystemRandom().randrange(2 ** 31)
         self.rng = random.Random(self.seed)
         roster = [s["species"] for s in sets]
         self.policies = {policies[0]: (self.advisor.model, self.advisor.extra)}
+        self.calibrations = {policies[0]: self.advisor.calibration}
         for path in policies[1:]:
             model = MaskablePPO.load(path, device="cpu")
             self.policies[path] = (model, TeamFeatures.for_model(model, roster))
+            self.calibrations[path] = self.advisor.calibrations.get("showdown", file_hash(path),
+                                                                 self.advisor.calibration_context)
         self.assigned: dict[str, str] = {}  # battle tag -> policy path
         self.advice: dict[str, list[dict]] = {}  # battle tag -> per-decision advice
         self.picks, self.matchups = PickModel(), MatchupModel()
@@ -119,16 +123,21 @@ class AdvisorPlayer(Player):
                 return "move:" + to_id(ev[3])
         return None
 
+    def activate_policy(self, policy_path: str) -> None:
+        """Switch both the model and its calibration together, including clearing an unsupported calibration."""
+        self.advisor.model, self.advisor.extra = self.policies[policy_path]
+        self.advisor.calibration = self.calibrations[policy_path]
+
     def choose_move(self, battle):
         mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
-        self.advisor.model, self.advisor.extra = self.policies[self.policy_for(battle)]
+        self.activate_policy(self.policy_for(battle))
         entry = {"turn": battle.turn, "force": bool(battle.force_switch)}
         self.advice.setdefault(battle.battle_tag, []).append(entry)
         try:
             advice = self.advisor.advise(battle, self.last_opponent_move(battle),
                                          self.logs.get(battle.battle_tag, []),
                                          battle.player_role)
-            entry.update({"actions": rounded(advice.actions[:5]), "win": advice.win_prob,
+            entry.update({"actions": rounded(advice.actions[:5]), "win": advice.win_raw, "win_cal": advice.win_prob,
                           "policy": rounded(sorted(advice.policy.items(), key=lambda kv: -kv[1])[:3]),
                           "lookahead": [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.lookahead[:3]],
                           "opponent": rounded(advice.opponent[:4]), "secs": round(advice.elapsed, 2),
@@ -165,7 +174,8 @@ class AdvisorPlayer(Player):
                   "source": f"showdown {battle.battle_tag}", "opponent": battle.opponent_username,
                   "rating": getattr(battle, "rating", None),
                   "versions": describe(self.assigned.get(battle.battle_tag), self.matchups.meta,
-                                       planner=self.planner, sample=self.sample, seed=self.seed)}
+                                       planner=self.planner, sample=self.sample, seed=self.seed,
+                                       calibration_context=self.advisor.calibration_context)}
         (self.out / f"{stamp}-{battle.battle_tag.split('-')[-1]}.json").write_text(
             json.dumps(record, ensure_ascii=False, indent=1))
         print(f"{battle.battle_tag}: {record['result']} vs {battle.opponent_username} [{record['policy']}]  "

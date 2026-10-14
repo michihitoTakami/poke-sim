@@ -11,7 +11,8 @@ API:   POST /api/preview/recognize {image: base64}   -> recognised opponent 6 wi
        GET  /api/state, /api/options/...              WS /ws (state pushes)
 
 Usage: uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_v2.zip [--port 8100]
-         [--obs-source "Capture Card"]  (password: $OBS_PASSWORD or ~/.config/poke-sim/obs.env)   # watch OBS: team preview, then the battle
+         [--obs-source "Capture Card"]  (password: $OBS_PASSWORD or ~/.config/poke-sim/obs.env)
+         # watch OBS: team preview, then the battle
 With OBS, the battle screen is read during the game (pokesim.vision.battle + pokesim.live.screen): messages, HP and
 the command prompt become turn events and advice without manual input (--no-screen to turn it off).
 For practice, reviewing games and commentary: official tournaments forbid outside help during battles.
@@ -58,7 +59,7 @@ class Live:
         self.roster = [s["species"] for s in self.sets]
         self.policy = policy
         self.ja = ja_names()
-        self.advisor = Advisor(self.sets, policy=policy, lookahead=lookahead, planner=planner)
+        self.advisor = Advisor(self.sets, policy=policy, lookahead=lookahead, planner=planner, source="switch")
         self.picks_model, self.matchups = PickModel(), MatchupModel()
         self.matchup_warning = self.matchups.check(policy)
         if self.matchup_warning:
@@ -94,6 +95,12 @@ class Live:
         move, _, mega = rest.partition(":")
         return self.name(move) + ("（メガシンカ）" if mega else "")
 
+    def named_path(self, path: dict | None) -> dict | None:
+        """pokesim.team.roles.win_path with Japanese names for the page."""
+        if not path or "sources" not in path:
+            return path
+        return dict(path, sources=[self.name(x) for x in path["sources"]])
+
     # --- state -----------------------------------------------------------------------------------------------------
     def state(self) -> dict:
         out: dict = {"preview": self.preview, "recognized": self.recognized, "lineup": self.lineup, "advice": None,
@@ -119,8 +126,9 @@ class Live:
             out["advice"] = {"actions": [{"id": a, "label": self.label(a), "p": round(p, 3)} for a, p in s.actions[:6]],
                              "opponent": [{"id": a, "label": self.label(a), "p": round(p, 3)}
                                           for a, p in s.opponent[:6]],
-                             "win_prob": s.win_prob, "win_kind": s.win_kind, "elapsed": round(s.elapsed, 2),
-                             "status": s.status}
+                             "win_prob": s.win_prob, "win_raw": s.win_raw, "win_kind": s.win_kind,
+                             "elapsed": round(s.elapsed, 2), "status": s.status,
+                             "win_path": self.named_path(s.status.get("win_path"))}
         return out
 
     async def broadcast(self) -> None:
@@ -152,7 +160,8 @@ class Live:
                         "brought": [round(float(p), 3) for p in picks.brought],
                         "lead": [round(float(p), 3) for p in picks.lead],
                         "lineups": [{"lineup": names, "names": [self.name(n) for n in names], "win": round(p, 3)}
-                                    for names, p in ranking[:10]]}
+                                    for names, p in ranking[:10]],
+                        "lineup_note": self.matchup_warning}
         self.session = BattleSession(self.sets)
         self.session.preview(species)
         self.translator = EventTranslator(self.session)
@@ -280,7 +289,8 @@ class Live:
         self.suggestion = suggestion
         self.history.append({"turn": battle.turn, "force_switch": force_switch,
                              "actions": suggestion.actions[:5], "opponent": suggestion.opponent[:5],
-                             "win_prob": suggestion.win_prob, "status": suggestion.status,
+                             "win": suggestion.win_raw, "win_cal": suggestion.win_prob,
+                             "status": suggestion.status,
                              "shadow": [(lab, round(p, 3), round(v, 3)) for lab, p, v in suggestion.shadow[:5]]})
 
 
@@ -412,7 +422,8 @@ def save_record(live: Live, result: str | None) -> Path:
     stamp = time.strftime("%Y%m%d-%H%M%S", time.localtime(live.started))
     record = {"started": stamp, "result": result, "team": live.roster, "preview": live.preview,
               "lineup": live.lineup, "log": live.session.log, "advice": live.history,
-              "versions": describe(live.policy, live.matchups.meta, planner=live.advisor.planner)}
+              "versions": describe(live.policy, live.matchups.meta, planner=live.advisor.planner,
+                                   calibration_context=live.advisor.calibration_context)}
     path = LOG_DIR / f"{stamp}.json"
     path.write_text(json.dumps(record, ensure_ascii=False, indent=1))
     try:

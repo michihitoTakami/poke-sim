@@ -125,7 +125,9 @@ def _ghost_hit_multiplier(mtype, defender: Pokemon) -> float:
     from poke_env.battle import PokemonType
     from poke_env.data import GenData
 
-    types = [t if t != PokemonType.GHOST else None for t in defender.types]
+    types = [t for t in defender.types if t is not None and t != PokemonType.GHOST]
+    if not types:
+        return 1.0
     types += [None] * (2 - len(types))
     return mtype.damage_multiplier(types[0], types[1], type_chart=GenData.from_gen(9).type_chart)
 

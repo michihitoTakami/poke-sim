@@ -171,3 +171,18 @@ def test_switch_request_keeps_the_outgoing_state_for_the_simulator(session):
     assert to_id(own["team"][own["incoming"]]["species"]) == incoming.species
     assert own["mons"][0]["boosts"]["def"] == 2
     assert own["switchMove"] == "batonpass"
+
+
+def test_first_decision_calibration_is_not_applied_to_late_or_forced_positions(session, monkeypatch):
+    from pokesim.evaluation.calibration import DECISION_POINT, Calibration
+    from pokesim.live.advisor import Advisor
+
+    EventTranslator(session).apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+                                   {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"}])
+    advisor = Advisor(session.sets, policy=None, lookahead=False, opponent_policy=None)
+    advisor.calibration = Calibration("switch", "abc", a=1, enabled=True, decision_point=DECISION_POINT)
+    monkeypatch.setattr(advisor, "_policy", lambda b: ({"move:protect": 1.0}, 0.7))
+    assert advisor.advise(session.decision()).win_prob == pytest.approx(0.7)
+    assert advisor.advise(session.decision(force_switch=True)).win_prob is None
+    EventTranslator(session).apply([{"type": "turn"}])
+    assert advisor.advise(session.decision()).win_prob is None
