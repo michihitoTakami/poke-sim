@@ -63,3 +63,16 @@ def test_aerilate_changes_the_type():
 
     mega = Pokemon(gen=9, species="salamencemega")  # Aerilate: Double-Edge is Flying
     assert effectiveness(Move("doubleedge", gen=9), mega, Pokemon(gen=9, species="skeledirge")).multiplier == 1.0
+
+
+def test_prankster_status_fails_on_dark():
+    from poke_env.battle import Pokemon
+
+    from pokesim.rl.threats import ThreatFeatures
+
+    priors = {"whimsicott": {"counter": {"encore": 0.7}, "ability": {"prankster": 1.0}}}
+    f = ThreatFeatures(priors)
+    foe = Pokemon(gen=9, species="whimsicott")
+    umbreon, skeledirge = Pokemon(gen=9, species="umbreon"), Pokemon(gen=9, species="skeledirge")
+    assert abs(f.counters(foe, skeledirge)[0] - 0.7) < 1e-6
+    assert f.counters(foe, umbreon)[0] == 0.0

@@ -9,7 +9,7 @@ damaging moves with their usage share, the Mega forme with its stone's share whi
 - for each of our 6: the chance it knocks that member out (e.g. on the switch-in);
 plus, per kind of set-up counter (Encore, phazing, Taunt, Haze, Yawn), the chance the opponent has one that works on
 our active Pokémon (Good as Gold / Magic Bounce block status moves aimed at it, a Substitute blocks Yawn and Clear
-Smog; Haze and Dragon Tail still work), whether its first hit is absorbed (Disguise still up; Sturdy, Multiscale,
+Smog, Prankster status moves fail on Dark types; Haze and Dragon Tail still work), whether its first hit is absorbed (Disguise still up; Sturdy, Multiscale,
 Shadow Shield at full HP), and volatile effects the base observation leaves out, for both active Pokémon (Curse and Perish Song, which Baton
 Pass hands on, Aqua Ring, Ingrain, Focus Energy, Magnet Rise, No Retreat, trapping; ours also Heal Block, Torment,
 Disable).
@@ -171,16 +171,22 @@ class ThreatFeatures:
         blocks status moves."""
         prior = self.priors.get(to_id(opp.base_species), {}) or self.priors.get(to_id(opp.species), {})
         known = set(opp.moves)
+        # Prankster status moves fail against Dark types: they work only if the opponent lacks Prankster
+        dark = any(t is not None and t.name == "DARK" for t in me.types)
+        prankster = float(self.abilities(opp)[KEY_ABILITIES.index("prankster")]) if dark else 0.0
         out = []
         for moves in COUNTER_GROUPS.values():
             usable = [m for m in moves if not self.blocked(m, me)]
+            works = {m: 1 - prankster if any_move(m).category == MoveCategory.STATUS
+                     and any_move(m).target is not None and any_move(m).target.name == "NORMAL" else 1.0
+                     for m in usable}
             if known & set(usable):
-                out.append(1.0)
+                out.append(max(works[m] for m in known & set(usable)))
             elif len(known) >= 4:
                 out.append(0.0)
             else:
                 share = prior.get("counter", {})
-                out.append(1.0 - float(np.prod([1 - share.get(m, 0.0) for m in usable])))
+                out.append(1.0 - float(np.prod([1 - share.get(m, 0.0) * works[m] for m in usable])))
         out.append(float(to_id(me.ability or "") in STATUS_BLOCKERS))
         return out
 
