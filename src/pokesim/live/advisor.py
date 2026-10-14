@@ -29,6 +29,7 @@ from pokesim.rl.env import REWARDS
 from pokesim.rl.features import embed
 from pokesim.rl.myteam import TeamFeatures, to_id
 from pokesim.search.lookahead import Lookahead, SetSampler, aggregate, label_to_action
+from pokesim.team.roles import win_path
 
 POLICY_WEIGHT = 0.5  # share of the policy in the combined recommendation
 # How the policy and the lookahead are combined (see combine()). "linear" was the plain average of the two
@@ -39,13 +40,15 @@ COMBINE = {"mode": "product", "weight": POLICY_WEIGHT, "temperature": 2.0, "tau"
 @dataclass
 class Suggestion:
     actions: list[tuple[str, float]]  # (label, probability), best first; labels as in the lookahead
-    win_prob: float | None = None  # policy value head mapped to [0, 1]; a rough guide
+    win_prob: float | None = None  # calibrated win probability; None when no calibration supports it
     opponent: list[tuple[str, float]] = field(default_factory=list)  # opponent's next action, most likely first
     policy: dict[str, float] = field(default_factory=dict)
     lookahead: list[tuple[str, float, float]] = field(default_factory=list)  # (label, prob, value)
     elapsed: float = 0.0
-    # win_prob is the PPO critic mapped to [0, 1]: its rewards include HP / faint shaping and discounting, so it is
-    # not a calibrated win probability
+    # win_raw is the PPO critic mapped to [0, 1]: its rewards include HP / faint shaping and discounting, so it is not
+    # a win probability. win_prob is it through a calibration for this source and policy
+    # (pokesim.evaluation.calibration), or None ("not enough data") when there is none or it is not enabled
+    win_raw: float | None = None
     win_kind: str = "policy value (uncalibrated)"
     status: dict = field(default_factory=dict)  # mode, fallback reason, failed branches, solver
     shadow: list[tuple[str, float, float]] = field(default_factory=list)  # planner advice in shadow mode
@@ -69,9 +72,13 @@ def action_label(action: int, battle: Battle) -> str | None:
 OPPONENT_MODEL = {"br_weight": 0.75, "tau": 0.7, "repeat": 0.3}
 # share of the cloned human policy in the opponent prediction (scripts/eval_records.py score --bc-weight)
 OPPONENT_POLICY_WEIGHT = 0.5
-# planner defaults (pokesim.search.planner): rho guards against a wrong opponent prediction; win_decay 0 scores a
-# win the same whenever it comes ("on" only); initial values, to be set on development data
-PLANNER = {"mode": "shadow", "rho": 0.3, "cloned_weight": OPPONENT_POLICY_WEIGHT, "win_decay": 0.0}
+# planner defaults (pokesim.search.planner): rho guards against a wrong opponent prediction. "search": the worker
+# settings the planner's worlds are evaluated with (services/sim-tools/lookahead.js): both continuation policies,
+# a real end scored +-1 (a win counts the same whenever it comes), a penalty for having no damage source left,
+# one seed per policy, 5 turns on, no new pass after 2.5 s. Initial values, to be set on development data.
+PLANNER_SEARCH = {"continuations": ["greedy", "tactical"], "scoring": "terminal", "lostPathPenalty": 0.3,
+                  "winDecay": 0.0, "seeds": 1, "rollout": 5, "deadlineMs": 2500}
+PLANNER = {"mode": "shadow", "rho": 0.3, "cloned_weight": OPPONENT_POLICY_WEIGHT, "search": PLANNER_SEARCH}
 
 
 class Advisor:
@@ -79,17 +86,26 @@ class Advisor:
                  seasons: tuple[str, ...] = ("M-6",), samples: int = 6, seeds: int = 2, rollout: int = 3,
                  reward: str = "sparse", opponent_model: dict | None = None,
                  opponent_policy: str | Path | None = "default", combine: dict | None = None,
-                 planner: dict | None = None):
+                 planner: dict | None = None, source: str | None = None):
+        """source: where the advice is used ("switch" / "showdown"), for the win calibration."""
         self.model = MaskablePPO.load(policy, device="cpu") if policy else None
+        self.calibration = None
+        if policy:
+            from pokesim.evaluation.calibration import Calibrations
+            from pokesim.runtime.bundle import file_hash
+
+            self.calibration = Calibrations().get(source, file_hash(policy))
         roster = [s["species"] for s in sets]
         self.extra = TeamFeatures.for_model(self.model, roster) if self.model else TeamFeatures(roster)
         self.victory = REWARDS[reward]["victory_value"]
         self.combine = dict(COMBINE, **(combine or {}))
         self.planner = dict(PLANNER, **planner) if planner else None
+        if self.planner:
+            self.planner["search"] = dict(PLANNER_SEARCH, **self.planner.get("search", {}))
         model = OPPONENT_MODEL if opponent_model is None else opponent_model
-        win_decay = self.planner.get("win_decay") if self.planner and self.planner["mode"] == "on" else None
+        search = self.planner["search"] if self.planner and self.planner["mode"] == "on" else None
         self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout, model,
-                                win_decay=win_decay) if lookahead else None
+                                search=search) if lookahead else None
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
         self.opponent_policy = None
@@ -126,7 +142,8 @@ class Advisor:
         """last_move: the opponent active's previous move ("move:<id>"), see BattleSession.last_move.
         log: the battle's protocol lines so far (BattleSession.log), for the cloned opponent policy."""
         start = time.perf_counter()
-        policy, win = self._policy(battle)
+        policy, win_raw = self._policy(battle)
+        win = self.calibration.apply(win_raw) if self.calibration else None
         ranked, opponent, shadow = [], [], []
         mode = self.planner["mode"] if self.planner else "legacy"
         status: dict = {"mode": mode}
@@ -151,7 +168,8 @@ class Advisor:
                 status["search"] = advice.status
                 if mode == "shadow":
                     try:
-                        planned = self._search(battle, last_move, dict(cloned), planned=True, cache=cache)
+                        planned = self._search(battle, last_move, dict(cloned), planned=True,
+                                               settings=self.planner["search"])
                         shadow = legal(planned)
                         status["shadow"] = planned.status
                     except Exception as e:  # noqa: BLE001 - observation-only failures must preserve live advice
@@ -169,13 +187,19 @@ class Advisor:
             opponent = mix_opponent(opponent, cloned)
         if not actions and not status.get("fallback") and not policy:
             status["fallback"] = "no advice"
+        try:
+            status["win_path"] = win_path(battle).as_dict()
+        except Exception as e:  # noqa: BLE001 - a diagnostic only
+            status["win_path"] = {"error": repr(e)[:120]}
         return Suggestion(actions, win, opponent, policy, ranked, time.perf_counter() - start, status=status,
-                          shadow=shadow)
+                          shadow=shadow, win_raw=win_raw,
+                          win_kind="calibrated" if win is not None else "policy value (uncalibrated)")
 
     def _search(self, battle: Battle, last_move: str | None, cloned: dict[str, float], planned: bool,
-                cache: dict | None = None):
+                cache: dict | None = None, settings: dict | None = None):
         """The legacy aggregate or the planner (planned) on the lookahead's worlds; cache keeps the worlds of one
-        position (by incoming Pokémon) so shadow mode solves the same worlds both ways."""
+        position (by incoming Pokémon). settings: worker settings for these queries (shadow mode evaluates the
+        planner's worlds with its own settings, so it measures the new method as a whole)."""
         from pokesim.search.planner import plan
 
         engine = self.engine
@@ -184,7 +208,7 @@ class Advisor:
         def solve(b, own, last, incoming=None):
             key = None if incoming is None else incoming.species
             if key not in cache:
-                cache[key] = engine.query(b, own, incoming)
+                cache[key] = engine.query(b, own, incoming, settings)
             if planned:
                 return plan(cache[key], engine.opponent_model, last, self.planner["rho"], cloned or None,
                             self.planner["cloned_weight"])

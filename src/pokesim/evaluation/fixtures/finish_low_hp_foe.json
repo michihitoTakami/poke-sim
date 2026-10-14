@@ -1,0 +1,175 @@
+{
+ "name": "finish_low_hp_foe",
+ "category": "win_conversion",
+ "note": "Finishing the last foe at 10% now beats stalling with Protect or switching (both attacks knock it out).",
+ "samples": [
+  {
+   "p1": {
+    "team": [
+     {
+      "species": "Garchomp",
+      "item": "Life Orb",
+      "ability": "Rough Skin",
+      "nature": "Jolly",
+      "moves": [
+       "Earthquake",
+       "Dragon Claw",
+       "Swords Dance",
+       "Protect"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 32,
+       "def": 0,
+       "spa": 0,
+       "spd": 0,
+       "spe": 2
+      },
+      "level": 50
+     },
+     {
+      "species": "Rotom-Wash",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "nature": "Bold",
+      "moves": [
+       "Hydro Pump",
+       "Volt Switch",
+       "Will-O-Wisp",
+       "Protect"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 0,
+       "def": 2,
+       "spa": 0,
+       "spd": 32,
+       "spe": 0
+      },
+      "level": 50
+     },
+     {
+      "species": "Hippowdon",
+      "item": "Leftovers",
+      "ability": "Sand Stream",
+      "nature": "Impish",
+      "moves": [
+       "Earthquake",
+       "Yawn",
+       "Slack Off",
+       "Stealth Rock"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 0,
+       "def": 2,
+       "spa": 0,
+       "spd": 32,
+       "spe": 0
+      },
+      "level": 50
+     }
+    ],
+    "mons": [
+     {
+      "hp": 1.0,
+      "boosts": {
+       "atk": 2
+      }
+     }
+    ]
+   },
+   "p2": {
+    "team": [
+     {
+      "species": "Hippowdon",
+      "item": "Leftovers",
+      "ability": "Sand Stream",
+      "nature": "Impish",
+      "moves": [
+       "Earthquake",
+       "Yawn",
+       "Slack Off",
+       "Stealth Rock"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 0,
+       "def": 2,
+       "spa": 0,
+       "spd": 32,
+       "spe": 0
+      },
+      "level": 50
+     },
+     {
+      "species": "Rotom-Wash",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "nature": "Bold",
+      "moves": [
+       "Hydro Pump",
+       "Volt Switch",
+       "Will-O-Wisp",
+       "Protect"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 0,
+       "def": 2,
+       "spa": 0,
+       "spd": 32,
+       "spe": 0
+      },
+      "level": 50
+     },
+     {
+      "species": "Garchomp",
+      "item": "Life Orb",
+      "ability": "Rough Skin",
+      "nature": "Jolly",
+      "moves": [
+       "Earthquake",
+       "Dragon Claw",
+       "Swords Dance",
+       "Protect"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 32,
+       "def": 0,
+       "spa": 0,
+       "spd": 0,
+       "spe": 2
+      },
+      "level": 50
+     }
+    ],
+    "mons": [
+     {
+      "hp": 0.1
+     },
+     {
+      "hp": 0
+     },
+     {
+      "hp": 0
+     }
+    ]
+   },
+   "field": {}
+  }
+ ],
+ "expect": [
+  {
+   "best_in": [
+    "move:earthquake",
+    "move:dragonclaw"
+   ]
+  },
+  {
+   "better": "move:earthquake",
+   "than": "move:protect"
+  }
+ ]
+}

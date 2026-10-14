@@ -109,6 +109,7 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
     over worlds. Worlds where every branch failed are left out and counted in status."""
     labels = results[0]["p1"]
     worlds, failed_cells, failed_worlds = [], 0, 0
+    extras: list[dict[str, np.ndarray]] = []  # per world: payoff per continuation policy, share resolved
     for res in results:
         try:
             payoff, opp, failed = clean(res)
@@ -119,6 +120,10 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
         payoff = payoff[idx]
         q = predict(payoff, opp, opponent_model or {}, last_move, cloned, cloned_weight)
         worlds.append(World(payoff, opp, 1.0, q))
+        cols = [res["p2"].index(lab) for lab in opp]
+        extras.append({name: matrix(m, idx, cols, payoff) for name, m in res.get("byContinuation", {}).items()}
+                      | ({"_resolved": matrix(res["resolved"], idx, cols, np.zeros_like(payoff))}
+                         if "resolved" in res else {}))
         failed_cells += failed
     if not worlds:
         raise ValueError("every sampled world failed")
@@ -128,4 +133,26 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
         for lab, p in zip(wd.opponent, wd.predicted):
             opponent[lab] = opponent.get(lab, 0.0) + float(p) / len(worlds)
     status = dict(sol.status, rho=rho, worlds=len(worlds), failed_worlds=failed_worlds, failed_cells=failed_cells)
+    status.update(diagnose(sol.prob, worlds, extras))
     return Advice(labels, sol.prob, sol.expected, opponent, status=status, worst=sol.worst)
+
+
+def matrix(rows: list[list], idx: list[int], cols: list[int], fallback: np.ndarray) -> np.ndarray:
+    """A worker matrix restricted to the world's kept options; missing cells (no run) take the payoff's value."""
+    m = np.array([[np.nan if v is None else v for v in row] for row in rows], dtype=float)[np.ix_(idx, cols)]
+    return np.where(np.isnan(m), fallback, m)
+
+
+def diagnose(x: np.ndarray, worlds: list[World], extras: list[dict[str, np.ndarray]]) -> dict:
+    """How far to trust the chosen mix's value: under each continuation policy (their spread is a disagreement of
+    the rollouts, not a confidence interval) and the share of rollouts that reached a real end."""
+    out: dict = {}
+    names = sorted({k for e in extras for k in e if not k.startswith("_")})
+    if names:
+        by = {n: float(np.mean([x @ e.get(n, wd.payoff) @ wd.predicted for wd, e in zip(worlds, extras)]))
+              for n in names}
+        out["by_continuation"] = by
+        out["continuation_spread"] = max(by.values()) - min(by.values())
+    if extras and all("_resolved" in e for e in extras):
+        out["resolved"] = float(np.mean([x @ e["_resolved"] @ wd.predicted for wd, e in zip(worlds, extras)]))
+    return out

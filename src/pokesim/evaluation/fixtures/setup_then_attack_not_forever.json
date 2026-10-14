@@ -1,0 +1,180 @@
+{
+ "name": "setup_then_attack_not_forever",
+ "category": "over_setup",
+ "note": "At +6 Special Attack, Calm Mind again does nothing: attack.",
+ "samples": [
+  {
+   "p1": {
+    "team": [
+     {
+      "species": "Floette-Eternal",
+      "item": "Floettite",
+      "ability": "Flower Veil",
+      "nature": "Modest",
+      "moves": [
+       "Moonblast",
+       "Substitute",
+       "Synthesis",
+       "Calm Mind"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 0,
+       "def": 0,
+       "spa": 32,
+       "spd": 0,
+       "spe": 2
+      },
+      "level": 50
+     },
+     {
+      "species": "Scolipede",
+      "item": "Mental Herb",
+      "ability": "Speed Boost",
+      "nature": "Jolly",
+      "moves": [
+       "Iron Defense",
+       "Protect",
+       "Substitute",
+       "Baton Pass"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 32,
+       "def": 0,
+       "spa": 0,
+       "spd": 0,
+       "spe": 2
+      },
+      "level": 50
+     },
+     {
+      "species": "Gholdengo",
+      "item": "Air Balloon",
+      "ability": "Good as Gold",
+      "nature": "Modest",
+      "moves": [
+       "Shadow Ball",
+       "Flash Cannon",
+       "Recover",
+       "Nasty Plot"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 0,
+       "def": 0,
+       "spa": 32,
+       "spd": 0,
+       "spe": 2
+      },
+      "level": 50
+     }
+    ],
+    "mons": [
+     {
+      "hp": 1.0,
+      "boosts": {
+       "spa": 6,
+       "spd": 6
+      },
+      "mega": true
+     },
+     {
+      "hp": 1.0
+     },
+     {
+      "hp": 1.0
+     }
+    ]
+   },
+   "p2": {
+    "team": [
+     {
+      "species": "Hippowdon",
+      "item": "Leftovers",
+      "ability": "Sand Stream",
+      "nature": "Impish",
+      "moves": [
+       "Earthquake",
+       "Yawn",
+       "Slack Off",
+       "Stealth Rock"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 0,
+       "def": 2,
+       "spa": 0,
+       "spd": 32,
+       "spe": 0
+      },
+      "level": 50
+     },
+     {
+      "species": "Garchomp",
+      "item": "Life Orb",
+      "ability": "Rough Skin",
+      "nature": "Jolly",
+      "moves": [
+       "Earthquake",
+       "Dragon Claw",
+       "Swords Dance",
+       "Protect"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 32,
+       "def": 0,
+       "spa": 0,
+       "spd": 0,
+       "spe": 2
+      },
+      "level": 50
+     },
+     {
+      "species": "Rotom-Wash",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "nature": "Bold",
+      "moves": [
+       "Hydro Pump",
+       "Volt Switch",
+       "Will-O-Wisp",
+       "Protect"
+      ],
+      "evs": {
+       "hp": 32,
+       "atk": 0,
+       "def": 2,
+       "spa": 0,
+       "spd": 32,
+       "spe": 0
+      },
+      "level": 50
+     }
+    ],
+    "mons": [
+     {
+      "hp": 1.0
+     },
+     {
+      "hp": 1.0
+     },
+     {
+      "hp": 1.0
+     }
+    ]
+   },
+   "field": {}
+  }
+ ],
+ "expect": [
+  {
+   "not_best": "move:calmmind"
+  },
+  {
+   "better": "move:moonblast",
+   "than": "move:calmmind"
+  }
+ ]
+}
