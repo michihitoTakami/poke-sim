@@ -201,8 +201,11 @@ class SetSampler:
                 "evs": dict(zip(STATS, map(int, points.split("-")))), "level": 50}
 
 
-def mon_state(mon: Pokemon, active: bool) -> dict:
+def mon_state(mon: Pokemon, active: bool, own: bool = False) -> dict:
+    from pokesim.state.codec import known_counters
+
     out = {"hp": 0.0 if mon.fainted else mon.current_hp_fraction, "mega": mega_evolved(mon)}
+    out.update(known_counters(mon, active, own))
     entry = GenData.from_gen(9).pokedex.get(current_forme(mon), {})
     if entry.get("battleOnly") and not mega_evolved(mon):  # e.g. Mimikyu-Busted (no Disguise left), Aegislash-Blade
         out["forme"] = entry["name"]
@@ -277,7 +280,12 @@ class Lookahead:
         if not battle.available_switches and not battle.trapped and incoming is None:
             bench = [m for m in battle.team.values() if m is not active][:2]
         mons = [active] + bench[:2]
-        states = [mon_state(m, i == 0) for i, m in enumerate(mons)]
+        states = [mon_state(m, i == 0, own=True) for i, m in enumerate(mons)]
+        request = battle.last_request.get("active") or []
+        if request:
+            states[0]["pp"] = {m["id"]: m["pp"] for m in request[0].get("moves", []) if "pp" in m}
+        if hasattr(battle, "state_tracker"):
+            states[0].update(battle.state_tracker.locks(battle.player_role, active.name))
         out = {"team": [own_sets[self.sampler.base_id(m.species)] for m in mons],
                 "mons": states,
                 "megaUsed": battle.used_mega_evolve, "conditions": side_conditions(battle.side_conditions,
@@ -302,6 +310,8 @@ class Lookahead:
                 item = None
             team.append(self.sampler.sample(m.species, list(m.moves), item, m.ability))
             mons.append(mon_state(m, i == 0))
+            if i == 0 and hasattr(battle, "state_tracker"):
+                mons[-1].update(battle.state_tracker.locks(battle.opponent_role, m.name))
         for sid in unseen[:3 - len(team)]:
             team.append(self.sampler.sample(sid))
             mons.append({"hp": 1.0})
