@@ -27,7 +27,7 @@ from pokesim.search.lookahead import Lookahead, SetSampler, label_to_action
 POLICY_WEIGHT = 0.5  # share of the policy in the combined recommendation
 # How the policy and the lookahead are combined (see combine()). "linear" was the plain average of the two
 # distributions; a near-deterministic policy then decided almost every turn on its own.
-COMBINE = {"mode": "product", "weight": POLICY_WEIGHT, "temperature": 2.0, "tau": 0.5, "margin": 1.0}
+COMBINE = {"mode": "product", "weight": POLICY_WEIGHT, "temperature": 2.0, "tau": 0.5, "margin": 1.0, "defer": 0.9}
 
 
 @dataclass
@@ -126,17 +126,19 @@ class Advisor:
 
 def combine(policy: dict[str, float], ranked: list[tuple[str, float, float]], mode: str = "product",
             weight: float = POLICY_WEIGHT, temperature: float = 1.0, tau: float = 0.5,
-            margin: float | None = None) -> list[tuple[str, float]]:
+            margin: float | None = None, defer: float | None = None) -> list[tuple[str, float]]:
     """Our action distribution from the policy (label -> prob) and the lookahead ((label, eq. prob, value)).
 
     linear:  weight * policy + (1 - weight) * lookahead equilibrium mix.
     product: policy^(weight / temperature) * lookahead^(1 - weight), where the lookahead's distribution is the mean of
              its equilibrium mix and softmax(value / tau); an action needs support from both. Actions whose
              lookahead value is more than `margin` below the best (a win counts 3, a Pokemon's HP 1) are dropped.
+    defer: when the lookahead's equilibrium puts at least this much on one action, its mix alone (the policy cannot
+    see unrevealed moves or Mega Evolution; the search samples them).
     With only one source, that source alone."""
     if not ranked:
         out = dict(policy)
-    elif not policy:
+    elif not policy or (defer is not None and max(p for _, p, _ in ranked) >= defer * sum(p for _, p, _ in ranked)):
         total = sum(p for _, p, _ in ranked) or 1.0
         out = {lab: p / total for lab, p, _ in ranked}
     elif mode == "linear":

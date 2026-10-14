@@ -21,3 +21,11 @@ def test_combine_product_needs_both():
     out = dict(combine(policy, ranked, temperature=2.0, margin=1.0))
     assert max(out, key=out.get) == "move:batonpass" and out["move:calmmind"] == 0.0
     assert abs(sum(out.values()) - 1) < 1e-6
+
+
+def test_combine_defers_to_a_confident_lookahead():
+    from pokesim.live.advisor import combine
+
+    policy = {"move:substitute": 0.66, "move:protect": 0.29, "switch:umbreon": 0.0}
+    ranked = [("switch:umbreon", 0.976, -0.63), ("switch:gholdengo", 0.024, -0.82), ("move:substitute", 0.0, -1.2)]
+    assert combine(policy, ranked, temperature=2.0, margin=1.0, defer=0.9)[0][0] == "switch:umbreon"
