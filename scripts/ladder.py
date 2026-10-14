@@ -3,6 +3,8 @@
   # public server (needs a registered account): credentials in ~/.config/poke-sim/showdown.env
   #   PS_USERNAME=...   PS_PASSWORD=...
   uv run python scripts/ladder.py --battles 30
+  # A/B: battles alternate between the policies (the record says which one played)
+  uv run python scripts/ladder.py --battles 30 --policy checkpoints/ppo_baton_v2.zip checkpoints/ppo_baton_items.zip
   # local test against a random player
   uv run python scripts/ladder.py --local --battles 2
 
@@ -23,11 +25,12 @@ import numpy as np
 from poke_env import AccountConfiguration, LocalhostServerConfiguration, ShowdownServerConfiguration
 from poke_env.environment import SinglesEnv
 from poke_env.player import Player, RandomPlayer
+from sb3_contrib import MaskablePPO
 
 from pokesim.config import FORMAT, RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor
 from pokesim.live.selection import MatchupModel, PickModel
-from pokesim.rl.myteam import FixedTeam, to_id
+from pokesim.rl.myteam import FixedTeam, TeamFeatures, to_id
 from pokesim.search.lookahead import label_to_action
 from pokesim.sim.pool import TeamPool, load_teams
 
@@ -48,9 +51,18 @@ def credentials() -> tuple[str, str] | None:
 
 
 class AdvisorPlayer(Player):
-    def __init__(self, sets: list[dict], policy: str | None, out: Path = OUT, **kwargs):
+    """With several policies, battles alternate between them (A/B comparison on the same ladder)."""
+
+    def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, **kwargs):
         self.sets, self.out = sets, out
-        self.advisor = Advisor(sets, policy=policy)
+        self.advisor = Advisor(sets, policy=policies[0])
+        roster = [s["species"] for s in sets]
+        self.policies = {policies[0]: (self.advisor.model, self.advisor.extra)}
+        for path in policies[1:]:
+            model = MaskablePPO.load(path, device="cpu")
+            self.policies[path] = (model, TeamFeatures.for_model(model, roster))
+        self.assigned: dict[str, str] = {}  # battle tag -> policy path
+        self.advice: dict[str, list[dict]] = {}  # battle tag -> per-decision advice
         self.picks, self.matchups = PickModel(), MatchupModel()
         self.lineups: dict[str, list[str]] = {}
         self.logs: dict[str, list[str]] = {}  # battle tag -> protocol lines
@@ -63,7 +75,14 @@ class AdvisorPlayer(Player):
                                                  if len(m) > 1 and m[1] not in ("request", "t:", "j", "l", "c"))
         await super()._handle_battle_message(split_messages)
 
+    def policy_for(self, battle) -> str:
+        if battle.battle_tag not in self.assigned:
+            paths = list(self.policies)
+            self.assigned[battle.battle_tag] = paths[len(self.assigned) % len(paths)]
+        return self.assigned[battle.battle_tag]
+
     def teampreview(self, battle) -> str:
+        self.policy_for(battle)
         opp = [m.species for m in battle.teampreview_opponent_team]
         ranking = self.matchups.rank([s["species"] for s in self.sets], self.picks.predict(opp))
         lineup = ranking[0][0] if ranking else [s["species"] for s in self.sets[:3]]
@@ -84,16 +103,26 @@ class AdvisorPlayer(Player):
 
     def choose_move(self, battle):
         mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
+        self.advisor.model, self.advisor.extra = self.policies[self.policy_for(battle)]
+        entry = {"turn": battle.turn, "force": bool(battle.force_switch)}
+        self.advice.setdefault(battle.battle_tag, []).append(entry)
         try:
             advice = self.advisor.advise(battle, self.last_opponent_move(battle),
                                          self.logs.get(battle.battle_tag, []),
                                          battle.player_role)
+            entry.update({"actions": rounded(advice.actions[:5]), "win": advice.win_prob,
+                          "policy": rounded(sorted(advice.policy.items(), key=lambda kv: -kv[1])[:3]),
+                          "lookahead": [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.lookahead[:3]],
+                          "opponent": rounded(advice.opponent[:4]), "secs": round(advice.elapsed, 2)})
             for label, _ in advice.actions:
                 action = label_to_action(label, battle)
                 if action is not None and mask[action]:
+                    entry["chosen"] = label
                     return SinglesEnv.action_to_order(np.int64(action), battle, strict=False)
         except Exception as e:  # noqa: BLE001 - never stall a live battle
             print("advice failed:", repr(e)[:200], flush=True)
+            entry["error"] = repr(e)[:200]
+        entry["chosen"] = "random"
         return self.choose_random_move(battle)
 
     def _battle_finished_callback(self, battle) -> None:
@@ -106,13 +135,19 @@ class AdvisorPlayer(Player):
         record = {"started": stamp, "result": "win" if battle.won else "loss" if battle.lost else None,
                   "team": [s["species"] for s in self.sets],
                   "preview": {"species": [m.species for m in battle.teampreview_opponent_team]},
-                  "lineup": self.lineups.get(battle.battle_tag), "log": log, "advice": [],
+                  "lineup": self.lineups.get(battle.battle_tag), "log": log,
+                  "advice": self.advice.pop(battle.battle_tag, []),
+                  "policy": Path(self.assigned.get(battle.battle_tag, "")).stem,
                   "source": f"showdown {battle.battle_tag}", "opponent": battle.opponent_username,
                   "rating": getattr(battle, "rating", None)}
         (self.out / f"{stamp}-{battle.battle_tag.split('-')[-1]}.json").write_text(
             json.dumps(record, ensure_ascii=False, indent=1))
-        print(f"{battle.battle_tag}: {record['result']} vs {battle.opponent_username}  "
+        print(f"{battle.battle_tag}: {record['result']} vs {battle.opponent_username} [{record['policy']}]  "
               f"({self.n_won_battles}-{self.n_lost_battles})", flush=True)
+
+
+def rounded(pairs) -> list:
+    return [(k, round(float(v), 3)) for k, v in pairs]
 
 
 async def run(args) -> None:
@@ -139,7 +174,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--battles", type=int, default=30)
     ap.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
-    ap.add_argument("--policy", default=str(ROOT / "checkpoints/ppo_baton_v2.zip"))
+    ap.add_argument("--policy", nargs="+", default=[str(ROOT / "checkpoints/ppo_baton_v2.zip")],
+                    help="one or more policies; with several, battles alternate between them")
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--local", action="store_true", help="local server (localhost:8000) against a random player")
     asyncio.run(run(ap.parse_args()))
