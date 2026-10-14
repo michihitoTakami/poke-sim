@@ -65,8 +65,33 @@ class Effectiveness:
     p_immune: float  # probability the move does nothing
 
 
-def _ability_multiplier(ability: str, move: Move, defender: Pokemon, type_mult: float) -> float:
-    move_type = move.type.name.lower()
+# attacker abilities that turn Normal moves into another type (and power them up by 1.2)
+TYPE_CHANGE = {"aerilate": "FLYING", "pixilate": "FAIRY", "refrigerate": "ICE", "galvanize": "ELECTRIC"}
+
+
+def move_type(move: Move, attacker: Pokemon | None):
+    """The type the move hits with: -ate abilities and Normalize change it, Liquid Voice makes sound moves Water."""
+    from poke_env.battle import PokemonType
+
+    ability = attacker.ability if attacker is not None else None
+    if ability in TYPE_CHANGE and move.type == PokemonType.NORMAL:
+        return PokemonType[TYPE_CHANGE[ability]]
+    if ability == "normalize":
+        return PokemonType.NORMAL
+    if ability == "liquidvoice" and "sound" in move.flags:
+        return PokemonType.WATER
+    return move.type
+
+
+def type_power(move: Move, attacker: Pokemon | None) -> float:
+    """1.2 when an -ate ability or Normalize changed the move's type."""
+    ability = attacker.ability if attacker is not None else None
+    changed = (ability in TYPE_CHANGE and move.type.name == "NORMAL") or ability == "normalize"
+    return 1.2 if changed else 1.0
+
+
+def _ability_multiplier(ability: str, move: Move, defender: Pokemon, type_mult: float, mtype=None) -> float:
+    move_type = (mtype or move.type).name.lower()
     if TYPE_IMMUNITY_ABILITIES.get(ability) == move_type:
         return 0.0
     if (flag := FLAG_IMMUNITY_ABILITIES.get(ability)) and flag in move.flags:
@@ -95,30 +120,31 @@ def _scrappy_share(attacker: Pokemon | None, season: str) -> float:
     return sum(p for a, p in ability_distribution(attacker, season).items() if a in GHOST_HITTERS)
 
 
-def _ghost_hit_multiplier(move: Move, defender: Pokemon) -> float:
+def _ghost_hit_multiplier(mtype, defender: Pokemon) -> float:
     """The type multiplier with the Ghost type's immunity to Normal / Fighting ignored."""
     from poke_env.battle import PokemonType
     from poke_env.data import GenData
 
     types = [t if t != PokemonType.GHOST else None for t in defender.types]
     types += [None] * (2 - len(types))
-    return move.type.damage_multiplier(types[0], types[1], type_chart=GenData.from_gen(9).type_chart)
+    return mtype.damage_multiplier(types[0], types[1], type_chart=GenData.from_gen(9).type_chart)
 
 
 def effectiveness(move: Move, attacker: Pokemon | None, defender: Pokemon, season: str = "M-6") -> Effectiveness:
-    type_mult = defender.damage_multiplier(move)
-    if type_mult == 0 and move.type.name in ("NORMAL", "FIGHTING") and move.category != MoveCategory.STATUS \
+    mtype = move_type(move, attacker)
+    type_mult = defender.damage_multiplier(mtype if move.category != MoveCategory.STATUS else move)
+    if type_mult == 0 and mtype.name in ("NORMAL", "FIGHTING") and move.category != MoveCategory.STATUS \
             and any(t is not None and t.name == "GHOST" for t in defender.types):
         share = _scrappy_share(attacker, season)
         if share > 0:  # Scrappy / Mind's Eye: the Ghost immunity does not apply
-            hit = _ghost_hit_multiplier(move, defender)
+            hit = _ghost_hit_multiplier(mtype, defender)
             if share >= 1:
                 type_mult = hit
             else:
                 return Effectiveness(share * hit, 1 - share)
     if move.category == MoveCategory.STATUS:
         return Effectiveness(type_mult, float(type_mult == 0))
-    if move.type.name.lower() == "ground" and defender.item == "airballoon":
+    if mtype.name.lower() == "ground" and defender.item == "airballoon":
         return Effectiveness(0.0, 1.0)
     if attacker is not None and attacker.ability in ATTACKER_IGNORES_ABILITIES:
         return Effectiveness(type_mult, float(type_mult == 0))
@@ -127,7 +153,7 @@ def effectiveness(move: Move, attacker: Pokemon | None, defender: Pokemon, seaso
         return Effectiveness(type_mult, float(type_mult == 0))
     expected = p_immune = 0.0
     for ability, p in dist.items():
-        m = _ability_multiplier(ability, move, defender, type_mult)
+        m = _ability_multiplier(ability, move, defender, type_mult, mtype)
         expected += p * m
         p_immune += p * (m == 0)
     return Effectiveness(expected, p_immune)

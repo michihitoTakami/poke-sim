@@ -54,3 +54,12 @@ def test_scrappy_hits_ghosts():
     mega = Pokemon(gen=9, species="lopunnymega")  # Scrappy
     assert effectiveness(Move("closecombat", gen=9), mega, gholdengo).multiplier == 2.0
     assert effectiveness(Move("closecombat", gen=9), Pokemon(gen=9, species="lopunny"), gholdengo).multiplier == 0.0
+
+
+def test_aerilate_changes_the_type():
+    from poke_env.battle import Move, Pokemon
+
+    from pokesim.sim.effectiveness import effectiveness
+
+    mega = Pokemon(gen=9, species="salamencemega")  # Aerilate: Double-Edge is Flying
+    assert effectiveness(Move("doubleedge", gen=9), mega, Pokemon(gen=9, species="skeledirge")).multiplier == 1.0

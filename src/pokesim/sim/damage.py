@@ -11,7 +11,7 @@ from functools import lru_cache
 from poke_env.battle import Move, MoveCategory, Pokemon, PokemonType, Status, Weather
 
 from pokesim.config import PROCESSED_DIR
-from pokesim.sim.effectiveness import effectiveness
+from pokesim.sim.effectiveness import effectiveness, move_type, type_power
 
 LEVEL = 50
 STATS = ["hp", "atk", "def", "spa", "spd", "spe"]
@@ -88,15 +88,17 @@ def calc(move: Move, attacker: Pokemon, defender: Pokemon, *, attacker_own: bool
 
     base = ((2 * LEVEL / 5 + 2) * move.base_power * attack / max(defense, 1)) / 50 + 2
     mod = effectiveness(move, attacker, defender, season).multiplier
-    if move.type in attacker.types:
+    mtype = move_type(move, attacker)
+    mod *= type_power(move, attacker)
+    if mtype in attacker.types:
         mod *= 2.0 if attacker.ability == "adaptability" else 1.5
     if physical and attacker.status == Status.BRN and attacker.ability != "guts":
         mod *= 0.5
     weather = weather or {}
     if Weather.SUNNYDAY in weather:
-        mod *= {PokemonType.FIRE: 1.5, PokemonType.WATER: 0.5}.get(move.type, 1.0)
+        mod *= {PokemonType.FIRE: 1.5, PokemonType.WATER: 0.5}.get(mtype, 1.0)
     elif Weather.RAINDANCE in weather:
-        mod *= {PokemonType.WATER: 1.5, PokemonType.FIRE: 0.5}.get(move.type, 1.0)
+        mod *= {PokemonType.WATER: 1.5, PokemonType.FIRE: 0.5}.get(mtype, 1.0)
     item = attacker.item or ""
     mod *= {"choiceband": 1.5 if physical else 1.0, "choicespecs": 1.0 if physical else 1.5,
             "lifeorb": 1.3}.get(item, 1.0)
