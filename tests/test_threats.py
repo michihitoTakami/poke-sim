@@ -43,3 +43,14 @@ def test_disguise_shield():
     f = ThreatFeatures({})
     assert f.shields(Pokemon(gen=9, species="mimikyu"))[0] == 1.0
     assert f.shields(Pokemon(gen=9, species="mimikyubusted"))[0] == 0.0
+
+
+def test_scrappy_hits_ghosts():
+    from poke_env.battle import Move, Pokemon
+
+    from pokesim.sim.effectiveness import effectiveness
+
+    gholdengo = Pokemon(gen=9, species="gholdengo")
+    mega = Pokemon(gen=9, species="lopunnymega")  # Scrappy
+    assert effectiveness(Move("closecombat", gen=9), mega, gholdengo).multiplier == 2.0
+    assert effectiveness(Move("closecombat", gen=9), Pokemon(gen=9, species="lopunny"), gholdengo).multiplier == 0.0

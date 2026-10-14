@@ -83,8 +83,39 @@ def _ability_multiplier(ability: str, move: Move, defender: Pokemon, type_mult: 
     return mult
 
 
+# attacker abilities that let Normal / Fighting moves hit Ghost types (Mega Lopunny, Ursaluna-Bloodmoon)
+GHOST_HITTERS = {"scrappy", "mindseye"}
+
+
+def _scrappy_share(attacker: Pokemon | None, season: str) -> float:
+    if attacker is None:
+        return 0.0
+    if attacker.ability:
+        return float(attacker.ability in GHOST_HITTERS)
+    return sum(p for a, p in ability_distribution(attacker, season).items() if a in GHOST_HITTERS)
+
+
+def _ghost_hit_multiplier(move: Move, defender: Pokemon) -> float:
+    """The type multiplier with the Ghost type's immunity to Normal / Fighting ignored."""
+    from poke_env.battle import PokemonType
+    from poke_env.data import GenData
+
+    types = [t if t != PokemonType.GHOST else None for t in defender.types]
+    types += [None] * (2 - len(types))
+    return move.type.damage_multiplier(types[0], types[1], type_chart=GenData.from_gen(9).type_chart)
+
+
 def effectiveness(move: Move, attacker: Pokemon | None, defender: Pokemon, season: str = "M-6") -> Effectiveness:
     type_mult = defender.damage_multiplier(move)
+    if type_mult == 0 and move.type.name in ("NORMAL", "FIGHTING") and move.category != MoveCategory.STATUS \
+            and any(t is not None and t.name == "GHOST" for t in defender.types):
+        share = _scrappy_share(attacker, season)
+        if share > 0:  # Scrappy / Mind's Eye: the Ghost immunity does not apply
+            hit = _ghost_hit_multiplier(move, defender)
+            if share >= 1:
+                type_mult = hit
+            else:
+                return Effectiveness(share * hit, 1 - share)
     if move.category == MoveCategory.STATUS:
         return Effectiveness(type_mult, float(type_mult == 0))
     if move.type.name.lower() == "ground" and defender.item == "airballoon":
