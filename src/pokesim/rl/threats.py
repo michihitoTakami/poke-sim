@@ -9,13 +9,15 @@ damaging moves with their usage share, the Mega forme with its stone's share whi
 - for each of our 6: the chance it knocks that member out (e.g. on the switch-in);
 plus, per kind of set-up counter (Encore, phazing, Taunt, Haze, Yawn), the chance the opponent has one that works on
 our active Pokémon (Good as Gold / Magic Bounce block status moves aimed at it, a Substitute blocks Yawn and Clear
-Smog, Prankster status moves fail on Dark types; Haze and Dragon Tail still work), whether its first hit is absorbed (Disguise still up; Sturdy, Multiscale,
-Shadow Shield at full HP), and volatile effects the base observation leaves out, for both active Pokémon (Curse and Perish Song, which Baton
-Pass hands on, Aqua Ring, Ingrain, Focus Energy, Magnet Rise, No Retreat, trapping; ours also Heal Block, Torment,
+Smog, Prankster status moves fail on Dark types; Haze and Dragon Tail still work), whether its first hit is absorbed
+(Disguise still up; Sturdy, Multiscale, Shadow Shield at full HP), and volatile effects the base observation leaves
+out, for both active Pokémon (Curse and Perish Song, which Baton Pass hands on, Aqua Ring, Ingrain, Focus Energy,
+Magnet Rise, No Retreat, trapping; ours also Heal Block, Torment,
 Disable).
 
   uv run python -m pokesim.rl.threats      # build data/processed/threat_priors.json from the set data
 """
+
 import json
 from functools import lru_cache
 
@@ -41,8 +43,22 @@ N_COUNTER = len(COUNTER_GROUPS) + 1
 SHIELD_ABILITIES = ["sturdy", "multiscale", "shadowshield"]  # survive / halve a hit at full HP
 N_SHIELD = 1 + len(SHIELD_ABILITIES)
 # abilities that change what we should do; known once revealed, else the usage share
-KEY_ABILITIES = ["prankster", "galewings", "triage", "unaware", "intimidate", "magicbounce", "goodasgold", "levitate",
-                 "regenerator", "moxie", "defiant", "competitive", "clearbody", "infiltrator"]
+KEY_ABILITIES = [
+    "prankster",
+    "galewings",
+    "triage",
+    "unaware",
+    "intimidate",
+    "magicbounce",
+    "goodasgold",
+    "levitate",
+    "regenerator",
+    "moxie",
+    "defiant",
+    "competitive",
+    "clearbody",
+    "infiltrator",
+]
 N_ABILITY = len(KEY_ABILITIES) + 1  # + the chance an Encore lands before our move
 SIZE = 4 + 6 + N_OWN + N_OPP + N_COUNTER + N_SHIELD + N_ABILITY
 MAX_MOVES = 10  # likely damaging moves kept per species
@@ -62,11 +78,11 @@ def move(mid: str) -> Move | None:
         return None
 
 
-def build_priors() -> dict[str, dict]:
+def build_priors(sampler=None) -> dict[str, dict]:
     """species -> {"moves": {move: share of sets carrying it}, "mega": {mega species id: share}}."""
     from pokesim.search.lookahead import SetSampler
 
-    sampler = SetSampler(["M-6"])
+    sampler = SetSampler(["M-6"]) if sampler is None else sampler
     out = {}
     for sid, sm in sampler.summary.items():
         total = sum(v for k, v in sm.moves.items() if k)
@@ -78,16 +94,21 @@ def build_priors() -> dict[str, dict]:
             it = sampler.items.get(k)
             if it is not None and it.mega_stone:
                 mega[to_id(it.mega_stone)] = mega.get(to_id(it.mega_stone), 0.0) + v / items
-        counters = {k: min(1.0, 4 * v / total) for k, v in sm.moves.items()
-                    if total and any(k in g for g in COUNTER_GROUPS.values())}
+        counters = {
+            k: min(1.0, 4 * v / total)
+            for k, v in sm.moves.items()
+            if total and any(k in g for g in COUNTER_GROUPS.values())
+        }
         ab_total = sum(v for k, v in sm.abilities.items() if k) or 1.0
         shields = {k: sm.abilities.get(k, 0) / ab_total for k in SHIELD_ABILITIES}
         key = {k: sm.abilities.get(k, 0) / ab_total for k in KEY_ABILITIES}
-        out[sid] = {"moves": {k: round(v, 3) for k, v in moves.items()},
-                    "counter": {k: round(v, 3) for k, v in counters.items()},
-                    "shield": {k: round(v, 3) for k, v in shields.items() if v > 0},
-                    "ability": {k: round(v, 3) for k, v in key.items() if v > 0},
-                    "mega": {k: round(v, 3) for k, v in mega.items() if v >= 0.01}}
+        out[sid] = {
+            "moves": {k: round(v, 3) for k, v in moves.items()},
+            "counter": {k: round(v, 3) for k, v in counters.items()},
+            "shield": {k: round(v, 3) for k, v in shields.items() if v > 0},
+            "ability": {k: round(v, 3) for k, v in key.items() if v > 0},
+            "mega": {k: round(v, 3) for k, v in mega.items() if v >= 0.01},
+        }
     return out
 
 
@@ -177,9 +198,14 @@ class ThreatFeatures:
         out = []
         for moves in COUNTER_GROUPS.values():
             usable = [m for m in moves if not self.blocked(m, me)]
-            works = {m: 1 - prankster if any_move(m).category == MoveCategory.STATUS
-                     and any_move(m).target is not None and any_move(m).target.name == "NORMAL" else 1.0
-                     for m in usable}
+            works = {
+                m: 1 - prankster
+                if any_move(m).category == MoveCategory.STATUS
+                and any_move(m).target is not None
+                and any_move(m).target.name == "NORMAL"
+                else 1.0
+                for m in usable
+            }
             if known & set(usable):
                 out.append(max(works[m] for m in known & set(usable)))
             elif len(known) >= 4:
@@ -203,21 +229,24 @@ class ThreatFeatures:
     def abilities(self, opp: Pokemon) -> np.ndarray:
         if opp.ability:
             return np.array([float(to_id(opp.ability) == k) for k in KEY_ABILITIES])
-        prior = (self.priors.get(to_id(opp.base_species), {}) or self.priors.get(to_id(opp.species), {}))
+        prior = self.priors.get(to_id(opp.base_species), {}) or self.priors.get(to_id(opp.species), {})
         return np.array([prior.get("ability", {}).get(k, 0.0) for k in KEY_ABILITIES])
 
     def __call__(self, battle: AbstractBattle) -> np.ndarray:
         feats = np.zeros(self.size, dtype=np.float32)
         a0 = self.size - N_ABILITY
         if battle.opponent_active_pokemon is not None:
-            feats[a0 - N_SHIELD:a0] = self.shields(battle.opponent_active_pokemon)
-            feats[a0:a0 + len(KEY_ABILITIES)] = self.abilities(battle.opponent_active_pokemon)
+            feats[a0 - N_SHIELD : a0] = self.shields(battle.opponent_active_pokemon)
+            feats[a0 : a0 + len(KEY_ABILITIES)] = self.abilities(battle.opponent_active_pokemon)
         n = 10 + N_OWN + N_OPP
-        feats[10:10 + N_OWN] = self.effects(battle.active_pokemon, True)
-        feats[10 + N_OWN:n] = self.effects(battle.opponent_active_pokemon, False)
-        if battle.active_pokemon is not None and battle.opponent_active_pokemon is not None \
-                and not battle.active_pokemon.fainted:
-            feats[n:n + N_COUNTER] = self.counters(battle.opponent_active_pokemon, battle.active_pokemon)
+        feats[10 : 10 + N_OWN] = self.effects(battle.active_pokemon, True)
+        feats[10 + N_OWN : n] = self.effects(battle.opponent_active_pokemon, False)
+        if (
+            battle.active_pokemon is not None
+            and battle.opponent_active_pokemon is not None
+            and not battle.active_pokemon.fainted
+        ):
+            feats[n : n + N_COUNTER] = self.counters(battle.opponent_active_pokemon, battle.active_pokemon)
             me_dark = any(t is not None and t.name == "DARK" for t in battle.active_pokemon.types)
             prankster = 0.0 if me_dark else feats[a0 + KEY_ABILITIES.index("prankster")]
             encore = feats[n]
@@ -237,8 +266,7 @@ class ThreatFeatures:
             if p <= 0:
                 continue
             if me is not None and moves:
-                dmg = np.array([damage.calc(m, f, me, attacker_own=False, weather=battle.weather).mean
-                                for m in moves])
+                dmg = np.array([damage.calc(m, f, me, attacker_own=False, weather=battle.weather).mean for m in moves])
                 hp = max(me.current_hp_fraction, 1e-3)
                 feats[0] += p * (1 - np.prod(1 - q * (dmg >= hp)))
                 feats[1] += p * min(expected_best(dmg, q) / hp, 2.0)
@@ -253,8 +281,7 @@ class ThreatFeatures:
                     continue
                 saved = dict(mon.boosts)
                 mon._boosts.clear()  # boosts do not carry over a switch
-                dmg = np.array([damage.calc(m, f, mon, attacker_own=False, weather=battle.weather).mean
-                                for m in moves])
+                dmg = np.array([damage.calc(m, f, mon, attacker_own=False, weather=battle.weather).mean for m in moves])
                 mon._boosts.update(saved)
                 hp = max(mon.current_hp_fraction, 1e-3)
                 feats[4 + slot] += p * (1 - np.prod(1 - q * (dmg >= hp)))

@@ -18,6 +18,7 @@ Usage: uv run python -m pokesim.rl.train --steps 300000 [--opponent heuristic] [
 
 import argparse
 from functools import partial
+from pathlib import Path
 
 from poke_env.player import MaxBasePowerPlayer, RandomPlayer, SimpleHeuristicsPlayer
 from sb3_contrib import MaskablePPO
@@ -110,7 +111,12 @@ def new_model(env) -> MaskablePPO:
 
 
 def main() -> None:
+    from pokesim.data.dataset import add_scope_args, scope_from, write_metadata
+    from pokesim.data.prior_bundle import DEFAULT, load_bundle
+
     parser = argparse.ArgumentParser()
+    add_scope_args(parser)
+    parser.add_argument("--prior-bundle", type=Path, default=DEFAULT)
     parser.add_argument("--steps", type=int, default=300_000)
     parser.add_argument("--opponent", default="heuristic", choices=list(OPPONENTS))
     parser.add_argument("--season", default="M-6")
@@ -139,7 +145,9 @@ def main() -> None:
                              "them is widened (new inputs start with zero weight)")
     args = parser.parse_args()
 
-    teams = load_teams(args.season)
+    scope = scope_from(args)
+    bundle = load_bundle(args.prior_bundle, scope)
+    teams = load_teams(args.season, scope=scope)
     CKPT_DIR.mkdir(exist_ok=True)
     league_dir = CKPT_DIR / f"{args.name}_league"
     snapshots = [args.init] if args.init and not args.my_team else []
@@ -148,7 +156,7 @@ def main() -> None:
         sets = load_my_team(args.my_team, args.lineup)
         my_team, snapshots = FixedTeam(sets), list(args.opp_snapshots)
         env_kwargs = {"extra": TeamFeatures([s["species"] for s in sets], items=args.items,
-                                                threats=args.threats), "lineup": "123"}
+                                                threats=args.threats, prior_bundle=bundle), "lineup": "123"}
     callback, model, done, seg = WinRateCallback(), None, 0, 0
     while done < args.steps:
         with ShowdownServer(args.port) as server:
@@ -157,7 +165,7 @@ def main() -> None:
                 if args.league:
                     opponent = partial(LeaguePlayer, snapshots=snapshots[:1] + snapshots[1:][-args.league_size:],
                                        p_heuristic=args.p_heuristic, seed=seg * 100 + rank,
-                                       p_lookahead=args.p_lookahead, teams=teams)
+                                       p_lookahead=args.p_lookahead, teams=teams, prior_bundle=bundle)
                 else:
                     opponent = OPPONENTS[args.opponent]
                 kwargs = dict(env_kwargs)
@@ -187,6 +195,10 @@ def main() -> None:
             seg += 1
             env.close()
         model.save(CKPT_DIR / args.name)
+        from pokesim.runtime.bundle import file_hash
+
+        write_metadata(CKPT_DIR / f"{args.name}.zip", dict(scope.metadata("train"),
+                       prior_bundle_sha=file_hash(args.prior_bundle), reward=args.reward))
         if args.league and not args.my_team:
             league_dir.mkdir(exist_ok=True)
             model.save(league_dir / f"seg{seg:03d}")

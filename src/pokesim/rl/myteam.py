@@ -11,6 +11,7 @@ Opponents pick their 3 after seeing our 6; `counter_preview` prefers members car
 
 Usage (build the priors from the Smogon stats in the DB): uv run python -m pokesim.rl.myteam
 """
+
 import json
 import random
 from pathlib import Path
@@ -49,8 +50,10 @@ class FixedTeam(Teambuilder):
         blocks = []
         for s in sets:
             evs = " / ".join(f"{v} {names[k]}" for k, v in s["evs"].items() if v)
-            blocks.append(f"{s['species']} @ {s['item']}\nAbility: {s['ability']}\nLevel: 50\nEVs: {evs}\n"
-                          f"{s['nature']} Nature\n" + "\n".join(f"- {m}" for m in s["moves"]))
+            blocks.append(
+                f"{s['species']} @ {s['item']}\nAbility: {s['ability']}\nLevel: 50\nEVs: {evs}\n"
+                f"{s['nature']} Nature\n" + "\n".join(f"- {m}" for m in s["moves"])
+            )
         return "\n\n".join(blocks)
 
     def yield_team(self) -> str:
@@ -86,34 +89,42 @@ def load_priors() -> dict[str, dict[str, float]]:
 class TeamFeatures:
     """Extra observation features for a fixed roster (see module docstring)."""
 
-    def __init__(self, roster: list[str], priors: dict[str, dict[str, float]] | None = None, items: bool = False,
-                 threats: bool = False):
+    def __init__(
+        self,
+        roster: list[str],
+        priors: dict[str, dict[str, float]] | None = None,
+        items: bool = False,
+        threats: bool = False,
+        prior_bundle: dict | None = None,
+    ):
         self.roster = [to_id(r) for r in roster]
-        self.priors = load_priors() if priors is None else priors
+        self.priors = (
+            prior_bundle["counter"] if prior_bundle is not None else load_priors() if priors is None else priors
+        )
         self.n_counter = len(COUNTER_GROUPS) + 1  # + Unaware
         self.size = 6 * len(self.roster) + 3 * self.n_counter
         self.items = None
         if items:  # held-item features (pokesim.rl.items) after the roster / counter-move ones
             from pokesim.rl.items import ItemFeatures
 
-            self.items = ItemFeatures()
+            self.items = ItemFeatures(prior_bundle["items"] if prior_bundle is not None else None)
             self.size += self.items.size
         self.threats = None
         if threats:  # unrevealed moves / Mega Evolution (pokesim.rl.threats) after the item features
             from pokesim.rl.threats import ThreatFeatures
 
-            self.threats = ThreatFeatures()
+            self.threats = ThreatFeatures(prior_bundle["threats"] if prior_bundle is not None else None)
             self.size += self.threats.size
         self.base_size = self.size - sum(x.size for x in (self.items, self.threats) if x)
 
     @classmethod
-    def for_model(cls, model, roster: list[str]) -> "TeamFeatures":
+    def for_model(cls, model, roster: list[str], prior_bundle: dict | None = None) -> "TeamFeatures":
         """The features a saved fixed-team policy was trained with (matched by its input size)."""
         from pokesim.rl.features import OBS_SIZE
 
         n = model.observation_space.shape[0] - OBS_SIZE
         for kwargs in ({}, {"items": True}, {"items": True, "threats": True}):
-            extra = cls(roster, **kwargs)
+            extra = cls(roster, prior_bundle=prior_bundle, **kwargs)
             if extra.size == n:
                 return extra
         raise ValueError(f"no feature set of size {n} for this roster")
@@ -150,10 +161,10 @@ class TeamFeatures:
         n = self.n_counter
         opp = battle.opponent_active_pokemon
         if opp is not None:
-            feats[base:base + n] = self.counter_probs(opp)
+            feats[base : base + n] = self.counter_probs(opp)
         others = [m for m in battle.opponent_team.values() if not m.fainted and m is not opp]
         if others:
-            feats[base + n:base + 2 * n] = np.max([self.counter_probs(m) for m in others], axis=0)
+            feats[base + n : base + 2 * n] = np.max([self.counter_probs(m) for m in others], axis=0)
         # unseen members: each previewed one not yet seen was brought with chance (slots left) / (unseen count)
         seen = {to_id(m.base_species) for m in battle.opponent_team.values()}
         unseen = [m for m in battle.teampreview_opponent_team if to_id(m.base_species) not in seen]
@@ -161,7 +172,7 @@ class TeamFeatures:
         if unseen and left:
             p_brought = left / len(unseen)
             probs = np.array([self.counter_probs(m) for m in unseen]) * p_brought
-            feats[base + 2 * n:base + 3 * n] = 1.0 - np.prod(1.0 - probs, axis=0)
+            feats[base + 2 * n : base + 3 * n] = 1.0 - np.prod(1.0 - probs, axis=0)
         parts = [feats] + [x(battle) for x in (self.items, self.threats) if x]
         return np.concatenate(parts) if len(parts) > 1 else feats
 

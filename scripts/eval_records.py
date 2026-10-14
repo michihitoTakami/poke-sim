@@ -20,13 +20,12 @@ import numpy as np
 
 from pokesim.config import ROOT
 from pokesim.live.advisor import Advisor
-from pokesim.live.observed import collect
 from pokesim.live.session import BattleSession
 from pokesim.rl.myteam import to_id
-from pokesim.search.lookahead import SetSampler, aggregate
+from pokesim.search.lookahead import aggregate
 
-CACHE = ROOT / "data" / "processed" / "eval_cache.jsonl"
-BC_CACHE = ROOT / "data" / "processed" / "eval_bc.jsonl"
+CACHE = ROOT / "data" / "processed" / "scoped/eval_cache.jsonl"
+BC_CACHE = ROOT / "data" / "processed" / "scoped/eval_bc.jsonl"
 
 
 def records(logs: Path) -> list[tuple[str, dict]]:
@@ -96,47 +95,79 @@ def visible(other: dict, other_stem: str, rec: dict, stem: str, scope: str) -> b
 
 
 def query(args) -> None:
+    from pokesim.data.dataset import scope_from, write_metadata
+    from pokesim.data.prior_bundle import load_bundle, sampler
+    from pokesim.runtime.bundle import file_hash
+
+    scope = scope_from(args)
+    bundle = load_bundle(args.prior_bundle, scope)
     sets = json.loads(Path(args.team).read_text())
-    advisor = Advisor(sets, policy=None, opponent_policy=None)
+    advisor = Advisor(sets, policy=None, opponent_policy=None, prior_bundle=bundle, sampler=sampler(bundle))
+    advisor.engine.sampler.utility = args.utility
+    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     out = open(args.out, "w")
-    recs = records(Path(args.logs))
-    current = {}
+    recs = scope.records(args.split)
+    if not recs:
+        advisor.close()
+        out.close()
+        raise ValueError(f"no eligible {args.split} records")
 
     def on_turn(stem, rec, session, battle, mine, theirs):
-        if current.get("stem") != stem:  # sets seen in other battles: by default only those played before this one
-            others = [r for s2, r in recs if visible(r, s2, rec, stem, args.observed_scope)] if args.observed else []
-            advisor.engine.sampler = SetSampler(["M-6"], observed=collect(others), utility=args.utility)
-            current["stem"] = stem
         results = advisor.engine.query(battle, advisor.own_sets)
         out.write(json.dumps({"battle": stem, "turn": battle.turn, "opponent": theirs, "mine": mine,
                               "opp_active": battle.opponent_active_pokemon.species, "results": results}) + "\n")
 
     n = turns(args, recs, on_turn)
     advisor.close()
+    out.close()
+    write_metadata(Path(args.out), dict(scope.metadata("train"), target_split=args.split,
+                   target_records=scope.metadata(args.split)["records"], prior_bundle_sha=file_hash(args.prior_bundle)))
     print(f"{n} decisions -> {args.out}")
 
 
 def bc(args) -> None:
+    from pokesim.data.dataset import scope_from, write_metadata
+    from pokesim.data.prior_bundle import load_bundle, sampler
     from pokesim.live.opponent import OpponentPolicy
+    from pokesim.runtime.bundle import file_hash
 
-    predictor = OpponentPolicy(args.bc_policy)
+    scope = scope_from(args)
+    predictor = OpponentPolicy(args.bc_policy, sampler=sampler(load_bundle(args.prior_bundle, scope)))
+    Path(args.bc_out).parent.mkdir(parents=True, exist_ok=True)
     out = open(args.bc_out, "w")
 
     def on_turn(stem, rec, session, battle, mine, theirs):
         out.write(json.dumps({"battle": stem, "turn": battle.turn, "opponent": theirs,
                               "dist": dict(predictor.predict(session.log))}) + "\n")
 
-    n = turns(args, records(Path(args.logs)), on_turn)
+    recs = scope.records(args.split)
+    if not recs:
+        out.close()
+        raise ValueError(f"no eligible {args.split} records")
+    n = turns(args, recs, on_turn)
+    out.close()
+    write_metadata(Path(args.bc_out), dict(scope.metadata("train"), target_split=args.split,
+                   target_records=scope.metadata(args.split)["records"], prior_bundle_sha=file_hash(args.prior_bundle),
+                   policy_sha=file_hash(args.bc_policy)))
     print(f"{n} decisions -> {args.bc_out}")
 
 
 def score(args) -> dict:
+    from pokesim.data.dataset import scope_from, validate_artifact
+
+    scope = scope_from(args)
+    meta = validate_artifact(Path(args.out), scope)
+    if meta.get("target_split") != args.split or meta.get("target_records") != scope.metadata(args.split)["records"]:
+        raise ValueError("evaluation cache belongs to another target split")
     model = {"br_weight": args.br_weight, "tau": args.tau, "repeat": args.repeat, "bc_weight": args.bc_weight}
     hit1 = hit3 = 0
     ll = []
     rows = [json.loads(line) for line in open(args.out)]
     bc_dist = {}
     if args.bc_weight > 0:
+        bc_meta = validate_artifact(Path(args.bc_out), scope)
+        if any(bc_meta.get(k) != meta.get(k) for k in ("target_split", "target_records", "prior_bundle_sha")):
+            raise ValueError("BC and search caches use different data or priors")
         bc_dist = {(r["battle"], r["turn"]): r["dist"] for r in map(json.loads, open(args.bc_out))}
         rows = [r for r in rows if (r["battle"], r["turn"]) in bc_dist]
     prev: dict[tuple, str] = {}  # (battle, opponent active) -> its previous move
@@ -165,6 +196,8 @@ def score(args) -> dict:
         if args.verbose:
             print(r["battle"], r["turn"], r["opponent"], [(k, round(dist[k], 2)) for k in ranked[:3]])
     n = len(rows)
+    if not n:
+        raise ValueError("evaluation has no scored decisions")
     res = {"n": n, "top1": hit1 / n, "top3": hit3 / n, "loglik": float(np.mean(ll))}
     print(f"{model}  n={n}  top1 {hit1}/{n} ({hit1 / n:.0%})  top3 {hit3}/{n} ({hit3 / n:.0%})  "
           f"mean log-lik {res['loglik']:.2f}")
@@ -176,8 +209,12 @@ def main() -> None:
     ap.add_argument("cmd", choices=["query", "score", "bc"])
     ap.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     ap.add_argument("--out", default=str(CACHE))
-    ap.add_argument("--logs", default=str(ROOT / "data/processed/replayed"),
-                    help="battle records (default: rebuilt from saved frames by replay_frames.py --records)")
+    from pokesim.data.dataset import add_scope_args
+    from pokesim.data.prior_bundle import DEFAULT
+
+    add_scope_args(ap)
+    ap.add_argument("--prior-bundle", type=Path, default=DEFAULT)
+    ap.add_argument("--split", choices=["development", "test"], default="development")
     ap.add_argument("--br-weight", type=float, default=0.0)
     ap.add_argument("--tau", type=float, default=0.1)
     ap.add_argument("--repeat", type=float, default=0.0)
@@ -185,11 +222,7 @@ def main() -> None:
     ap.add_argument("--bc-weight", type=float, default=0.0, help="share of the cloned human policy (needs bc)")
     ap.add_argument("--bc-policy", default=str(ROOT / "checkpoints/bc_human.zip"))
     ap.add_argument("--bc-out", default=str(BC_CACHE))
-    ap.add_argument("--observed", action=argparse.BooleanOptionalAction, default=True,
-                    help="blend in the sets seen in our other battles")
     ap.add_argument("--utility", type=float, default=0.03, help="pseudo-share for learnable utility moves")
-    ap.add_argument("--observed-scope", choices=["before", "others"], default="before",
-                    help="before: sets from battles played earlier only; others: all other battles (sees the future)")
     args = ap.parse_args()
     {"query": query, "score": score, "bc": bc}[args.cmd](args)
 

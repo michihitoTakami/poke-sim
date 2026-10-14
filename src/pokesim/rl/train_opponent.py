@@ -35,11 +35,12 @@ from pokesim.sim.pool import TeamPool, load_teams
 from pokesim.sim.server import ShowdownServer
 
 
-def variant_teams(sets: list[dict], n: int, seed: int = 0) -> list[str]:
+def variant_teams(sets: list[dict], n: int, seed: int = 0, prior_bundle: dict | None = None) -> list[str]:
     """`n` packed teams with our 6 species and sets sampled from the set data (legal per the validator)."""
+    from pokesim.data.prior_bundle import sampler as frozen_sampler
     from pokesim.search.lookahead import SetSampler
 
-    sampler = SetSampler(["M-6"], seed=seed)
+    sampler = SetSampler(["M-6"], seed=seed) if prior_bundle is None else frozen_sampler(prior_bundle, seed)
     cands = []
     for _ in range(n * 2):
         for _attempt in range(20):
@@ -82,11 +83,12 @@ class OurSide(Player):
     """Our side as the environment's opponent: policy / script on the real team, heuristic bot on variants.
     `team` must be the OurTeams the environment hands out (it says whether the battle's team is the real one)."""
 
-    def __init__(self, *args, policy: str, roster: list[str], p_script: float = 0.2, seed: int = 0, **kwargs):
+    def __init__(self, *args, policy: str, roster: list[str], p_script: float = 0.2, seed: int = 0,
+                 prior_bundle: dict | None = None, **kwargs):
         fmt = kwargs.get("battle_format")
         self.rng, self.p_script = random.Random(seed), p_script
         self.pilot = PolicyPilot(battle_format=fmt, policy=policy, roster=roster, deterministic=False,
-                                 start_listening=False)
+                                 start_listening=False, prior_bundle=prior_bundle)
         self.script = BatonScript(battle_format=fmt, start_listening=False)
         self.heuristic = SimpleHeuristicsPlayer(battle_format=fmt, start_listening=False)
         self.assigned: dict[str, object] = {}
@@ -108,7 +110,12 @@ class OurSide(Player):
 
 
 def main() -> None:
+    from pokesim.data.dataset import add_scope_args, scope_from, write_metadata
+    from pokesim.data.prior_bundle import DEFAULT, load_bundle
+
     ap = argparse.ArgumentParser()
+    add_scope_args(ap)
+    ap.add_argument("--prior-bundle", type=Path, default=DEFAULT)
     ap.add_argument("--steps", type=int, default=3_000_000)
     ap.add_argument("--name", default="opp_baton")
     ap.add_argument("--init", default=str(CKPT_DIR / "bc_human.zip"))
@@ -129,12 +136,14 @@ def main() -> None:
     ap.add_argument("--n-steps", type=int, default=1024)
     args = ap.parse_args()
 
+    scope = scope_from(args)
+    bundle = load_bundle(args.prior_bundle, scope)
     sets = load_my_team(args.team, args.lineup)
     roster = [s["species"] for s in sets]
     real = FixedTeam(sets).packed
-    variants = variant_teams(sets, args.variants)
+    variants = variant_teams(sets, args.variants, prior_bundle=bundle)
     print(f"{len(variants)} variant teams of our 6", flush=True)
-    teams = load_teams(args.season)
+    teams = load_teams(args.season, scope=scope)
     callback, model, done, seg = WinRateCallback(), None, 0, 0
     while done < args.steps:
         with ShowdownServer(args.port) as server:
@@ -143,7 +152,7 @@ def main() -> None:
                 seed = seg * 100 + rank
                 ours = OurTeams(real, variants, args.p_real, seed=seed)
                 opponent = partial(OurSide, policy=args.our_policy, roster=roster, p_script=args.p_script,
-                                   seed=seed)
+                                   seed=seed, prior_bundle=bundle)
                 kwargs = {"lineup": CounterPreview(args.p_counter, seed=seed),
                           "opponent_preview": UsualLineup(args.p_usual_lineup, seed=seed)}
                 factories.append(partial(make_env, opponent, TeamPool(teams, 1 + seed), ours,
@@ -162,6 +171,10 @@ def main() -> None:
             seg += 1
             env.close()
         model.save(CKPT_DIR / args.name)
+        from pokesim.runtime.bundle import file_hash
+
+        write_metadata(CKPT_DIR / f"{args.name}.zip", dict(scope.metadata("train"),
+                       prior_bundle_sha=file_hash(args.prior_bundle), reward="win"))
         model.save(CKPT_DIR / f"{args.name}_seg{seg:03d}")
         print(f"segment {seg} done ({done} steps), saved {Path(CKPT_DIR / args.name)}.zip", flush=True)
 

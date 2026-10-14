@@ -53,11 +53,11 @@ def item_class(item: str, mega_stones: set[str]) -> str:
     return "other"
 
 
-def build_priors() -> tuple[dict[str, dict[str, float]], Counter]:
+def build_priors(sampler=None) -> tuple[dict[str, dict[str, float]], Counter]:
     """Per species: share of each item class (species with any item data), and the overall class shares."""
     from pokesim.search.lookahead import SetSampler
 
-    sampler = SetSampler(["M-6"])
+    sampler = SetSampler(["M-6"]) if sampler is None else sampler
     stones = {i for i, it in sampler.items.items() if it.mega_stone}
     out, overall = {}, Counter()
     for sid, sm in sampler.summary.items():

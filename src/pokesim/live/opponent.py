@@ -31,9 +31,9 @@ def label_of(action: int, battle) -> str | None:
 
 
 class OpponentPolicy:
-    def __init__(self, path=DEFAULT_POLICY, samples: int = 4):
+    def __init__(self, path=DEFAULT_POLICY, samples: int = 4, sampler=None):
         self.model = MaskablePPO.load(str(path), device="cpu")
-        self.sides = Sides(seed=0)
+        self.sides = Sides(seed=0, sampler=sampler)
         self.samples = samples
 
     def predict(self, log: list[str], our_role: str = "p1", force_switch: bool = False) -> list[tuple[str, float]]:

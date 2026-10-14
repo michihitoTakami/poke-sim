@@ -26,10 +26,10 @@ class LookaheadPlayer(Player):
     """Plays the lookahead's top action; falls back to the heuristic bot for forced switches or on errors."""
 
     def __init__(self, *args, teams: list[dict], seasons: list[str], samples: int = 6, seeds: int = 2,
-                 rollout: int = 3, show: bool = False, **kwargs):
+                 rollout: int = 3, show: bool = False, sampler=None, **kwargs):
         # set up before Player.__init__ starts listening, since requests can arrive right away
         self.teams = teams
-        self.engine = Lookahead(SetSampler(seasons), samples, seeds, rollout)
+        self.engine = Lookahead(SetSampler(seasons) if sampler is None else sampler, samples, seeds, rollout)
         self.fallback = SimpleHeuristicsPlayer(battle_format=kwargs.get("battle_format"), start_listening=False)
         self.decisions = self.fallbacks = 0
         self.ja = ja_names() if show else None
