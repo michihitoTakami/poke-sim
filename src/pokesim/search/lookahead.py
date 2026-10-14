@@ -31,7 +31,10 @@ SIDE_IDS = {"STEALTH_ROCK": ("stealthrock", None), "SPIKES": ("spikes", None), "
             "STICKY_WEB": ("stickyweb", None), "REFLECT": ("reflect", 5), "LIGHT_SCREEN": ("lightscreen", 5),
             "AURORA_VEIL": ("auroraveil", 5), "TAILWIND": ("tailwind", 4)}
 VOLATILE_IDS = {"SUBSTITUTE": "substitute", "LEECH_SEED": "leechseed", "YAWN": "yawn", "TAUNT": "taunt",
-                "CONFUSION": "confusion"}
+                "CONFUSION": "confusion", "CURSE": "curse", "SALT_CURE": "saltcure", "AQUA_RING": "aquaring",
+                "INGRAIN": "ingrain", "FOCUS_ENERGY": "focusenergy", "MAGNET_RISE": "magnetrise",
+                "NO_RETREAT": "noretreat", "HEAL_BLOCK": "healblock", "TORMENT": "torment"}
+PERISH = {"PERISH0": 0, "PERISH1": 1, "PERISH2": 2, "PERISH3": 3}
 BOOSTS = ["atk", "def", "spa", "spd", "spe", "accuracy", "evasion"]
 
 
@@ -199,6 +202,11 @@ def mon_state(mon: Pokemon, active: bool) -> dict:
     if active:
         out["boosts"] = {k: v for k, v in mon.boosts.items() if k in BOOSTS and v}
         out["volatiles"] = [VOLATILE_IDS[e.name] for e in mon.effects if e.name in VOLATILE_IDS]
+        perish = [PERISH[e.name] for e in mon.effects if e.name in PERISH]
+        if perish:  # Perish Song: faints when the count runs out
+            out["perish"] = min(perish)
+        if any(e.name == "ENCORE" for e in mon.effects) and mon.last_move is not None:
+            out["encore"] = mon.last_move.id  # locked into its last move
         if mon.protect_counter:  # consecutive Protect / Detect / Endure: the next one succeeds 1 in 3^n
             out["stall"] = mon.protect_counter
         out["mega"] = mega_evolved(mon)

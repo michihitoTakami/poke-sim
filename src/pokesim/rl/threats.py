@@ -6,7 +6,10 @@ ThreatFeatures adds, for the opposing active Pokémon over its possible sets (re
 damaging moves with their usage share, the Mega forme with its stone's share while it can still Mega Evolve):
 - the chance one of its moves knocks out our active Pokémon, and its expected best damage to it;
 - the chance it moves first, and the chance it still Mega Evolves;
-- for each of our 6: the chance it knocks that member out (e.g. on the switch-in).
+- for each of our 6: the chance it knocks that member out (e.g. on the switch-in);
+plus volatile effects the base observation leaves out, for both active Pokémon (Curse and Perish Song, which Baton
+Pass hands on, Aqua Ring, Ingrain, Focus Energy, Magnet Rise, No Retreat, trapping; ours also Heal Block, Torment,
+Disable).
 
   uv run python -m pokesim.rl.threats      # build data/processed/threat_priors.json from the set data
 """
@@ -22,7 +25,13 @@ from pokesim.rl.myteam import to_id
 from pokesim.sim import damage
 
 PRIORS_PATH = PROCESSED_DIR / "threat_priors.json"
-SIZE = 4 + 6
+SHARED_EFFECTS = ["CURSE", "AQUA_RING", "INGRAIN", "FOCUS_ENERGY", "MAGNET_RISE", "NO_RETREAT"]
+OWN_EFFECTS = ["HEAL_BLOCK", "TORMENT", "DISABLE"]
+PERISH = {"PERISH0": 0, "PERISH1": 1, "PERISH2": 2, "PERISH3": 3}
+TRAPPED = {"TRAPPED", "PARTIALLY_TRAPPED", "OCTOLOCK"}
+N_OWN = len(SHARED_EFFECTS) + len(OWN_EFFECTS) + 3
+N_OPP = len(SHARED_EFFECTS) + 3
+SIZE = 4 + 6 + N_OWN + N_OPP
 MAX_MOVES = 10  # likely damaging moves kept per species
 
 
@@ -114,8 +123,17 @@ class ThreatFeatures:
                 rest -= p
         return [(mon, max(rest, 0.0))] + out
 
+    @staticmethod
+    def effects(mon: Pokemon | None, own: bool) -> list[float]:
+        names = {e.name for e in mon.effects} if mon is not None and not mon.fainted else set()
+        perish = [PERISH[n] for n in names if n in PERISH]
+        out = [float(n in names) for n in SHARED_EFFECTS + (OWN_EFFECTS if own else [])]
+        return out + [float(bool(perish)), (min(perish) / 3.0) if perish else 0.0, float(bool(names & TRAPPED))]
+
     def __call__(self, battle: AbstractBattle) -> np.ndarray:
         feats = np.zeros(self.size, dtype=np.float32)
+        feats[10:10 + N_OWN] = self.effects(battle.active_pokemon, True)
+        feats[10 + N_OWN:] = self.effects(battle.opponent_active_pokemon, False)
         me, opp = battle.active_pokemon, battle.opponent_active_pokemon
         if me is not None and me.fainted:  # forced switch: only the switch-in chances matter
             me = None
