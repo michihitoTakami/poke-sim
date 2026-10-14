@@ -83,9 +83,9 @@ class AdvisorPlayer(Player):
 
     def policy_for(self, battle) -> str:
         if battle.battle_tag not in self.assigned:
-            paths = list(self.policies)  # keep alternating across restarts: count the records already saved
-            done = len(list(self.out.glob("*.json"))) if self.out.exists() else 0
-            self.assigned[battle.battle_tag] = paths[(done + len(self.assigned)) % len(paths)]
+            paths = list(self.policies)  # alternate across restarts too: by the number of records saved so far
+            done = len(list(self.out.glob("*.json"))) if self.out.exists() else 0  # one battle at a time
+            self.assigned[battle.battle_tag] = paths[done % len(paths)]
         return self.assigned[battle.battle_tag]
 
     def teampreview(self, battle) -> str:
