@@ -601,6 +601,13 @@ def fit(args) -> None:
             best, best_state = ll, {k: v.clone() for k, v in policy.state_dict().items()}
     policy.load_state_dict(best_state)
     model.save(args.out)
+    from pokesim.data.dataset import write_metadata
+    from pokesim.runtime.bundle import file_hash
+
+    output = Path(args.out if str(args.out).endswith(".zip") else str(args.out) + ".zip")
+    write_metadata(output, dict(scope.metadata("train"), prior_bundle_sha=data_meta["prior_bundle_sha"],
+                                data_sha=file_hash(args.data), records_sha=file_hash(args.records),
+                                development_records=scope.metadata("development")["records"]))
     print(f"saved {args.out}.zip (best held-out log-lik {best:.2f})")
 
 

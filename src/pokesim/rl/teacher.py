@@ -6,8 +6,8 @@ with our real sets and, at every turn decision, runs the lookahead with many set
 policy observation (embed + TeamFeatures with items and threats), the action mask, the lookahead's equilibrium
 mix and the value of each action (a win counts 3, a Pokemon's HP 1), and what we played.
 
-The opponent's set priors only blend in sets seen in our battles played before the one being replayed
-(--observed-scope before; "all" is the old setting, which lets a battle see its own and later opponents' sets).
+The opponent's set priors are frozen on the manifest's train records. The default target is development.
+Values use the terminal planner's ranking units, not calibrated win probabilities or the old HP/+3 scale.
 
 report: for saved policies, how often their top choice is the lookahead's best action, and how often it is a
 blunder (value more than --margin below the best), on those positions.
@@ -116,10 +116,13 @@ def build(args) -> None:
 def report(args) -> None:
     from sb3_contrib import MaskablePPO
 
-    from pokesim.data.dataset import validate_artifact
+    from pokesim.data.dataset import scope_from, validate_artifact
     from pokesim.rl.advise import action_probs
 
-    validate_artifact(Path(args.data))
+    scope = scope_from(args)
+    meta = validate_artifact(Path(args.data), scope)
+    if meta.get("target_records") != scope.metadata(meta["target_split"])["records"]:
+        raise ValueError("teacher target records changed: rebuild it")
     data = np.load(args.data)
     value, masks = data["value"], data["masks"]
     best = np.nanmax(value, axis=1)
@@ -160,9 +163,10 @@ def main() -> None:
     b.add_argument("--prior-bundle", type=Path, default=DEFAULT)
     b.add_argument("--split", choices=["train", "development", "test"], default="development")
     r = sub.add_parser("report")
+    add_scope_args(r)
     r.add_argument("policies", nargs="*")
     r.add_argument("--data", default=str(OUT))
-    r.add_argument("--margin", type=float, default=1.0)
+    r.add_argument("--margin", type=float, default=0.15, help="planner ranking gap; not win probability")
     args = ap.parse_args()
     build(args) if args.cmd == "build" else report(args)
 
