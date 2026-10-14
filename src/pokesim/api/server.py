@@ -11,7 +11,7 @@ API:   POST /api/preview/recognize {image: base64}   -> recognised opponent 6 wi
        GET  /api/state, /api/options/...              WS /ws (state pushes)
 
 Usage: uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_v2.zip [--port 8100]
-         [--obs-source "Capture Card"]  (password from $OBS_PASSWORD)   # watch OBS: team preview, then the battle
+         [--obs-source "Capture Card"]  (password: $OBS_PASSWORD or ~/.config/poke-sim/obs.env)   # watch OBS: team preview, then the battle
 With OBS, the battle screen is read during the game (pokesim.vision.battle + pokesim.live.screen): messages, HP and
 the command prompt become turn events and advice without manual input (--no-screen to turn it off).
 For practice, reviewing games and commentary: official tournaments forbid outside help during battles.
@@ -419,6 +419,18 @@ def save_record(live: Live, result: str | None) -> Path:
     return path
 
 
+def obs_password() -> str:
+    """$OBS_PASSWORD, else the OBS_PASSWORD= line of ~/.config/poke-sim/obs.env (kept out of the repo)."""
+    if os.environ.get("OBS_PASSWORD"):
+        return os.environ["OBS_PASSWORD"]
+    path = Path.home() / ".config" / "poke-sim" / "obs.env"
+    if path.exists():
+        for line in path.read_text().splitlines():
+            if line.strip().startswith("OBS_PASSWORD="):
+                return line.split("=", 1)[1].strip()
+    return ""
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
@@ -429,7 +441,8 @@ def main() -> None:
     parser.add_argument("--obs-source", help="OBS capture source name: watch it for the team preview")
     parser.add_argument("--obs-host", default="localhost")
     parser.add_argument("--obs-port", type=int, default=4455)
-    parser.add_argument("--obs-password", default=os.environ.get("OBS_PASSWORD", ""), help="default: $OBS_PASSWORD")
+    parser.add_argument("--obs-password", default=obs_password(),
+                        help="default: $OBS_PASSWORD, else OBS_PASSWORD=... in ~/.config/poke-sim/obs.env")
     parser.add_argument("--obs-fps", type=float, default=4.0)
     parser.add_argument("--obs-record", type=Path, help="save changed frames here (e.g. data/raw/obs_frames)")
     args = parser.parse_args()

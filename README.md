@@ -2,6 +2,7 @@
 
 Pokémon Champions シングル（3v3, `gen9championsbssregmc`）の対戦サポートツール。
 計画の全体像は `docs/plan.md` を参照。
+対人戦の課題に対する改善設計は [対人戦の判断品質を改善する実装設計](docs/competitive-improvement-design.md) を参照。
 
 ## セットアップ
 ```bash
@@ -51,7 +52,7 @@ uv run python scripts/sim_matchups.py fit         # 選出ごとの勝率モデ�
 # サーバー（ブラウザで http://127.0.0.1:8100 、OBS のブラウザソースには /overlay）
 uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_v2.zip \
     [--obs-source "キャプチャのソース名"] [--obs-record /data/poke-sim/obs_frames]
-    # OBS の選出画面を自動で認識（パスワードは環境変数 OBS_PASSWORD）。--obs-record は変化した画面を保存（容量が大きいので別ディスク推奨）
+    # OBS の選出画面を自動で認識（パスワードは環境変数 OBS_PASSWORD か ~/.config/poke-sim/obs.env の OBS_PASSWORD=...）。--obs-record は変化した画面を保存（容量が大きいので別ディスク推奨）
 ```
 
 - 選出画面: OBS から自動認識（または画像をアップロード）。誤認識は候補から直せます。
