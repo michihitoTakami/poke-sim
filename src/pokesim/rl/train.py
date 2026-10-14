@@ -132,6 +132,8 @@ def main() -> None:
                         help="league: chance a battle's opponent is the (slow) lookahead player")
     parser.add_argument("--n-envs", type=int, default=1, help="parallel environments (subprocesses)")
     parser.add_argument("--n-steps", type=int, help="rollout length per environment (overrides the checkpoint's)")
+    parser.add_argument("--threats", action="store_true",
+                        help="with --items: also the unrevealed-move / Mega Evolution features (pokesim.rl.threats)")
     parser.add_argument("--items", action="store_true",
                         help="with --my-team: add the held-item features (pokesim.rl.items); a --init policy without "
                              "them is widened (new inputs start with zero weight)")
@@ -145,7 +147,8 @@ def main() -> None:
     if args.my_team:
         sets = load_my_team(args.my_team, args.lineup)
         my_team, snapshots = FixedTeam(sets), list(args.opp_snapshots)
-        env_kwargs = {"extra": TeamFeatures([s["species"] for s in sets], items=args.items), "lineup": "123"}
+        env_kwargs = {"extra": TeamFeatures([s["species"] for s in sets], items=args.items,
+                                                threats=args.threats), "lineup": "123"}
     callback, model, done, seg = WinRateCallback(), None, 0, 0
     while done < args.steps:
         with ShowdownServer(args.port) as server:
