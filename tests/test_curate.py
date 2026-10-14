@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from pokesim.data.curate_battles import curate
 from pokesim.data.split_manifest import Splits, make
 
@@ -75,3 +77,15 @@ def test_record_keys_follow_the_battle(tmp_path):
     path = tmp_path / "split.json"
     path.write_text(json.dumps(make(battles, test_from="20261016-000000")))
     assert Splits(path).record_keys(battles, "train") == {"logs/20261013-021356", "replayed/20261013-021356"}
+
+
+@pytest.mark.parametrize("kinds", [("switch_live", "switch_live"), ("switch_rebuilt", "switch_rebuilt"),
+                                   ("switch_live", "switch_rebuilt")])
+def test_same_leads_do_not_confirm_a_rematch_as_a_duplicate(tmp_path, kinds):
+    sources = {kind: tmp_path / kind for kind in kinds}
+    write(sources[kinds[0]], "first", record("20261015-010000", result="win"))
+    write(sources[kinds[1]], "second", record("20261015-010600", result="loss"))
+    battles, _ = curate(sources)
+    assert len(battles) == 2
+    assert {b.result for b in battles} == {"win", "loss"}
+    assert all(b.merge_pending for b in battles)

@@ -69,3 +69,33 @@ def test_prediction_changes_what_we_play():
     attack_expected = plan(results, rho=0.0, cloned={"move:attack": 1.0}, cloned_weight=1.0)
     setup_expected = plan(results, rho=0.0, cloned={"move:setup": 1.0}, cloned_weight=1.0)
     assert attack_expected.prob[1] > 0.99 and setup_expected.prob[0] > 0.99
+
+
+@pytest.mark.parametrize("rho, expected", [(0.0, "risky"), (1.0, "safe")])
+def test_switch_candidates_are_compared_using_the_same_risk_objective(rho, expected):
+    from types import SimpleNamespace
+
+    from pokesim.search.lookahead import Lookahead
+
+    engine = Lookahead.__new__(Lookahead)
+    battle = SimpleNamespace(available_switches=[SimpleNamespace(species=s) for s in ("risky", "safe")])
+
+    def solve(battle, own, last, incoming):
+        payoff = [[2.0, -3.0]] if incoming.species == "risky" else [[0.5, 0.4]]
+        return plan([{"p1": ["move:hit"], "p2": ["move:hit", "move:setup"], "payoff": payoff}],
+                    rho=rho, cloned={"move:hit": 1.0}, cloned_weight=1.0)
+
+    advice = engine.advise_switch(battle, {}, solve=solve)
+    assert advice.labels[np.argmax(advice.prob)] == f"switch:{expected}"
+
+
+def test_solver_fallback_keeps_the_risk_objective(monkeypatch):
+    from types import SimpleNamespace
+
+    import pokesim.search.planner as planner
+
+    monkeypatch.setattr(planner, "linprog", lambda *a, **kw: SimpleNamespace(success=False, message="failed"))
+    world = World(np.array([[2.0, -3.0], [0.5, 0.4]]), ["hit", "setup"], predicted=np.array([1.0, 0.0]))
+    sol = solve_common([world], rho=1.0)
+    assert sol.prob.tolist() == [0.0, 1.0]
+    assert sol.status["objective"] == pytest.approx(0.4)

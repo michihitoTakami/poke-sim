@@ -125,3 +125,49 @@ def test_a_failed_search_falls_back_instead_of_losing_the_turn(session):
     sug = advisor.advise(session.decision())
     assert "node worker died" in sug.status["fallback"]
     assert sug.actions == []  # no policy loaded either: the caller picks a legal move
+
+
+def test_shadow_failure_preserves_the_legacy_recommendation(session, monkeypatch):
+    from types import SimpleNamespace
+
+    import numpy as np
+
+    from pokesim.live.advisor import Advisor
+    from pokesim.search.lookahead import Advice
+
+    EventTranslator(session).apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+                                   {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"}])
+    advisor = Advisor(session.sets, policy=None, lookahead=False, opponent_policy=None, planner={"mode": "shadow"})
+    advisor.engine = SimpleNamespace()
+
+    def search(*args, planned=False, **kwargs):
+        if planned:
+            raise RuntimeError("shadow failed")
+        return Advice(["move:protect"], np.array([1.0]), np.array([1.0]))
+
+    monkeypatch.setattr(advisor, "_search", search)
+    sug = advisor.advise(session.decision())
+    assert sug.actions == [("move:protect", 1.0)]
+    assert "shadow failed" in sug.status["shadow"]["error"]
+    assert "fallback" not in sug.status
+
+
+def test_switch_request_keeps_the_outgoing_state_for_the_simulator(session):
+    from types import SimpleNamespace
+
+    from pokesim.rl.myteam import to_id
+    from pokesim.search.lookahead import Lookahead
+
+    EventTranslator(session).apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+                                   {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"},
+                                   {"type": "boost", "side": "me", "stat": "def", "amount": 2},
+                                   {"type": "move", "side": "me", "move": "batonpass"}])
+    battle = session.decision(force_switch=True)
+    incoming = battle.available_switches[0]
+    engine = Lookahead.__new__(Lookahead)
+    engine.sampler = SimpleNamespace(base_id=lambda sid: sid)
+    own = engine.own_side(battle, {to_id(s["species"]): s for s in session.sets}, incoming)
+    assert own["team"][0]["species"] == "Scolipede"
+    assert to_id(own["team"][own["incoming"]]["species"]) == incoming.species
+    assert own["mons"][0]["boosts"]["def"] == 2
+    assert own["switchMove"] == "batonpass"

@@ -5,10 +5,9 @@ Sources (each record: opponent preview, our lineup, protocol log, result; us = p
   switch_rebuilt  data/processed/replayed       rebuilt from saved frames (scripts/replay_frames.py --records)
   showdown        data/raw/ladder               Showdown ladder (scripts/ladder.py)
 
-A Switch battle can be in both Switch sources. Two records are the same battle only when the opponent's preview
-has 5+ species in common, they started within 15 minutes and the first Pokémon each side sent in match; the
-rebuilt one is then the primary record. A live record and a rebuilt one with the very same start time (the rebuilt
-record keeps it) need only 4 in common: the preview reader misreads a slot or two. Records that are close but do
+A Switch battle can be in both Switch sources. A live record and a rebuilt record are confirmed duplicates only
+when their start timestamps match (the rebuilt record keeps it), their previews have 4+ species in common and
+the first Pokémon each side sent in match. The rebuilt one is the primary record. Records that are close but do
 not pass that check are kept as separate battles and listed in each other's `merge_pending` (a rematch with the
 same team is a different battle: we do not drop it on a guess). Showdown battles are identified by their battle tag.
 
@@ -121,7 +120,7 @@ def same_battle(a: tuple[Battle, dict], b: tuple[Battle, dict]) -> str | None:
         return None
     leads = first_switches(ra.get("log") or [])
     same_start = ba.started == bb.started and ba.records[0]["kind"] != bb.records[0]["kind"]
-    if (common >= 5 or same_start) and None not in leads and leads == first_switches(rb.get("log") or []):
+    if same_start and None not in leads and leads == first_switches(rb.get("log") or []):
         return "same"
     return "pending"
 

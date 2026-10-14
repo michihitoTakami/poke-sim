@@ -150,9 +150,12 @@ class Advisor:
                 opponent = sorted(advice.opponent.items(), key=lambda kv: -kv[1])
                 status["search"] = advice.status
                 if mode == "shadow":
-                    planned = self._search(battle, last_move, dict(cloned), planned=True, cache=cache)
-                    shadow = legal(planned)
-                    status["shadow"] = planned.status
+                    try:
+                        planned = self._search(battle, last_move, dict(cloned), planned=True, cache=cache)
+                        shadow = legal(planned)
+                        status["shadow"] = planned.status
+                    except Exception as e:  # noqa: BLE001 - observation-only failures must preserve live advice
+                        status["shadow"] = {"error": repr(e)[:200]}
             except Exception as e:  # noqa: BLE001 - a failed search must not lose the turn: the policy decides
                 ranked = []
                 status["fallback"] = f"search failed: {e!r}"[:200]

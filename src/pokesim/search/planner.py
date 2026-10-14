@@ -70,8 +70,12 @@ def solve_common(worlds: list[World], rho: float = RHO) -> Solution:
         status = {"solver": "highs", "objective": float(-res.fun)}
     else:
         x = np.zeros(n)
-        x[int(np.argmax(expected))] = 1.0
+        x[int(np.argmax((1 - rho) * expected + rho * worst))] = 1.0
         status = {"solver": "fallback", "reason": res.message}
+    # Recompute the realized objective, including the risk term, for comparing switch candidates and fallback.
+    objective = (1 - rho) * float(x @ expected) + rho * sum(
+        wg * float((x @ wd.payoff).min()) for wg, wd in zip(w, worlds))
+    status["objective"] = objective
     return Solution(x, expected, worst, status)
 
 

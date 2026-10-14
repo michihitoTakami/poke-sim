@@ -15,8 +15,6 @@ from dataclasses import dataclass, field
 import numpy as np
 from poke_env.battle import Battle, Pokemon
 from poke_env.data import GenData
-
-from pokesim.sim.formes import current_forme
 from sqlalchemy import select
 
 from pokesim.config import FORMAT, ROOT, SHOWDOWN_DIR
@@ -24,6 +22,7 @@ from pokesim.data.smogon_stats import smogon_summaries
 from pokesim.data.summarize_sets import SpeciesSummary, summarize
 from pokesim.db.models import Item, Learnset, Move, Species
 from pokesim.db.session import Session
+from pokesim.sim.formes import current_forme
 
 STATS = ["hp", "atk", "def", "spa", "spd", "spe"]
 WEATHER_IDS = {"RAINDANCE": "raindance", "SUNNYDAY": "sunnyday", "SANDSTORM": "sandstorm", "SNOWSCAPE": "snowscape",
@@ -38,7 +37,6 @@ VOLATILE_IDS = {"SUBSTITUTE": "substitute", "LEECH_SEED": "leechseed", "YAWN": "
                 "INGRAIN": "ingrain", "FOCUS_ENERGY": "focusenergy", "MAGNET_RISE": "magnetrise",
                 "NO_RETREAT": "noretreat", "HEAL_BLOCK": "healblock", "TORMENT": "torment"}
 PERISH = {"PERISH0": 0, "PERISH1": 1, "PERISH2": 2, "PERISH3": 3}
-BATON_PASSED = {"substitute", "leechseed", "curse", "confusion", "aquaring", "ingrain", "focusenergy", "magnetrise"}
 BOOSTS = ["atk", "def", "spa", "spd", "spe", "accuracy", "evasion"]
 
 
@@ -202,7 +200,7 @@ class SetSampler:
 
 
 def mon_state(mon: Pokemon, active: bool) -> dict:
-    out = {"hp": 0.0 if mon.fainted else mon.current_hp_fraction}
+    out = {"hp": 0.0 if mon.fainted else mon.current_hp_fraction, "mega": mega_evolved(mon)}
     entry = GenData.from_gen(9).pokedex.get(current_forme(mon), {})
     if entry.get("battleOnly") and not mega_evolved(mon):  # e.g. Mimikyu-Busted (no Disguise left), Aegislash-Blade
         out["forme"] = entry["name"]
@@ -218,7 +216,6 @@ def mon_state(mon: Pokemon, active: bool) -> dict:
             out["encore"] = mon.last_move.id  # locked into its last move
         if mon.protect_counter:  # consecutive Protect / Detect / Endure: the next one succeeds 1 in 3^n
             out["stall"] = mon.protect_counter
-        out["mega"] = mega_evolved(mon)
     return out
 
 
@@ -266,27 +263,25 @@ class Lookahead:
         return reply
 
     def own_side(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None) -> dict:
-        """incoming: for a switch decision, the Pokémon coming in (it starts the position as our active; after
-        Baton Pass it takes over the passer's boosts and passable effects)."""
-        active = battle.active_pokemon if incoming is None else incoming
+        """Keep the outgoing active first; the worker executes incoming's actual switch-in transition."""
+        active = battle.active_pokemon
+        if active is None:
+            raise ValueError("switch reconstruction needs the outgoing active")
         brought = [m for m in battle.team.values() if m.fainted or m.active or m in battle.available_switches]
         bench = [m for m in brought if m is not active]
         if not battle.available_switches and not battle.trapped and incoming is None:
             bench = [m for m in battle.team.values() if m is not active][:2]
         mons = [active] + bench[:2]
         states = [mon_state(m, i == 0) for i, m in enumerate(mons)]
-        passer = battle.active_pokemon
-        if incoming is not None and passer is not None and not passer.fainted and passer.last_move is not None \
-                and passer.last_move.id == "batonpass":
-            passed = mon_state(passer, True)
-            states[0]["boosts"] = passed.get("boosts", {})
-            states[0]["volatiles"] = [v for v in passed.get("volatiles", []) if v in BATON_PASSED]
-            if "perish" in passed:
-                states[0]["perish"] = passed["perish"]
-        return {"team": [own_sets[self.sampler.base_id(m.species)] for m in mons],
+        out = {"team": [own_sets[self.sampler.base_id(m.species)] for m in mons],
                 "mons": states,
                 "megaUsed": battle.used_mega_evolve, "conditions": side_conditions(battle.side_conditions,
                                                                                     battle.turn)}
+        if incoming is not None:
+            out["incoming"] = mons.index(incoming)
+            if not active.fainted and active.last_move is not None and active.last_move.id == "batonpass":
+                out["switchMove"] = "batonpass"
+        return out
 
     def opponent_side(self, battle: Battle) -> dict:
         active = battle.opponent_active_pokemon
@@ -338,7 +333,7 @@ class Lookahead:
             else:
                 adv = solve(battle, own_sets, last_move, mon)
             labels.append(f"switch:{to_id(mon.species)}")
-            values.append(float(adv.prob @ adv.value))
+            values.append(float(adv.status.get("objective", adv.prob @ adv.value)))
             status["switch"][labels[-1]] = adv.status
         if not labels:
             raise ValueError("no switch available")
