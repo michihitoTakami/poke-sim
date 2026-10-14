@@ -23,7 +23,8 @@ HIPPO = {"species": "Hippowdon", "item": "Leftovers", "ability": "Sand Stream", 
 def run(code: str, sample: dict) -> dict:
     js = """
 const fs = require('fs'), vm = require('vm');
-const sandbox = {require: n => n === 'readline' ? {createInterface: () => ({on: () => {}})} : require(n),
+const sandbox = {__dirname: require('path').dirname(process.argv[1]),
+    require: n => n === 'readline' ? {createInterface: () => ({on: () => {}})} : require(n),
     process: {argv: ['node', 'worker', process.argv[2]]}, module: {exports: {}}, console};
 vm.runInNewContext(fs.readFileSync(process.argv[1], 'utf8') +
     '\\nmodule.exports={setUp,evaluate,tactical,greedy,score,hasDamageSource};', sandbox);
