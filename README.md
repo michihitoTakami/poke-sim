@@ -38,11 +38,18 @@ uv run python -m pokesim.rl.bc record --battles 4000 && uv run python -m pokesim
 uv run python -m pokesim.rl.train --my-team data/my_teams/baton.json --season all --reward sparse \
     --init checkpoints/bc_baton.zip --league --opp-snapshots checkpoints/ppo_m6_league3m.zip --name ppo_baton2 --steps 1000000
 uv run python -m pokesim.rl.train ... --random-lineup --name ppo_baton_any   # どの3体を選んでも動くモデル
+# 相手目線の学習（真似 AI から出発し、この構築に勝つように学習）→ その相手を練習相手にして学習し直す
+uv run python -m pokesim.rl.human build && uv run python -m pokesim.rl.human fit   # 人間の行動の真似 AI（bc_human）
+uv run python -m pokesim.rl.train_opponent --init checkpoints/bc_human.zip --name opp_baton --steps 3000000
+uv run python -m pokesim.rl.train ... --random-lineup --init checkpoints/ppo_baton_any.zip --p-heuristic 0.2 --n-envs 4 \
+    --opp-snapshots checkpoints/opp_baton_seg012.zip checkpoints/opp_baton_seg001.zip checkpoints/opp_baton_seg012.zip \
+    checkpoints/bc_human.zip checkpoints/ppo_m6_league3m.zip --name ppo_baton_opp --steps 3000000
+cp checkpoints/ppo_baton_opp_seg010.zip checkpoints/ppo_baton_v2.zip   # 100万ステップ版を採用（評価で最良）
 uv run python scripts/sim_matchups.py record --policy checkpoints/ppo_baton_any.zip --battles 12000
 uv run python scripts/sim_matchups.py fit         # 選出ごとの勝率モデル
 
 # サーバー（ブラウザで http://127.0.0.1:8100 、OBS のブラウザソースには /overlay）
-uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_any.zip \
+uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_v2.zip \
     [--obs-source "キャプチャのソース名"] [--obs-record /data/poke-sim/obs_frames]
     # OBS の選出画面を自動で認識（パスワードは環境変数 OBS_PASSWORD）。--obs-record は変化した画面を保存（容量が大きいので別ディスク推奨）
 ```

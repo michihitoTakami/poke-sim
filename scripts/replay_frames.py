@@ -103,7 +103,7 @@ def main() -> None:
     if args.apply:
         from pokesim.live.advisor import Advisor
 
-        advisor = Advisor(sets, policy="checkpoints/ppo_baton_any.zip")
+        advisor = Advisor(sets, policy="checkpoints/ppo_baton_v2.zip")
     reader, preview_reader = ScreenReader(), None
     games: list[Game] = []
     game, preview_gone = None, True

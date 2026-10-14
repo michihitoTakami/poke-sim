@@ -10,7 +10,7 @@ API:   POST /api/preview/recognize {image: base64}   -> recognised opponent 6 wi
        POST /api/end {result: "win"|"loss"}            -> saves the record
        GET  /api/state, /api/options/...              WS /ws (state pushes)
 
-Usage: uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_any.zip [--port 8100]
+Usage: uv run python -m pokesim.api.server --policy checkpoints/ppo_baton_v2.zip [--port 8100]
          [--obs-source "Capture Card"]  (password from $OBS_PASSWORD)   # watch OBS: team preview, then the battle
 With OBS, the battle screen is read during the game (pokesim.vision.battle + pokesim.live.screen): messages, HP and
 the command prompt become turn events and advice without manual input (--no-screen to turn it off).

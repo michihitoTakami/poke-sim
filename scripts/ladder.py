@@ -139,7 +139,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--battles", type=int, default=30)
     ap.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
-    ap.add_argument("--policy", default=str(ROOT / "checkpoints/ppo_baton_any.zip"))
+    ap.add_argument("--policy", default=str(ROOT / "checkpoints/ppo_baton_v2.zip"))
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--local", action="store_true", help="local server (localhost:8000) against a random player")
     asyncio.run(run(ap.parse_args()))
