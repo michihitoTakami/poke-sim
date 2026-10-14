@@ -71,6 +71,7 @@ class Game:
         adv = self.advisor.advise(self.session.decision(force_switch=force_switch), self.session.last_move(),
                                   self.session.log)
         print("    advice:", [(label, round(p, 2)) for label, p in adv.actions[:3]], "win", adv.win_prob,
+              "raw", adv.win_raw,
               "opp:", [(label, round(p, 2)) for label, p in adv.opponent[:3]])
 
     def record(self) -> dict:

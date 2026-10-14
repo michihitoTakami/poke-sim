@@ -100,7 +100,8 @@ def _advise(self, battle, session):
         self.policy_agree.append(max(real_policy, key=real_policy.get) == max(sug.policy, key=sug.policy.get))
     if self.shown < 6:
         self.shown += 1
-        win = f"{sug.win_prob:.0%}" if sug.win_prob is not None else "-"
+        win = f"{sug.win_prob:.0%}" if sug.win_prob is not None else \
+            (f"(raw {sug.win_raw:.0%})" if sug.win_raw is not None else "-")
         print(f"T{battle.turn} {battle.active_pokemon.species} vs {battle.opponent_active_pokemon.species}: "
               + " / ".join(f"{a} {p:.0%}" for a, p in sug.actions[:3]) + f"  win~{win}  opp: "
               + " / ".join(f"{a} {p:.0%}" for a, p in sug.opponent[:3]) + f"  ({sug.elapsed:.1f}s)")

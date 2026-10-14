@@ -24,6 +24,7 @@
   .bar { height:6px; background:var(--accent); border-radius:3px; }
   .row { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin:4px 0; }
   .muted { color:var(--muted); font-size:12px; }
+  .warn { color:#e8a33d; font-size:13px; margin:4px 0; }
   .queue span { display:inline-block; background:#2b3342; border-radius:4px; padding:1px 6px; margin:2px; }
   .big { font-size:18px; font-weight:600; }
   .chosen { background:#1f4f6b; }
@@ -157,6 +158,7 @@ function render(s) {
     $('lineups').innerHTML = p.lineups.length ? '<table><tr><th>先発</th><th>残り</th><th>推定勝率</th></tr>' +
       p.lineups.map((l, i) => `<tr class="pick${sameLineup(l.lineup, s.lineup) ? ' chosen' : ''}" data-i="${i}"><td>${l.names[0]}</td><td>${l.names.slice(1).join('・')}</td><td>${pct(l.win)}</td></tr>`).join('') + '</table>'
       : '選出ごとの勝率モデルがまだありません（scripts/sim_matchups.py）。手動で選んでください。';
+    if (p.lineup_note && p.lineups.length) $('lineups').innerHTML += `<div class="muted">※ 推定勝率は参考値: ${p.lineup_note}</div>`;
     document.querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => selectLineup(p.lineups[+tr.dataset.i].lineup));
   }
   const b = s.battle;
@@ -189,7 +191,12 @@ function render(s) {
   }
   const a = s.advice;
   const bars = list => list.map(x => `<div class="row"><span style="width:170px">${x.label}</span><span style="width:44px">${pct(x.p)}</span><div class="bar" style="width:${Math.round(x.p * 160)}px"></div></div>`).join('');
-  $('advice').innerHTML = a ? bars(a.actions) + `<div class="muted">推定勝率（目安）: ${a.win_prob == null ? '-' : pct(a.win_prob)} ・ 計算 ${a.elapsed}s</div>` : '<span class="muted">-</span>';
+  const win = a && (a.win_prob != null ? `推定勝率: ${pct(a.win_prob)}（較正済み）`
+    : `推定勝率: -（較正データ不足）${a.win_raw != null ? ` ・ 方策の評価値 ${pct(a.win_raw)}（勝率ではありません）` : ''}`);
+  const wp = a && a.win_path;
+  const path = wp && !wp.error && (wp.no_source ? '<div class="warn">相手の残りにダメージを与えられるポケモンがいません</div>'
+    : wp.last_source ? `<div class="warn">攻撃できる残りは ${wp.sources.join('・')} だけです</div>` : '');
+  $('advice').innerHTML = a ? bars(a.actions) + (path || '') + `<div class="muted">${win} ・ 計算 ${a.elapsed}s</div>` : '<span class="muted">-</span>';
   $('opp-advice').innerHTML = a && a.opponent.length ? bars(a.opponent) : '<span class="muted">-</span>';
 }
 let moveListFor = null;

@@ -66,7 +66,7 @@ class AdvisorPlayer(Player):
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
                  planner: dict | None = None, sample: bool = False, seed: int | None = None, **kwargs):
         self.sets, self.out = sets, out
-        self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner)
+        self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner, source="showdown")
         self.planner, self.sample = planner, sample
         self.seed = seed if seed is not None else random.SystemRandom().randrange(2 ** 31)
         self.rng = random.Random(self.seed)
@@ -128,7 +128,7 @@ class AdvisorPlayer(Player):
             advice = self.advisor.advise(battle, self.last_opponent_move(battle),
                                          self.logs.get(battle.battle_tag, []),
                                          battle.player_role)
-            entry.update({"actions": rounded(advice.actions[:5]), "win": advice.win_prob,
+            entry.update({"actions": rounded(advice.actions[:5]), "win": advice.win_raw, "win_cal": advice.win_prob,
                           "policy": rounded(sorted(advice.policy.items(), key=lambda kv: -kv[1])[:3]),
                           "lookahead": [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.lookahead[:3]],
                           "opponent": rounded(advice.opponent[:4]), "secs": round(advice.elapsed, 2),
