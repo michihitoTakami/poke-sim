@@ -606,7 +606,7 @@ def fit(args) -> None:
 
     output = Path(args.out if str(args.out).endswith(".zip") else str(args.out) + ".zip")
     write_metadata(output, dict(scope.metadata("train"), prior_bundle_sha=data_meta["prior_bundle_sha"],
-                                data_sha=file_hash(args.data), records_sha=file_hash(args.records),
+                                data_sha=file_hash(args.data), records_data_sha=file_hash(args.records),
                                 development_records=scope.metadata("development")["records"]))
     print(f"saved {args.out}.zip (best held-out log-lik {best:.2f})")
 
