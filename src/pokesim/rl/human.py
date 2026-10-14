@@ -176,9 +176,11 @@ def open_session(lines: list[str], role: str, sets: list[dict], species: dict) -
     return session, canonical(body, role, set_names, species)
 
 
-def decisions(log: str, role: str, sides: Sides, probe=None) -> tuple[list[Decision], bool | None]:
+def decisions(log: str, role: str, sides: Sides, probe=None,
+              keep_failed: bool = False) -> tuple[list[Decision], bool | None]:
     """All decisions `role` made in a battle log (full Showdown log text), and whether that side won.
-    probe(battle, own_sets): called at each kept decision (e.g. another player's choice) -> Decision.extra."""
+    probe(battle, own_sets): called at each kept decision (e.g. another player's choice) -> Decision.extra.
+    keep_failed: also keep moves that failed (`[still]` followed by -fail, e.g. a repeated Protect)."""
     species = sides.species
     lines = [ln for ln in log.split("\n") if ln.startswith("|")]
     winner_name = next((ln.split("|")[2] for ln in lines if ln.startswith("|win|")), None)
@@ -191,9 +193,10 @@ def decisions(log: str, role: str, sides: Sides, probe=None) -> tuple[list[Decis
     out: list[Decision] = []
     in_turn, acted, megas = False, False, set()
     turn = 0
-    for line in body:
+    for i, line in enumerate(body):
         parts = line.split("|")
         kind = parts[1]
+        failed = keep_failed and line.endswith("[still]") and i + 1 < len(body) and body[i + 1].startswith("|-fail|")
         if kind == "turn":
             session.apply(line)
             in_turn, acted, megas = True, False, set()
@@ -202,7 +205,7 @@ def decisions(log: str, role: str, sides: Sides, probe=None) -> tuple[list[Decis
         mine = len(parts) > 2 and parts[2].startswith(role)
         if in_turn and mine and kind == "-mega":
             megas.add(parts[2][:3])
-        if in_turn and mine and kind in ("move", "switch") and "[from]" not in line and not line.endswith("[still]"):
+        if in_turn and mine and kind in ("move", "switch") and "[from]" not in line and (failed or not line.endswith("[still]")):
             force = acted
             if kind == "move" and force:
                 pass  # a second move in one turn (Dancer, Instruct...): not a choice

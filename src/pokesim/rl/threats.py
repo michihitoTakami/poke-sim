@@ -7,7 +7,9 @@ damaging moves with their usage share, the Mega forme with its stone's share whi
 - the chance one of its moves knocks out our active Pokémon, and its expected best damage to it;
 - the chance it moves first, and the chance it still Mega Evolves;
 - for each of our 6: the chance it knocks that member out (e.g. on the switch-in);
-plus volatile effects the base observation leaves out, for both active Pokémon (Curse and Perish Song, which Baton
+plus, per kind of set-up counter (Encore, phazing, Taunt, Haze, Yawn), the chance the opponent has one that works on
+our active Pokémon (Good as Gold / Magic Bounce block status moves aimed at it, a Substitute blocks Yawn and Clear
+Smog; Haze and Dragon Tail still work), and volatile effects the base observation leaves out, for both active Pokémon (Curse and Perish Song, which Baton
 Pass hands on, Aqua Ring, Ingrain, Focus Energy, Magnet Rise, No Retreat, trapping; ours also Heal Block, Torment,
 Disable).
 
@@ -21,7 +23,7 @@ from poke_env.battle import AbstractBattle, Field, Move, MoveCategory, Pokemon
 
 from pokesim.config import PROCESSED_DIR
 from pokesim.rl.items import UNKNOWN, is_mega
-from pokesim.rl.myteam import to_id
+from pokesim.rl.myteam import COUNTER_GROUPS, to_id
 from pokesim.sim import damage
 
 PRIORS_PATH = PROCESSED_DIR / "threat_priors.json"
@@ -31,8 +33,16 @@ PERISH = {"PERISH0": 0, "PERISH1": 1, "PERISH2": 2, "PERISH3": 3}
 TRAPPED = {"TRAPPED", "PARTIALLY_TRAPPED", "OCTOLOCK"}
 N_OWN = len(SHARED_EFFECTS) + len(OWN_EFFECTS) + 3
 N_OPP = len(SHARED_EFFECTS) + 3
-SIZE = 4 + 6 + N_OWN + N_OPP
+STATUS_BLOCKERS = {"goodasgold", "magicbounce"}
+SUB_BLOCKED = {"yawn", "clearsmog"}
+N_COUNTER = len(COUNTER_GROUPS) + 1
+SIZE = 4 + 6 + N_OWN + N_OPP + N_COUNTER
 MAX_MOVES = 10  # likely damaging moves kept per species
+
+
+@lru_cache(maxsize=None)
+def any_move(mid: str) -> Move:
+    return Move(mid, gen=9)
 
 
 @lru_cache(maxsize=None)
@@ -60,7 +70,10 @@ def build_priors() -> dict[str, dict]:
             it = sampler.items.get(k)
             if it is not None and it.mega_stone:
                 mega[to_id(it.mega_stone)] = mega.get(to_id(it.mega_stone), 0.0) + v / items
+        counters = {k: min(1.0, 4 * v / total) for k, v in sm.moves.items()
+                    if total and any(k in g for g in COUNTER_GROUPS.values())}
         out[sid] = {"moves": {k: round(v, 3) for k, v in moves.items()},
+                    "counter": {k: round(v, 3) for k, v in counters.items()},
                     "mega": {k: round(v, 3) for k, v in mega.items() if v >= 0.01}}
     return out
 
@@ -130,10 +143,42 @@ class ThreatFeatures:
         out = [float(n in names) for n in SHARED_EFFECTS + (OWN_EFFECTS if own else [])]
         return out + [float(bool(perish)), (min(perish) / 3.0) if perish else 0.0, float(bool(names & TRAPPED))]
 
+    @staticmethod
+    def blocked(mid: str, target: Pokemon) -> bool:
+        """Whether the move cannot affect `target` (status move into Good as Gold / Magic Bounce, Yawn into a
+        Substitute)."""
+        m = any_move(mid)
+        aimed = m.target is not None and m.target.name in ("NORMAL", "ANY", "ADJACENT_FOE", "RANDOM_NORMAL")
+        if m.category == MoveCategory.STATUS and aimed and to_id(target.ability or "") in STATUS_BLOCKERS:
+            return True
+        return mid in SUB_BLOCKED and any(e.name == "SUBSTITUTE" for e in target.effects)
+
+    def counters(self, opp: Pokemon, me: Pokemon) -> list[float]:
+        """Per counter group: the chance the opponent has a move of it that works on `me`; then whether `me`
+        blocks status moves."""
+        prior = self.priors.get(to_id(opp.base_species), {}) or self.priors.get(to_id(opp.species), {})
+        known = set(opp.moves)
+        out = []
+        for moves in COUNTER_GROUPS.values():
+            usable = [m for m in moves if not self.blocked(m, me)]
+            if known & set(usable):
+                out.append(1.0)
+            elif len(known) >= 4:
+                out.append(0.0)
+            else:
+                share = prior.get("counter", {})
+                out.append(1.0 - float(np.prod([1 - share.get(m, 0.0) for m in usable])))
+        out.append(float(to_id(me.ability or "") in STATUS_BLOCKERS))
+        return out
+
     def __call__(self, battle: AbstractBattle) -> np.ndarray:
         feats = np.zeros(self.size, dtype=np.float32)
+        n = 10 + N_OWN + N_OPP
         feats[10:10 + N_OWN] = self.effects(battle.active_pokemon, True)
-        feats[10 + N_OWN:] = self.effects(battle.opponent_active_pokemon, False)
+        feats[10 + N_OWN:n] = self.effects(battle.opponent_active_pokemon, False)
+        if battle.active_pokemon is not None and battle.opponent_active_pokemon is not None \
+                and not battle.active_pokemon.fainted:
+            feats[n:n + N_COUNTER] = self.counters(battle.opponent_active_pokemon, battle.active_pokemon)
         me, opp = battle.active_pokemon, battle.opponent_active_pokemon
         if me is not None and me.fainted:  # forced switch: only the switch-in chances matter
             me = None
