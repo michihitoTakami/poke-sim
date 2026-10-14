@@ -62,8 +62,9 @@ class Advisor:
                  seasons: tuple[str, ...] = ("M-6",), samples: int = 6, seeds: int = 2, rollout: int = 3,
                  reward: str = "sparse", opponent_model: dict | None = None,
                  opponent_policy: str | Path | None = "default"):
-        self.extra = TeamFeatures([s["species"] for s in sets])
         self.model = MaskablePPO.load(policy, device="cpu") if policy else None
+        roster = [s["species"] for s in sets]
+        self.extra = TeamFeatures.for_model(self.model, roster) if self.model else TeamFeatures(roster)
         self.victory = REWARDS[reward]["victory_value"]
         model = OPPONENT_MODEL if opponent_model is None else opponent_model
         self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout, model) if lookahead else None

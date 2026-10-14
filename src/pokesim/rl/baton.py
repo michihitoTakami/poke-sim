@@ -112,7 +112,7 @@ class PolicyPilot(BatonScript):
 
     def __init__(self, *args, policy: str, roster: list[str], deterministic: bool = True, **kwargs):
         self.model = MaskablePPO.load(policy, device="cpu")
-        self.extra, self.deterministic = TeamFeatures(roster), deterministic
+        self.extra, self.deterministic = TeamFeatures.for_model(self.model, roster), deterministic
         super().__init__(*args, **kwargs)
 
     def choose_move(self, battle):

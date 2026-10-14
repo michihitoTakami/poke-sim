@@ -70,6 +70,29 @@ def make_env(opponent, team, opponent_team, server_configuration, reward, env_kw
                                     reward=reward, **env_kwargs), info_keywords=("won",))
 
 
+def load_widened(path: str, env, custom: dict | None = None) -> MaskablePPO:
+    """Load a checkpoint for `env`; if env has more inputs (appended features), widen the first layers with zero
+    weights for the new inputs, so the policy starts out acting exactly as before."""
+    init = MaskablePPO.load(path, device="cpu", custom_objects=custom)
+    if init.observation_space.shape == env.observation_space.shape:
+        return MaskablePPO.load(path, env=env, device="cuda", tensorboard_log=str(ROOT / "runs"), custom_objects=custom)
+    model = MaskablePPO("MlpPolicy", env, device="cuda", n_steps=init.n_steps, batch_size=init.batch_size,
+                        gamma=init.gamma, learning_rate=init.learning_rate, ent_coef=init.ent_coef,
+                        policy_kwargs=init.policy_kwargs, tensorboard_log=str(ROOT / "runs"), verbose=0)
+    old, new = init.policy.state_dict(), model.policy.state_dict()
+    for key, tensor in new.items():
+        src = old[key]
+        if src.shape != tensor.shape:  # first linear layers: [out, in_old] -> [out, in_new]
+            assert src.dim() == 2 and src.shape[0] == tensor.shape[0], key
+            tensor.zero_()
+            tensor[:, : src.shape[1]] = src
+        else:
+            tensor.copy_(src)
+    model.policy.load_state_dict(new)
+    print(f"widened {path}: {init.observation_space.shape[0]} -> {env.observation_space.shape[0]} inputs", flush=True)
+    return model
+
+
 def new_model(env) -> MaskablePPO:
     return MaskablePPO(
         "MlpPolicy",
@@ -109,6 +132,9 @@ def main() -> None:
                         help="league: chance a battle's opponent is the (slow) lookahead player")
     parser.add_argument("--n-envs", type=int, default=1, help="parallel environments (subprocesses)")
     parser.add_argument("--n-steps", type=int, help="rollout length per environment (overrides the checkpoint's)")
+    parser.add_argument("--items", action="store_true",
+                        help="with --my-team: add the held-item features (pokesim.rl.items); a --init policy without "
+                             "them is widened (new inputs start with zero weight)")
     args = parser.parse_args()
 
     teams = load_teams(args.season)
@@ -119,7 +145,7 @@ def main() -> None:
     if args.my_team:
         sets = load_my_team(args.my_team, args.lineup)
         my_team, snapshots = FixedTeam(sets), list(args.opp_snapshots)
-        env_kwargs = {"extra": TeamFeatures([s["species"] for s in sets]), "lineup": "123"}
+        env_kwargs = {"extra": TeamFeatures([s["species"] for s in sets], items=args.items), "lineup": "123"}
     callback, model, done, seg = WinRateCallback(), None, 0, 0
     while done < args.steps:
         with ShowdownServer(args.port) as server:
@@ -142,8 +168,7 @@ def main() -> None:
             env = SubprocVecEnv(factories, start_method="spawn") if args.n_envs > 1 else factories[0]()
             if model is None and args.init:
                 custom = {"n_steps": args.n_steps} if args.n_steps else None
-                model = MaskablePPO.load(args.init, env=env, device="cuda", tensorboard_log=str(ROOT / "runs"),
-                                         custom_objects=custom)
+                model = load_widened(args.init, env, custom)
             elif model is None:
                 model = new_model(env)
             else:

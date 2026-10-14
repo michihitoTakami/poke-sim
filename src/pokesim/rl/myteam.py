@@ -86,11 +86,25 @@ def load_priors() -> dict[str, dict[str, float]]:
 class TeamFeatures:
     """Extra observation features for a fixed roster (see module docstring)."""
 
-    def __init__(self, roster: list[str], priors: dict[str, dict[str, float]] | None = None):
+    def __init__(self, roster: list[str], priors: dict[str, dict[str, float]] | None = None, items: bool = False):
         self.roster = [to_id(r) for r in roster]
         self.priors = load_priors() if priors is None else priors
         self.n_counter = len(COUNTER_GROUPS) + 1  # + Unaware
         self.size = 6 * len(self.roster) + 3 * self.n_counter
+        self.items = None
+        if items:  # held-item features (pokesim.rl.items) after the roster / counter-move ones
+            from pokesim.rl.items import ItemFeatures
+
+            self.items = ItemFeatures()
+            self.size += self.items.size
+
+    @classmethod
+    def for_model(cls, model, roster: list[str]) -> "TeamFeatures":
+        """The features a saved fixed-team policy was trained with (with or without held items)."""
+        from pokesim.rl.features import OBS_SIZE
+
+        plain = cls(roster)
+        return cls(roster, items=True) if model.observation_space.shape[0] > OBS_SIZE + plain.size else plain
 
     def counter_probs(self, mon) -> list[float]:
         prior = self.priors.get(to_id(mon.base_species), {}) or self.priors.get(to_id(mon.species), {})
@@ -115,7 +129,7 @@ class TeamFeatures:
         return -1
 
     def __call__(self, battle: AbstractBattle) -> np.ndarray:
-        feats = np.zeros(self.size, dtype=np.float32)
+        feats = np.zeros(self.size - (self.items.size if self.items else 0), dtype=np.float32)
         for slot, mon in enumerate(list(battle.team.values())[:6]):
             idx = self.roster_index(mon)
             if idx >= 0:
@@ -136,7 +150,7 @@ class TeamFeatures:
             p_brought = left / len(unseen)
             probs = np.array([self.counter_probs(m) for m in unseen]) * p_brought
             feats[base + 2 * n:base + 3 * n] = 1.0 - np.prod(1.0 - probs, axis=0)
-        return feats
+        return np.concatenate([feats, self.items(battle)]) if self.items else feats
 
 
 # Types that hit Scolipede (Bug/Poison) super-effectively, and so threaten the passer through Iron Defense.
