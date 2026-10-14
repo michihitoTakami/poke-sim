@@ -4,6 +4,8 @@
   #   PS_USERNAME=...   PS_PASSWORD=...
   uv run python scripts/ladder.py --battles 30
   # A/B: battles alternate between the policies (the record says which one played)
+  # On the public server it exits between battles when the code or priors change, so a loop restarting it keeps
+  # playing the latest version (see /data/poke-sim/ladder_logs/run3h.sh).
   uv run python scripts/ladder.py --battles 30 --policy checkpoints/ppo_baton_v2.zip checkpoints/ppo_baton_items.zip
   # local test against a random player
   uv run python scripts/ladder.py --local --battles 2
@@ -81,8 +83,9 @@ class AdvisorPlayer(Player):
 
     def policy_for(self, battle) -> str:
         if battle.battle_tag not in self.assigned:
-            paths = list(self.policies)
-            self.assigned[battle.battle_tag] = paths[len(self.assigned) % len(paths)]
+            paths = list(self.policies)  # keep alternating across restarts: count the records already saved
+            done = len(list(self.out.glob("*.json"))) if self.out.exists() else 0
+            self.assigned[battle.battle_tag] = paths[(done + len(self.assigned)) % len(paths)]
         return self.assigned[battle.battle_tag]
 
     def teampreview(self, battle) -> str:
@@ -150,6 +153,13 @@ class AdvisorPlayer(Player):
               f"({self.n_won_battles}-{self.n_lost_battles})", flush=True)
 
 
+def code_stamp() -> float:
+    """Latest modification time of the code, the sim scripts and the priors the advisor reads."""
+    paths = [*(ROOT / "src").rglob("*.py"), *(ROOT / "services" / "sim-tools").glob("*.js"), Path(__file__),
+             *(ROOT / "data" / "processed").glob("*_priors*.json")]
+    return max((p.stat().st_mtime for p in paths if p.exists()), default=0.0)
+
+
 def rounded(pairs) -> list:
     return [(k, round(float(v), 3)) for k, v in pairs]
 
@@ -182,7 +192,12 @@ async def run(args) -> None:
                        account_configuration=AccountConfiguration(*cred),
                        server_configuration=ShowdownServerConfiguration, max_concurrent_battles=1,
                        start_timer_on_battle_start=True)
-    await me.ladder(args.battles)
+    stamp = code_stamp()
+    for _ in range(args.battles):
+        await me.ladder(1)
+        if code_stamp() != stamp:  # code or priors changed: exit between battles so the caller restarts us
+            print("code changed: exiting to reload", flush=True)
+            break
     print(f"done: {me.n_won_battles}-{me.n_lost_battles}")
 
 
