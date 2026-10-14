@@ -19,7 +19,8 @@ def worker(code, sample):
     # Do not start the stdin server; export its internal functions from a VM for boundary tests.
     js = """
 const fs = require('fs'), vm = require('vm');
-const sandbox = {require: n => n === 'readline' ? {createInterface: () => ({on: () => {}})} : require(n),
+const sandbox = {__dirname: require('path').dirname(process.argv[1]),
+    require: n => n === 'readline' ? {createInterface: () => ({on: () => {}})} : require(n),
     process: {argv: ['node', 'worker', process.argv[2]]}, module: {exports: {}}, console};
 const source = fs.readFileSync(process.argv[1], 'utf8');
 vm.runInNewContext(source + '\\nmodule.exports={setUp,step,evaluate};', sandbox);

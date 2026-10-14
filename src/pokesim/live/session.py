@@ -17,6 +17,7 @@ from poke_env.battle import Battle, Effect, MoveCategory
 
 from pokesim.config import FORMAT, RAW_DIR, ROOT, SHOWDOWN_DIR
 from pokesim.rl.myteam import FixedTeam
+from pokesim.state.tracker import TrackedBattle
 
 STATS_CACHE = RAW_DIR / "live/team_stats"
 
@@ -42,7 +43,7 @@ class BattleSession:
         self.sets, self.username, self.role = sets, username, role
         self.opp_role = "p2" if role == "p1" else "p1"
         self.info = team_stats(sets, format_id)
-        self.battle = Battle(f"live-{uuid.uuid4().hex[:8]}", username, logging.getLogger("live"), gen=9)
+        self.battle = TrackedBattle(f"live-{uuid.uuid4().hex[:8]}", username, logging.getLogger("live"), gen=9)
         self.log: list[str] = []
         self.pp_used: dict[str, dict[str, int]] = {}
         self.rqid = 0
@@ -57,6 +58,7 @@ class BattleSession:
                 continue
             self.log.append(line)
             split = line.split("|")
+            self.battle.state_tracker.apply(split)
             kind = split[1] if len(split) > 1 else ""
             if kind == "win":
                 self.battle.won_by(split[2])
@@ -113,10 +115,12 @@ class BattleSession:
                 disabled_move = line.split("|")[4].lower().replace(" ", "").replace("-", "")
                 break
         out = []
+        locks = self.battle.state_tracker.locks(self.role, info["name"])
+        encore_move = locks.get("encore", last)
         for m in info["moves"]:
             pp = max(0, m["maxpp"] - used.get(m["id"], 0))
             disabled = pp == 0 or m["id"] == disabled_move
-            if Effect.ENCORE in effects and last and m["id"] != last:
+            if Effect.ENCORE in effects and encore_move and m["id"] != encore_move:
                 disabled = True
             if choice_locked and m["id"] != last:
                 disabled = True

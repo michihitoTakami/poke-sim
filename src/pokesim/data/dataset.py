@@ -22,6 +22,8 @@ def observation_code() -> dict:
         "sim/damage.py",
         "sim/effectiveness.py",
         "live/session.py",
+        "state/codec.py",
+        "state/tracker.py",
     ]
     return {p: file_hash(ROOT / "src/pokesim" / p) for p in paths}
 
