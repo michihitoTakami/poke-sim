@@ -135,7 +135,13 @@ def combine(policy: dict[str, float], ranked: list[tuple[str, float, float]], mo
              lookahead value is more than `margin` below the best (a win counts 3, a Pokemon's HP 1) are dropped.
     defer: when the lookahead's equilibrium puts at least this much on one action, its mix alone (the policy cannot
     see unrevealed moves or Mega Evolution; the search samples them).
-    With only one source, that source alone."""
+    With only one source, that source alone.
+    If the lookahead's mix gives no weight to any legal action (it was spent on options the battle does not allow),
+    its mix is replaced by softmax(value / tau) over the legal ones."""
+    if ranked and sum(p for _, p, _ in ranked) <= 0:
+        values = np.array([v for _, _, v in ranked])
+        soft = np.exp((values - values.max()) / tau)
+        ranked = [(lab, float(q), v) for (lab, _, v), q in zip(ranked, soft / soft.sum())]
     if not ranked:
         out = dict(policy)
     elif not policy or (defer is not None and max(p for _, p, _ in ranked) >= defer * sum(p for _, p, _ in ranked)):

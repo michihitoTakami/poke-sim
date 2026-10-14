@@ -40,7 +40,11 @@ SUB_BLOCKED = {"yawn", "clearsmog"}
 N_COUNTER = len(COUNTER_GROUPS) + 1
 SHIELD_ABILITIES = ["sturdy", "multiscale", "shadowshield"]  # survive / halve a hit at full HP
 N_SHIELD = 1 + len(SHIELD_ABILITIES)
-SIZE = 4 + 6 + N_OWN + N_OPP + N_COUNTER + N_SHIELD
+# abilities that change what we should do; known once revealed, else the usage share
+KEY_ABILITIES = ["prankster", "galewings", "triage", "unaware", "intimidate", "magicbounce", "goodasgold", "levitate",
+                 "regenerator", "moxie", "defiant", "competitive", "clearbody", "infiltrator"]
+N_ABILITY = len(KEY_ABILITIES) + 1  # + the chance an Encore lands before our move
+SIZE = 4 + 6 + N_OWN + N_OPP + N_COUNTER + N_SHIELD + N_ABILITY
 MAX_MOVES = 10  # likely damaging moves kept per species
 
 
@@ -78,9 +82,11 @@ def build_priors() -> dict[str, dict]:
                     if total and any(k in g for g in COUNTER_GROUPS.values())}
         ab_total = sum(v for k, v in sm.abilities.items() if k) or 1.0
         shields = {k: sm.abilities.get(k, 0) / ab_total for k in SHIELD_ABILITIES}
+        key = {k: sm.abilities.get(k, 0) / ab_total for k in KEY_ABILITIES}
         out[sid] = {"moves": {k: round(v, 3) for k, v in moves.items()},
                     "counter": {k: round(v, 3) for k, v in counters.items()},
                     "shield": {k: round(v, 3) for k, v in shields.items() if v > 0},
+                    "ability": {k: round(v, 3) for k, v in key.items() if v > 0},
                     "mega": {k: round(v, 3) for k, v in mega.items() if v >= 0.01}}
     return out
 
@@ -188,16 +194,29 @@ class ThreatFeatures:
         prior = self.priors.get(to_id(opp.base_species), {}).get("shield", {})
         return [disguise] + [float(full) * prior.get(k, 0.0) for k in SHIELD_ABILITIES]
 
+    def abilities(self, opp: Pokemon) -> np.ndarray:
+        if opp.ability:
+            return np.array([float(to_id(opp.ability) == k) for k in KEY_ABILITIES])
+        prior = (self.priors.get(to_id(opp.base_species), {}) or self.priors.get(to_id(opp.species), {}))
+        return np.array([prior.get("ability", {}).get(k, 0.0) for k in KEY_ABILITIES])
+
     def __call__(self, battle: AbstractBattle) -> np.ndarray:
         feats = np.zeros(self.size, dtype=np.float32)
+        a0 = self.size - N_ABILITY
         if battle.opponent_active_pokemon is not None:
-            feats[-N_SHIELD:] = self.shields(battle.opponent_active_pokemon)
+            feats[a0 - N_SHIELD:a0] = self.shields(battle.opponent_active_pokemon)
+            feats[a0:a0 + len(KEY_ABILITIES)] = self.abilities(battle.opponent_active_pokemon)
         n = 10 + N_OWN + N_OPP
         feats[10:10 + N_OWN] = self.effects(battle.active_pokemon, True)
         feats[10 + N_OWN:n] = self.effects(battle.opponent_active_pokemon, False)
         if battle.active_pokemon is not None and battle.opponent_active_pokemon is not None \
                 and not battle.active_pokemon.fainted:
             feats[n:n + N_COUNTER] = self.counters(battle.opponent_active_pokemon, battle.active_pokemon)
+            me_dark = any(t is not None and t.name == "DARK" for t in battle.active_pokemon.types)
+            prankster = 0.0 if me_dark else feats[a0 + KEY_ABILITIES.index("prankster")]
+            encore = feats[n]
+        else:
+            encore = prankster = 0.0
         me, opp = battle.active_pokemon, battle.opponent_active_pokemon
         if me is not None and me.fainted:  # forced switch: only the switch-in chances matter
             me = None
@@ -233,6 +252,8 @@ class ThreatFeatures:
                 mon._boosts.update(saved)
                 hp = max(mon.current_hp_fraction, 1e-3)
                 feats[4 + slot] += p * (1 - np.prod(1 - q * (dmg >= hp)))
+        # an Encore that lands before our move locks us into the move we used last turn
+        feats[-1] = encore * (1 - (1 - prankster) * (1 - feats[2]))
         return feats
 
 

@@ -17,7 +17,7 @@ def test_effects_block():
     mon._effects = {Effect.CURSE: 1, Effect.PERISH2: 1}
     own = ThreatFeatures.effects(mon, True)
     assert len(own) == N_OWN and own[0] == 1.0 and own[-3:] == [1.0, 2 / 3, 0.0]
-    assert len(ThreatFeatures.effects(None, False)) == N_OPP and SIZE == 10 + N_OWN + N_OPP + 6 + 4
+    assert len(ThreatFeatures.effects(None, False)) == N_OPP and SIZE == 10 + N_OWN + N_OPP + 6 + 4 + 15
 
 
 def test_good_as_gold_blocks_status_counters():

@@ -29,3 +29,11 @@ def test_combine_defers_to_a_confident_lookahead():
     policy = {"move:substitute": 0.66, "move:protect": 0.29, "switch:umbreon": 0.0}
     ranked = [("switch:umbreon", 0.976, -0.63), ("switch:gholdengo", 0.024, -0.82), ("move:substitute", 0.0, -1.2)]
     assert combine(policy, ranked, temperature=2.0, margin=1.0, defer=0.9)[0][0] == "switch:umbreon"
+
+
+def test_combine_without_lookahead_mass_uses_values():
+    from pokesim.live.advisor import combine
+
+    policy = {"move:slackoff": 1.0, "switch:scolipede": 0.0}
+    ranked = [("switch:scolipede", 0.0, -3.16), ("move:slackoff", 0.0, -1.28)]
+    assert combine(policy, ranked, temperature=2.0, margin=1.0, defer=0.9)[0][0] == "move:slackoff"
