@@ -6,6 +6,9 @@ with our real sets and, at every turn decision, runs the lookahead with many set
 policy observation (embed + TeamFeatures with items and threats), the action mask, the lookahead's equilibrium
 mix and the value of each action (a win counts 3, a Pokemon's HP 1), and what we played.
 
+The opponent's set priors only blend in sets seen in our battles played before the one being replayed
+(--observed-scope before; "all" is the old setting, which lets a battle see its own and later opponents' sets).
+
 report: for saved policies, how often their top choice is the lookahead's best action, and how often it is a
 blunder (value more than --margin below the best), on those positions.
 
@@ -52,7 +55,18 @@ def build(args) -> None:
     team = json.loads(open(args.team).read())
     roster = [s["species"] for s in team]
     extra = TeamFeatures(roster, items=True, threats=True)
-    engine = Lookahead(SetSampler(["M-6"]), args.samples, args.seeds, args.rollout, OPPONENT_MODEL)
+    from pokesim.live.observed import collect, load_records
+
+    records = load_records() if args.observed_scope == "before" else []
+
+    def sampler_before(stem: str) -> SetSampler:
+        if args.observed_scope == "all":
+            return SetSampler(["M-6"])
+        started = stem.split("/")[-1][:15]
+        earlier = [r for r in records if r.get("started", "") < started]
+        return SetSampler(["M-6"], observed=collect(earlier))
+
+    engine = Lookahead(SetSampler(["M-6"], observed={}), args.samples, args.seeds, args.rollout, OPPONENT_MODEL)
     own = {engine.sampler.base_id(to_id(s["species"])): s for s in team}
     sides = OurSides(team)
     rows = {k: [] for k in ("obs", "masks", "prob", "value", "played", "battle", "turn")}
@@ -75,6 +89,7 @@ def build(args) -> None:
 
     logs = record_logs()
     for k, (stem, log) in enumerate(logs):
+        engine.sampler = sampler_before(stem)
         try:
             ds, _ = decisions(log, "p1", sides, probe=probe, keep_failed=True)
         except Exception as e:  # noqa: BLE001 - a record our session cannot follow
@@ -131,6 +146,8 @@ def main() -> None:
     b.add_argument("--seeds", type=int, default=3)
     b.add_argument("--rollout", type=int, default=3)
     b.add_argument("--out", default=str(OUT))
+    b.add_argument("--observed-scope", choices=["before", "none", "all"], default="before",
+                   help="sets seen in our battles: before = only battles played earlier; all = every battle")
     r = sub.add_parser("report")
     r.add_argument("policies", nargs="*")
     r.add_argument("--data", default=str(OUT))

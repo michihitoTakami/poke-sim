@@ -176,11 +176,43 @@ def open_session(lines: list[str], role: str, sets: list[dict], species: dict) -
     return session, canonical(body, role, set_names, species)
 
 
+def ejected(line: str) -> bool:
+    """An Eject Button / Eject Pack going off: the switch after it is forced."""
+    return line.startswith("|-enditem|") and ("Eject Button" in line or "Eject Pack" in line)
+
+
+def turn_choice(body: list[str], start: int, role: str, keep_failed: bool = False) -> str | None:
+    """The label of `role`'s turn decision in the turn that starts at body[start] (a |turn| line): its first move or
+    switch of the turn (a Mega Evolution announced before it marks the move), or None when it made no choice we can
+    see (it could not move, or the battle ended)."""
+    megas: set[str] = set()
+    for i in range(start + 1, len(body)):
+        line = body[i]
+        parts = line.split("|")
+        kind = parts[1]
+        if kind in ("turn", "win", "tie"):
+            return None
+        if len(parts) < 3 or not parts[2].startswith(role):
+            continue
+        if kind == "cant" or kind == "faint" or ejected(line):
+            return None  # no choice, or the switch that follows is a forced one
+        if kind == "-mega":
+            megas.add(parts[2][:3])
+        failed = keep_failed and line.endswith("[still]") and i + 1 < len(body) and body[i + 1].startswith("|-fail|")
+        if kind in ("move", "switch") and "[from]" not in line and (failed or not line.endswith("[still]")):
+            return label_of(line, megas)
+    return None
+
+
 def decisions(log: str, role: str, sides: Sides, probe=None,
               keep_failed: bool = False) -> tuple[list[Decision], bool | None]:
     """All decisions `role` made in a battle log (full Showdown log text), and whether that side won.
     probe(battle, own_sets): called at each kept decision (e.g. another player's choice) -> Decision.extra.
-    keep_failed: also keep moves that failed (`[still]` followed by -fail, e.g. a repeated Protect)."""
+    keep_failed: also keep moves that failed (`[still]` followed by -fail, e.g. a repeated Protect).
+
+    A turn decision is observed at the start of its turn, before either side acts: when the opponent moves first,
+    its move, its Mega Evolution and the damage we took are not in the input of the choice we had already made.
+    A forced switch (after a faint, U-turn, Baton Pass, ...) is a later decision of its own and sees the turn so far."""
     species = sides.species
     lines = [ln for ln in log.split("\n") if ln.startswith("|")]
     winner_name = next((ln.split("|")[2] for ln in lines if ln.startswith("|win|")), None)
@@ -191,7 +223,23 @@ def decisions(log: str, role: str, sides: Sides, probe=None,
     revealed = sides.revealed(log, role)
     session, body = open_session(lines, role, sets, species)
     out: list[Decision] = []
-    in_turn, acted, megas = False, False, set()
+
+    def keep(force: bool, label: str, turn: int) -> None:
+        try:
+            battle = session.decision(force_switch=force)
+            action = to_action(battle, label) if battle.active_pokemon or force else None
+        except Exception:  # noqa: BLE001 - a log our session cannot follow: skip the decision
+            return
+        if action is None:
+            return
+        mask = honest_mask(battle, revealed)
+        if mask[action]:
+            last = session.last_move(role) if not force else None
+            last_action = to_action(battle, last) if last else None
+            out.append(Decision(embed(battle), mask, action, label, "force" if force else "turn", turn,
+                                last, last_action, probe(battle, sets) if probe else None))
+
+    in_turn, acted = False, False
     turn = 0
     for i, line in enumerate(body):
         parts = line.split("|")
@@ -199,36 +247,20 @@ def decisions(log: str, role: str, sides: Sides, probe=None,
         failed = keep_failed and line.endswith("[still]") and i + 1 < len(body) and body[i + 1].startswith("|-fail|")
         if kind == "turn":
             session.apply(line)
-            in_turn, acted, megas = True, False, set()
+            in_turn, acted = True, False
             turn = int(parts[2])
+            label = turn_choice(body, i, role, keep_failed)
+            if label is not None:
+                keep(False, label, turn)
             continue
         mine = len(parts) > 2 and parts[2].startswith(role)
-        if in_turn and mine and kind == "-mega":
-            megas.add(parts[2][:3])
-        if in_turn and mine and kind in ("move", "switch") and "[from]" not in line and (failed or not line.endswith("[still]")):
-            force = acted
-            if kind == "move" and force:
-                pass  # a second move in one turn (Dancer, Instruct...): not a choice
-            else:
-                label = label_of(line, megas)
-                try:
-                    battle = session.decision(force_switch=force)
-                    action = to_action(battle, label) if battle.active_pokemon or force else None
-                except Exception:  # noqa: BLE001 - a log our session cannot follow: skip the decision
-                    action = None
-                if action is not None:
-                    mask = honest_mask(battle, revealed)
-                    if mask[action]:
-                        last = session.last_move(role) if not force else None
-                        last_action = to_action(battle, last) if last else None
-                        out.append(Decision(embed(battle), mask, action, label, "force" if force else "turn", turn,
-                                            last, last_action, probe(battle, sets) if probe else None))
-            if kind == "move":
-                acted = True
-            elif not force:
-                acted = True
-        if kind == "cant" and mine:
-            acted = True
+        chose = kind in ("move", "switch") and "[from]" not in line and (failed or not line.endswith("[still]"))
+        if in_turn and mine and chose:
+            if kind == "switch" and acted:
+                keep(True, label_of(line, set()), turn)
+            acted = True  # a second move in one turn (Dancer, Instruct...) is not a choice
+        if mine and (kind in ("cant", "faint") or ejected(line)):
+            acted = True  # a switch after this is forced
         try:
             session.apply(line)
         except Exception:  # noqa: BLE001
@@ -287,8 +319,8 @@ def build(args) -> None:
     gamma = 0.97
 
     def dump(items, roles, path):
-        rows = {"obs": [], "masks": [], "actions": [], "returns": [], "battle": [], "kind": [], "label": [],
-                "last": [], "turn": []}
+        rows = {"obs": [], "masks": [], "actions": [], "returns": [], "known": [], "battle": [], "kind": [],
+                "label": [], "last": [], "turn": []}
         bad = 0
         for stem, log in items:
             for role in roles:
@@ -304,6 +336,7 @@ def build(args) -> None:
                     rows["actions"].append(d.action)
                     ret = 0.0 if won is None else (1.0 if won else -1.0) * gamma ** (len(ds) - 1 - k)
                     rows["returns"].append(ret)
+                    rows["known"].append(won is not None)  # an unknown result is not a draw: no value target
                     rows["battle"].append(f"{stem}:{role}")
                     rows["kind"].append(d.kind)
                     rows["label"].append(d.label)
@@ -311,6 +344,7 @@ def build(args) -> None:
                     rows["turn"].append(d.turn)
         np.savez_compressed(path, obs=np.array(rows["obs"], dtype=np.float32), masks=np.array(rows["masks"]),
                             actions=np.array(rows["actions"]), returns=np.array(rows["returns"], dtype=np.float32),
+                            known=np.array(rows["known"], dtype=bool),
                             battle=np.array(rows["battle"]), kind=np.array(rows["kind"]),
                             label=np.array(rows["label"]), last=np.array(rows["last"]), turn=np.array(rows["turn"]))
         n_turn = sum(k == "turn" for k in rows["kind"])
@@ -335,6 +369,30 @@ def split(battles: np.ndarray, test: float = 0.15) -> tuple[np.ndarray, np.ndarr
     return np.where(~is_test)[0], np.where(is_test)[0]
 
 
+def manifest_split(battles: np.ndarray, manifest: str) -> tuple[np.ndarray, np.ndarray]:
+    """Train / held-out indices of our records from the shared split (pokesim.data.split_manifest): train battles
+    to train on, development battles to choose the epoch; calibration, test, purged and unknown battles are left out
+    of both."""
+    from pokesim.data.curate_battles import load
+    from pokesim.data.split_manifest import Splits
+
+    splits, ledger = Splits(Path(manifest)), load()
+    train, dev = splits.record_keys(ledger, "train"), splits.record_keys(ledger, "development")
+    keys = np.array([b.rsplit(":", 1)[0] for b in battles])
+    tr, te = np.flatnonzero(np.isin(keys, list(train))), np.flatnonzero(np.isin(keys, list(dev)))
+    print(f"split manifest: {len(tr)} train / {len(te)} development decisions, "
+          f"{len(keys) - len(tr) - len(te)} left out (calibration / test / purged / not in the ledger)", flush=True)
+    return tr, te
+
+
+def known(data) -> np.ndarray:
+    """Which rows have a known battle result. Files built before the `known` column: a return of exactly 0 was an
+    unknown result (a known one is +-gamma^k)."""
+    if "known" in data:
+        return np.asarray(data["known"], dtype=bool)
+    return np.asarray(data["returns"]) != 0
+
+
 def fit(args) -> None:
     import torch
     from sb3_contrib import MaskablePPO
@@ -343,19 +401,24 @@ def fit(args) -> None:
     from pokesim.rl.train import new_model
 
     data = {k: v for k, v in np.load(args.data).items()}
+    data["known"] = known(data)
     tr, te = split(data["battle"])
     te_rec = np.array([], dtype=int)
     if args.records:  # our opponents: held out by battle, the rest repeated --records-weight times
         rec = np.load(args.records)
-        rtr, rte = split(rec["battle"], test=args.records_test)
+        if args.split_manifest:
+            rtr, rte = manifest_split(rec["battle"], args.split_manifest)
+        else:
+            rtr, rte = split(rec["battle"], test=args.records_test)
         n = len(data["actions"])
-        for k in ("obs", "masks", "actions", "returns"):
-            data[k] = np.concatenate([data[k], rec[k]])
+        for k in ("obs", "masks", "actions", "returns", "known"):
+            data[k] = np.concatenate([data[k], known(rec) if k == "known" else rec[k]])
         tr = np.concatenate([tr] + [rtr + n] * args.records_weight)
         te_rec = rte + n
         print(f"records: {len(rtr)} train decisions (x{args.records_weight}), {len(rte)} held out", flush=True)
     obs, masks = torch.tensor(data["obs"]), data["masks"]
     actions, rets = torch.tensor(data["actions"]), torch.tensor(data["returns"])
+    has_result = torch.tensor(data["known"])
     if args.init:
         model = MaskablePPO.load(args.init, device="cuda")
     else:
@@ -388,7 +451,9 @@ def fit(args) -> None:
             dist = policy.get_distribution(o, action_masks=masks[idx])
             logp = dist.log_prob(actions[idx].to(device))
             v = policy.predict_values(o).squeeze(1)
-            loss = -logp.mean() + args.vf_coef * torch.nn.functional.mse_loss(v, rets[idx].to(device))
+            k = has_result[idx].to(device)
+            value_loss = ((v - rets[idx].to(device)) ** 2 * k).sum() / k.sum().clamp_min(1)
+            loss = -logp.mean() + args.vf_coef * value_loss
             opt.zero_grad()
             loss.backward()
             opt.step()
@@ -426,6 +491,8 @@ def main() -> None:
                                      "epoch is then chosen on its held-out battles")
     f.add_argument("--records-weight", type=int, default=10)
     f.add_argument("--records-test", type=float, default=0.25)
+    f.add_argument("--split-manifest", help="hold out our records by the shared split (data/curated/"
+                                            "split_manifest.json) instead of a hash share")
     args = ap.parse_args()
     build(args) if args.cmd == "build" else fit(args)
 

@@ -90,3 +90,20 @@ def test_last_move_and_repeat_share(session):
     assert rep["move:yawn"] == pytest.approx(0.7 * plain["move:yawn"] + 0.3)
     t.apply([{"type": "switch", "side": "opp", "species": "Garchomp"}])
     assert session.last_move() is None
+
+
+def test_choice_lock_ends_when_it_switches_out():
+    sets = load_my_team(TEAM, ["Scolipede", "Floette-Eternal", "Gholdengo"])
+    sets = [dict(s, item="Choice Specs") if s["species"] == "Gholdengo" else s for s in sets]
+    s = BattleSession(sets)
+    s.preview(["Garchomp", "Primarina", "Ninetales-Alola", "Hippowdon", "Gyarados", "Kingambit"])
+    s.select([0, 1, 2])
+    t = EventTranslator(s)
+    t.apply([{"type": "switch", "side": "me", "species": "Gholdengo"},
+             {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"},
+             {"type": "move", "side": "me", "move": "shadowball"}, {"type": "turn"}])
+    assert [m.id for m in s.decision().available_moves] == ["shadowball"]
+    t.apply([{"type": "switch", "side": "me", "species": "Scolipede"}, {"type": "turn"},
+             {"type": "switch", "side": "me", "species": "Gholdengo"}, {"type": "turn"}])
+    assert len(s.decision().available_moves) == 4  # a new stint: no lock until it moves again
+

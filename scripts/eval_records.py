@@ -84,6 +84,17 @@ def turns(args, recs, on_turn) -> int:
     return n
 
 
+def visible(other: dict, other_stem: str, rec: dict, stem: str, scope: str) -> bool:
+    """Whether another battle's revealed sets may inform the predictions in this one.
+    before: only battles that started earlier (what was known at the time; the default)
+    others: every other battle, later ones included (the old setting: it can see the future)"""
+    if other_stem == stem:
+        return False
+    if scope == "others":
+        return True
+    return (other.get("started") or other_stem) < (rec.get("started") or stem)
+
+
 def query(args) -> None:
     sets = json.loads(Path(args.team).read_text())
     advisor = Advisor(sets, policy=None, opponent_policy=None)
@@ -92,8 +103,8 @@ def query(args) -> None:
     current = {}
 
     def on_turn(stem, rec, session, battle, mine, theirs):
-        if current.get("stem") != stem:  # sets seen in the *other* battles only, as known before this one
-            others = [r for s2, r in recs if s2 != stem] if args.observed else []
+        if current.get("stem") != stem:  # sets seen in other battles: by default only those played before this one
+            others = [r for s2, r in recs if visible(r, s2, rec, stem, args.observed_scope)] if args.observed else []
             advisor.engine.sampler = SetSampler(["M-6"], observed=collect(others), utility=args.utility)
             current["stem"] = stem
         results = advisor.engine.query(battle, advisor.own_sets)
@@ -177,6 +188,8 @@ def main() -> None:
     ap.add_argument("--observed", action=argparse.BooleanOptionalAction, default=True,
                     help="blend in the sets seen in our other battles")
     ap.add_argument("--utility", type=float, default=0.03, help="pseudo-share for learnable utility moves")
+    ap.add_argument("--observed-scope", choices=["before", "others"], default="before",
+                    help="before: sets from battles played earlier only; others: all other battles (sees the future)")
     args = ap.parse_args()
     {"query": query, "score": score, "bc": bc}[args.cmd](args)
 

@@ -96,13 +96,17 @@ class BattleSession:
         used = self.pp_used.get(info["name"], {})
         effects = mon.effects if mon else {}
         last = None
-        for line in reversed(self.log):
-            if line.startswith(f"|move|{self.role}a: {info['name']}|"):
+        for line in reversed(self.log):  # since it came in: a Choice lock or Encore ends when it switches out
+            if line.startswith((f"|switch|{self.role}a: ", f"|drag|{self.role}a: ", f"|replace|{self.role}a: ")):
+                break
+            if line.startswith(f"|move|{self.role}a: {info['name']}|") and "[from]" not in line:
                 last = line.split("|")[3].lower().replace(" ", "").replace("-", "")
                 break
         choice_locked = mon is not None and mon.item in ("choicescarf", "choiceband", "choicespecs") and last
         disabled_move = None
-        for line in reversed(self.log):  # Disable on our active Pokémon (ends with |-end|...|Disable)
+        for line in reversed(self.log):  # Disable on our active Pokémon (ends with |-end|...|Disable, or a switch)
+            if line.startswith((f"|switch|{self.role}a: ", f"|drag|{self.role}a: ")):
+                break
             if line.startswith(f"|-end|{self.role}a: {info['name']}|") and "Disable" in line:
                 break
             if line.startswith(f"|-start|{self.role}a: {info['name']}|Disable|"):
