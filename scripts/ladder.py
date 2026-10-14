@@ -17,7 +17,9 @@ import argparse
 import asyncio
 import json
 import os
+import random
 import re
+import uuid
 import time
 from pathlib import Path
 
@@ -30,7 +32,8 @@ from sb3_contrib import MaskablePPO
 from pokesim.config import FORMAT, RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor
 from pokesim.live.selection import MatchupModel, PickModel
-from pokesim.rl.myteam import FixedTeam, TeamFeatures, to_id
+from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, to_id
+from pokesim.rl.opponents import LeaguePlayer
 from pokesim.search.lookahead import label_to_action
 from pokesim.sim.pool import TeamPool, load_teams
 
@@ -53,9 +56,10 @@ def credentials() -> tuple[str, str] | None:
 class AdvisorPlayer(Player):
     """With several policies, battles alternate between them (A/B comparison on the same ladder)."""
 
-    def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, **kwargs):
+    def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
+                 **kwargs):
         self.sets, self.out = sets, out
-        self.advisor = Advisor(sets, policy=policies[0])
+        self.advisor = Advisor(sets, policy=policies[0], combine=combine)
         roster = [s["species"] for s in sets]
         self.policies = {policies[0]: (self.advisor.model, self.advisor.extra)}
         for path in policies[1:]:
@@ -152,17 +156,29 @@ def rounded(pairs) -> list:
 
 async def run(args) -> None:
     sets = json.loads(Path(args.team).read_text())
+    combine = json.loads(args.combine) if args.combine else None
     if args.local:
-        me = AdvisorPlayer(sets, args.policy, out=Path(args.out), battle_format=FORMAT,
-                           server_configuration=LocalhostServerConfiguration, max_concurrent_battles=1)
-        foe = RandomPlayer(battle_format=FORMAT, team=TeamPool(load_teams("observed"), 0),
-                           server_configuration=LocalhostServerConfiguration)
+        tag = uuid.uuid4().hex[:6]
+        me = AdvisorPlayer(sets, args.policy, out=Path(args.out), combine=combine, battle_format=FORMAT,
+                           server_configuration=LocalhostServerConfiguration, max_concurrent_battles=1,
+                           account_configuration=AccountConfiguration(f"adv_{tag}", None))
+        pool = TeamPool(load_teams("observed"), 0)
+        if args.local_opponent:
+            foe = LeaguePlayer(battle_format=FORMAT, team=pool, snapshots=[args.local_opponent], p_heuristic=0.0,
+                               server_configuration=LocalhostServerConfiguration,
+                               account_configuration=AccountConfiguration(f"opp_{tag}", None))
+            rng = random.Random(0)
+            foe.teampreview = lambda battle: counter_preview(battle, rng, 0.7)
+        else:
+            foe = RandomPlayer(battle_format=FORMAT, team=pool, server_configuration=LocalhostServerConfiguration,
+                               account_configuration=AccountConfiguration(f"opp_{tag}", None))
         await me.battle_against(foe, n_battles=args.battles)
+        print(f"done: {me.n_won_battles}-{me.n_lost_battles} combine={combine}", flush=True)
         return
     cred = credentials()
     if cred is None:
         raise SystemExit(f"no Showdown account: put PS_USERNAME / PS_PASSWORD in {CREDENTIALS}")
-    me = AdvisorPlayer(sets, args.policy, out=Path(args.out), battle_format=FORMAT,
+    me = AdvisorPlayer(sets, args.policy, out=Path(args.out), combine=combine, battle_format=FORMAT,
                        account_configuration=AccountConfiguration(*cred),
                        server_configuration=ShowdownServerConfiguration, max_concurrent_battles=1,
                        start_timer_on_battle_start=True)
@@ -178,6 +194,8 @@ def main() -> None:
                     help="one or more policies; with several, battles alternate between them")
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--local", action="store_true", help="local server (localhost:8000) against a random player")
+    ap.add_argument("--local-opponent", help="with --local: a saved opponent policy instead (counter-picks 70%%)")
+    ap.add_argument("--combine", help='JSON overriding the advisor\'s COMBINE, e.g. \'{"mode": "linear"}\'')
     asyncio.run(run(ap.parse_args()))
 
 

@@ -25,6 +25,9 @@ from pokesim.rl.myteam import TeamFeatures, to_id
 from pokesim.search.lookahead import Lookahead, SetSampler, label_to_action
 
 POLICY_WEIGHT = 0.5  # share of the policy in the combined recommendation
+# How the policy and the lookahead are combined (see combine()). "linear" was the plain average of the two
+# distributions; a near-deterministic policy then decided almost every turn on its own.
+COMBINE = {"mode": "product", "weight": POLICY_WEIGHT, "temperature": 2.0, "tau": 0.5, "margin": 1.0}
 
 
 @dataclass
@@ -61,11 +64,12 @@ class Advisor:
     def __init__(self, sets: list[dict], policy: str | None = None, lookahead: bool = True,
                  seasons: tuple[str, ...] = ("M-6",), samples: int = 6, seeds: int = 2, rollout: int = 3,
                  reward: str = "sparse", opponent_model: dict | None = None,
-                 opponent_policy: str | Path | None = "default"):
+                 opponent_policy: str | Path | None = "default", combine: dict | None = None):
         self.model = MaskablePPO.load(policy, device="cpu") if policy else None
         roster = [s["species"] for s in sets]
         self.extra = TeamFeatures.for_model(self.model, roster) if self.model else TeamFeatures(roster)
         self.victory = REWARDS[reward]["victory_value"]
+        self.combine = dict(COMBINE, **(combine or {}))
         model = OPPONENT_MODEL if opponent_model is None else opponent_model
         self.engine = Lookahead(SetSampler(list(seasons)), samples, seeds, rollout, model) if lookahead else None
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
@@ -114,17 +118,48 @@ class Advisor:
             ranked = [(lab, p, v) for lab, p, v in advice.ranked()
                       if (a := label_to_action(lab, battle)) is not None and mask[a]]
             opponent = sorted(advice.opponent.items(), key=lambda kv: -kv[1])
-        combined: dict[str, float] = {}
-        look_total = sum(p for _, p, _ in ranked) or 1.0
-        w = POLICY_WEIGHT if policy and ranked else (1.0 if policy else 0.0)
-        for lab, p, _ in ranked:
-            combined[lab] = combined.get(lab, 0.0) + (1 - w) * p / look_total
-        for lab, p in policy.items():
-            combined[lab] = combined.get(lab, 0.0) + w * p
-        actions = sorted(combined.items(), key=lambda kv: -kv[1])
+        actions = combine(policy, ranked, **self.combine)
         if self.opponent_policy is not None and log and battle.opponent_active_pokemon is not None:
             opponent = mix_opponent(opponent, self.opponent_policy.predict(log, our_role))
         return Suggestion(actions, win, opponent, policy, ranked, time.perf_counter() - start)
+
+
+def combine(policy: dict[str, float], ranked: list[tuple[str, float, float]], mode: str = "product",
+            weight: float = POLICY_WEIGHT, temperature: float = 1.0, tau: float = 0.5,
+            margin: float | None = None) -> list[tuple[str, float]]:
+    """Our action distribution from the policy (label -> prob) and the lookahead ((label, eq. prob, value)).
+
+    linear:  weight * policy + (1 - weight) * lookahead equilibrium mix.
+    product: policy^(weight / temperature) * lookahead^(1 - weight), where the lookahead's distribution is the mean of
+             its equilibrium mix and softmax(value / tau); an action needs support from both. Actions whose
+             lookahead value is more than `margin` below the best (a win counts 3, a Pokemon's HP 1) are dropped.
+    With only one source, that source alone."""
+    if not ranked:
+        out = dict(policy)
+    elif not policy:
+        total = sum(p for _, p, _ in ranked) or 1.0
+        out = {lab: p / total for lab, p, _ in ranked}
+    elif mode == "linear":
+        total = sum(p for _, p, _ in ranked) or 1.0
+        out = {}
+        for lab, p, _ in ranked:
+            out[lab] = out.get(lab, 0.0) + (1 - weight) * p / total
+        for lab, p in policy.items():
+            out[lab] = out.get(lab, 0.0) + weight * p
+    else:
+        labels = [lab for lab, _, _ in ranked]
+        values = np.array([v for _, _, v in ranked])
+        eq = np.array([p for _, p, _ in ranked])
+        eq = eq / eq.sum() if eq.sum() > 0 else np.full(len(eq), 1 / len(eq))
+        soft = np.exp((values - values.max()) / tau)
+        look = 0.5 * eq + 0.5 * soft / soft.sum()
+        pol = np.array([policy.get(lab, 0.0) for lab in labels]) + 1e-4
+        score = (weight / temperature) * np.log(pol) + (1 - weight) * np.log(look + 1e-4)
+        if margin is not None:
+            score[values < values.max() - margin] = -np.inf
+        prob = np.exp(score - score.max())
+        out = dict(zip(labels, (prob / prob.sum()).tolist()))
+    return sorted(out.items(), key=lambda kv: -kv[1])
 
 
 def mix_opponent(search: list[tuple[str, float]], cloned: list[tuple[str, float]],
