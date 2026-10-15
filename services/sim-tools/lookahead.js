@@ -674,7 +674,9 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = req.valueLeaves ? require('./value_search').evaluateValue(req,
+    reply = req.terminalSearch ? require('./terminal_search').terminalSearch(req,
+      {setUp, choices, step, State, extractChannelMessages}) :
+      req.valueLeaves ? require('./value_search').evaluateValue(req,
       {setUp, choices, step, score, State, extractChannelMessages}) :
       req.branches ? require('./branch_matches').evaluateBranches(req,
       {setUp, choices, step, policy, State, extractChannelMessages}) :

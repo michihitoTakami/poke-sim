@@ -1,0 +1,599 @@
+{
+  "format": "gen9championsbssregmc",
+  "samples": [
+    {
+      "p1": {
+        "team": [
+          {
+            "species": "Floette-Eternal",
+            "item": "Floettite",
+            "ability": "Flower Veil",
+            "nature": "Bold",
+            "moves": [
+              "Moonblast",
+              "Substitute",
+              "Synthesis",
+              "Calm Mind"
+            ],
+            "evs": {
+              "hp": 24,
+              "atk": 0,
+              "def": 32,
+              "spa": 10,
+              "spd": 0,
+              "spe": 0
+            },
+            "level": 50
+          },
+          {
+            "species": "Salamence",
+            "item": "Salamencite",
+            "ability": "Intimidate",
+            "nature": "Adamant",
+            "moves": [
+              "Double-Edge",
+              "Earthquake",
+              "Dragon Dance",
+              "Roost"
+            ],
+            "evs": {
+              "hp": 32,
+              "atk": 32,
+              "def": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 2
+            },
+            "level": 50
+          },
+          {
+            "species": "Scolipede",
+            "item": "Mental Herb",
+            "ability": "Speed Boost",
+            "nature": "Jolly",
+            "moves": [
+              "Iron Defense",
+              "Protect",
+              "Substitute",
+              "Baton Pass"
+            ],
+            "evs": {
+              "hp": 30,
+              "atk": 0,
+              "def": 13,
+              "spa": 0,
+              "spd": 0,
+              "spe": 23
+            },
+            "level": 50
+          }
+        ],
+        "mons": [
+          {
+            "hp": 0.6358381502890174,
+            "mega": false,
+            "ppUsed": {
+              "moonblast": 1,
+              "substitute": 1,
+              "synthesis": 1,
+              "calmmind": 2
+            },
+            "lastMove": "moonblast",
+            "boosts": {
+              "spa": 2,
+              "spd": 2
+            },
+            "volatiles": [],
+            "pp": {
+              "moonblast": 15,
+              "substitute": 11,
+              "synthesis": 7,
+              "calmmind": 18
+            }
+          },
+          {
+            "hp": 0.0,
+            "mega": false,
+            "ppUsed": {
+              "doubleedge": 2,
+              "earthquake": 3,
+              "dragondance": 2,
+              "roost": 1
+            }
+          },
+          {
+            "hp": 1.0,
+            "mega": false,
+            "ppUsed": {
+              "irondefense": 0,
+              "protect": 0,
+              "substitute": 0,
+              "batonpass": 0
+            }
+          }
+        ],
+        "megaUsed": true,
+        "conditions": {}
+      },
+      "p2": {
+        "team": [
+          {
+            "species": "Dragapult",
+            "item": "",
+            "ability": "infiltrator",
+            "nature": "adamant",
+            "moves": [
+              "protect",
+              "dragonclaw",
+              "dragondance",
+              "batonpass"
+            ],
+            "evs": {
+              "hp": 2,
+              "atk": 32,
+              "def": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 32
+            },
+            "level": 50
+          },
+          {
+            "species": "Mimikyu",
+            "item": "Life Orb",
+            "ability": "disguise",
+            "nature": "adamant",
+            "moves": [
+              "swordsdance",
+              "playrough",
+              "drainpunch",
+              "rest"
+            ],
+            "evs": {
+              "hp": 19,
+              "atk": 32,
+              "def": 10,
+              "spa": 0,
+              "spd": 0,
+              "spe": 4
+            },
+            "level": 50
+          },
+          {
+            "species": "Heracross",
+            "item": "Heracronite",
+            "ability": "moxie",
+            "nature": "jolly",
+            "moves": [
+              "pinmissile",
+              "rockblast",
+              "trailblaze",
+              "spikes"
+            ],
+            "evs": {
+              "hp": 2,
+              "atk": 32,
+              "def": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 32
+            },
+            "level": 50
+          }
+        ],
+        "mons": [
+          {
+            "hp": 0.01,
+            "mega": false,
+            "boosts": {},
+            "volatiles": []
+          },
+          {
+            "hp": 0.0,
+            "mega": false,
+            "forme": "Mimikyu-Busted"
+          },
+          {
+            "hp": 0.0,
+            "mega": true
+          }
+        ],
+        "megaUsed": true,
+        "conditions": {}
+      },
+      "field": {}
+    },
+    {
+      "p1": {
+        "team": [
+          {
+            "species": "Floette-Eternal",
+            "item": "Floettite",
+            "ability": "Flower Veil",
+            "nature": "Bold",
+            "moves": [
+              "Moonblast",
+              "Substitute",
+              "Synthesis",
+              "Calm Mind"
+            ],
+            "evs": {
+              "hp": 24,
+              "atk": 0,
+              "def": 32,
+              "spa": 10,
+              "spd": 0,
+              "spe": 0
+            },
+            "level": 50
+          },
+          {
+            "species": "Salamence",
+            "item": "Salamencite",
+            "ability": "Intimidate",
+            "nature": "Adamant",
+            "moves": [
+              "Double-Edge",
+              "Earthquake",
+              "Dragon Dance",
+              "Roost"
+            ],
+            "evs": {
+              "hp": 32,
+              "atk": 32,
+              "def": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 2
+            },
+            "level": 50
+          },
+          {
+            "species": "Scolipede",
+            "item": "Mental Herb",
+            "ability": "Speed Boost",
+            "nature": "Jolly",
+            "moves": [
+              "Iron Defense",
+              "Protect",
+              "Substitute",
+              "Baton Pass"
+            ],
+            "evs": {
+              "hp": 30,
+              "atk": 0,
+              "def": 13,
+              "spa": 0,
+              "spd": 0,
+              "spe": 23
+            },
+            "level": 50
+          }
+        ],
+        "mons": [
+          {
+            "hp": 0.6358381502890174,
+            "mega": false,
+            "ppUsed": {
+              "moonblast": 1,
+              "substitute": 1,
+              "synthesis": 1,
+              "calmmind": 2
+            },
+            "lastMove": "moonblast",
+            "boosts": {
+              "spa": 2,
+              "spd": 2
+            },
+            "volatiles": [],
+            "pp": {
+              "moonblast": 15,
+              "substitute": 11,
+              "synthesis": 7,
+              "calmmind": 18
+            }
+          },
+          {
+            "hp": 0.0,
+            "mega": false,
+            "ppUsed": {
+              "doubleedge": 2,
+              "earthquake": 3,
+              "dragondance": 2,
+              "roost": 1
+            }
+          },
+          {
+            "hp": 1.0,
+            "mega": false,
+            "ppUsed": {
+              "irondefense": 0,
+              "protect": 0,
+              "substitute": 0,
+              "batonpass": 0
+            }
+          }
+        ],
+        "megaUsed": true,
+        "conditions": {}
+      },
+      "p2": {
+        "team": [
+          {
+            "species": "Dragapult",
+            "item": "",
+            "ability": "clearbody",
+            "nature": "timid",
+            "moves": [
+              "protect",
+              "dragonclaw",
+              "dragondance",
+              "batonpass"
+            ],
+            "evs": {
+              "hp": 9,
+              "atk": 0,
+              "def": 0,
+              "spa": 32,
+              "spd": 0,
+              "spe": 25
+            },
+            "level": 50
+          },
+          {
+            "species": "Mimikyu",
+            "item": "Life Orb",
+            "ability": "disguise",
+            "nature": "adamant",
+            "moves": [
+              "swordsdance",
+              "shadowsneak",
+              "drainpunch",
+              "curse"
+            ],
+            "evs": {
+              "hp": 26,
+              "atk": 32,
+              "def": 7,
+              "spa": 0,
+              "spd": 1,
+              "spe": 0
+            },
+            "level": 50
+          },
+          {
+            "species": "Heracross",
+            "item": "Heracronite",
+            "ability": "moxie",
+            "nature": "jolly",
+            "moves": [
+              "pinmissile",
+              "earthquake",
+              "closecombat",
+              "knockoff"
+            ],
+            "evs": {
+              "hp": 2,
+              "atk": 32,
+              "def": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 32
+            },
+            "level": 50
+          }
+        ],
+        "mons": [
+          {
+            "hp": 0.01,
+            "mega": false,
+            "boosts": {},
+            "volatiles": []
+          },
+          {
+            "hp": 0.0,
+            "mega": false,
+            "forme": "Mimikyu-Busted"
+          },
+          {
+            "hp": 0.0,
+            "mega": true
+          }
+        ],
+        "megaUsed": true,
+        "conditions": {}
+      },
+      "field": {}
+    }
+  ],
+  "observationLog": [
+    "|player|p1|me|",
+    "|player|p2|opponent|",
+    "|gen|9",
+    "|gametype|singles",
+    "|clearpoke",
+    "|poke|p1|Scolipede, L50, M|",
+    "|poke|p1|Gholdengo, L50|",
+    "|poke|p1|Salamence, L50, F|",
+    "|poke|p1|Floette-Eternal, L50, F|",
+    "|poke|p1|Skeledirge, L50, F|",
+    "|poke|p1|Umbreon, L50, M|",
+    "|poke|p2|dragapult, L50|",
+    "|poke|p2|heracross, L50|",
+    "|poke|p2|toxapex, L50|",
+    "|poke|p2|volcarona, L50|",
+    "|poke|p2|archaludon, L50|",
+    "|poke|p2|mimikyu, L50|",
+    "|teampreview|3",
+    "|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by so1ro)",
+    "|inactive|Time left: 90 sec this turn | 420 sec total | 90 sec grace",
+    "|inactive|nomvd has 60 seconds left.",
+    "|",
+    "|teamsize|p1|3",
+    "|teamsize|p2|3",
+    "|start",
+    "|switch|p1a: Salamence|Salamence, L50, M|202/202",
+    "|switch|p2a: Dragapult|Dragapult, L50, F|100/100",
+    "|-ability|p1a: Salamence|Intimidate|boost",
+    "|-fail|p2a: Dragapult|unboost|[from] ability: Clear Body|[of] p2a: Dragapult",
+    "|turn|1",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|detailschange|p1a: Salamence|Salamence-Mega, L50, M",
+    "|-mega|p1a: Salamence|Salamence|Salamencite",
+    "|move|p2a: Dragapult|Protect|p2a: Dragapult",
+    "|-singleturn|p2a: Dragapult|Protect",
+    "|move|p1a: Salamence|Double-Edge|p2a: Dragapult",
+    "|-activate|p2a: Dragapult|move: Protect",
+    "|",
+    "|upkeep",
+    "|turn|2",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|inactive|nomvd has 30 seconds left.",
+    "|",
+    "|switch|p2a: Mimikyu|Mimikyu, L50, F|100/100",
+    "|move|p1a: Salamence|Dragon Dance|p1a: Salamence",
+    "|-boost|p1a: Salamence|atk|1",
+    "|-boost|p1a: Salamence|spe|1",
+    "|",
+    "|upkeep",
+    "|turn|3",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p1a: Salamence|Earthquake|p2a: Mimikyu",
+    "|-activate|p2a: Mimikyu|ability: Disguise",
+    "|-damage|p2a: Mimikyu|100/100",
+    "|detailschange|p2a: Mimikyu|Mimikyu-Busted, L50, F",
+    "|-damage|p2a: Mimikyu|87/100|[from] pokemon: Mimikyu-Busted",
+    "|move|p2a: Mimikyu|Swords Dance|p2a: Mimikyu",
+    "|-boost|p2a: Mimikyu|atk|2",
+    "|",
+    "|upkeep",
+    "|turn|4",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p1a: Salamence|Double-Edge|p2a: Mimikyu",
+    "|-damage|p2a: Mimikyu|0 fnt",
+    "|faint|p2a: Mimikyu",
+    "|-damage|p1a: Salamence|164/202|[from] Recoil",
+    "|",
+    "|upkeep",
+    "|",
+    "|switch|p2a: Dragapult|Dragapult, L50, F|100/100",
+    "|turn|5",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p2a: Dragapult|Dragon Claw|p1a: Salamence",
+    "|-supereffective|p1a: Salamence|1",
+    "|-damage|p1a: Salamence|48/202",
+    "|move|p1a: Salamence|Dragon Dance|p1a: Salamence",
+    "|-boost|p1a: Salamence|atk|1",
+    "|-boost|p1a: Salamence|spe|1",
+    "|",
+    "|upkeep",
+    "|turn|6",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p1a: Salamence|Roost|p1a: Salamence",
+    "|-heal|p1a: Salamence|149/202",
+    "|-singleturn|p1a: Salamence|move: Roost",
+    "|move|p2a: Dragapult|Dragon Claw|p1a: Salamence",
+    "|-supereffective|p1a: Salamence|1",
+    "|-damage|p1a: Salamence|35/202",
+    "|",
+    "|upkeep",
+    "|turn|7",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p2a: Dragapult|Protect|p2a: Dragapult",
+    "|-singleturn|p2a: Dragapult|Protect",
+    "|move|p1a: Salamence|Earthquake|p2a: Dragapult",
+    "|-activate|p2a: Dragapult|move: Protect",
+    "|",
+    "|upkeep",
+    "|turn|8",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p1a: Salamence|Earthquake|p2a: Dragapult",
+    "|-enditem|p2a: Dragapult|Focus Sash",
+    "|-damage|p2a: Dragapult|1/100",
+    "|move|p2a: Dragapult|Dragon Claw|p1a: Salamence",
+    "|-supereffective|p1a: Salamence|1",
+    "|-damage|p1a: Salamence|0 fnt",
+    "|faint|p1a: Salamence",
+    "|",
+    "|upkeep",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|switch|p1a: Floette|Floette-Eternal, L50, F|173/173",
+    "|turn|9",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p2a: Dragapult|Protect|p2a: Dragapult",
+    "|-singleturn|p2a: Dragapult|Protect",
+    "|move|p1a: Floette|Calm Mind|p1a: Floette",
+    "|-boost|p1a: Floette|spa|1",
+    "|-boost|p1a: Floette|spd|1",
+    "|",
+    "|upkeep",
+    "|turn|10",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p2a: Dragapult|Protect||[still]",
+    "|-fail|p2a: Dragapult",
+    "|move|p1a: Floette|Calm Mind|p1a: Floette",
+    "|-boost|p1a: Floette|spa|1",
+    "|-boost|p1a: Floette|spd|1",
+    "|",
+    "|upkeep",
+    "|turn|11",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p2a: Dragapult|Dragon Dance|p2a: Dragapult",
+    "|-boost|p2a: Dragapult|atk|1",
+    "|-boost|p2a: Dragapult|spe|1",
+    "|move|p1a: Floette|Substitute|p1a: Floette",
+    "|-start|p1a: Floette|Substitute",
+    "|-damage|p1a: Floette|130/173",
+    "|",
+    "|upkeep",
+    "|turn|12",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|move|p2a: Dragapult|Baton Pass|p2a: Dragapult",
+    "|",
+    "|switch|p2a: Heracross|Heracross, L50, F, shiny|100/100|[from] Baton Pass",
+    "|move|p1a: Floette|Synthesis|p1a: Floette",
+    "|-heal|p1a: Floette|173/173",
+    "|",
+    "|upkeep",
+    "|turn|13",
+    "|inactive|Time left: 55 sec this turn | 420 sec total",
+    "|",
+    "|detailschange|p2a: Heracross|Heracross-Mega, L50, F, shiny",
+    "|-mega|p2a: Heracross|Heracross|Heracronite",
+    "|move|p2a: Heracross|Pin Missile|p1a: Floette",
+    "|-resisted|p1a: Floette|1",
+    "|-activate|p1a: Floette|move: Substitute|[damage]",
+    "|-resisted|p1a: Floette|1",
+    "|-end|p1a: Floette|Substitute",
+    "|-resisted|p1a: Floette|1",
+    "|-damage|p1a: Floette|152/173",
+    "|-resisted|p1a: Floette|1",
+    "|-damage|p1a: Floette|131/173",
+    "|-resisted|p1a: Floette|1",
+    "|-damage|p1a: Floette|110/173",
+    "|-hitcount|p1a: Floette|5",
+    "|move|p1a: Floette|Moonblast|p2a: Heracross",
+    "|-supereffective|p2a: Heracross|1",
+    "|-damage|p2a: Heracross|0 fnt",
+    "|faint|p2a: Heracross",
+    "|",
+    "|upkeep",
+    "|",
+    "|switch|p2a: Dragapult|Dragapult, L50, F|1/100",
+    "|turn|14"
+  ],
+  "source": "20261016-052245 T14; observed prefix only; opponent set particles are hypotheses",
+  "expected": "move:moonblast"
+}

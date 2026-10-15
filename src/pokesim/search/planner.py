@@ -42,7 +42,7 @@ class Solution:
     status: dict = field(default_factory=dict)
 
 
-def solve_common(worlds: list[World], rho: float = RHO) -> Solution:
+def solve_common(worlds: list[World], rho: float = RHO, secondary: np.ndarray | None = None) -> Solution:
     """The common mix maximizing the objective above (scipy's HiGHS LP). Falls back to the best action against the
     prediction when the solver fails."""
     n = worlds[0].payoff.shape[0]
@@ -65,7 +65,16 @@ def solve_common(worlds: list[World], rho: float = RHO) -> Solution:
     res = linprog(c, A_ub=np.array(rows), b_ub=np.zeros(len(rows)), A_eq=a_eq, b_eq=[1.0], bounds=bounds,
                   method="highs")
     if res.success:
+        if secondary is not None:
+            # Lexicographic: preserve the optimal win objective, then prefer earlier terminal wins.
+            # No HP reward, discount, or speed bonus can trade away meaningful winning probability.
+            tie = linprog(-np.r_[secondary, np.zeros(g)],
+                          A_ub=np.vstack([rows, c]), b_ub=np.r_[np.zeros(len(rows)), res.fun + 1e-9],
+                          A_eq=a_eq, b_eq=[1.0], bounds=bounds, method='highs')
+            if tie.success:
+                res = tie
         x = np.clip(res.x[:n], 0, None)
+        x[x < 1e-8] = 0
         x = x / x.sum()
         status = {"solver": "highs", "objective": float(-res.fun)}
     else:
@@ -103,12 +112,24 @@ def predict(payoff: np.ndarray, labels: list[str], opponent_model: dict, last_mo
 
 
 def plan(results: list[dict], opponent_model: dict | None = None, last_move: str | None = None,
-         rho: float = RHO, cloned: dict[str, float] | None = None, cloned_weight: float = 0.5) -> Advice:
+         rho: float = RHO, cloned: dict[str, float] | None = None, cloned_weight: float = 0.5,
+         pure: bool = False) -> Advice:
     """Advice from the lookahead's sampled worlds with one common mix (see the module docstring).
     value[a] is the expected score against the predicted opponent; the opponent dict the predicted mix averaged
     over worlds. Worlds where every branch failed are left out and counted in status."""
     labels = results[0]["p1"]
+    tree = results[0].get('terminal_search')
+    if tree and tree.get('immediate_wins'):
+        # A proven immediate win in every sampled world/reply/chance path outranks all bootstrap/rollout guesses.
+        candidates = set.intersection(*(set(r['terminal_search']['immediate_wins']) for r in results))
+        if candidates:
+            chosen = min(candidates)
+            prob = np.array([float(lab == chosen) for lab in labels])
+            return Advice(labels, prob, prob.copy(), {},
+                          status={'solver': 'sampled-world-immediate-win', 'objective': 1.,
+                                  'terminal_search': tree, 'worlds': len(results)}, worst=prob.copy())
     worlds, failed_cells, failed_worlds = [], 0, 0
+    speed_terms = []
     extras: list[dict[str, np.ndarray]] = []  # per world: payoff per continuation policy, share resolved
     for res in results:
         try:
@@ -121,19 +142,36 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
         q = predict(payoff, opp, opponent_model or {}, last_move, cloned, cloned_weight)
         worlds.append(World(payoff, opp, 1.0, q))
         cols = [res["p2"].index(lab) for lab in opp]
+        if tree:
+            speed_terms.append(matrix(res['winSpeed'], idx, cols, np.zeros_like(payoff)) @ q)
         extras.append({name: matrix(m, idx, cols, payoff) for name, m in res.get("byContinuation", {}).items()}
                       | ({"_resolved": matrix(res["resolved"], idx, cols, np.zeros_like(payoff))}
                          if "resolved" in res else {}))
         failed_cells += failed
     if not worlds:
         raise ValueError("every sampled world failed")
-    sol = solve_common(worlds, rho)
+    secondary = np.mean(speed_terms, axis=0) if speed_terms else None
+    sol = solve_common(worlds, rho, secondary)
+    if pure:
+        # The caller plays one top move. Rank actual pure-action utilities, not the largest probability of a
+        # mixed equilibrium whose protection requires randomizing between ALL of its actions.
+        objective = (1 - rho) * sol.expected + rho * sol.worst
+        candidates = np.flatnonzero(objective >= objective.max() - 1e-9)
+        chosen = int(candidates[np.argmax(secondary[candidates])]) if secondary is not None else int(candidates[0])
+        sol.prob = np.eye(len(labels))[chosen]
+        sol.status.update(solver='pure-robust', objective=float(objective[chosen]))
     opponent: dict[str, float] = {}
     for wd in worlds:
         for lab, p in zip(wd.opponent, wd.predicted):
             opponent[lab] = opponent.get(lab, 0.0) + float(p) / len(worlds)
     status = dict(sol.status, rho=rho, worlds=len(worlds), failed_worlds=failed_worlds, failed_cells=failed_cells)
     status.update(diagnose(sol.prob, worlds, extras))
+    if tree:
+        status['terminal_search'] = tree
+        status['root_evidence'] = [{'label': lab, 'expected': float(sol.expected[i]),
+                                    'worst': float(sol.worst[i]),
+                                    'trials': sum(sum(r['visits'][r['p1'].index(lab)]) for r in results)}
+                                   for i, lab in enumerate(labels)]
     return Advice(labels, sol.prob, sol.expected, opponent, status=status, worst=sol.worst)
 
 
