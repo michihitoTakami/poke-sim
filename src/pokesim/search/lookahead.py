@@ -459,12 +459,29 @@ def label_to_action(label: str, battle: Battle) -> int | None:
     """Map a lookahead label to poke-env's SinglesEnv action index (0-5 switch, 6-9 move, 10-13 move+mega)."""
     kind, _, rest = label.partition(":")
     if kind == "switch":
-        for i, mon in enumerate(battle.team.values()):
-            if to_id(mon.species) == rest or mon.species == rest:
-                return i
-        return None
+        matches = [i for i, mon in enumerate(battle.team.values()) if switch_species_matches(rest, mon)]
+        return matches[0] if len(matches) == 1 else None
     move_id, _, mega = rest.partition(":")
     moves = list(battle.active_pokemon.moves.keys())[:4]
     if move_id not in moves:
         return None
     return (10 if mega else 6) + moves.index(move_id)
+
+
+def switch_species_matches(species: str, mon: Pokemon) -> bool:
+    """Worker labels use the current forme; poke-env can keep its original species after changing forme.
+
+    Do not collapse every forme to baseSpecies (Floette-Eternal is distinct from ordinary Floette). A Mega
+    alias needs the correct battle-only origin AND its observed stats; an unevolved preview member cannot match.
+    """
+    species = to_id(species)
+    if species in {to_id(mon.species), current_forme(mon)}:
+        return True
+    entry = GenData.from_gen(mon.gen).pokedex.get(species, {})
+    if not (entry.get("forme") or "").startswith("Mega"):
+        return False
+    origins = entry.get("battleOnly") or entry.get("changesFrom") or entry.get("baseSpecies") or []
+    if isinstance(origins, str):
+        origins = [origins]
+    return (to_id(mon.species) in {to_id(s) for s in origins}
+            and dict(mon.base_stats) == entry.get("baseStats"))
