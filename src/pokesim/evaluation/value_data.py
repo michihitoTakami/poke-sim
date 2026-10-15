@@ -46,7 +46,7 @@ def export_value(out: Path, dataset: Path) -> dict:
                         counts["censored_or_failed_trials"] += 1
                         continue
                     eligible = [d for d in trial["trajectory"] if d["side"] == 'p1' and d["phase"] == 'move'
-                                and not d["rootIntervention"]]
+                                and not d["rootIntervention"] and not d.get('rejected')]
                     counts["excluded_root_or_other_decisions"] += len(trial["trajectory"]) - len(eligible)
                     for d in eligible:
                         sample = {"schema_version": 1, "split": cfg["split"], "group": bid,

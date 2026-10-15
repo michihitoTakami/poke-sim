@@ -7,9 +7,12 @@ matrix (from services/sim-tools/lookahead.js); we solve it as a zero-sum game, t
   - value[a]: expected score of action a against the opponent's equilibrium mix (HP balance; a win counts +3)
 """
 import json
+import os
 import random
 import re
+import select as io_select
 import subprocess
+import time
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -258,22 +261,44 @@ class Lookahead:
     """Runs the Node lookahead worker and turns battles into recommendations."""
 
     def __init__(self, sampler: SetSampler, samples: int = 6, seeds: int = 2, rollout: int = 3,
-                 opponent_model: dict | None = None, win_decay: float | None = None, search: dict | None = None):
+                 opponent_model: dict | None = None, win_decay: float | None = None, search: dict | None = None,
+                 value_model=None):
         """search: worker settings for every query (see services/sim-tools/lookahead.js): continuations, scoring,
         lostPathPenalty, deadlineMs, and seeds / rollout / winDecay overriding the arguments."""
         self.sampler, self.n_samples, self.seeds, self.rollout = sampler, samples, seeds, rollout
         self.win_decay = win_decay  # None: the worker's default (a quicker win scores higher)
         self.search = dict(search or {})
+        self.value_model = value_model
         self.opponent_model = opponent_model or {}
         self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
 
     def close(self) -> None:
         self.proc.kill()
+        self.proc.wait(timeout=5)
 
     def _query(self, request: dict) -> dict:
+        if self.proc.poll() is not None:
+            self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
+                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
         self.proc.stdin.write(json.dumps(request) + "\n")
-        reply = json.loads(self.proc.stdout.readline())
+        self.proc.stdin.flush()
+        deadline = time.monotonic() + getattr(self, 'query_timeout', 30.)
+        chunks = []
+        while True:
+            remaining = deadline - time.monotonic()
+            ready, _, _ = io_select.select([self.proc.stdout], [], [], max(0, remaining))
+            if not ready or remaining <= 0:
+                self.proc.kill()
+                self.proc.wait(timeout=5)
+                raise TimeoutError('search worker exceeded response deadline')
+            part = os.read(self.proc.stdout.fileno(), 65536)
+            if not part:
+                raise RuntimeError('search worker exited before replying')
+            chunks.append(part)
+            if b'\n' in part:
+                break
+        reply = json.loads(b''.join(chunks))
         if "error" in reply:
             raise RuntimeError(reply["error"])
         return reply
@@ -340,7 +365,7 @@ class Lookahead:
                 "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
 
     def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None,
-              search: dict | None = None, belief=None) -> list[dict]:
+              search: dict | None = None, belief=None, log=None, our_role='p1', value=False) -> list[dict]:
         """Payoff matrices (our options x the opponent's) for sampled opponent sets. search: settings for this query
         only (as the constructor's). belief: draw the opponent's sets from it (see opponent_side)."""
         own = self.own_side(battle, own_sets, incoming)
@@ -353,6 +378,17 @@ class Lookahead:
         request.update(self.search)
         request.update(search or {})
         request.pop("plans", None)  # plan search settings (see plans), not the payoff query's
+        if value:
+            if self.value_model is None or not log:
+                raise ValueError('learned search requires a value model and observed history')
+            if our_role not in ('p1', 'p2'):
+                raise ValueError('invalid observer role')
+            history = list(log)
+            if our_role == 'p2':
+                history = [re.sub(r'\bp([12])(?=[a-z]?[:|]|$)',
+                                  lambda m: 'p' + ('2' if m[1] == '1' else '1'), line) for line in history]
+            request.update(valueLeaves=True, observationLog=history)
+            return self.value_model.apply(self._query(request))
         return self._query(request)["results"]
 
     def plans(self, battle: Battle, own_sets: dict[str, dict], plans: dict, belief=None) -> dict:

@@ -58,6 +58,18 @@ def test_value_export_keeps_terminal_observations_but_excludes_forced_root_oppon
         export_value(root, target)
 
 
+def test_rejected_action_attempt_is_not_exported_as_an_executed_reference_decision(tmp_path):
+    root = tmp_path / 'experiment'
+    _, row = experiment(root)
+    row['result']['trials'][0]['trajectory'][2]['rejected'] = 'trapped'
+    row['payload_sha'] = digest({k: v for k, v in row.items() if k != 'payload_sha'})
+    atomic_json(root / 'positions' / f"{row['case']['id']}.json", row)
+    target = tmp_path / 'value.jsonl'
+    export_value(root, target)
+    samples = [json.loads(line) for line in target.read_text().splitlines()]
+    assert len(samples) == 1 and samples[0]['step'] == 3 and samples[0]['sample_weight'] == 1
+
+
 @pytest.mark.parametrize('scope,split', [
     ('sampled_full_information_continuations', 'train'), ('public_observation', 'diagnostic'),
     ('public_observation', 'test'),

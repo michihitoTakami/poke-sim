@@ -121,6 +121,7 @@ function createCodec(dir) {
       battle.field.addPseudoWeather('trickroom', 'debug');
       battle.field.pseudoWeather.trickroom.duration = f.trickroom;
     }
+    const entryLogPosition = battle.log.length;
     for (const sideId of ['p1', 'p2']) {
       const spec = sample[sideId];
       if (spec.incoming === undefined) continue;
@@ -147,6 +148,8 @@ function createCodec(dir) {
       }
       battle.makeRequest(battle.sides.some(side => side.active.some(mon => mon.switchFlag)) ? 'switch' : 'move');
     }
+    // Only real incoming-switch events may extend a public observer; the reconstructed setup log is private.
+    battle.pokesimEntryLog = battle.log.slice(entryLogPosition);
     return battle;
   }
 

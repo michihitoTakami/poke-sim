@@ -105,7 +105,7 @@ def test_terminal_targets_follow_the_observers_perspective_and_root_is_marked():
     req = request(maxTurns=100)
     result = run(req)
     validate_trials(result, 1, [0], ["expert/tactical"])
-    assert result["policyVersion"] == "public-reference-v1"
+    assert result["policyVersion"] == "public-reference-v2"
     assert result["trials"][0]["outcome"] in {'win', 'loss', 'draw'}
     trace = result["trials"][0]["trajectory"]
     assert any(not d["rootIntervention"] and d["phase"] == 'move' for d in trace)

@@ -66,13 +66,13 @@ class AdvisorPlayer(Player):
 
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
                  planner: dict | None = None, sample: bool = False, seed: int | None = None,
-                 opponent_policy: str = "default", belief: bool = False, **kwargs):
+                 opponent_policy: str = "default", belief: bool = False, value_run=None, **kwargs):
         self.sets, self.out = sets, out
         self.belief = belief
         self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner,
                                source="showdown", sample=sample, opponent_policy=opponent_policy,
-                               belief=belief)
-        self.planner, self.sample = planner, sample
+                               belief=belief, value_run=value_run)
+        self.planner, self.sample = self.advisor.planner, sample
         self.seed = seed if seed is not None else random.SystemRandom().randrange(2 ** 31)
         self.rng = random.Random(self.seed)
         roster = [s["species"] for s in sets]
@@ -91,6 +91,7 @@ class AdvisorPlayer(Player):
                 print(f"lineup table vs {Path(path).name}:", warning, flush=True)
         self.lineups: dict[str, list[str]] = {}
         self.logs: dict[str, list[str]] = {}  # battle tag -> protocol lines
+        self.value_logged: set[str] = set()
         super().__init__(team=FixedTeam(sets), **kwargs)
 
     async def _handle_battle_message(self, split_messages):
@@ -109,6 +110,9 @@ class AdvisorPlayer(Player):
 
     def teampreview(self, battle) -> str:
         self.policy_for(battle)
+        if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
+            print(f'{battle.battle_tag}: matched; value model '
+                  f'{self.advisor.engine.value_model.version["dataset_id"][:12]}', flush=True)
         opp = [m.species for m in battle.teampreview_opponent_team]
         ranking = self.matchups.rank([s["species"] for s in self.sets], self.picks.predict(opp))
         lineup = ranking[0][0] if ranking else [s["species"] for s in self.sets[:3]]
@@ -132,15 +136,19 @@ class AdvisorPlayer(Player):
         self.advisor.model, self.advisor.extra = self.policies[policy_path]
         self.advisor.calibration = self.calibrations[policy_path]
 
-    def choose_move(self, battle):
+    async def choose_move(self, battle):
         mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
         self.activate_policy(self.policy_for(battle))
         entry = {"turn": battle.turn, "force": bool(battle.force_switch)}
         self.advice.setdefault(battle.battle_tag, []).append(entry)
         try:
-            advice = self.advisor.advise(battle, self.last_opponent_move(battle),
-                                         self.logs.get(battle.battle_tag, []),
-                                         battle.player_role)
+            advice = await asyncio.to_thread(self.advisor.advise, battle, self.last_opponent_move(battle),
+                                              self.logs.get(battle.battle_tag, []), battle.player_role)
+            value = advice.status.get('search', {}).get('value', {})
+            if value.get('learned', 0) and battle.battle_tag not in self.value_logged:
+                self.value_logged.add(battle.battle_tag)
+                print(f'{battle.battle_tag}: value active ({value["learned"]} leaves, '
+                      f'{advice.elapsed:.2f}s)', flush=True)
             entry.update({"actions": rounded(advice.actions[:5]), "win": advice.win_raw, "win_cal": advice.win_prob,
                           "policy": rounded(sorted(advice.policy.items(), key=lambda kv: -kv[1])[:3]),
                           "lookahead": [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.lookahead[:3]],
@@ -205,7 +213,7 @@ async def run(args) -> None:
     if planner and args.search:
         planner["search"] = json.loads(args.search)
     play = {"combine": combine, "planner": planner, "sample": args.sample, "seed": args.seed,
-            "opponent_policy": args.opponent_policy, "belief": args.belief}
+            "opponent_policy": args.opponent_policy, "belief": args.belief, "value_run": args.value_run}
     if args.local:
         tag = uuid.uuid4().hex[:6]
         me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
@@ -237,7 +245,7 @@ async def run(args) -> None:
                        start_timer_on_battle_start=True)
     stamp = code_stamp()
     for _ in range(args.battles):
-        await me.ladder(1)
+        await asyncio.wait_for(me.ladder(1), timeout=args.battle_timeout)
         if code_stamp() != stamp:  # code or priors changed: exit between battles so the caller restarts us
             print("code changed: exiting to reload", flush=True)
             break
@@ -252,6 +260,9 @@ def main() -> None:
                     help="cloned human policy for the opponent prediction (default: checkpoints/bc_human.zip)")
     ap.add_argument("--belief", action="store_true",
                     help="infer the opponent's sets from damage and move order (pokesim.belief) for the lookahead")
+    ap.add_argument('--value-run', type=Path, help='validated terminal-value run; requires planner on/shadow')
+    ap.add_argument('--battle-timeout', type=float, default=600,
+                    help='restart after a stuck public battle/network connection (seconds)')
     ap.add_argument("--policy", nargs="+", default=[str(ROOT / "checkpoints/ppo_baton_v2.zip")],
                     help="one or more policies; with several, battles alternate between them")
     ap.add_argument("--out", default=str(OUT))
