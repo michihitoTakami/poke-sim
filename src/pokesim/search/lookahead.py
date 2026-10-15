@@ -258,12 +258,14 @@ class Lookahead:
     """Runs the Node lookahead worker and turns battles into recommendations."""
 
     def __init__(self, sampler: SetSampler, samples: int = 6, seeds: int = 2, rollout: int = 3,
-                 opponent_model: dict | None = None, win_decay: float | None = None, search: dict | None = None):
+                 opponent_model: dict | None = None, win_decay: float | None = None, search: dict | None = None,
+                 value_model=None):
         """search: worker settings for every query (see services/sim-tools/lookahead.js): continuations, scoring,
         lostPathPenalty, deadlineMs, and seeds / rollout / winDecay overriding the arguments."""
         self.sampler, self.n_samples, self.seeds, self.rollout = sampler, samples, seeds, rollout
         self.win_decay = win_decay  # None: the worker's default (a quicker win scores higher)
         self.search = dict(search or {})
+        self.value_model = value_model
         self.opponent_model = opponent_model or {}
         self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
@@ -340,7 +342,7 @@ class Lookahead:
                 "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
 
     def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None,
-              search: dict | None = None, belief=None) -> list[dict]:
+              search: dict | None = None, belief=None, log=None, our_role='p1', value=False) -> list[dict]:
         """Payoff matrices (our options x the opponent's) for sampled opponent sets. search: settings for this query
         only (as the constructor's). belief: draw the opponent's sets from it (see opponent_side)."""
         own = self.own_side(battle, own_sets, incoming)
@@ -353,6 +355,17 @@ class Lookahead:
         request.update(self.search)
         request.update(search or {})
         request.pop("plans", None)  # plan search settings (see plans), not the payoff query's
+        if value:
+            if self.value_model is None or not log:
+                raise ValueError('learned search requires a value model and observed history')
+            if our_role not in ('p1', 'p2'):
+                raise ValueError('invalid observer role')
+            history = list(log)
+            if our_role == 'p2':
+                history = [re.sub(r'\bp([12])(?=[a-z]?[:|]|$)',
+                                  lambda m: 'p' + ('2' if m[1] == '1' else '1'), line) for line in history]
+            request.update(valueLeaves=True, observationLog=history)
+            return self.value_model.apply(self._query(request))
         return self._query(request)["results"]
 
     def plans(self, battle: Battle, own_sets: dict[str, dict], plans: dict, belief=None) -> dict:

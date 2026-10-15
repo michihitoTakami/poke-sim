@@ -54,12 +54,14 @@ def ja_names() -> dict[str, str]:
 
 
 class Live:
-    def __init__(self, team: Path, policy: str | None, lookahead: bool = True, planner: dict | None = None):
+    def __init__(self, team: Path, policy: str | None, lookahead: bool = True, planner: dict | None = None,
+                 value_run: Path | None = None):
         self.sets = json.loads(Path(team).read_text())
         self.roster = [s["species"] for s in self.sets]
         self.policy = policy
         self.ja = ja_names()
-        self.advisor = Advisor(self.sets, policy=policy, lookahead=lookahead, planner=planner, source="switch")
+        self.advisor = Advisor(self.sets, policy=policy, lookahead=lookahead, planner=planner, source="switch",
+                               value_run=value_run)
         self.picks_model, self.matchups = PickModel(), MatchupModel()
         self.matchup_warning = self.matchups.check(policy)
         if self.matchup_warning:
@@ -493,6 +495,7 @@ def main() -> None:
     parser.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     parser.add_argument("--policy", help="fixed-team policy checkpoint (trained with this team order)")
     parser.add_argument("--no-lookahead", action="store_true")
+    parser.add_argument('--value-run', type=Path, help='validated terminal-value run; requires planner on/shadow')
     parser.add_argument("--planner", choices=["off", "shadow", "on"], default="off",
                         help="common-strategy planner (pokesim.search.planner): shadow records it next to the "
                              "current advice, on acts on it")
@@ -507,7 +510,8 @@ def main() -> None:
     parser.add_argument("--obs-record", type=Path, help="save changed frames here (e.g. data/raw/obs_frames)")
     args = parser.parse_args()
     planner = None if args.planner == "off" else {"mode": args.planner}
-    live = Live(Path(args.team), args.policy, lookahead=not args.no_lookahead, planner=planner)
+    live = Live(Path(args.team), args.policy, lookahead=not args.no_lookahead, planner=planner,
+                value_run=args.value_run)
     live.read_screen = not args.no_screen
     obs = None
     if args.obs_source:

@@ -118,6 +118,7 @@ class Advisor:
         prior_bundle: dict | None = None,
         sampler: SetSampler | None = None,
         belief: bool = False,
+        value_run: str | Path | None = None,
     ):
         """source: where the advice is used ("switch" / "showdown"), for the win calibration.
         belief: infer the opponent's sets from the damage and move order seen so far (pokesim.belief.sets) and
@@ -134,6 +135,20 @@ class Advisor:
         self.planner = dict(PLANNER, **planner) if planner else None
         if self.planner:
             self.planner["search"] = dict(PLANNER_SEARCH, **self.planner.get("search", {}))
+        value_model = None
+        if value_run is not None:
+            from pokesim.value.runtime import ValueEnsemble
+
+            if not lookahead or not self.planner or self.planner['mode'] not in ('on', 'shadow'):
+                raise ValueError('value-run requires lookahead and planner on/shadow')
+            value_model = ValueEnsemble(value_run)
+            requested = (planner or {}).get('search', {})
+            self.planner['search'].update(plans=None, seeds=1, rollout=2,
+                                          continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
+                                          lostPathPenalty=0)
+            self.planner['search'].update({k: v for k, v in requested.items()
+                                          if k not in ('plans', 'continuations', 'tiebreak', 'lostPathPenalty')})
+            self.planner['search']['value_model'] = value_model.version
         from pokesim.evaluation.calibration import Calibrations, continuation_context
         from pokesim.runtime.bundle import file_hash
 
@@ -159,6 +174,7 @@ class Advisor:
                 rollout,
                 model,
                 search=search,
+                value_model=value_model,
             )
             if lookahead
             else None
@@ -252,7 +268,7 @@ class Advisor:
             try:
                 cache: dict = {}
                 advice = self._search(battle, last_move, dict(cloned), planned=mode == "on", cache=cache,
-                                      belief=belief)
+                                      belief=belief, log=log, our_role=our_role)
                 ranked = legal(advice)
                 opponent = sorted(advice.opponent.items(), key=lambda kv: -kv[1])
                 status["search"] = advice.status
@@ -260,7 +276,7 @@ class Advisor:
                     try:
                         planned = self._search(
                             battle, last_move, dict(cloned), planned=True, settings=self.planner["search"],
-                            belief=belief,
+                            belief=belief, log=log, our_role=our_role,
                         )
                         shadow = legal(planned)
                         status["shadow"] = planned.status
@@ -308,6 +324,8 @@ class Advisor:
         cache: dict | None = None,
         settings: dict | None = None,
         belief=None,
+        log=None,
+        our_role='p1',
     ):
         """The legacy aggregate or the planner (planned) on the lookahead's worlds; cache keeps the worlds of one
         position (by incoming Pokémon). settings: worker settings for these queries (shadow mode evaluates the
@@ -321,9 +339,11 @@ class Advisor:
         def solve(b, own, last, incoming=None):
             key = None if incoming is None else incoming.species
             if key not in cache:
-                cache[key] = engine.query(b, own, incoming, settings, belief=belief)
+                extra = ({'value': True, 'log': log, 'our_role': our_role}
+                         if planned and getattr(engine, 'value_model', None) is not None else {})
+                cache[key] = engine.query(b, own, incoming, settings, belief=belief, **extra)
             if planned:
-                return plan(
+                advice = plan(
                     cache[key],
                     engine.opponent_model,
                     last,
@@ -331,6 +351,13 @@ class Advisor:
                     cloned or None,
                     self.planner["cloned_weight"],
                 )
+                values = [res['value_status'] for res in cache[key] if 'value_status' in res]
+                if values:
+                    advice.status['value'] = {'model': values[0]['model'],
+                                              **{k: sum(v[k] for v in values)
+                                                 for k in ('terminal', 'learned', 'failed')},
+                                              'inference_ms': max(v['inference_ms'] for v in values)}
+                return advice
             return aggregate(cache[key], engine.opponent_model, last)
 
         if battle.force_switch or battle.active_pokemon is None or battle.active_pokemon.fainted:

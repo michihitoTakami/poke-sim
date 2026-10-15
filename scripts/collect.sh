@@ -17,8 +17,13 @@ while [ ! -e "$C/STOP" ]; do
   i=$((i+1)); t0=$(date +%s)
   before=$(ls data/raw/ladder/*.json 2>/dev/null | wc -l)
   # shellcheck disable=SC2086
-  uv run python scripts/ladder.py --battles 20 --planner "${PLANNER:-on}" --policy $POLICIES ${EXTRA:-} \
-      >> "$C/ladder.log" 2>&1
+  if [ -n "${PYTHON:-}" ]; then
+    "$PYTHON" scripts/ladder.py --battles 20 --planner "${PLANNER:-on}" --policy $POLICIES ${EXTRA:-} \
+        >> "$C/ladder.log" 2>&1
+  else
+    uv run python scripts/ladder.py --battles 20 --planner "${PLANNER:-on}" --policy $POLICIES ${EXTRA:-} \
+        >> "$C/ladder.log" 2>&1
+  fi
   code=$?
   after=$(ls data/raw/ladder/*.json 2>/dev/null | wc -l)
   echo "batch $i exit $code, +$((after - before)) battles (total $after), $(( $(date +%s) - t0 ))s, $(date)" >> "$C/status.log"
