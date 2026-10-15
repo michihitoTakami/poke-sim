@@ -38,6 +38,7 @@ from sb3_contrib import MaskablePPO
 from pokesim.config import FORMAT, RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor
 from pokesim.live.selection import MatchupModel, PickModel
+from pokesim.rl.bc import CounterPickHeuristic
 from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, to_id
 from pokesim.rl.opponents import LeaguePlayer
 from pokesim.runtime.bundle import describe, file_hash
@@ -201,6 +202,8 @@ async def run(args) -> None:
     sets = json.loads(Path(args.team).read_text())
     combine = json.loads(args.combine) if args.combine else None
     planner = None if args.planner == "off" else {"mode": args.planner}
+    if planner and args.search:
+        planner["search"] = json.loads(args.search)
     play = {"combine": combine, "planner": planner, "sample": args.sample, "seed": args.seed,
             "opponent_policy": args.opponent_policy, "belief": args.belief}
     if args.local:
@@ -208,8 +211,12 @@ async def run(args) -> None:
         me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
                            server_configuration=LocalhostServerConfiguration, max_concurrent_battles=1,
                            account_configuration=AccountConfiguration(f"adv_{tag}", None))
-        pool = TeamPool(load_teams("observed"), 0)
-        if args.local_opponent:
+        pool = TeamPool(load_teams("observed"), args.seed or 0)  # the same seed: the same opponent teams
+        if args.local_opponent == "heuristic":
+            foe = CounterPickHeuristic(battle_format=FORMAT, team=pool, seed=0, p_counter=0.7,
+                                       server_configuration=LocalhostServerConfiguration,
+                                       account_configuration=AccountConfiguration(f"opp_{tag}", None))
+        elif args.local_opponent:
             foe = LeaguePlayer(battle_format=FORMAT, team=pool, snapshots=[args.local_opponent], p_heuristic=0.0,
                                server_configuration=LocalhostServerConfiguration,
                                account_configuration=AccountConfiguration(f"opp_{tag}", None))
@@ -249,10 +256,13 @@ def main() -> None:
                     help="one or more policies; with several, battles alternate between them")
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--local", action="store_true", help="local server (localhost:8000) against a random player")
-    ap.add_argument("--local-opponent", help="with --local: a saved opponent policy instead (counter-picks 70%%)")
+    ap.add_argument("--local-opponent", help="with --local: a saved opponent policy instead (counter-picks 70%%), "
+                                              "or \"heuristic\" for the counter-picking heuristic bot")
     ap.add_argument("--combine", help='JSON overriding the advisor\'s COMBINE, e.g. \'{"mode": "linear"}\'')
     ap.add_argument("--planner", choices=["off", "shadow", "on"], default="off",
                     help="common-strategy planner: shadow records it next to the current advice, on plays it")
+    ap.add_argument("--search", help='JSON overriding the planner\'s worker settings (PLANNER_SEARCH), e.g. '
+                                      '\'{"continuations": ["expert/tactical", "expert/disrupt"]}\'')
     ap.add_argument("--sample", action="store_true", help="draw the action from the advice instead of its top")
     ap.add_argument("--seed", type=int, help="seed for --sample (default: random, saved in each record)")
     asyncio.run(run(ap.parse_args()))
