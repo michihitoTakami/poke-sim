@@ -30,14 +30,37 @@ def is_team_preview(frame: np.ndarray) -> bool:
 
 
 class ObsFrames:
-    def __init__(self, source: str, host: str = "localhost", port: int = 4455, password: str = ""):
+    """Connects lazily and again after any failure: OBS can be closed and reopened while the server runs (a
+    connection, once closed, never recovers by itself)."""
+
+    def __init__(self, source: str, host: str = "localhost", port: int = 4455, password: str = "",
+                 connect: Callable | None = None):
+        self.source, self.host, self.port, self.password = source, host, port, password
+        self._connect = connect or self._obs_client
+        self.client = None
+
+    def _obs_client(self):
         import obsws_python as obs
 
-        self.client = obs.ReqClient(host=host, port=port, password=password, timeout=5)
-        self.source = source
+        return obs.ReqClient(host=self.host, port=self.port, password=self.password, timeout=5)
+
+    def close(self) -> None:
+        client, self.client = self.client, None
+        if client is not None:
+            try:
+                client.disconnect()
+            except Exception:  # noqa: BLE001 - already closed
+                pass
 
     def grab(self) -> np.ndarray | None:
-        resp = self.client.get_source_screenshot(self.source, "jpg", 1920, 1080, 90)  # ~15 ms; png ~70-400 ms
+        """A frame, or an exception (the next call reconnects)."""
+        try:
+            if self.client is None:
+                self.client = self._connect()
+            resp = self.client.get_source_screenshot(self.source, "jpg", 1920, 1080, 90)  # ~15 ms; png ~70-400 ms
+        except Exception:
+            self.close()
+            raise
         data = base64.b64decode(resp.image_data.split(",", 1)[-1])
         return cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
 

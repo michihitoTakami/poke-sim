@@ -68,6 +68,8 @@ class Live:
         self.screen = None  # ScreenReader (OCR), loaded on the first battle frame
         self.read_screen = True
         self.clients: set[WebSocket] = set()
+        # OBS link (watch_obs): None without OBS; else connected, since (time of the last change), failures, error
+        self.obs: dict | None = None
         self.reset()
 
     def reset(self) -> None:
@@ -105,7 +107,8 @@ class Live:
     def state(self) -> dict:
         out: dict = {"preview": self.preview, "recognized": self.recognized, "lineup": self.lineup, "advice": None,
                      "battle": None, "screen": {"on": self.tracker is not None and self.read_screen,
-                                                "log": self.screen_log[-25:], "saved": self.saved}}
+                                                "log": self.screen_log[-25:], "saved": self.saved},
+                     "obs": self.obs}
         if self.session:
             b = self.session.battle
             me, opp = b.active_pokemon, b.opponent_active_pokemon
@@ -234,14 +237,17 @@ class Live:
         from pokesim.vision.obs_client import is_team_preview
 
         armed, last_seen, last_saved = True, 0.0, None
+        self.obs = {"connected": False, "since": time.time(), "failures": 0, "error": None}
         while True:
             tick = time.time()
             try:
                 frame = await asyncio.to_thread(frames.grab)
-            except Exception as e:  # noqa: BLE001 - OBS closed or source renamed: keep retrying
-                print("OBS grab failed:", repr(e)[:120], flush=True)
-                await asyncio.sleep(3)
+            except Exception as e:  # noqa: BLE001 - OBS closed or source renamed: reconnect and keep retrying
+                await self.obs_failed(e)
+                await asyncio.sleep(obs_backoff(self.obs["failures"]))
                 continue
+            if not self.obs["connected"]:
+                await self.obs_connected()
             now = time.time()
             if record is not None and frame is not None:
                 small = cv2.resize(frame, (96, 54), interpolation=cv2.INTER_AREA).astype(np.int16)
@@ -275,6 +281,28 @@ class Live:
                 armed = True  # gone for a while: the next team preview is a new battle
             await asyncio.sleep(max(0.0, 1 / fps - (time.time() - tick)))
 
+    async def obs_failed(self, error: Exception) -> None:
+        """Log the first failure and then at most once a minute (not every retry); show it in the control page."""
+        o, now = self.obs, time.time()
+        was_connected = o["connected"]
+        if was_connected:
+            o.update(connected=False, since=now, failures=0)
+        o["failures"] += 1
+        o["error"] = repr(error)[:160]
+        if o["failures"] == 1 or now - o.get("logged", 0) >= 60:
+            o["logged"] = now
+            print(f"OBS grab failed ({o['failures']}x since {time.strftime('%H:%M:%S', time.localtime(o['since']))}):",
+                  o["error"], flush=True)
+        if was_connected or o["failures"] == 1:
+            await self.broadcast()
+
+    async def obs_connected(self) -> None:
+        o = self.obs
+        if o["failures"]:
+            print(f"OBS reconnected after {o['failures']} failed attempts", flush=True)
+        o.update(connected=True, since=time.time(), failures=0, error=None)
+        await self.broadcast()
+
     async def advise(self, force_switch: bool = False) -> None:
         battle = self.session.decision(force_switch=force_switch)
         if battle.finished:
@@ -292,6 +320,11 @@ class Live:
                              "win": suggestion.win_raw, "win_cal": suggestion.win_prob,
                              "status": suggestion.status,
                              "shadow": [(lab, round(p, 3), round(v, 3)) for lab, p, v in suggestion.shadow[:5]]})
+
+
+def obs_backoff(failures: int) -> float:
+    """Seconds before the next OBS attempt: 3 s for the first three, then doubling up to 30 s while it stays down."""
+    return 3.0 if failures <= 3 else min(30.0, 3.0 * 2 ** (failures - 3))
 
 
 def create_app(live: Live, obs: dict | None = None) -> FastAPI:

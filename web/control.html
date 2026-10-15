@@ -171,7 +171,12 @@ function render(s) {
     document.querySelectorAll('#lead-pick button').forEach(bt => bt.onclick = () => startBattle(bt.dataset.sp));
   }
   const sc = s.screen || {};
-  $('screen-status').textContent = sc.on ? '画面から自動で読み取り中（メッセージ・HP・コマンド画面）' + (sc.saved ? ` ・ 記録済み: ${sc.saved}` : '') : 'OBS 連携なし、または選出画面待ち（手入力）';
+  const obs = s.obs;
+  const obsDown = obs && !obs.connected;
+  $('screen-status').textContent = obsDown
+    ? `⚠ OBS 未接続（${new Date(obs.since * 1000).toLocaleTimeString()} から、再接続を試行中 ${obs.failures} 回）: 画面も対戦も記録されていません`
+    : sc.on ? '画面から自動で読み取り中（メッセージ・HP・コマンド画面）' + (sc.saved ? ` ・ 記録済み: ${sc.saved}` : '') : 'OBS 連携なし、または選出画面待ち（手入力）';
+  $('screen-status').style.color = obsDown ? '#c0392b' : '';
   $('screen-log').textContent = (sc.log || []).slice().reverse().join('\n');
   $('guide').textContent = sc.on && s.preview ? '画面から自動で読み取っています（入力は不要。読み落としがあれば下で補正）' : !s.preview ? '選出画面を待っています（OBS で自動認識、または画像から認識）'
     : !s.lineup ? '左の「選出の提案」から実際に選んだ選出をクリック'
