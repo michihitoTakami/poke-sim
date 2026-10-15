@@ -171,3 +171,31 @@ console.log(JSON.stringify({nodes:s.nodes.size,choices}));
     result = json.loads(out.stdout)
     assert result['nodes'] == 1
     assert len(set(result['choices'])) == 1
+
+
+def test_pausing_a_live_trial_does_not_turn_it_into_a_value_sample():
+    js = r"""
+const fs=require('fs'),vm=require('vm');
+const sandbox={__dirname:process.cwd()+'/services/sim-tools',
+ require:n=>n==='readline'?{createInterface:()=>({on:()=>{}})}:require(n),
+ process:{argv:['node','worker',process.argv[1]]},module:{exports:{}}};
+vm.runInNewContext(fs.readFileSync('./services/sim-tools/lookahead.js','utf8')+
+ '\nmodule.exports={setUp,step,choices,State,extractChannelMessages};',sandbox);
+const d=sandbox.module.exports;
+const req=JSON.parse(fs.readFileSync('./tests/fixtures/terminal-moonblast-turn14.json'));
+const {Search}=require('./services/sim-tools/terminal_search');
+const s=new Search(req,d),st=s.states[0],pending=[];
+const i=st.p1.findIndex(x=>x[1]==='move:calmmind');
+const j=st.p2.findIndex(x=>x[1]==='move:dragonclaw');
+d.observedStep=require('./services/sim-tools/public_policy').observedStep;
+s.active=s.trial([0,i,j],false,pending);
+const paused=!s.active.next().done;
+const final=s.finish();
+console.log(JSON.stringify({paused,pending:pending.length,censored:final.summary.censored,
+ terminal:final.summary.terminal,unfinished:final.summary.unfinished_at_deadline,
+ scored:st.cells[i][j].n}));
+"""
+    out = subprocess.run(['node', '-e', js, str(SHOWDOWN_DIR)], cwd=ROOT, text=True,
+                         capture_output=True, check=True, timeout=10)
+    assert json.loads(out.stdout) == {'paused': True, 'pending': 0, 'censored': 0,
+                                     'terminal': 0, 'unfinished': 1, 'scored': 0}

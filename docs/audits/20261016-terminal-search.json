@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "purpose": "incident regression and bounded-runtime integration; not a strength or live win-rate claim",
+  "algorithm_commit": "fdeb16d",
+  "algorithm_code_sha": "b0de8c99daa95430922e86ade5716f9619a170bf75bcfa75206ab3f3a325ae87",
+  "worker_sha": "dedeae3faee276de738d42dad87a2bfd28ee9eb64a33d3ec0342d39c6b88ac72",
+  "regression_report_sha": "e4df4a52e9c8d53eaba5108cbfca384a354cb84dd8a7d5ab9368308ad08289bf",
+  "engine": "942cda71d14bf0618bd57991708a2e2734b6daba",
+  "value_run": "runs/terminal-value-v2",
+  "value_dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+  "tests": {
+    "related_regressions": 141,
+    "additional_rpc_pause_regression": 1,
+    "additional_runtime_quality_gate": 2,
+    "all_passed": true
+  },
+  "production_incident": "20261016-052245 T14, last Dragapult 1%, chose Calm Mind instead of Moonblast",
+  "real_position_checks": {
+    "runs": 14,
+    "finisher_repeats": 10,
+    "gates": {
+      "all_under_10s": true,
+      "finisher_10_of_10": true,
+      "stable_particles": true,
+      "no_fallback": true,
+      "no_failures": true
+    },
+    "min_seconds": 7.911496590997558,
+    "max_seconds": 7.965153297001962,
+    "terminal_trials_range": [
+      713,
+      3487
+    ],
+    "censored_at_turn_cap": 0,
+    "failed": 0
+  },
+  "local_smoke": [
+    {
+      "result": "win",
+      "decisions": 15,
+      "max_seconds": 8.03,
+      "fallbacks": 0,
+      "advice_errors": 0,
+      "simulation_errors": 0,
+      "censored_at_turn_cap": 0,
+      "terminal_simulations": 18089,
+      "max_tree_decisions": 4
+    },
+    {
+      "result": "loss",
+      "decisions": 26,
+      "max_seconds": 7.97,
+      "fallbacks": 0,
+      "advice_errors": 0,
+      "simulation_errors": 0,
+      "censored_at_turn_cap": 3,
+      "terminal_simulations": 37676,
+      "max_tree_decisions": 6
+    }
+  ],
+  "artifacts": {
+    "real_position_checks": "runs/terminal-search-real-regressions-v2",
+    "local_records": "data/processed/diagnostics/terminal-search-local-v2"
+  },
+  "limits": [
+    "sampled opponent sets; not all hidden worlds",
+    "UCT selectively deepens; not a complete minimax proof of the whole game",
+    "120-turn cap can use learned reference value",
+    "one final unfinished simulation is unscored",
+    "two local games do not establish strength"
+  ],
+  "deployment_gate": "stop collection after current battle on fallback, simulation error, or decision >10s"
+}

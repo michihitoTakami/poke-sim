@@ -9,6 +9,7 @@ PR #7と10/15の実戦結果を踏まえた次の実装順・価値学習・採�
 サーバー（ローカル Showdown・ラダー収集・Switch 対戦サポート）の立ち上げと更新は [運用手順](docs/operations.md) を参照。
 価値モデルの事前学習・V_refの学習・初回の比較結果は [価値学習の実行手順](docs/value-training.md) を参照。
 勝敗価値を探索・ラダーへ接続する手順は [価値探索の接続手順](docs/value-search-runtime.md) を参照。
+即勝ちの確認・1判断8.5秒の木探索は [終局探索の仕様と起動方法](docs/terminal-search.md) を参照。
 
 ## セットアップ
 ```bash
@@ -84,7 +85,8 @@ uv run python -m pokesim.evaluation.fixtures -v  # E1: 既知の失敗パター�
 uv run python -m pokesim.evaluation.calibration fit --source showdown --policy checkpoints/ppo_baton_items.zip
 uv run python -m pokesim.evaluation.calibration report
 ```
-- プランナーは先読みの続きを2種類の方策（greedy / tactical: メガ・回復・安全な積み・バトン/交代）で打ち、終局を ±1、
+- 以下の固定継続・ソフト期限の説明は、価値モデルを指定しない従来経路のものです。
+- 従来のプランナーは先読みの続きを2種類の方策（greedy / tactical: メガ・回復・安全な積み・バトン/交代）で打ち、終局を ±1、
   途中局面は低信頼の代替値で評価します（`status.shadow` の `resolved` = 終局まで進んだ割合、`continuation_spread` = 2方策の評価差）。
 - 推定勝率は、source・方策・続きの設定が一致する較正がある場合に、1ターン目の通常判断でだけ表示します。
   それ以降や強制交代は較正の対象外です。較正がない場合も、方策の評価値を勝率とは区別して参考表示します。
