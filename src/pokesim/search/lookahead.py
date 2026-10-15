@@ -342,7 +342,17 @@ class Lookahead:
             request["winDecay"] = self.win_decay
         request.update(self.search)
         request.update(search or {})
+        request.pop("plans", None)  # plan search settings (see plans), not the payoff query's
         return self._query(request)["results"]
+
+    def plans(self, battle: Battle, own_sets: dict[str, dict], plans: dict, belief=None) -> dict:
+        """Plan search (services/sim-tools/lookahead.js evaluatePlans): each of our candidate plans played to the end
+        of the battle in sampled worlds, against the opponent policies in `plans`. Returns the worker's reply."""
+        own = self.own_side(battle, own_sets)
+        field = field_state(battle)
+        samples = [{"p1": own, "p2": self.opponent_side(battle, belief), "field": field}
+                   for _ in range(self.n_samples)]
+        return self._query({"format": FORMAT, "samples": samples, "plans": plans})
 
     def advise(self, battle: Battle, own_sets: dict[str, dict], last_move: str | None = None) -> Advice:
         return aggregate(self.query(battle, own_sets), self.opponent_model, last_move)

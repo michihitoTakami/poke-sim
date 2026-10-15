@@ -36,7 +36,8 @@ def methods() -> dict[str, tuple[dict, str]]:
     from pokesim.live.advisor import PLANNER, PLANNER_SEARCH
 
     return {"legacy": (LEGACY, "aggregate"),
-            "planner": (dict(PLANNER_SEARCH, deadlineMs=None), f"plan:{PLANNER['rho']}")}
+            "planner": ({k: v for k, v in PLANNER_SEARCH.items() if k != "plans"} | {"deadlineMs": None},
+                        f"plan:{PLANNER['rho']}")}
 
 
 @dataclass

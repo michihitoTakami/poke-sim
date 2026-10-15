@@ -74,18 +74,27 @@ OPPONENT_MODEL = {"br_weight": 0.75, "tau": 0.7, "repeat": 0.3}
 # share of the cloned human policy in the opponent prediction (scripts/eval_records.py score --bc-weight)
 OPPONENT_POLICY_WEIGHT = 0.5
 # planner defaults (pokesim.search.planner): rho guards against a wrong opponent prediction. "search": the worker
-# settings the planner's worlds are evaluated with (services/sim-tools/lookahead.js): both continuation policies,
-# a real end scored +-1 (a win counts the same whenever it comes), a penalty for having no damage source left,
-# one seed per policy, 5 turns on, no new pass after 2.5 s. Initial values, to be set on development data.
+# settings the planner's worlds are evaluated with (services/sim-tools/lookahead.js): we play on with the expert
+# continuation (the Baton Pass player's plans), the opponent with tactical and with disrupt (haze / phazing / Encore
+# / status against set-up); a real end scored +-1 less a small tie-break for a slower win, a penalty for having no
+# damage source left, one seed per policy, 5 turns on, no new pass after 2.5 s. "plans": on turns our active can set
+# up, the expert plans (how far to stack) are played to the end of the battle first and the best one becomes our
+# continuation (Advisor._choose_plan). Local A/B 2026-10-15 (100 battles each vs the heuristic bot and opp_baton):
+# greedy/tactical 75%, with expert + plans 79% (not a significant difference); initial values, to be set on
+# development data.
+PLAN_CANDIDATES = ["expert", "expert@0", "expert@2", "expert@4", "expert@6"]
 PLANNER_SEARCH = {
-    "continuations": ["greedy", "tactical"],
+    "continuations": ["expert/tactical", "expert/disrupt"],
     "scoring": "terminal",
     "lostPathPenalty": 0.3,
     "winDecay": 0.0,
     "seeds": 1,
     "rollout": 5,
     "deadlineMs": 2500,
+    "plans": {"candidates": PLAN_CANDIDATES, "opponents": ["tactical", "disrupt"], "seeds": 1, "maxTurns": 60},
 }
+# plan search (Advisor._choose_plan): another plan replaces the default only when it wins by this much more
+PLAN_MARGIN = 0.1
 PLANNER = {"mode": "shadow", "rho": 0.3, "cloned_weight": OPPONENT_POLICY_WEIGHT, "search": PLANNER_SEARCH}
 
 
@@ -155,6 +164,7 @@ class Advisor:
             else None
         )
         self.beliefs = None
+        self.last_plan: dict | None = None  # the plan search of the last _search (see _choose_plan)
         if belief and self.engine:
             from pokesim.belief.sets import Beliefs
 
@@ -306,6 +316,7 @@ class Advisor:
 
         engine = self.engine
         cache = {} if cache is None else cache
+        self.last_plan = None
 
         def solve(b, own, last, incoming=None):
             key = None if incoming is None else incoming.species
@@ -324,7 +335,50 @@ class Advisor:
 
         if battle.force_switch or battle.active_pokemon is None or battle.active_pokemon.fainted:
             return engine.advise_switch(battle, self.own_sets, last_move, solve)
-        return solve(battle, self.own_sets, last_move)
+        current = settings if settings is not None else (self.planner or {}).get("search", {})
+        if planned and current.get("plans") and can_set_up(battle.active_pokemon):
+            chosen = self._choose_plan(battle, current, belief)
+            if chosen is not None:
+                settings = with_plan(current, chosen)
+        advice = solve(battle, self.own_sets, last_move)
+        if self.last_plan is not None:
+            advice.status["plans"] = self.last_plan
+        return advice
+
+    def _choose_plan(self, battle: Battle, settings: dict, belief) -> str | None:
+        """Our plan for this position (how far to stack, when to heal): the candidate with the best result played
+        to the end, over all sampled worlds together (one choice for every world: we cannot see which one is real).
+        The first candidate is the default: another replaces it only when it scores higher by plans["margin"]
+        (default PLAN_MARGIN), so a few games' noise does not change the plan. None when the search fails."""
+        self.last_plan = None
+        try:
+            reply = self.engine.plans(battle, self.own_sets, settings["plans"], belief)
+        except Exception as e:  # noqa: BLE001 - the default plan still plays
+            self.last_plan = {"error": repr(e)[:200]}
+            return None
+        scores = {name: r["score"] for name, r in reply["plans"].items() if r["score"] is not None}
+        default = settings["plans"]["candidates"][0]
+        best = max(scores, key=scores.get) if scores else None
+        margin = settings["plans"].get("margin", PLAN_MARGIN)
+        chosen = best if best is not None and scores[best] > scores.get(default, -1.0) + margin else default
+        self.last_plan = {"chosen": chosen, "scores": {k: round(v, 3) for k, v in scores.items()},
+                          "unfinished": {k: r["unfinished"] for k, r in reply["plans"].items() if r["unfinished"]},
+                          "cycles": reply["cycles"], "ms": reply["elapsedMs"]}
+        return chosen
+
+
+def can_set_up(mon) -> bool:
+    """Whether the active has a move that raises its own stats or Baton Pass: the positions plans differ in."""
+    return any(m.id == "batonpass" or (m.target == "self" and m.boosts and any(v > 0 for v in m.boosts.values()))
+               for m in mon.moves.values())
+
+
+def with_plan(settings: dict, plan: str) -> dict:
+    """The worker settings with our continuation "expert" (alone or as "expert/<theirs>") replaced by the plan."""
+    def ours(name: str) -> str:
+        mine, sep, theirs = name.partition("/")
+        return (plan if mine == "expert" else mine) + sep + theirs
+    return dict(settings, continuations=[ours(c) for c in settings.get("continuations", [])])
 
 
 def combine(
