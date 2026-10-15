@@ -206,12 +206,19 @@ const knows = (mon, ids) => mon.moveSlots.some(s => s.pp > 0 && ids.has(s.id));
 const boostSum = mon => Object.values(mon.boosts).reduce((a, v) => a + Math.max(0, v), 0);
 const stage = s => (s >= 0 ? (2 + s) / 2 : 2 / (2 - s));
 
-function speedOf(mon, speBoost = mon.boosts ? mon.boosts.spe : 0) {
-  if (mon.isActive) return mon.getActionSpeed();  // boosts, items, paralysis, Tailwind, Trick Room
+// Speed as it orders moves: higher moves first. Under Trick Room it is inverted for every Pokemon alike (as
+// getActionSpeed does for the active), so bench and active Pokemon compare correctly either way.
+function rawSpeed(mon, speBoost = mon.boosts ? mon.boosts.spe : 0) {
+  if (mon.isActive && speBoost === mon.boosts.spe) return mon.getStat('spe', false, false);  // items, paralysis, Tailwind
   let v = mon.storedStats.spe * stage(speBoost);
   if (mon.item === 'choicescarf') v *= 1.5;
   if (mon.status === 'par') v *= 0.5;
   return v;
+}
+
+function speedOf(mon, speBoost = mon.boosts ? mon.boosts.spe : 0) {
+  const v = rawSpeed(mon, speBoost);
+  return mon.battle.field.getPseudoWeather('trickroom') ? 1e4 - v : v;
 }
 
 // Does a status move have its effect on the target now (not the accuracy roll)?
@@ -251,9 +258,9 @@ function isSetupThreat(mon) {
   });
 }
 
-// Disrupt: tactical, but uses the status and anti-setup moves it has: haze / phaze a boosted foe, Encore a foe that
-// just used a status move, Taunt a set-up Pokemon, then Toxic / Will-O-Wisp / Yawn / paralysis when its attacks do
-// little. Stands for the opponents that beat a setup / Baton Pass team.
+// Disrupt: tactical, but uses the status and anti-setup moves it has: Trick Room against a faster foe, haze / phaze
+// a boosted foe, Encore a foe that just used a status move, Taunt a set-up Pokemon, then Toxic / Will-O-Wisp / Yawn /
+// paralysis when its attacks do little. Stands for the opponents that beat a setup / Baton Pass team.
 function disrupt(battle, side) {
   const opts = choices(battle, side);
   if (opts.length === 1 || side.activeRequest.forceSwitch) return tactical(battle, side);
@@ -266,6 +273,9 @@ function disrupt(battle, side) {
   if (best >= foe.hp) return tactical(battle, side);  // a KO comes first
   const threat = isSetupThreat(foe), boosted = boostSum(foe) >= 2;
   let m;
+  // Trick Room when the foe outspeeds us (it also turns a Speed-boosted Baton Pass against the receiver)
+  if (!battle.field.getPseudoWeather('trickroom') && rawSpeed(foe) > rawSpeed(me) &&
+      (m = moves.find(x => x.move.id === 'trickroom'))) return m.choice;
   if (boosted && (m = pick(mv => RESET.has(mv.id) || PHAZE.has(mv.id)))) return m.choice;
   if (threat && foe.lastMove && foe.lastMove.category === 'Status' && (m = pick(mv => mv.id === 'encore'))) {
     return m.choice;

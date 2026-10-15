@@ -39,9 +39,11 @@ const sandbox = {__dirname: require('path').dirname(process.argv[1]),
     require: n => n === 'readline' ? {createInterface: () => ({on: () => {}})} : require(n),
     process: {argv: ['node', 'worker', process.argv[2]]}, module: {exports: {}}, console};
 vm.runInNewContext(fs.readFileSync(process.argv[1], 'utf8') +
-    '\\nmodule.exports={setUp,evaluate,tactical,expert,disrupt,receiver,expectedDamage,damageRoll,policy};', sandbox);
+    '\\nmodule.exports={setUp,evaluate,tactical,expert,disrupt,receiver,'
+    + 'expectedDamage,damageRoll,policy,speedOf};', sandbox);
 const sample = JSON.parse(process.argv[3]);
-const {setUp,evaluate,tactical,expert,disrupt,receiver,expectedDamage,damageRoll,policy} = sandbox.module.exports;
+const {setUp,evaluate,tactical,expert,disrupt,receiver,expectedDamage,damageRoll,policy,speedOf} =
+    sandbox.module.exports;
 const format = 'gen9championsbssregmc';
 const label = (b, side, c) => {
   const [kind, n] = c.split(' ');
@@ -201,3 +203,44 @@ def test_no_passing_back_and_forth_or_passing_a_single_boost():
     assert run(code, sample) == "switch:floetteeternal"  # not the other passer, which cannot hurt the foe
     one = side([PASSER, GHOLDENGO], [{"hp": 1.0, "boosts": {"spe": 1}}, {"hp": 1.0}])
     assert choose("expert", one, side([WEAK])) != "move:batonpass"  # +1 Speed alone is not worth a turn yet
+
+
+def test_can_set_up_sees_boosting_moves_and_baton_pass():
+    from poke_env.battle import Pokemon
+
+    from pokesim.live.advisor import can_set_up
+
+    def mon(*moves):
+        m = Pokemon(gen=9, species="gholdengo")
+        for move in moves:
+            m._add_move(move)
+        return m
+
+    assert can_set_up(mon("shadowball", "nastyplot"))
+    assert can_set_up(mon("snarl", "batonpass"))
+    assert not can_set_up(mon("shadowball", "flashcannon", "recover"))
+
+
+TR_SETTER = {"species": "Hatterene", "item": "Leftovers", "ability": "Magic Bounce", "nature": "Quiet",
+             "moves": ["Trick Room", "Psychic", "Dazzling Gleam", "Mystical Fire"], "evs": SPEC, "level": 50}
+
+
+def test_trick_room_inverts_speed_for_bench_and_active_alike():
+    code = ("const b = setUp(sample, format, 1); const s = b.p1.pokemon;"
+            "console.log(JSON.stringify([speedOf(s[0]) > speedOf(b.p2.active[0]), speedOf(s[1]) > speedOf(s[2])]));")
+    sample = {"p1": side([GHOLDENGO, GHOLDENGO, DIRGE]), "p2": side([SLOW_SPECIAL]), "field": {}}
+    fast = dict(GHOLDENGO, evs=FAST)
+    sample["p1"]["team"] = [fast, fast, DIRGE]
+    assert run(code, sample) == [True, True]  # Gholdengo outspeeds Hatterene and Skeledirge
+    sample["field"] = {"trickroom": 3}
+    assert run(code, sample) == [False, False]  # under Trick Room both comparisons flip
+
+
+def test_disrupt_sets_trick_room_against_a_faster_foe():
+    ours = side([TR_SETTER])
+    theirs = side([dict(GHOLDENGO, evs=FAST)])  # faster, and Hatterene cannot knock it out
+    assert choose("disrupt", ours, theirs) == "move:trickroom"
+    sample = {"p1": ours, "p2": theirs, "field": {"trickroom": 3}}
+    out = run("const b = setUp(sample, format, 1); console.log(JSON.stringify(label(b, b.p1, disrupt(b, b.p1))));",
+              sample)
+    assert out != "move:trickroom"  # not again while it is up (that would end it)

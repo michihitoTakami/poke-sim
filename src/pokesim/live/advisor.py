@@ -369,7 +369,9 @@ class Advisor:
 
 def can_set_up(mon) -> bool:
     """Whether the active has a move that raises its own stats or Baton Pass: the positions plans differ in."""
-    return any(m.id == "batonpass" or (m.target == "self" and m.boosts and any(v > 0 for v in m.boosts.values()))
+    from poke_env.battle import Target
+
+    return any(m.id == "batonpass" or (m.target == Target.SELF and m.boosts and any(v > 0 for v in m.boosts.values()))
                for m in mon.moves.values())
 
 
