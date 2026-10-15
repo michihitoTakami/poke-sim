@@ -49,6 +49,18 @@ OUT = RAW_DIR / "ladder"
 CREDENTIALS = Path.home() / ".config" / "poke-sim" / "showdown.env"
 
 
+def search_quality_issues(status: dict, elapsed: float) -> list[str]:
+    """Deployment gate for terminal search; failures must not silently become another collection batch."""
+    issues = []
+    if status.get('fallback'):
+        issues.append('search fallback')
+    if status.get('search', {}).get('terminal_search', {}).get('failed', 0):
+        issues.append('simulation failed')
+    if elapsed > 10:
+        issues.append('decision exceeded 10 seconds')
+    return issues
+
+
 def credentials() -> tuple[str, str] | None:
     env = dict(os.environ)
     if CREDENTIALS.exists():
@@ -92,6 +104,7 @@ class AdvisorPlayer(Player):
         self.lineups: dict[str, list[str]] = {}
         self.logs: dict[str, list[str]] = {}  # battle tag -> protocol lines
         self.value_logged: set[str] = set()
+        self.quality_issues: list[str] = []
         super().__init__(team=FixedTeam(sets), **kwargs)
 
     async def _handle_battle_message(self, split_messages):
@@ -145,7 +158,15 @@ class AdvisorPlayer(Player):
             advice = await asyncio.to_thread(self.advisor.advise, battle, self.last_opponent_move(battle),
                                               self.logs.get(battle.battle_tag, []), battle.player_role)
             value = advice.status.get('search', {}).get('value', {})
-            if value.get('learned', 0) and battle.battle_tag not in self.value_logged:
+            tree = advice.status.get('search', {}).get('terminal_search', {})
+            if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
+                self.quality_issues.extend(search_quality_issues(advice.status, advice.elapsed))
+            if tree and battle.battle_tag not in self.value_logged:
+                self.value_logged.add(battle.battle_tag)
+                print(f'{battle.battle_tag}: terminal search active ({tree["terminal"]} ends, '
+                      f'{tree["censored"]} capped, {tree["unfinished_at_deadline"]} unfinished; '
+                      f'{advice.elapsed:.2f}s)', flush=True)
+            elif value.get('learned', 0) and battle.battle_tag not in self.value_logged:
                 self.value_logged.add(battle.battle_tag)
                 print(f'{battle.battle_tag}: value active ({value["learned"]} leaves, '
                       f'{advice.elapsed:.2f}s)', flush=True)
@@ -167,6 +188,8 @@ class AdvisorPlayer(Player):
         except Exception as e:  # noqa: BLE001 - never stall a live battle
             print("advice failed:", repr(e)[:200], flush=True)
             entry["error"] = repr(e)[:200]
+        if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
+            self.quality_issues.append('advice failed or had no legal action')
         entry["chosen"] = "random"
         return self.choose_random_move(battle)
 
@@ -246,6 +269,10 @@ async def run(args) -> None:
     stamp = code_stamp()
     for _ in range(args.battles):
         await asyncio.wait_for(me.ladder(1), timeout=args.battle_timeout)
+        if me.quality_issues:
+            print('terminal search quality gate: stop after this battle: ' +
+                  ', '.join(sorted(set(me.quality_issues))), flush=True)
+            raise SystemExit(78)
         if code_stamp() != stamp:  # code or priors changed: exit between battles so the caller restarts us
             print("code changed: exiting to reload", flush=True)
             break

@@ -6,6 +6,7 @@ matrix (from services/sim-tools/lookahead.js); we solve it as a zero-sum game, t
   - prob[a]:  our equilibrium mix, averaged over samples (the recommended action distribution)
   - value[a]: expected score of action a against the opponent's equilibrium mix (HP balance; a win counts +3)
 """
+import hashlib
 import json
 import os
 import random
@@ -368,10 +369,27 @@ class Lookahead:
               search: dict | None = None, belief=None, log=None, our_role='p1', value=False) -> list[dict]:
         """Payoff matrices (our options x the opponent's) for sampled opponent sets. search: settings for this query
         only (as the constructor's). belief: draw the opponent's sets from it (see opponent_side)."""
+        started = time.monotonic()
         own = self.own_side(battle, own_sets, incoming)
         field = field_state(battle)
-        samples = [{"p1": own, "p2": self.opponent_side(battle, belief), "field": field}
-                   for _ in range(self.n_samples)]
+        settings = dict(self.search, **(search or {}))
+        deep = value and settings.get('terminalSearch')
+        previous_rng = self.sampler.rng if deep else None
+        previous_belief_rng = getattr(belief, 'rng', None)
+        if deep:
+            # Identical observations draw identical particles; a repeated query must not invent a new opponent.
+            seed = int(hashlib.sha256(json.dumps([log, own, field], sort_keys=True).encode()).hexdigest()[:16], 16)
+            self.sampler.rng = random.Random(seed)
+            if previous_belief_rng is not None:
+                belief.rng = random.Random(seed)
+        try:
+            samples = [{"p1": own, "p2": self.opponent_side(battle, belief), "field": field}
+                       for _ in range(self.n_samples)]
+        finally:
+            if deep:
+                self.sampler.rng = previous_rng
+                if previous_belief_rng is not None:
+                    belief.rng = previous_belief_rng
         request = {"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout, "samples": samples}
         if self.win_decay is not None:
             request["winDecay"] = self.win_decay
@@ -388,6 +406,10 @@ class Lookahead:
                 history = [re.sub(r'\bp([12])(?=[a-z]?[:|]|$)',
                                   lambda m: 'p' + ('2' if m[1] == '1' else '1'), line) for line in history]
             request.update(valueLeaves=True, observationLog=history)
+            if deep:
+                from pokesim.search.terminal import search as terminal_search
+
+                return terminal_search(self, request, started=started)
             return self.value_model.apply(self._query(request))
         return self._query(request)["results"]
 

@@ -32,6 +32,11 @@ while [ ! -e "$C/STOP" ]; do
   code=$?
   after=$(ls data/raw/ladder/*.json 2>/dev/null | wc -l)
   echo "batch $i exit $code, +$((after - before)) battles (total $after), $(( $(date +%s) - t0 ))s, $(date)" >> "$C/status.log"
+  if [ "$code" -eq 78 ]; then
+    touch "$C/STOP"
+    echo "search quality gate failed; stopped for inspection $(date)" >> "$C/status.log"
+    break
+  fi
   if [ $((after - before)) -eq 0 ]; then  # nothing saved (login / network trouble): back off, up to 30 min
     fails=$((fails+1)); sleep $(( fails < 6 ? 60 * 2 ** (fails - 1) : 1800 ))
   else

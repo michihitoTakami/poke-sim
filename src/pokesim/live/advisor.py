@@ -132,6 +132,7 @@ class Advisor:
         )
         self.victory = REWARDS[reward]["victory_value"]
         self.combine = dict(COMBINE, **(combine or {}))
+        self.sample = sample
         self.planner = dict(PLANNER, **planner) if planner else None
         if self.planner:
             self.planner["search"] = dict(PLANNER_SEARCH, **self.planner.get("search", {}))
@@ -143,7 +144,7 @@ class Advisor:
                 raise ValueError('value-run requires lookahead and planner on/shadow')
             value_model = ValueEnsemble(value_run)
             requested = (planner or {}).get('search', {})
-            self.planner['search'].update(plans=None, seeds=1, rollout=2,
+            self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=8500,
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
                                           lostPathPenalty=0)
             self.planner['search'].update({k: v for k, v in requested.items()
@@ -350,6 +351,7 @@ class Advisor:
                     self.planner["rho"],
                     cloned or None,
                     self.planner["cloned_weight"],
+                    pure=not self.sample and bool(cache[key][0].get('terminal_search')),
                 )
                 values = [res['value_status'] for res in cache[key] if 'value_status' in res]
                 if values:
@@ -360,6 +362,10 @@ class Advisor:
                 return advice
             return aggregate(cache[key], engine.opponent_model, last)
 
+        if (planned and getattr(engine, 'value_model', None) is not None and
+                (settings or self.planner['search']).get('terminalSearch')):
+            # One joint query includes every forced-switch candidate and shares one decision budget.
+            return solve(battle, self.own_sets, last_move)
         if battle.force_switch or battle.active_pokemon is None or battle.active_pokemon.fainted:
             return engine.advise_switch(battle, self.own_sets, last_move, solve)
         current = settings if settings is not None else (self.planner or {}).get("search", {})
