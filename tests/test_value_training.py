@@ -9,7 +9,7 @@ import pytest
 import torch
 
 from pokesim.evaluation.branch_matches import file_sha
-from pokesim.value.dataset import inputs, load, prepare, weights_by_battle
+from pokesim.value.dataset import encode_file, inputs, load, prepare, weights_by_battle
 from pokesim.value.evaluate import group_means, score
 from pokesim.value.features import Encoder, health
 from pokesim.value.model import load_checkpoint, predict
@@ -170,3 +170,32 @@ def test_prepare_train_reload_and_report_end_to_end(tmp_path):
     with pytest.raises(ValueError, match='overwrite'):
         run(args)
     assert all(torch.isfinite(v).all() for v in model.state_dict().values())
+
+
+@pytest.mark.parametrize('setting', ['unknown_outcome', 'root_intervention', 'future_outcome', 'mixed_reference'])
+def test_invalid_value_rows_are_rejected_before_training(tmp_path, setting):
+    base = sources(tmp_path)
+    spec = inputs(base)['reference_train']
+    rows = [json.loads(line) for line in spec['path'].read_text().splitlines()]
+    if setting == 'unknown_outcome':
+        rows[0]['target'] = None
+    elif setting == 'root_intervention':
+        rows[0]['step'] = 0
+    elif setting == 'future_outcome':
+        rows[0]['observation']['history'] = ['|turn|2', '|win|Future winner']
+    else:
+        rows[0]['reference_policy_version'] = 'another-reference'
+    spec['path'].write_text(''.join(json.dumps(row) + '\n' for row in rows))
+    with pytest.raises(ValueError):
+        encode_file(spec, Encoder(dex()))
+
+
+def test_modified_feature_cache_is_rejected(tmp_path):
+    base = sources(tmp_path)
+    dex_path = tmp_path / 'dex.json'
+    dex_path.write_text(json.dumps(dex()))
+    cache = tmp_path / 'features'
+    prepare(base, dex_path, cache)
+    (cache / 'reference_train.npz').write_bytes(b'changed')
+    with pytest.raises(ValueError, match='modified prepared'):
+        load(cache)
