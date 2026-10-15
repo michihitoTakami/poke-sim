@@ -2,7 +2,7 @@
 // Nonterminal leaves cross the Python boundary as actor-visible JSON; no HP score enters learned payoffs.
 const {createHash} = require('crypto');
 const {PublicObservation} = require('./public_observation');
-const {choosePublic, VERSION} = require('./public_policy');
+const {choosePublic, observedStep, VERSION} = require('./public_policy');
 
 function evaluateValue(req, {setUp, choices, step, score, State, extractChannelMessages}) {
   const start = Date.now(), names = req.continuations || ['expert/tactical', 'expert/disrupt'];
@@ -33,8 +33,18 @@ function evaluateValue(req, {setUp, choices, step, score, State, extractChannelM
           const observer = new PublicObservation(req.observationLog, b.dex, extractChannelMessages,
             b.dex.currentMod.startsWith('champions'));
           observer.append(st.entryLog || []);
+          for (const side of b.sides) {
+            observer.bindActive(side.id, side.active[0]?.name);
+            observer.bindActive(side.id, side.active[0]?.illusion?.name);
+          }
           let at = b.log.length;
-          const advance = (a, c) => {step(b, a, c); observer.append(b.log.slice(at), true); at = b.log.length;};
+          let root = true;
+          const advance = (a, c) => {
+            observedStep(b, a, c, step, side => choose(side, side.id === 'p1' ? ours : theirs),
+              root ? [] : ['p1', 'p2']);
+            root = false;
+            observer.append(b.log.slice(at), true); at = b.log.length;
+          };
           const choose = (side, policy) => !side.activeRequest || side.activeRequest.wait ? 'pass' :
             choosePublic(observer.view(side), policy, b.dex)[0];
           const rootTurn = b.turn;

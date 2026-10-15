@@ -41,6 +41,12 @@ def validate(args):
     selected_battles = [b for b in scope.select(args.split) if b.source == 'showdown'][:args.limit]
     ids = {b.battle_id for b in selected_battles}
     records = dict(scope.records(args.split))
+    excluded = [b.battle_id for b in selected_battles
+                if '|turn|1' not in records[b.battle_id].get('log', []) or not records[b.battle_id].get('lineup')]
+    selected_battles = [b for b in selected_battles if b.battle_id not in excluded]
+    ids = {b.battle_id for b in selected_battles}
+    if not selected_battles:
+        raise ValueError('no eligible normal-turn source records')
     ensemble = ValueEnsemble(args.value_run)
     if args.split != 'development':
         for split in ('train', 'development'):
@@ -55,6 +61,7 @@ def validate(args):
     opponent = OpponentPolicy(cloned_path) if cloned_path.exists() else None
     own = {engine.sampler.base_id(to_id(s['species'])): s for s in sets}
     contract = {'split': args.split, 'source': scope.metadata(args.split), 'battles': sorted(ids),
+                'excluded_no_turn_or_lineup': excluded,
                 'purpose': 'action-ranking development gate; calibration sources consumed, final test unopened',
                 'value': ensemble.version, 'worlds': args.worlds, 'root_seed_base': 1000,
                 'repeat_seed_base': 2000, 'terminal_seed_base': 32, 'terminal_seeds': args.seeds,
@@ -105,7 +112,10 @@ def validate(args):
             for action in actions:
                 action_rows = [r for r in trials['trials'] if r['action'] == action]
                 complete = all(r['target'] is not None for r in action_rows)
+                known = sum(r['target'] for r in action_rows if r['target'] is not None)
+                unknown = sum(r['target'] is None for r in action_rows)
                 outcomes[action] = {'mean': float(np.mean([r['target'] for r in action_rows])) if complete else None,
+                                    'bounds': [known / len(action_rows), (known + unknown) / len(action_rows)],
                                     'trials': len(action_rows),
                                     'failed': sum(r['outcome'] == 'failed' for r in action_rows),
                                     'unfinished': sum(r['outcome'] == 'unfinished' for r in action_rows)}
@@ -122,12 +132,20 @@ def validate(args):
         engine.close()
     complete = [r for r in rows if all(v['mean'] is not None for v in r['outcomes'].values())]
     delta = [r['outcomes'][r['learned']]['mean'] - r['outcomes'][r['hp']]['mean'] for r in complete]
+    bounds = [[0., 0.] if r['learned'] == r['hp'] else
+              [r['outcomes'][r['learned']]['bounds'][0] - r['outcomes'][r['hp']]['bounds'][1],
+               r['outcomes'][r['learned']]['bounds'][1] - r['outcomes'][r['hp']]['bounds'][0]] for r in rows]
     report = {'sources': len(rows), 'complete_sources': len(complete), 'disagreements': sum(r['learned'] != r['hp']
                                                                                                 for r in rows),
               'repeat_changes': sum(r['learned'] != r['repeat'] for r in rows),
-              'learned_mean': float(np.mean([r['outcomes'][r['learned']]['mean'] for r in complete])),
-              'hp_mean': float(np.mean([r['outcomes'][r['hp']]['mean'] for r in complete])),
-              'difference': float(np.mean(delta)), 'paired_battle_ci95': intervals(delta) if delta else None,
+              'learned_mean': (float(np.mean([r['outcomes'][r['learned']]['mean'] for r in complete]))
+                               if complete else None),
+              'hp_mean': float(np.mean([r['outcomes'][r['hp']]['mean'] for r in complete])) if complete else None,
+              'difference': float(np.mean(delta)) if delta else None,
+              'difference_bounds_all_sources': np.mean(bounds, axis=0).tolist(),
+              'failed_trials': sum(v['failed'] for r in rows for v in r['outcomes'].values()),
+              'unfinished_trials': sum(v['unfinished'] for r in rows for v in r['outcomes'].values()),
+              'paired_battle_ci95': intervals(delta) if delta else None,
               'search_seconds': {'median': float(np.median([r['search_seconds'] for r in rows])),
                                  'max': max(r['search_seconds'] for r in rows)},
               'contract_sha': digest(contract), 'model_frozen': True, 'live_win_rate_measured': False}

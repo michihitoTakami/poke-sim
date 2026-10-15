@@ -1,6 +1,6 @@
 // A versioned, deliberately simple reference policy over client observations. No sampled world or engine objects.
 const {health, id, legalChoices} = require('./public_observation');
-const VERSION = 'public-reference-v1';
+const VERSION = 'public-reference-v2';
 const stage = s => s >= 0 ? (2 + s) / 2 : 2 / (2 - s);
 
 function choosePublic(view, name, dex) {
@@ -102,4 +102,19 @@ function choosePublic(view, name, dex) {
   return finish(best);
 }
 
-module.exports = {choosePublic, VERSION};
+function observedStep(battle, ours, theirs, step, rechoose, allowed = ['p1', 'p2']) {
+  const actions = [ours, theirs];
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try { return step(battle, actions[0], actions[1]); }
+    catch (e) {
+      // The official engine sends this private request update only after the attempted switch is rejected.
+      // Retry from that observed request; never inspect the opponent's hidden trapping ability.
+      const match = String(e.message || e).match(/^Choice rejected: (p[12]) switch \d+: Can't switch: The active Pokémon is trapped/);
+      if (!match || !allowed.includes(match[1]) || !battle[match[1]].activeRequest?.active?.[0]?.trapped) throw e;
+      actions[match[1] === 'p1' ? 0 : 1] = rechoose(battle[match[1]]);
+    }
+  }
+  throw new Error('observed request retries exhausted');
+}
+
+module.exports = {choosePublic, observedStep, VERSION};

@@ -65,9 +65,12 @@ PLANNER=on setsid nohup ~/Working/poke-sim/scripts/collect.sh > /dev/null 2>&1 <
 | `PLANNER` | `off` / `shadow`（従来の方式が指し、プランナーは裏で計算するだけ）/ `on`（プランナーが指す） | `on` |
 | `POLICIES` | 使う方策。複数指定すると対戦ごとに交互に使う | `checkpoints/ppo_baton_v2.zip checkpoints/ppo_baton_items.zip` |
 | `EXTRA` | `ladder.py` に追加で渡すオプション | なし |
+| `PYTHON` | 既存venvのPythonを直接使う場合の実行ファイル。未指定なら`uv run python` | 未指定 |
 | `COLLECT_DIR` | ログと停止ファイルの置き場所 | `/data/poke-sim/collect` |
 
 `EXTRA` の例は `EXTRA="--belief --opponent-policy checkpoints/bc_human_v2b.zip"` です。
+勝敗価値を探索で使う場合は`EXTRA="--value-run runs/terminal-value-v2"`と`PLANNER=on`を指定します。
+参照方策の版を含む検証条件と起動例は[価値探索の接続手順](value-search-runtime.md)を参照してください。
 
 状態の確認：
 ```bash
@@ -111,6 +114,7 @@ tail -f $L    # "Uvicorn running on http://127.0.0.1:8100" と出れば起動完
 | オプション | 意味 |
 |---|---|
 | `--planner off\|shadow\|on` | プランナーの使い方（既定 `off`） |
+| `--value-run` | 検証済み勝敗価値の実行ディレクトリ。`--planner on`または`shadow`と併用 |
 | `--no-lookahead` | 先読みを使わず、方策だけで助言する |
 | `--team` | 自分の構築ファイル（既定 `data/my_teams/baton.json`） |
 | `--obs-record` | 画面が変わったときにフレームを保存する場所（対戦記録を作り直すのに使う） |

@@ -7,9 +7,12 @@ matrix (from services/sim-tools/lookahead.js); we solve it as a zero-sum game, t
   - value[a]: expected score of action a against the opponent's equilibrium mix (HP balance; a win counts +3)
 """
 import json
+import os
 import random
 import re
+import select as io_select
 import subprocess
+import time
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -272,10 +275,30 @@ class Lookahead:
 
     def close(self) -> None:
         self.proc.kill()
+        self.proc.wait(timeout=5)
 
     def _query(self, request: dict) -> dict:
+        if self.proc.poll() is not None:
+            self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
+                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
         self.proc.stdin.write(json.dumps(request) + "\n")
-        reply = json.loads(self.proc.stdout.readline())
+        self.proc.stdin.flush()
+        deadline = time.monotonic() + getattr(self, 'query_timeout', 30.)
+        chunks = []
+        while True:
+            remaining = deadline - time.monotonic()
+            ready, _, _ = io_select.select([self.proc.stdout], [], [], max(0, remaining))
+            if not ready or remaining <= 0:
+                self.proc.kill()
+                self.proc.wait(timeout=5)
+                raise TimeoutError('search worker exceeded response deadline')
+            part = os.read(self.proc.stdout.fileno(), 65536)
+            if not part:
+                raise RuntimeError('search worker exited before replying')
+            chunks.append(part)
+            if b'\n' in part:
+                break
+        reply = json.loads(b''.join(chunks))
         if "error" in reply:
             raise RuntimeError(reply["error"])
         return reply

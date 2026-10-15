@@ -1,7 +1,7 @@
 // Offline root-action comparisons. No HP score, deadline, policy selection or live-planner changes.
 const {createHash} = require('crypto');
 const {PublicObservation, legalChoices} = require('./public_observation');
-const {choosePublic, VERSION} = require('./public_policy');
+const {choosePublic, observedStep, VERSION} = require('./public_policy');
 
 function evaluateBranches(req, {setUp, choices, step, policy, State, extractChannelMessages}) {
   const cfg = req.branches;
@@ -57,6 +57,10 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
           try {
             const observer = isPublic ? new PublicObservation(cfg.observationLog, battle.dex,
               extractChannelMessages, battle.dex.currentMod.startsWith('champions')) : null;
+            if (observer) for (const side of battle.sides) {
+              observer.bindActive(side.id, side.active[0]?.name);
+              observer.bindActive(side.id, side.active[0]?.illusion?.name);
+            }
             let logPosition = battle.log.length, decisionStep = 0;
             const decide = (side, policyName, fixedAction = null) => {
               if (side.activeRequest?.wait || !side.activeRequest) return 'pass';
@@ -71,7 +75,12 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
               return selection[0];
             };
             const advance = (a, b) => {
-              step(battle, a, b);
+              if (observer) observedStep(battle, a, b, step, side => {
+                const previous = [...row.trajectory].reverse().find(d => d.side === side.id);
+                if (previous) previous.rejected = 'trapped';
+                return decide(side, side.id === 'p1' ? p1Policy : p2Policy);
+              }, decisionStep === 0 ? ['p2'] : ['p1', 'p2']);
+              else step(battle, a, b);
               if (observer) observer.append(battle.log.slice(logPosition), true);
               logPosition = battle.log.length;
               decisionStep++;

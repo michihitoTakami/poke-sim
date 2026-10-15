@@ -45,6 +45,12 @@ class PublicObservation {
     return id(s.baseSpecies || s.name);
   }
 
+  bindActive(side, name) {
+    // Reconstruction may replace a player's nickname. Alias the active slot only, without revealing species/sets.
+    const key = this.state.active[side];
+    if (key && name) this.names[side][name] = key;
+  }
+
   append(lines, simulated = false) {
     const publicLines = this.extract(lines.join('\n'), [0])[0];
     for (let line of publicLines) {

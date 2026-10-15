@@ -8,6 +8,7 @@ PR #7と10/15の実戦結果を踏まえた次の実装順・価値学習・採�
 公開リプレイと公開情報だけの分岐対戦から学習データを作る手順は [公開観測の価値データ生成](docs/public-value-data.md) を参照。
 サーバー（ローカル Showdown・ラダー収集・Switch 対戦サポート）の立ち上げと更新は [運用手順](docs/operations.md) を参照。
 価値モデルの事前学習・V_refの学習・初回の比較結果は [価値学習の実行手順](docs/value-training.md) を参照。
+勝敗価値を探索・ラダーへ接続する手順は [価値探索の接続手順](docs/value-search-runtime.md) を参照。
 
 ## セットアップ
 ```bash

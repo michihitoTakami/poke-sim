@@ -24,7 +24,7 @@ class ValueEnsemble:
                 file_sha(data / 'dex.json') != cfg['dex_sha']):
             raise ValueError('value features or dex differ from training')
         expected = {'own': 'expert', 'opponent_pool': ['expert/tactical', 'expert/disrupt'],
-                    'version': 'public-reference-v1'}
+                    'version': 'public-reference-v2'}
         if cfg['reference'] != expected:
             raise ValueError('unsupported value continuation contract')
         self.encoder = Encoder.load(data / 'dex.json')
