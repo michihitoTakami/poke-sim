@@ -65,10 +65,12 @@ class AdvisorPlayer(Player):
 
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
                  planner: dict | None = None, sample: bool = False, seed: int | None = None,
-                 opponent_policy: str = "default", **kwargs):
+                 opponent_policy: str = "default", belief: bool = False, **kwargs):
         self.sets, self.out = sets, out
+        self.belief = belief
         self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner,
-                               source="showdown", sample=sample, opponent_policy=opponent_policy)
+                               source="showdown", sample=sample, opponent_policy=opponent_policy,
+                               belief=belief)
         self.planner, self.sample = planner, sample
         self.seed = seed if seed is not None else random.SystemRandom().randrange(2 ** 31)
         self.rng = random.Random(self.seed)
@@ -176,7 +178,7 @@ class AdvisorPlayer(Player):
                   "rating": getattr(battle, "rating", None),
                   "versions": describe(self.assigned.get(battle.battle_tag), self.matchups.meta,
                                        planner=self.planner, sample=self.sample, seed=self.seed,
-                                       opponent_policy=self.advisor.opponent_policy_version,
+                                       opponent_policy=self.advisor.opponent_policy_version, belief=self.belief,
                                        calibration_context=self.advisor.calibration_context)}
         (self.out / f"{stamp}-{battle.battle_tag.split('-')[-1]}.json").write_text(
             json.dumps(record, ensure_ascii=False, indent=1))
@@ -200,7 +202,7 @@ async def run(args) -> None:
     combine = json.loads(args.combine) if args.combine else None
     planner = None if args.planner == "off" else {"mode": args.planner}
     play = {"combine": combine, "planner": planner, "sample": args.sample, "seed": args.seed,
-            "opponent_policy": args.opponent_policy}
+            "opponent_policy": args.opponent_policy, "belief": args.belief}
     if args.local:
         tag = uuid.uuid4().hex[:6]
         me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
@@ -241,6 +243,8 @@ def main() -> None:
     ap.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     ap.add_argument("--opponent-policy", default="default",
                     help="cloned human policy for the opponent prediction (default: checkpoints/bc_human.zip)")
+    ap.add_argument("--belief", action="store_true",
+                    help="infer the opponent's sets from damage and move order (pokesim.belief) for the lookahead")
     ap.add_argument("--policy", nargs="+", default=[str(ROOT / "checkpoints/ppo_baton_v2.zip")],
                     help="one or more policies; with several, battles alternate between them")
     ap.add_argument("--out", default=str(OUT))

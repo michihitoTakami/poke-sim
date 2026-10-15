@@ -29,7 +29,7 @@ from pokesim.rl.advise import action_probs
 from pokesim.rl.env import REWARDS
 from pokesim.rl.features import embed
 from pokesim.rl.myteam import TeamFeatures, to_id
-from pokesim.search.lookahead import Lookahead, SetSampler, aggregate, label_to_action
+from pokesim.search.lookahead import Lookahead, SetSampler, aggregate, label_to_action, revealed
 from pokesim.team.roles import win_path
 
 POLICY_WEIGHT = 0.5  # share of the policy in the combined recommendation
@@ -108,8 +108,11 @@ class Advisor:
         sample: bool = False,
         prior_bundle: dict | None = None,
         sampler: SetSampler | None = None,
+        belief: bool = False,
     ):
-        """source: where the advice is used ("switch" / "showdown"), for the win calibration."""
+        """source: where the advice is used ("switch" / "showdown"), for the win calibration.
+        belief: infer the opponent's sets from the damage and move order seen so far (pokesim.belief.sets) and
+        let the lookahead draw them from that (needs the battle's log in advise)."""
         self.model = MaskablePPO.load(policy, device="cpu") if policy else None
         roster = [s["species"] for s in sets]
         self.extra = (
@@ -151,6 +154,11 @@ class Advisor:
             if lookahead
             else None
         )
+        self.beliefs = None
+        if belief and self.engine:
+            from pokesim.belief.sets import Beliefs
+
+            self.beliefs = Beliefs(sets, self.engine.sampler)
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
         self.opponent_policy = None
@@ -168,6 +176,8 @@ class Advisor:
     def close(self) -> None:
         if self.engine:
             self.engine.close()
+        if self.beliefs:
+            self.beliefs.close()
 
     def _policy(self, battle: Battle) -> tuple[dict[str, float], float | None]:
         if self.model is None:
@@ -219,17 +229,28 @@ class Advisor:
                 if (a := label_to_action(lab, battle)) is not None and mask[a]
             ]
 
+        belief = None
+        if self.beliefs is not None and log and opp_active is not None:
+            try:
+                belief = self.beliefs.get(battle.battle_tag, log, our_role)
+                status["belief"] = {"observations": len(belief.observations),
+                                    "active": belief.summary(opp_active.species, *revealed(opp_active))}
+            except Exception as e:  # noqa: BLE001 - without the belief the lookahead draws from the prior
+                belief = None
+                status["belief"] = {"error": repr(e)[:200]}
         if can_search:
             try:
                 cache: dict = {}
-                advice = self._search(battle, last_move, dict(cloned), planned=mode == "on", cache=cache)
+                advice = self._search(battle, last_move, dict(cloned), planned=mode == "on", cache=cache,
+                                      belief=belief)
                 ranked = legal(advice)
                 opponent = sorted(advice.opponent.items(), key=lambda kv: -kv[1])
                 status["search"] = advice.status
                 if mode == "shadow":
                     try:
                         planned = self._search(
-                            battle, last_move, dict(cloned), planned=True, settings=self.planner["search"]
+                            battle, last_move, dict(cloned), planned=True, settings=self.planner["search"],
+                            belief=belief,
                         )
                         shadow = legal(planned)
                         status["shadow"] = planned.status
@@ -276,6 +297,7 @@ class Advisor:
         planned: bool,
         cache: dict | None = None,
         settings: dict | None = None,
+        belief=None,
     ):
         """The legacy aggregate or the planner (planned) on the lookahead's worlds; cache keeps the worlds of one
         position (by incoming Pokémon). settings: worker settings for these queries (shadow mode evaluates the
@@ -288,7 +310,7 @@ class Advisor:
         def solve(b, own, last, incoming=None):
             key = None if incoming is None else incoming.species
             if key not in cache:
-                cache[key] = engine.query(b, own, incoming, settings)
+                cache[key] = engine.query(b, own, incoming, settings, belief=belief)
             if planned:
                 return plan(
                     cache[key],
