@@ -10,7 +10,8 @@ survive the next Earthquake and chose Slack Off.
 - **damage taken**: our HP is exact, so the share of the simulator's 16 damage rolls that give the HP we lost (all
   rolls at least our HP for a KO);
 - **damage dealt**: its HP is a percentage, so the share of our rolls within rounding of the percent it lost;
-- **move order**: when both used a move of the same priority, whether the candidate's speed explains who went first;
+- **move order**: when both used a move of the same actual priority, whether the candidate's speed explains who
+  went first (the simulator applies move and ability priority modifiers, including Grassy Glide, Gale Wings and Triage);
 - **no Choice item**: two different moves in one stay on the field.
 
 Candidates are drawn from the same prior the lookahead used (48 per Pokémon, conditioned on what is revealed) and
@@ -25,12 +26,23 @@ The lookahead draws the opponent's revealed Pokémon from the posterior when the
 (`scripts/ladder.py --belief`). The advice status shows the active's most likely item / nature / spread. Off by
 default.
 
+Each observation freezes the items known at that time, including a known empty item slot. Our active uses its
+current item rather than restoring the original team item. Opponent item loss / acquisition / explicit item reveal
+starts a new item epoch and resets the two-move Choice check. Earlier damage / speed observations remain usable
+if their item was known; observations with an unknown old item and old no-Choice evidence are excluded after an
+item event. This conservatively drops evidence instead of explaining it using the new item. Offline scoring pins
+the epoch to the scored observation so a later item event cannot change which earlier evidence it uses.
+Turns with an item or Mega / details change are excluded from speed evidence because the turn-start sample is stale.
+
 ```sh
 uv run python -m pokesim.belief.evaluate --split development
 uv run python scripts/ladder.py --planner on --belief ...
 ```
 
 ## Evaluation
+
+The numbers below precede the item-history and actual-priority fixes. Re-run the evaluator before using them to
+assess the corrected inference. They do not establish a playing-strength improvement.
 
 Each observation is scored before it is seen, with the candidates drawn given what was revealed at that moment:
 log P under equal weights (the prior the lookahead used) and under the posterior from the earlier observations.

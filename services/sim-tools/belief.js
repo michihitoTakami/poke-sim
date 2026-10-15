@@ -3,10 +3,11 @@
 //
 // Usage: node belief.js <showdown_dir>
 // Request:  {"format", "jobs": [{"sample": {"p1": SIDE, "p2": SIDE, "field": FIELD}, "candidates": [set, ...],
-//            "attacker": "p1" | "p2" (optional), "move": id, "crit": bool}]}
+//            "attacker": "p1" | "p2" (optional), "move": id, "crit": bool, "moves": [ourMove, theirMove]}]}
 //   SIDE and FIELD as in lookahead.js. Each candidate replaces p2's active set (team[0]) in turn.
 // Response: {"results": [[{"rolls": [16 damages, high roll first] | null, "hp": defender HP, "maxhp": defender max HP,
 //              "speeds": [p1 action speed, p2 action speed]} | null (the position could not be built), ...], ...]}
+//   Speed jobs return priorities (including move / ability modifiers); a known mons[0].item overrides the candidate.
 //   rolls are the simulator's damage formula with each of the 16 random factors, the critical hit fixed to "crit";
 //   null when the move does not damage (immune, status move, fixed failure). Action speeds include boosts, items,
 //   paralysis, Tailwind and Trick Room (inverted), as the simulator orders moves of equal priority.
@@ -17,10 +18,21 @@ const {setUp} = require(path.resolve(__dirname, 'state_codec.js')).createCodec(d
 
 function evaluate(job, candidate, format) {
   const sample = JSON.parse(JSON.stringify(job.sample));
-  sample.p2.team = sample.p2.team.map((s, i) => (i === 0 || !s) ? candidate : s);  // padding repeats it
+  const set = {...candidate};
+  const state = sample.p2.mons[0];
+  if (Object.hasOwn(state, "item")) set.item = state.item;
+  sample.p2.team = sample.p2.team.map((s, i) => (i === 0 || !s) ? set : s);  // padding repeats it
   const battle = setUp(sample, format, 1);
   const p1 = battle.p1.active[0], p2 = battle.p2.active[0];
   const out = {speeds: [p1.getActionSpeed(), p2.getActionSpeed()], rolls: null};
+  if (job.moves) {
+    out.priorities = [p1, p2].map((source, i) => {
+      const target = i === 0 ? p2 : p1;
+      const move = battle.dex.getActiveMove(job.moves[i]);
+      const priority = battle.singleEvent("ModifyPriority", move, null, source, target, null, move.priority);
+      return battle.runEvent("ModifyPriority", source, target, move, priority);
+    });
+  }
   if (job.attacker) {
     const [source, target] = job.attacker === 'p1' ? [p1, p2] : [p2, p1];
     out.hp = target.hp;
