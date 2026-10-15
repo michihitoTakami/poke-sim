@@ -162,12 +162,16 @@ class Advisor:
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
         self.opponent_policy = None
+        self.opponent_policy_version: dict | None = None  # which cloned policy predicted the opponent (records)
         if opponent_policy:
             from pokesim.live.opponent import DEFAULT_POLICY, OpponentPolicy
 
             path = DEFAULT_POLICY if opponent_policy == "default" else Path(opponent_policy)
             if Path(path).exists():
                 self.opponent_policy = OpponentPolicy(path)
+                self.opponent_policy_version = {"path": Path(path).name, "sha": file_hash(path)}
+            elif opponent_policy != "default":
+                raise FileNotFoundError(f"opponent policy not found: {path}")
 
     def close(self) -> None:
         if self.engine:
