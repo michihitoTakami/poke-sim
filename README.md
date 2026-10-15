@@ -5,6 +5,7 @@ Pokémon Champions シングル（3v3, `gen9championsbssregmc`）の対戦サポ
 対人戦の課題に対する改善設計は [対人戦の判断品質を改善する実装設計](docs/competitive-improvement-design.md) を参照。
 PR #7と10/15の実戦結果を踏まえた次の実装順・価値学習・採用基準は [勝敗を目的に改善する次期設計](docs/winning-ai-roadmap.md) を参照。
 候補手を固定して終局まで比較するコマンドは [終局分岐評価の実行手順](docs/terminal-branch-evaluation.md) を参照。
+公開リプレイと公開情報だけの分岐対戦から学習データを作る手順は [公開観測の価値データ生成](docs/public-value-data.md) を参照。
 
 ## セットアップ
 ```bash

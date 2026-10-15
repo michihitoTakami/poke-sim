@@ -36,6 +36,7 @@ const readline = require('readline');
 const dir = process.argv[2];
 const { Battle, Teams } = require(path.resolve(dir, 'dist/sim'));
 const { State } = require(path.resolve(dir, 'dist/sim/state'));
+const {extractChannelMessages} = require(path.resolve(dir, 'dist/sim/battle'));
 
 const WIN_BONUS = 3;
 const WIN_DECAY = 0.05;  // per turn: a quicker win scores higher
@@ -673,7 +674,8 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = req.branches ? require('./branch_matches').evaluateBranches(req, {setUp, choices, step, policy, State}) :
+    reply = req.branches ? require('./branch_matches').evaluateBranches(req,
+      {setUp, choices, step, policy, State, extractChannelMessages}) :
       req.plans ? evaluatePlans(req) : evaluateAll(req);
   } catch (e) {
     reply = { error: String(e && e.stack || e) };

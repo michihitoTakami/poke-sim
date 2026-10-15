@@ -1,7 +1,7 @@
 """Offline root-action trials with terminal labels, fixed sampled worlds and fixed continuations.
 
-These labels describe full-information heuristic continuations in sampled worlds. They are diagnostic data,
-not measured ladder win probabilities or an observation-constrained V_ref training set.
+The default full-information continuations are diagnostic only. Public-observation mode records information-
+constrained reference-policy trajectories and can export terminal value data from a frozen train/development split.
 """
 from __future__ import annotations
 
@@ -52,7 +52,10 @@ def tree_sha(root: Path, suffixes: set[str]) -> str:
 
 
 def load_cases(path: Path) -> list[dict]:
-    data = json.loads(path.read_text())
+    return normalize_cases(json.loads(path.read_text()))
+
+
+def normalize_cases(data: list[dict]) -> list[dict]:
     if not isinstance(data, list) or not data:
         raise ValueError("positions must be a nonempty JSON array")
     cases, seen = [], set()
@@ -92,10 +95,12 @@ def ensure_manifest(out: Path, contract: dict, provenance: dict) -> dict:
         return saved
     if out.exists() and any(out.iterdir()):
         raise ValueError("output has files but no manifest; choose an empty --out directory")
+    scope = contract.get("information_scope", "sampled_full_information_continuations")
+    split = contract.get("split", "diagnostic")
     manifest = {"schema_version": SCHEMA, "experiment_id": expected, "contract": contract,
-                "provenance": provenance, "purpose": "diagnostic_development",
-                "information_scope": "sampled_full_information_continuations",
-                "training_ready": False}
+                "provenance": provenance, "purpose": "diagnostic_development" if split == "diagnostic" else split,
+                "information_scope": scope,
+                "training_ready": scope == "public_observation" and split in {"train", "development"}}
     atomic_json(path, manifest)
     return manifest
 
@@ -113,8 +118,37 @@ def validate_trials(reply: dict, worlds: int, seeds: list[int], continuations: l
             raise ValueError("invalid outcome/terminal label from worker")
         if row["outcome"] == "failed" and not row["error"]:
             raise ValueError("failed trial without a reason")
+        if reply.get("informationScope") == "public_observation":
+            validate_trajectory(row)
     if len(actual) != len(expected) or set(actual) != expected:
         raise ValueError("worker returned incomplete or duplicate paired trials")
+
+
+def validate_trajectory(trial: dict) -> None:
+    if not isinstance(trial.get("trajectory"), list):
+        raise ValueError("missing public trajectory")
+    for decision in trial["trajectory"]:
+        obs = decision["observation"]
+        if (obs.get("schema") != 1 or obs.get("side") != decision["side"] or
+                decision["side"] not in {"p1", "p2"} or obs["request"]["side"]["id"] != decision["side"]):
+            raise ValueError("observation perspective mismatch")
+        if decision["action"] not in decision["legal"]:
+            raise ValueError("recorded action is not legal")
+        expected = trial["target"]
+        if expected is not None and decision["side"] == "p2":
+            expected = 1 - expected
+        if decision["target"] != expected:
+            raise ValueError("trajectory label does not match actual terminal outcome")
+        if decision["rootIntervention"] != (decision["step"] == 0):
+            raise ValueError("root intervention is not marked")
+
+
+def validate_prior_lineage(metadata: dict, scope_contract: dict) -> None:
+    if scope_contract and (
+        metadata.get("split_manifest_sha") != scope_contract["source_scope"]["split_manifest_sha"] or
+        metadata.get("records_sha") != scope_contract["prior_train_records_sha"]
+    ):
+        raise ValueError("prior bundle belongs to a different train split; rebuild it for this frozen scope")
 
 
 def tally(trials: list[dict]) -> dict:
@@ -164,6 +198,8 @@ def run_case(engine: Lookahead, sets: list[dict], own_sets: dict, rec: dict, cas
     samples = [{"p1": own, "p2": engine.opponent_side(battle), "field": field_state(battle)}
                for _ in range(cfg["worlds"])]
     branches = {"seeds": cfg["seeds"], "continuations": cfg["continuations"], "maxTurns": cfg["max_turns"]}
+    if cfg.get("information_scope") == "public_observation":
+        branches.update(informationScope="public_observation", observationLog=session.log)
     if case["actions"] is not None:
         branches["actions"] = case["actions"]
     request = {"format": FORMAT, "samples": samples, "branches": branches}
@@ -182,12 +218,16 @@ def generate(args) -> None:
     from pokesim.data.prior_bundle import DEFAULT, load_bundle, sampler
     from pokesim.search.lookahead import Lookahead, to_id
 
-    cases = load_cases(args.positions)
+    args.records = args.records or args.data_root / "data/raw/ladder"
+    cases, scope_contract = scoped_cases(args)
     # Validate train-only priors before creating any artifacts; never load operational/live priors.
-    prior_path = args.prior_bundle or DEFAULT
+    prior_path = args.prior_bundle or (DEFAULT if args.data_root == ROOT else
+                                       args.data_root / "data/processed/scoped/priors.json")
     bundle = load_bundle(prior_path)
+    validate_prior_lineage(json.loads(sidecar(prior_path).read_text()), scope_contract)
     sets = json.loads(args.team.read_text())
-    contract = {"schema_version": SCHEMA, "format": FORMAT, "positions": cases,
+    contract = {"schema_version": SCHEMA, "format": FORMAT, "positions": cases, **scope_contract,
+                "information_scope": args.information_scope, "split": args.split,
                 "records": {c["file"]: file_sha(args.records / c["file"]) for c in cases},
                 "team_sha": file_sha(args.team), "prior_sha": file_sha(prior_path),
                 "prior_manifest_sha": file_sha(sidecar(prior_path)),
@@ -232,7 +272,7 @@ def report(out: Path) -> dict:
         row = load_result(path, manifest, case)
         results.append({"file": case["file"], "turn": case["turn"], "actions": summarize(row["result"])})
     summary = {"experiment_id": manifest["experiment_id"], "purpose": manifest["purpose"],
-               "information_scope": manifest["information_scope"], "training_ready": False,
+               "information_scope": manifest["information_scope"], "training_ready": manifest["training_ready"],
                "completed_positions": len(results), "planned_positions": len(manifest["contract"]["positions"]),
                "positions": results}
     atomic_json(out / "summary.json", summary)
@@ -246,6 +286,41 @@ def report(out: Path) -> dict:
     return summary
 
 
+def scoped_cases(args) -> tuple[list[dict], dict]:
+    """Keep every branch/turn/world of a source battle in its pre-existing split. Never rewrite the manifest."""
+    if args.split == "diagnostic":
+        if args.positions is None:
+            raise ValueError("diagnostic generation requires --positions")
+        return load_cases(args.positions), {}
+    if args.information_scope != "public_observation":
+        raise ValueError("training/development generation requires public_observation")
+    from pokesim.data.dataset import DatasetScope
+
+    scope = DatasetScope(args.ledger or args.data_root / "data/curated/battles.jsonl",
+                         args.split_manifest or args.data_root / "data/curated/split_manifest.json", args.data_root)
+    selected = {b.battle_id: b for b in scope.select(args.split) if b.source == "showdown"}
+    records = {bid: rec for bid, rec in scope.records(args.split) if bid in selected}
+    by_file = {Path(b.records[0]["path"]).name: bid for bid, b in selected.items()}
+    if len(by_file) != len(selected):
+        raise ValueError("ambiguous primary record filenames in split")
+    if args.positions:
+        cases = load_cases(args.positions)
+    else:
+        candidates = [{"file": name, "turn": 1} for name, bid in sorted(by_file.items())
+                      if "|turn|1" in records[bid].get("log", []) and records[bid].get("lineup")]
+        cases = normalize_cases(candidates)
+    for case in cases:
+        bid = by_file.get(case["file"])
+        if bid is None:
+            raise ValueError(f"position is outside the requested {args.split} split: {case['file']}")
+        expected = selected[bid].records[0]["sha"]
+        if not file_sha(args.records / case["file"]).startswith(expected):
+            raise ValueError("record directory differs from the frozen dataset scope")
+    return cases, {"source_scope": scope.metadata(args.split),
+                   "prior_train_records_sha": scope.metadata("train")["records_sha"],
+                   "battle_ids": {c["file"]: by_file[c["file"]] for c in cases}}
+
+
 def positive(value: str) -> int:
     n = int(value)
     if n < 1:
@@ -257,9 +332,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     gen = commands.add_parser("generate", help="generate resumable diagnostic terminal trials")
-    gen.add_argument("--positions", type=Path, required=True, help="JSON array of {file, turn, actions?}")
+    gen.add_argument("--positions", type=Path, help="JSON array; scoped mode defaults to turn 1 of each battle")
     gen.add_argument("--out", type=Path, required=True)
-    gen.add_argument("--records", type=Path, default=ROOT / "data/raw/ladder")
+    gen.add_argument("--records", type=Path, help="default: DATA_ROOT/data/raw/ladder")
+    gen.add_argument("--data-root", type=Path, default=ROOT)
+    gen.add_argument("--information-scope", choices=["sampled_full_information_continuations", "public_observation"],
+                     default="sampled_full_information_continuations")
+    gen.add_argument("--split", choices=["diagnostic", "train", "development"], default="diagnostic")
+    gen.add_argument("--ledger", type=Path)
+    gen.add_argument("--split-manifest", type=Path)
     gen.add_argument("--team", type=Path, default=ROOT / "data/my_teams/baton.json")
     gen.add_argument("--prior-bundle", type=Path, help="default: data/processed/scoped/priors.json")
     gen.add_argument("--worlds", type=positive, default=6)
@@ -270,13 +351,20 @@ def main() -> None:
     gen.add_argument("--limit", type=positive, help="process first N positions; omit later to resume the rest")
     rep = commands.add_parser("report", help="summarize completed position files without DB or simulator")
     rep.add_argument("--out", type=Path, required=True)
+    exp = commands.add_parser("export-value", help="export scoped public terminal trajectories to value JSONL")
+    exp.add_argument("--out", type=Path, required=True, help="completed public train/development experiment")
+    exp.add_argument("--dataset", type=Path, required=True, help="new JSONL file; never overwrites")
     args = parser.parse_args()
     if args.command == "generate":
         if len(set(args.continuations)) != len(args.continuations):
             parser.error("continuations must be distinct")
         generate(args)
-    else:
+    elif args.command == "report":
         report(args.out)
+    else:
+        from pokesim.evaluation.value_data import export_value
+
+        print(json.dumps(export_value(args.out, args.dataset), ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
