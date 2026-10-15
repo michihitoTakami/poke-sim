@@ -1,9 +1,8 @@
 import os
 import subprocess
 
-from scripts.ladder import search_quality_issues
-
 from pokesim.config import ROOT
+from scripts.ladder import search_quality_issues
 
 
 def test_terminal_search_errors_stop_collection_but_incomplete_final_trial_is_expected():
