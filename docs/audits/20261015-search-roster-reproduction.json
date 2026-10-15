@@ -1,0 +1,377 @@
+{
+  "context": "Fixed hypothetical Gyarados set, identical seed and continuation policies; this is a roster reconstruction diagnostic, not an estimate of ladder strength.",
+  "results": {
+    "broken": {
+      "members": [
+        {
+          "species": "Scolipede",
+          "hp": 124,
+          "fainted": false
+        },
+        {
+          "species": "Gholdengo",
+          "hp": 0,
+          "fainted": true
+        },
+        {
+          "species": "Salamence",
+          "hp": 202,
+          "fainted": false
+        }
+      ],
+      "pokemonLeft": 2,
+      "batonScores": [
+        0.99,
+        0.99,
+        0.99,
+        0.99
+      ],
+      "resolved": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "actual_roster": {
+      "members": [
+        {
+          "species": "Scolipede",
+          "hp": 124,
+          "fainted": false
+        },
+        {
+          "species": "Gholdengo",
+          "hp": 0,
+          "fainted": true
+        },
+        {
+          "species": "Floette-Mega",
+          "hp": 0,
+          "fainted": true
+        }
+      ],
+      "pokemonLeft": 1,
+      "batonScores": [
+        -0.975,
+        -0.975,
+        -0.975,
+        -0.975
+      ],
+      "resolved": [
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "worker_options": {
+    "format": "gen9championsbssregmc",
+    "seeds": 1,
+    "rollout": 5,
+    "winDecay": 0,
+    "scoring": "terminal",
+    "lostPathPenalty": 0.3,
+    "continuations": [
+      "expert/tactical",
+      "expert/disrupt"
+    ]
+  },
+  "samples": {
+    "broken": {
+      "p1": {
+        "team": [
+          {
+            "species": "Scolipede",
+            "item": "Mental Herb",
+            "ability": "Speed Boost",
+            "nature": "Jolly",
+            "moves": [
+              "Iron Defense",
+              "Protect",
+              "Substitute",
+              "Baton Pass"
+            ],
+            "evs": {
+              "hp": 30,
+              "atk": 0,
+              "def": 13,
+              "spa": 0,
+              "spd": 0,
+              "spe": 23
+            },
+            "level": 50
+          },
+          {
+            "species": "Gholdengo",
+            "item": "Air Balloon",
+            "ability": "Good as Gold",
+            "nature": "Modest",
+            "moves": [
+              "Shadow Ball",
+              "Flash Cannon",
+              "Recover",
+              "Nasty Plot"
+            ],
+            "evs": {
+              "hp": 13,
+              "atk": 0,
+              "def": 0,
+              "spa": 21,
+              "spd": 0,
+              "spe": 32
+            },
+            "level": 50
+          },
+          {
+            "species": "Salamence",
+            "item": "Salamencite",
+            "ability": "Intimidate",
+            "nature": "Adamant",
+            "moves": [
+              "Double-Edge",
+              "Earthquake",
+              "Dragon Dance",
+              "Roost"
+            ],
+            "evs": {
+              "hp": 32,
+              "atk": 32,
+              "def": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 2
+            },
+            "level": 50
+          }
+        ],
+        "mons": [
+          {
+            "hp": 0.7515151515151515,
+            "mega": false,
+            "ppUsed": {
+              "irondefense": 2,
+              "protect": 0,
+              "substitute": 1,
+              "batonpass": 0
+            },
+            "lastMove": "irondefense",
+            "boosts": {
+              "def": 4,
+              "spe": 3
+            },
+            "volatiles": [],
+            "pp": {
+              "irondefense": 14,
+              "protect": 8,
+              "substitute": 11,
+              "batonpass": 20
+            }
+          },
+          {
+            "hp": 0.0,
+            "mega": false,
+            "ppUsed": {
+              "shadowball": 2,
+              "flashcannon": 0,
+              "recover": 0,
+              "nastyplot": 0
+            }
+          },
+          {
+            "hp": 1.0,
+            "mega": false,
+            "ppUsed": {
+              "doubleedge": 0,
+              "earthquake": 0,
+              "dragondance": 0,
+              "roost": 0
+            }
+          }
+        ],
+        "megaUsed": true,
+        "conditions": {}
+      },
+      "p2": {
+        "team": [
+          {
+            "species": "Gyarados",
+            "ability": "Intimidate",
+            "item": "Leftovers",
+            "nature": "Jolly",
+            "moves": [
+              "Earthquake",
+              "Ice Fang",
+              "Dragon Dance",
+              "Waterfall"
+            ],
+            "level": 50,
+            "evs": {
+              "hp": 0,
+              "atk": 32,
+              "def": 0,
+              "spa": 0,
+              "spd": 2,
+              "spe": 32
+            }
+          }
+        ],
+        "mons": [
+          {
+            "hp": 1.0,
+            "boosts": {
+              "atk": 1,
+              "spe": 1
+            }
+          }
+        ]
+      },
+      "field": {}
+    },
+    "actual_roster": {
+      "p1": {
+        "team": [
+          {
+            "species": "Scolipede",
+            "item": "Mental Herb",
+            "ability": "Speed Boost",
+            "nature": "Jolly",
+            "moves": [
+              "Iron Defense",
+              "Protect",
+              "Substitute",
+              "Baton Pass"
+            ],
+            "evs": {
+              "hp": 30,
+              "atk": 0,
+              "def": 13,
+              "spa": 0,
+              "spd": 0,
+              "spe": 23
+            },
+            "level": 50
+          },
+          {
+            "species": "Gholdengo",
+            "item": "Air Balloon",
+            "ability": "Good as Gold",
+            "nature": "Modest",
+            "moves": [
+              "Shadow Ball",
+              "Flash Cannon",
+              "Recover",
+              "Nasty Plot"
+            ],
+            "evs": {
+              "hp": 13,
+              "atk": 0,
+              "def": 0,
+              "spa": 21,
+              "spd": 0,
+              "spe": 32
+            },
+            "level": 50
+          },
+          {
+            "species": "Floette-Eternal",
+            "item": "Floettite",
+            "ability": "Flower Veil",
+            "nature": "Bold",
+            "moves": [
+              "Moonblast",
+              "Substitute",
+              "Synthesis",
+              "Calm Mind"
+            ],
+            "evs": {
+              "hp": 24,
+              "atk": 0,
+              "def": 32,
+              "spa": 10,
+              "spd": 0,
+              "spe": 0
+            },
+            "level": 50
+          }
+        ],
+        "mons": [
+          {
+            "hp": 0.7515151515151515,
+            "mega": false,
+            "ppUsed": {
+              "irondefense": 2,
+              "protect": 0,
+              "substitute": 1,
+              "batonpass": 0
+            },
+            "lastMove": "irondefense",
+            "boosts": {
+              "def": 4,
+              "spe": 3
+            },
+            "volatiles": [],
+            "pp": {
+              "irondefense": 14,
+              "protect": 8,
+              "substitute": 11,
+              "batonpass": 20
+            }
+          },
+          {
+            "hp": 0.0,
+            "mega": false,
+            "ppUsed": {
+              "shadowball": 2,
+              "flashcannon": 0,
+              "recover": 0,
+              "nastyplot": 0
+            }
+          },
+          {
+            "hp": 0,
+            "mega": true
+          }
+        ],
+        "megaUsed": true,
+        "conditions": {}
+      },
+      "p2": {
+        "team": [
+          {
+            "species": "Gyarados",
+            "ability": "Intimidate",
+            "item": "Leftovers",
+            "nature": "Jolly",
+            "moves": [
+              "Earthquake",
+              "Ice Fang",
+              "Dragon Dance",
+              "Waterfall"
+            ],
+            "level": 50,
+            "evs": {
+              "hp": 0,
+              "atk": 32,
+              "def": 0,
+              "spa": 0,
+              "spd": 2,
+              "spe": 32
+            }
+          }
+        ],
+        "mons": [
+          {
+            "hp": 1.0,
+            "boosts": {
+              "atk": 1,
+              "spe": 1
+            }
+          }
+        ]
+      },
+      "field": {}
+    }
+  }
+}
