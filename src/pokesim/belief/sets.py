@@ -8,7 +8,7 @@ simulator (services/sim-tools/belief.js):
   damage, opponent attacking   our HP is exact: the share of the 16 damage rolls that give the HP lost (a KO: rolls
                                at least the HP it had)
   damage, we attack it         its HP is a percentage: the share of rolls within rounding of the percent lost
-  speed                        1 if the candidate's speed explains the order, 1/2 on a tie, 0 otherwise
+  speed                        when actual priorities match: 1 if speed explains the order, 1/2 on a tie, else 0
   no choice                    0 for a Choice item, else 1 (no simulator needed)
 
 and floored, L = (1 - EPS) * P + EPS: effects the reconstruction does not carry (an unrevealed ability of ours,
@@ -41,6 +41,9 @@ def likelihood(obs: Observation, result: dict | None, candidate: dict | None = N
     if result is None:
         return 1.0
     if obs.kind == "speed":
+        priorities = result.get("priorities")
+        if priorities and priorities[0] != priorities[1]:
+            return 1.0  # different priority brackets say nothing about speed
         ours, theirs = result["speeds"]
         if ours == theirs:
             return 0.5
@@ -109,11 +112,18 @@ class SetBelief:
         finally:
             self.sampler.rng = saved
 
-    def weights(self, species: str, cands: list[dict], before: int | None = None) -> np.ndarray:
+    def weights(self, species: str, cands: list[dict], before: int | None = None,
+                item_epoch: int | None = None) -> np.ndarray:
         """Posterior weights of the candidates (prior draws: equal) from the observations of this species
-        (the first `before` observations of the battle, default all)."""
+        (the first `before` observations of the battle, default all). item_epoch pins the item history for
+        pre-observation evaluation; live queries use the observer's current epoch."""
         base = self.sampler.base_id(species)
-        obs = [o for o in self.observations[:before] if o.species == base]
+        epoch = self.observer.item_epochs.get(base, 0) if item_epoch is None else item_epoch
+        # Unknown past items cannot be reconstructed from a candidate for the current item.
+        # A past no-Choice observation likewise constrains only the item held at that time.
+        obs = [o for o in self.observations[:before] if o.species == base and (
+            o.item_epoch == epoch or (o.kind != "nochoice" and
+                                     "item" in o.sample["p2"]["mons"][0]))]
         if not obs:
             return np.full(len(cands), 1 / len(cands))
         keys = [key(c) for c in cands]

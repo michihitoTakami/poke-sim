@@ -28,7 +28,7 @@ def score_battle(belief: SetBelief, log: list[str]) -> list[dict]:
     for k, obs in enumerate(belief.observations):
         cands = belief.candidates(obs.species, *obs.revealed)
         prior = np.full(len(cands), 1 / len(cands))
-        post = belief.weights(obs.species, cands, before=k)
+        post = belief.weights(obs.species, cands, before=k, item_epoch=obs.item_epoch)
         res = belief.results(obs, cands)
         lik = np.array([(1 - belief.eps) * likelihood(obs, r, c) + belief.eps for r, c in zip(res, cands)])
         rows.append({"kind": obs.kind, "attacker": obs.attacker, "species": obs.species,
