@@ -4,6 +4,12 @@
 `state/codec.py` exports known counters. `state/tracker.py` retains public Disable and Encore move identities
 for reconstructed sessions and clears them on switching or the corresponding end event.
 
+Our selected roster comes from the current request's `side.pokemon`, including fainted and trapped members.
+`battle.team` may retain all six preview members; an empty `available_switches` must never refill the simulated
+bench from it. Missing, preview-only or inconsistent selected-roster requests fail the search rather than guess.
+`tests/test_search_roster.py` covers preview-to-selection, the last survivor, trapped benches and forced entry
+through the Python-to-Node boundary.
+
 The active Pokémon's PP comes from its actual/generated request. Bench PP transfers consumption instead of
 poke-env's maximum: standard-generation move maxima differ from Champions. Opponent exact PP is not exported.
 Badly poisoned counters and known Choice locks survive reconstruction. The adapter refreshes DisableMove
