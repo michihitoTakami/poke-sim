@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "purpose": "public-reference-v2 retraining and integration gate; no final-test or live win-rate claim",
+  "engine_commit": "942cda71d14bf0618bd57991708a2e2734b6daba",
+  "training_code": {
+    "commit": "b3fa44dd8774",
+    "dirty": false
+  },
+  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+  "reference_policy": {
+    "own": "expert",
+    "opponent_pool": [
+      "expert/tactical",
+      "expert/disrupt"
+    ],
+    "version": "public-reference-v2"
+  },
+  "public": {
+    "train_battles": 4218,
+    "development_battles": 740
+  },
+  "reference": {
+    "train_battles": 34,
+    "development_battles": 19,
+    "train_rows": 21602,
+    "development_rows": 11490,
+    "terminal_trials": 2992,
+    "failed_trials": 0,
+    "unfinished_trials": 0,
+    "development_models": {
+      "constant": {
+        "brier": {
+          "mean": 0.2524751417483646,
+          "ci95": [
+            0.22318678371684522,
+            0.28224985784806517
+          ]
+        },
+        "log_loss": {
+          "mean": 0.6984015170668695,
+          "ci95": [
+            0.6388143080688994,
+            0.7589782222948898
+          ]
+        }
+      },
+      "hp": {
+        "brier": {
+          "mean": 0.1536451185859188,
+          "ci95": [
+            0.12275383116889657,
+            0.18672259415916348
+          ]
+        },
+        "log_loss": {
+          "mean": 0.46550484752435395,
+          "ci95": [
+            0.38940625937735246,
+            0.547701115297501
+          ]
+        }
+      },
+      "scratch": {
+        "brier": {
+          "mean": 0.14883364757995454,
+          "ci95": [
+            0.11207746034232251,
+            0.18782556116451443
+          ]
+        },
+        "log_loss": {
+          "mean": 0.4705476239401572,
+          "ci95": [
+            0.3645376942239393,
+            0.5898109602689353
+          ]
+        }
+      },
+      "pretrained": {
+        "brier": {
+          "mean": 0.13233639978589054,
+          "ci95": [
+            0.10307140485822408,
+            0.1639554237995304
+          ]
+        },
+        "log_loss": {
+          "mean": 0.4159397269395595,
+          "ci95": [
+            0.3299617224093744,
+            0.5113949769062234
+          ]
+        }
+      },
+      "transfer": {
+        "brier": {
+          "mean": 0.1527292374909066,
+          "ci95": [
+            0.12842843578300153,
+            0.17599609391326224
+          ]
+        },
+        "log_loss": {
+          "mean": 0.46365411486251046,
+          "ci95": [
+            0.402091333616763,
+            0.5226042369085531
+          ]
+        }
+      }
+    },
+    "paired_differences": {
+      "scratch_minus_constant": {
+        "brier": {
+          "mean": -0.10364149416841012,
+          "ci95": [
+            -0.14435373989006323,
+            -0.06062914316888608
+          ]
+        },
+        "log_loss": {
+          "mean": -0.2278538931267123,
+          "ci95": [
+            -0.3353978387224519,
+            -0.10449807036545107
+          ]
+        }
+      },
+      "scratch_minus_hp": {
+        "brier": {
+          "mean": -0.0048114710059642945,
+          "ci95": [
+            -0.026654475807376295,
+            0.019769775357951356
+          ]
+        },
+        "log_loss": {
+          "mean": 0.005042776415803235,
+          "ci95": [
+            -0.05873981811691526,
+            0.08211569565770292
+          ]
+        }
+      },
+      "pretrained_minus_constant": {
+        "brier": {
+          "mean": -0.1201387419624741,
+          "ci95": [
+            -0.15951730373376374,
+            -0.08125510215990145
+          ]
+        },
+        "log_loss": {
+          "mean": -0.28246179012731,
+          "ci95": [
+            -0.38306268699753476,
+            -0.17710488788886328
+          ]
+        }
+      },
+      "pretrained_minus_hp": {
+        "brier": {
+          "mean": -0.02130871880002826,
+          "ci95": [
+            -0.040521847823179205,
+            -0.0012922818657664053
+          ]
+        },
+        "log_loss": {
+          "mean": -0.0495651205847944,
+          "ci95": [
+            -0.10529706925554075,
+            0.013202966518614018
+          ]
+        }
+      },
+      "pretrained_minus_scratch": {
+        "brier": {
+          "mean": -0.016497247794063963,
+          "ci95": [
+            -0.030824038241200714,
+            -0.002528016428554508
+          ]
+        },
+        "log_loss": {
+          "mean": -0.054607897000597636,
+          "ci95": [
+            -0.10389207069667517,
+            -0.00785908787973378
+          ]
+        }
+      },
+      "transfer_minus_constant": {
+        "brier": {
+          "mean": -0.09974590425745802,
+          "ci95": [
+            -0.14481203203769086,
+            -0.05893795796373454
+          ]
+        },
+        "log_loss": {
+          "mean": -0.23474740220435897,
+          "ci95": [
+            -0.33647474967064533,
+            -0.14498499598389142
+          ]
+        }
+      },
+      "transfer_minus_hp": {
+        "brier": {
+          "mean": -0.0009158810950121966,
+          "ci95": [
+            -0.026289804362570342,
+            0.02542915140608062
+          ]
+        },
+        "log_loss": {
+          "mean": -0.0018507326618434365,
+          "ci95": [
+            -0.06158273740040482,
+            0.06183035943798071
+          ]
+        }
+      },
+      "transfer_minus_scratch": {
+        "brier": {
+          "mean": 0.0038955899109520994,
+          "ci95": [
+            -0.02369020501605764,
+            0.03447516943863177
+          ]
+        },
+        "log_loss": {
+          "mean": -0.006893509077646672,
+          "ci95": [
+            -0.08979832215151266,
+            0.08178768353469526
+          ]
+        }
+      }
+    }
+  },
+  "search_gate": {
+    "sources": 21,
+    "complete_sources": 21,
+    "disagreements": 12,
+    "repeat_changes": 6,
+    "learned_mean": 0.4375,
+    "hp_mean": 0.4265873015873017,
+    "difference": 0.010912698412698419,
+    "difference_bounds_all_sources": [
+      0.010912698412698419,
+      0.010912698412698419
+    ],
+    "failed_trials": 0,
+    "unfinished_trials": 0,
+    "paired_battle_ci95": [
+      -0.020337301587301588,
+      0.04216269841269842
+    ],
+    "search_seconds": {
+      "median": 1.4687102909665555,
+      "max": 2.294083871995099
+    },
+    "contract_sha": "b8bfdc18e637bf4f0d396024b14f18b564eb663857c20193815c6e576cac1467",
+    "model_frozen": true,
+    "live_win_rate_measured": false
+  },
+  "gate_scope": "calibration used for integration development, not an untouched test; 21 eligible source games, one short source excluded; frozen six fresh worlds and eight seeds per selected action",
+  "local_smoke": [
+    {
+      "file": "20261016-050349-803460.json",
+      "result": "win",
+      "decisions": 61,
+      "learned_decisions": 49,
+      "fallback_decisions": 0,
+      "failed_leaves": 0,
+      "max_seconds": 5.0
+    },
+    {
+      "file": "20261016-050437-803461.json",
+      "result": "loss",
+      "decisions": 22,
+      "learned_decisions": 21,
+      "fallback_decisions": 0,
+      "failed_leaves": 0,
+      "max_seconds": 4.51
+    }
+  ],
+  "reload_verification": {
+    "public:public": "exact CPU reload prediction match",
+    "public:metrics": "reproduced battle-weighted metrics and bootstrap",
+    "reference:scratch": "exact CPU reload prediction match",
+    "reference:pretrained": "exact CPU reload prediction match",
+    "reference:transfer": "exact CPU reload prediction match",
+    "reference:metrics": "reproduced battle-weighted metrics and bootstrap"
+  },
+  "checkpoints": {
+    "public:0": "b7fae7e7bb0a6276143c96410512d7a32b94b109123018e760222a5fd61a607f",
+    "scratch:0": "00604e3076b0534ed0503e4e9c33c70ae0761de41d08accdcbd455361a9b902e",
+    "pretrained:0": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+    "public:1": "96f158b38d4ab3cd92edcaa4678914683619e685bfc877c13b714cc0b14e98fd",
+    "scratch:1": "7597fd85cdae913f44aa75276c0aba337be7459c1263343c603b1959f2692a72",
+    "pretrained:1": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+    "public:2": "eaa7848e42cd4701b4b6f1627c6b38eb70673367efcd14801eac207ddaee279a",
+    "scratch:2": "28d3326883adda71c8a1716eac542c97a4bc31ffc4079bd1c756db23a2c820fe",
+    "pretrained:2": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+  },
+  "artifacts": {
+    "model": "runs/terminal-value-v2",
+    "features": "data/processed/public_value/features-v2",
+    "search": "runs/value-search-reference-v2-validation"
+  }
+}

@@ -10,6 +10,11 @@ cd "$(dirname "$0")/.." || exit 1
 C=${COLLECT_DIR:-/data/poke-sim/collect}
 POLICIES=${POLICIES:-"checkpoints/ppo_baton_v2.zip checkpoints/ppo_baton_items.zip"}
 mkdir -p "$C"
+exec 9>"$C/collect.lock"
+if ! flock -n 9; then
+  echo "collection is already running for $C" >&2
+  exit 1
+fi
 rm -f "$C/STOP"
 echo "start $(date) pid $$ planner ${PLANNER:-on} extra '${EXTRA:-}' commit $(git rev-parse --short HEAD)" >> "$C/status.log"
 i=0; fails=0
