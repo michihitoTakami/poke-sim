@@ -283,11 +283,21 @@ class Lookahead:
         active = battle.active_pokemon
         if active is None:
             raise ValueError("switch reconstruction needs the outgoing active")
-        brought = [m for m in battle.team.values() if m.fainted or m.active or m in battle.available_switches]
-        bench = [m for m in brought if m is not active]
-        if not battle.available_switches and not battle.trapped and incoming is None:
-            bench = [m for m in battle.team.values() if m is not active][:2]
-        mons = [active] + bench[:2]
+        # poke-env retains all six preview members in battle.team. Only the current request identifies the
+        # selected team, including fainted or trapped members; available_switches cannot identify that roster.
+        request = battle.last_request
+        roster = request.get("side", {}).get("pokemon", [])
+        if request.get("teamPreview") or not 1 <= len(roster) <= 3:
+            raise ValueError("selected team request unavailable")
+        try:
+            brought = [battle.team[entry["ident"]] for entry in roster]
+        except KeyError as e:
+            raise ValueError("selected team request has an unknown member") from e
+        if len({id(mon) for mon in brought}) != len(brought) or active not in brought:
+            raise ValueError("selected team request is inconsistent")
+        if incoming is not None and incoming not in brought:
+            raise ValueError("incoming Pokemon is not on the selected team")
+        mons = [active] + [mon for mon in brought if mon is not active]
         states = [mon_state(m, i == 0, own=True) for i, m in enumerate(mons)]
         request = battle.last_request.get("active") or []
         if request:
