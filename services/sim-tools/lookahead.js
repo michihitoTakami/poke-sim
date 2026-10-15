@@ -673,7 +673,8 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = req.plans ? evaluatePlans(req) : evaluateAll(req);
+    reply = req.branches ? require('./branch_matches').evaluateBranches(req, {setUp, choices, step, policy, State}) :
+      req.plans ? evaluatePlans(req) : evaluateAll(req);
   } catch (e) {
     reply = { error: String(e && e.stack || e) };
   }
