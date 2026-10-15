@@ -201,6 +201,14 @@ class SetSampler:
                 "evs": dict(zip(STATS, map(int, points.split("-")))), "level": 50}
 
 
+def revealed(mon: Pokemon) -> tuple[tuple[str, ...], str | None, str | None]:
+    """An opponent's Pokémon's revealed moves, item ("" when known to have none, None when unknown) and ability."""
+    item = None if mon.item == "unknown_item" else (mon.item or "")
+    if mega_evolved(mon) and not item:
+        item = None
+    return tuple(mon.moves), item, mon.ability
+
+
 def mon_state(mon: Pokemon, active: bool, own: bool = False) -> dict:
     from pokesim.state.codec import known_counters
 
@@ -296,7 +304,9 @@ class Lookahead:
                 out["switchMove"] = "batonpass"
         return out
 
-    def opponent_side(self, battle: Battle) -> dict:
+    def opponent_side(self, battle: Battle, belief=None) -> dict:
+        """belief (pokesim.belief.sets.SetBelief): draw the revealed Pokémon's sets from what the battle showed
+        instead of from the prior alone."""
         active = battle.opponent_active_pokemon
         seen = [active] + [m for m in battle.opponent_team.values() if m is not active]
         seen_ids = {self.sampler.base_id(m.species) for m in seen}
@@ -305,10 +315,11 @@ class Lookahead:
         self.sampler.rng.shuffle(unseen)
         team, mons = [], []
         for i, m in enumerate(seen[:3]):
-            item = None if m.item == "unknown_item" else (m.item or "")
-            if mega_evolved(m) and not item:
-                item = None
-            team.append(self.sampler.sample(m.species, list(m.moves), item, m.ability))
+            moves, item, ability = revealed(m)
+            if belief is not None:
+                team.append(belief.draw(m.species, moves, item, ability))
+            else:
+                team.append(self.sampler.sample(m.species, list(moves), item, ability))
             mons.append(mon_state(m, i == 0))
             if i == 0 and hasattr(battle, "state_tracker"):
                 mons[-1].update(battle.state_tracker.locks(battle.opponent_role, m.name))
@@ -319,12 +330,13 @@ class Lookahead:
                 "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
 
     def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None,
-              search: dict | None = None) -> list[dict]:
+              search: dict | None = None, belief=None) -> list[dict]:
         """Payoff matrices (our options x the opponent's) for sampled opponent sets. search: settings for this query
-        only (as the constructor's)."""
+        only (as the constructor's). belief: draw the opponent's sets from it (see opponent_side)."""
         own = self.own_side(battle, own_sets, incoming)
         field = field_state(battle)
-        samples = [{"p1": own, "p2": self.opponent_side(battle), "field": field} for _ in range(self.n_samples)]
+        samples = [{"p1": own, "p2": self.opponent_side(battle, belief), "field": field}
+                   for _ in range(self.n_samples)]
         request = {"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout, "samples": samples}
         if self.win_decay is not None:
             request["winDecay"] = self.win_decay

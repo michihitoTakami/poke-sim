@@ -114,7 +114,7 @@ def test_a_failed_search_falls_back_instead_of_losing_the_turn(session):
     class Broken:
         opponent_model: dict = {}
 
-        def query(self, *args):
+        def query(self, *args, **kwargs):
             raise RuntimeError("node worker died")
 
     t = EventTranslator(session)
