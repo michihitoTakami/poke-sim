@@ -8,7 +8,7 @@ boosts, status, field), then read the lines that follow until the next action:
            percentage. With the critical hit flag from "|-crit|".
   speed    both actives used a move this turn, neither switched before moving, the same priority, no Quick Claw /
            Custap Berry / Quash / Trick Room starting this turn, and the opponent's move is not a status move (Prankster
-           would change its priority): who went first.
+           would change its priority): who went first. The worker checks actual priorities per candidate.
 
   no choice two different moves in one stay on the field (Choice items lock the first): not a Choice item.
 
@@ -43,10 +43,15 @@ class Observation:
     opponent_first: bool | None = None  # speed
     revealed: tuple = ((), None, None)  # the opponent active's moves, item, ability known at the time
 
+    item_epoch: int = 0  # changes whenever the opponent loses, receives or explicitly reveals an item
+    moves: tuple[str, str] | None = None  # speed: our move and their move
+
     def job(self) -> dict:
         out = {"sample": self.sample}
         if self.kind == "damage":
             out.update(attacker=self.attacker, move=self.move, crit=self.crit)
+        elif self.kind == "speed" and self.moves:
+            out["moves"] = self.moves
         return out
 
 
@@ -57,8 +62,11 @@ def move_entry(move_id: str) -> dict:
 def own_sample_side(battle, own_sets: dict, base_id) -> dict:
     """Our active (exact set) padded with two more of ours (the simulator needs a team; they do not act)."""
     active = battle.active_pokemon
-    sets = [own_sets[base_id(to_id(active.species))]]
-    sets += [s for k, s in own_sets.items() if s is not sets[0]][:2]
+    original = own_sets[base_id(to_id(active.species))]
+    current = dict(original)
+    if active.item != "unknown_item":
+        current["item"] = active.item or ""
+    sets = [current] + [s for s in own_sets.values() if s is not original][:2]
     state = mon_state(active, True, own=True)
     for k in ("ppUsed", "pp", "choiceMove"):  # damage and speed do not depend on them; avoid PP mismatches
         state.pop(k, None)
@@ -68,7 +76,11 @@ def own_sample_side(battle, own_sets: dict, base_id) -> dict:
 
 def opponent_sample_side(battle) -> dict:
     """The opponent's active first; its set (team[0]) is filled in per candidate. Padding repeats the slot."""
-    state = mon_state(battle.opponent_active_pokemon, True)
+    active = battle.opponent_active_pokemon
+    state = mon_state(active, True)
+    item = revealed(active)[1]
+    if item is not None:
+        state["item"] = item  # empty string means known to have none
     return {"team": [None, None, None], "mons": [state, {"hp": 1.0}, {"hp": 1.0}],
             "megaUsed": battle.opponent_used_mega_evolve,
             "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
@@ -89,6 +101,7 @@ class Observer:
         self._stay: set[str] = set()  # moves the opponent's active used since it came in
         self._stay_done = False
         self._n = 0
+        self.item_epochs: dict[str, int] = {}
 
     # -- feeding ---------------------------------------------------------------------------------------------------
     def feed(self, log: list[str]) -> list[Observation]:
@@ -115,6 +128,12 @@ class Observer:
         kind = parts[1] if len(parts) > 1 else ""
         if kind == "error":  # a server reply to a rejected choice, not a battle event
             return
+        if kind in ("-enditem", "-item") and len(parts) > 2 and parts[2].startswith(self.opp):
+            active = self.session.battle.opponent_active_pokemon
+            if active is not None:
+                species = self.base_id(to_id(active.species))
+                self.item_epochs[species] = self.item_epochs.get(species, 0) + 1
+            self._stay, self._stay_done = set(), False
         if kind in BOUNDARY:
             self._resolve_move()
         if kind == "turn":
@@ -153,7 +172,9 @@ class Observer:
                          "revealed": revealed(battle.opponent_active_pokemon),
                          "species": self.base_id(to_id(battle.opponent_active_pokemon.species)),
                          "defender": f"{self.opp if side == self.role else self.role}a: ", "lines": [],
-                         "turn": battle.turn}
+                         "turn": battle.turn,
+                         "item_epoch": self.item_epochs.get(
+                             self.base_id(to_id(battle.opponent_active_pokemon.species)), 0)}
         if self._turn is not None:
             self._turn["moves"].append((side, move))
 
@@ -176,7 +197,7 @@ class Observer:
             f"{p['turn']}:{self._n}", "damage", p["turn"], p["species"], p["sample"], move=p["move"],
             attacker="p1" if p["side"] == self.role else "p2",
             crit=any(x.startswith(f"|-crit|{p['defender']}") for x in lines), before=float(p["before"]),
-            after=after, revealed=p["revealed"]))
+            after=after, revealed=p["revealed"], item_epoch=p["item_epoch"]))
 
     # -- Choice items ----------------------------------------------------------------------------------------------
     def _lock_evidence(self, parts: list[str]) -> None:
@@ -190,7 +211,9 @@ class Observer:
             opp = battle.opponent_active_pokemon
             self._n += 1
             self.observations.append(Observation(f"{battle.turn}:{self._n}", "nochoice", battle.turn,
-                                                 self.base_id(to_id(opp.species)), {}, revealed=revealed(opp)))
+                                                 self.base_id(to_id(opp.species)), {}, revealed=revealed(opp),
+                                                 item_epoch=self.item_epochs.get(
+                                                     self.base_id(to_id(opp.species)), 0)))
 
     # -- speed -----------------------------------------------------------------------------------------------------
     def _begin_turn(self) -> None:
@@ -204,7 +227,9 @@ class Observer:
             return
         self._turn = {"sample": sample, "moves": [], "lines": [], "turn": battle.turn,
                       "revealed": revealed(battle.opponent_active_pokemon),
-                      "species": self.base_id(to_id(battle.opponent_active_pokemon.species))}
+                      "species": self.base_id(to_id(battle.opponent_active_pokemon.species)),
+                      "item_epoch": self.item_epochs.get(
+                          self.base_id(to_id(battle.opponent_active_pokemon.species)), 0)}
 
     def _resolve_turn(self) -> None:
         t, self._turn = self._turn, None
@@ -223,6 +248,9 @@ class Observer:
                 first_moves[side] = (i, to_id(parts[3]))
         if set(first_moves) != {self.role, self.opp}:
             return
+        # The turn-start sample cannot describe order after an item or forme changes mid-turn.
+        if any(x.startswith(("|-item|", "|-enditem|", "|-mega|", "|detailschange|")) for x in lines):
+            return
         if any(s in x for x in lines for s in ORDER_EFFECTS) or any(
                 x.startswith("|-fieldstart|") and "Trick Room" in x for x in lines):
             return
@@ -233,7 +261,8 @@ class Observer:
         self._n += 1
         self.observations.append(Observation(
             f"{t['turn']}:{self._n}", "speed", t["turn"], t["species"], t["sample"],
-            opponent_first=first_moves[self.opp][0] < first_moves[self.role][0], revealed=t["revealed"]))
+            opponent_first=first_moves[self.opp][0] < first_moves[self.role][0], revealed=t["revealed"],
+            item_epoch=t["item_epoch"], moves=(first_moves[self.role][1], first_moves[self.opp][1])))
 
     def _sample(self) -> dict:
         battle = self.session.battle
