@@ -58,7 +58,6 @@ class BattleSession:
                 continue
             self.log.append(line)
             split = line.split("|")
-            self.battle.state_tracker.apply(split)
             kind = split[1] if len(split) > 1 else ""
             if kind == "win":
                 self.battle.won_by(split[2])
@@ -153,7 +152,10 @@ class BattleSession:
             if active:
                 active_info = info
             item = info["item"] if mon is None or mon.item in (None, "unknown_item") else mon.item
-            pokemon.append({"ident": f"{self.role}: {info['name']}", "details": info["details"],
+            # A receiver can already be Mega evolved. Reusing the original team-file details here reverts
+            # its observed forme when poke-env refreshes the next request.
+            details = mon._last_details if mon is not None and mon._last_details else info['details']
+            pokemon.append({"ident": f"{self.role}: {info['name']}", "details": details,
                             "condition": condition, "active": active, "stats": info["stats"],
                             "moves": [m["id"] for m in info["moves"]], "baseAbility": info["ability"],
                             "item": item, "pokeball": "pokeball", "ability": info["ability"]})

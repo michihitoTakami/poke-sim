@@ -1,0 +1,718 @@
+{
+  "measured_at": "2026-10-16T14:55:27.186299+09:00",
+  "commit": "b58f514f6bdba2e48e2c0fa9d6489f0ad82bd4ff",
+  "purpose": "Post-restart incident and behavior audit; no code changes or live move interventions",
+  "battles": [
+    {
+      "file": "20261016-134836-po6mrvh9u9dgtwo0cth7aicmu0ltffapw.json",
+      "result": "win",
+      "lineup": [
+        "Scolipede",
+        "Salamence",
+        "Umbreon"
+      ],
+      "turns": 7,
+      "decisions": 8,
+      "opponent_forfeited": true
+    },
+    {
+      "file": "20261016-135040-2699278746.json",
+      "result": "win",
+      "lineup": [
+        "Skeledirge",
+        "Gholdengo",
+        "Umbreon"
+      ],
+      "turns": 13,
+      "decisions": 15,
+      "opponent_forfeited": false
+    },
+    {
+      "file": "20261016-135307-2699279518.json",
+      "result": "loss",
+      "lineup": [
+        "Salamence",
+        "Scolipede",
+        "Umbreon"
+      ],
+      "turns": 11,
+      "decisions": 14,
+      "opponent_forfeited": false
+    },
+    {
+      "file": "20261016-135442-2699280112.json",
+      "result": "win",
+      "lineup": [
+        "Floette-Eternal",
+        "Gholdengo",
+        "Salamence"
+      ],
+      "turns": 1,
+      "decisions": 1,
+      "opponent_forfeited": true
+    },
+    {
+      "file": "20261016-135816-2699280608.json",
+      "result": "win",
+      "lineup": [
+        "Skeledirge",
+        "Gholdengo",
+        "Umbreon"
+      ],
+      "turns": 23,
+      "decisions": 25,
+      "opponent_forfeited": false
+    },
+    {
+      "file": "20261016-140008-6uynb3lg8e5e1sget04dtv550olukmopw.json",
+      "result": "win",
+      "lineup": [
+        "Floette-Eternal",
+        "Gholdengo",
+        "Skeledirge"
+      ],
+      "turns": 10,
+      "decisions": 10,
+      "opponent_forfeited": true
+    },
+    {
+      "file": "20261016-140257-2699282306.json",
+      "result": "loss",
+      "lineup": [
+        "Skeledirge",
+        "Gholdengo",
+        "Umbreon"
+      ],
+      "turns": 10,
+      "decisions": 12,
+      "opponent_forfeited": false
+    }
+  ],
+  "summary": {
+    "wins": 5,
+    "losses": 2,
+    "decisions": 85,
+    "max_seconds": 8.01,
+    "recorded_fallbacks": 0,
+    "recorded_exceptions": 0,
+    "simulation_failures": 0
+  },
+  "baton_audit": {
+    "totals": {
+      "battles": 7,
+      "selected:umbreon": 5,
+      "selected:scolipede": 2,
+      "attempted_passes": 3,
+      "completed_passes": 3,
+      "fainted:umbreon": 3,
+      "boosts_lost:faint": 2,
+      "all_boosts_lost:switch": 2,
+      "fainted:scolipede": 1,
+      "uncompleted_pass_attempts": 0
+    },
+    "moves": {
+      "scolipede": {
+        "protect": 2,
+        "substitute": 2,
+        "batonpass": 2,
+        "irondefense": 3
+      },
+      "salamence": {
+        "dragondance": 1,
+        "roost": 2,
+        "earthquake": 2
+      },
+      "umbreon": {
+        "calmmind": 6,
+        "batonpass": 1,
+        "snarl": 1
+      },
+      "gholdengo": {
+        "nastyplot": 5,
+        "recover": 8,
+        "shadowball": 5,
+        "flashcannon": 4
+      },
+      "floetteeternal": {
+        "moonblast": 1,
+        "substitute": 1,
+        "synthesis": 4
+      },
+      "skeledirge": {
+        "shadowball": 3,
+        "willowisp": 2,
+        "torchsong": 5,
+        "slackoff": 2
+      }
+    },
+    "recipients": {
+      "salamence": 1,
+      "salamencemega": 1,
+      "gholdengo": 1
+    },
+    "payloads": {
+      "spe:+3": 1,
+      "def:+6,spe:+4": 1,
+      "spa:+1,spd:+1": 1
+    },
+    "modes": {
+      "terminal": 7
+    },
+    "lineups": {
+      "salamence/scolipede/umbreon": {
+        "win": 1,
+        "loss": 1
+      },
+      "gholdengo/skeledirge/umbreon": {
+        "win": 2,
+        "loss": 1
+      },
+      "floetteeternal/gholdengo/salamence": {
+        "win": 1
+      },
+      "floetteeternal/gholdengo/skeledirge": {
+        "win": 1
+      }
+    },
+    "results": {
+      "used_baton": {
+        "win": 2,
+        "loss": 1
+      },
+      "appeared_passer_without_baton": {
+        "win": 1,
+        "loss": 1
+      }
+    },
+    "examples": {
+      "boosts_lost:faint": [
+        {
+          "file": "20261016-135040-2699278746.json",
+          "turn": 5,
+          "species": "umbreon",
+          "boosts": {
+            "spa": 2,
+            "spd": 3
+          }
+        },
+        {
+          "file": "20261016-140257-2699282306.json",
+          "turn": 5,
+          "species": "umbreon",
+          "boosts": {
+            "spa": 2,
+            "spd": 2
+          }
+        }
+      ]
+    }
+  },
+  "baton_state_comparisons": [
+    {
+      "file": "20261016-134836-po6mrvh9u9dgtwo0cth7aicmu0ltffapw.json",
+      "turn": 5,
+      "species": "salamence",
+      "python_boosts": {
+        "accuracy": 0,
+        "atk": 0,
+        "def": 0,
+        "evasion": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 0
+      },
+      "python_effects": [],
+      "protocol_boosts": {
+        "spe": 3
+      },
+      "protocol_volatiles": [],
+      "live_speed_samples": [
+        {
+          "ours": 122,
+          "opponent": 72,
+          "ourAction": 122,
+          "opponentAction": 72
+        },
+        {
+          "ours": 122,
+          "opponent": 72,
+          "ourAction": 122,
+          "opponentAction": 72
+        },
+        {
+          "ours": 122,
+          "opponent": 72,
+          "ourAction": 122,
+          "opponentAction": 72
+        },
+        {
+          "ours": 122,
+          "opponent": 72,
+          "ourAction": 122,
+          "opponentAction": 72
+        },
+        {
+          "ours": 122,
+          "opponent": 80,
+          "ourAction": 122,
+          "opponentAction": 80
+        },
+        {
+          "ours": 122,
+          "opponent": 72,
+          "ourAction": 122,
+          "opponentAction": 72
+        }
+      ],
+      "chosen": "move:dragondance:mega"
+    },
+    {
+      "file": "20261016-135307-2699279518.json",
+      "turn": 10,
+      "species": "salamence",
+      "python_boosts": {
+        "accuracy": 0,
+        "atk": 0,
+        "def": 0,
+        "evasion": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 0
+      },
+      "python_effects": [],
+      "protocol_boosts": {
+        "def": 6,
+        "spe": 4
+      },
+      "protocol_volatiles": [
+        "substitute"
+      ],
+      "live_speed_samples": [
+        {
+          "ours": 142,
+          "opponent": 116,
+          "ourAction": 142,
+          "opponentAction": 116
+        },
+        {
+          "ours": 142,
+          "opponent": 116,
+          "ourAction": 142,
+          "opponentAction": 116
+        },
+        {
+          "ours": 142,
+          "opponent": 116,
+          "ourAction": 142,
+          "opponentAction": 116
+        },
+        {
+          "ours": 142,
+          "opponent": 116,
+          "ourAction": 142,
+          "opponentAction": 116
+        },
+        {
+          "ours": 142,
+          "opponent": 120,
+          "ourAction": 142,
+          "opponentAction": 120
+        },
+        {
+          "ours": 142,
+          "opponent": 148,
+          "ourAction": 142,
+          "opponentAction": 148
+        }
+      ],
+      "chosen": "switch:scolipede"
+    },
+    {
+      "file": "20261016-135816-2699280608.json",
+      "turn": 14,
+      "species": "gholdengo",
+      "python_boosts": {
+        "accuracy": 0,
+        "atk": 0,
+        "def": 0,
+        "evasion": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 0
+      },
+      "python_effects": [],
+      "protocol_boosts": {
+        "spa": 1,
+        "spd": 1
+      },
+      "protocol_volatiles": [],
+      "live_speed_samples": [
+        {
+          "ours": 136,
+          "opponent": 158,
+          "ourAction": 136,
+          "opponentAction": 158
+        },
+        {
+          "ours": 136,
+          "opponent": 237,
+          "ourAction": 136,
+          "opponentAction": 237
+        },
+        {
+          "ours": 136,
+          "opponent": 158,
+          "ourAction": 136,
+          "opponentAction": 158
+        },
+        {
+          "ours": 136,
+          "opponent": 158,
+          "ourAction": 136,
+          "opponentAction": 158
+        },
+        {
+          "ours": 136,
+          "opponent": 237,
+          "ourAction": 136,
+          "opponentAction": 237
+        },
+        {
+          "ours": 136,
+          "opponent": 220,
+          "ourAction": 136,
+          "opponentAction": 220
+        }
+      ],
+      "chosen": "move:nastyplot"
+    }
+  ],
+  "finished_battle_reproduction": {
+    "file": "20261016-140257-2699282306.json",
+    "finished": true,
+    "network_connected": false,
+    "sent_to_server": false,
+    "returned_order": "/choose move willowisp",
+    "quality_issues": [
+      "search fallback"
+    ],
+    "new_advice_after_callback": [
+      {
+        "turn": 10,
+        "force": false,
+        "actions": [
+          [
+            "move:willowisp",
+            0.934
+          ],
+          [
+            "move:torchsong",
+            0.03
+          ],
+          [
+            "move:shadowball",
+            0.025
+          ],
+          [
+            "move:slackoff",
+            0.01
+          ]
+        ],
+        "win": 0.3703624129295349,
+        "win_cal": null,
+        "policy": [
+          [
+            "move:willowisp",
+            0.934
+          ],
+          [
+            "move:torchsong",
+            0.03
+          ],
+          [
+            "move:shadowball",
+            0.025
+          ]
+        ],
+        "lookahead": [],
+        "opponent": [],
+        "secs": 0.06,
+        "status": {
+          "mode": "on",
+          "calibration": {
+            "supported_point": false,
+            "context": "2f002df0239cdcd7"
+          },
+          "fallback": "search failed: ValueError('learned search requires a value model and observed history')",
+          "win_path": {
+            "sources": [],
+            "blocked": {},
+            "unseen": 0,
+            "no_source": true,
+            "last_source": false
+          }
+        },
+        "chosen": "move:willowisp",
+        "chosen_p": 0.9344
+      }
+    ],
+    "interpretation": "Reproduces an end-of-battle false quality stop. Original unrecorded call not captured."
+  },
+  "speed_support_reproduction": {
+    "file": "20261016-135816-2699280608.json",
+    "through_turn": 16,
+    "observations": [
+      {
+        "turn": 13,
+        "opponent_first": true,
+        "moves": [
+          "batonpass",
+          "calmmind"
+        ],
+        "candidates": 48,
+        "compatible": 48,
+        "speeds": [
+          [
+            85,
+            147
+          ],
+          [
+            85,
+            156
+          ],
+          [
+            85,
+            158
+          ],
+          [
+            85,
+            220
+          ],
+          [
+            85,
+            234
+          ],
+          [
+            85,
+            237
+          ]
+        ]
+      },
+      {
+        "turn": 14,
+        "opponent_first": false,
+        "moves": [
+          "nastyplot",
+          "calmmind"
+        ],
+        "candidates": 48,
+        "compatible": 0,
+        "speeds": [
+          [
+            136,
+            147
+          ],
+          [
+            136,
+            156
+          ],
+          [
+            136,
+            158
+          ],
+          [
+            136,
+            220
+          ],
+          [
+            136,
+            234
+          ],
+          [
+            136,
+            237
+          ]
+        ]
+      },
+      {
+        "turn": 15,
+        "opponent_first": false,
+        "moves": [
+          "flashcannon",
+          "moonblast"
+        ],
+        "candidates": 48,
+        "compatible": 0,
+        "speeds": [
+          [
+            136,
+            147
+          ],
+          [
+            136,
+            156
+          ],
+          [
+            136,
+            158
+          ],
+          [
+            136,
+            220
+          ],
+          [
+            136,
+            234
+          ],
+          [
+            136,
+            237
+          ]
+        ]
+      }
+    ],
+    "compatible_slow_proposal": {
+      "set": {
+        "species": "Floette-Eternal",
+        "item": "Floettite",
+        "ability": "symbiosis",
+        "nature": "Modest",
+        "moves": [
+          "calmmind",
+          "moonblast",
+          "charm",
+          "protect"
+        ],
+        "evs": {
+          "hp": 24,
+          "atk": 0,
+          "def": 0,
+          "spa": 10,
+          "spd": 0,
+          "spe": 0
+        },
+        "level": 50
+      },
+      "speeds": [
+        136,
+        112
+      ],
+      "likelihood": 1.0
+    },
+    "caveat": "Uses current live prior and the observed prefix. Original 48 candidates were not saved."
+  },
+  "runtime_observed": {
+    "started_epoch": 1792126013.389869,
+    "collector_pid": 1058411,
+    "local_showdown_pid": 1058272,
+    "commit": "b58f514f6bdba2e48e2c0fa9d6489f0ad82bd4ff",
+    "branch": "master",
+    "algorithm": "public-information-set-uct-v1",
+    "continuation_policy": "public-baton-v1",
+    "belief": true,
+    "decision_ms": 8500,
+    "value_run": "runs/terminal-value-v2",
+    "ladder_log": "/data/poke-sim/collect/ladder.log",
+    "log_offset": 107742,
+    "quality_stop": true,
+    "local_showdown_http": 200,
+    "previous_local_showdown_pids": [
+      983518
+    ],
+    "verification": {
+      "official_match_started": true,
+      "first_match_completed": true,
+      "time": 1792130129.424119,
+      "terminal_search_active": true,
+      "collector_alive": false,
+      "local_showdown_http": 200,
+      "completed_battles": 7,
+      "wins": 5,
+      "losses": 2
+    }
+  },
+  "choice_execution_mismatches": {
+    "file": "20261016-135040-2699278746.json",
+    "unexplained": [
+      {
+        "turn": 7,
+        "chosen": "recover",
+        "executed": "nastyplot"
+      },
+      {
+        "turn": 9,
+        "chosen": "shadowball",
+        "executed": "recover"
+      },
+      {
+        "turn": 11,
+        "chosen": "flashcannon",
+        "executed": "shadowball"
+      },
+      {
+        "turn": 12,
+        "chosen": "recover",
+        "executed": "shadowball"
+      },
+      {
+        "turn": 13,
+        "chosen": "shadowball",
+        "executed": "flashcannon"
+      }
+    ],
+    "explained_by_encore": [
+      {
+        "turn": 3,
+        "chosen": "moonlight",
+        "executed": "calmmind"
+      }
+    ],
+    "sent_orders_and_request_ids_saved": false,
+    "cause": "Unresolved; same-battle message serialization exists in PSClient."
+  },
+  "collector_stop": {
+    "at_jst": "2026-10-16T14:02:58+09:00",
+    "exit_code": 78,
+    "reason": "search fallback",
+    "saved_decision_with_reason_found": false,
+    "continued_collection": false
+  },
+  "behavior_examples": [
+    {
+      "file": "20261016-135307-2699279518.json",
+      "turn": 10,
+      "chosen": "switch:scolipede",
+      "recipient_hp": "35/202",
+      "discarded_boosts": {
+        "def": 6,
+        "spe": 4
+      },
+      "discarded_volatiles": [
+        "substitute"
+      ],
+      "target_hp": 1
+    },
+    {
+      "file": "20261016-135816-2699280608.json",
+      "turn": 16,
+      "chosen": "move:recover",
+      "opponent_hp_percent": 19,
+      "preceding_flash_cannon_damage_percent": 81,
+      "opponent_action": "synthesis",
+      "later_consecutive_recover_turns": [
+        18,
+        19,
+        20,
+        21
+      ]
+    }
+  ],
+  "final_status_check": {
+    "at": "2026-10-16T15:01:58.295309+09:00",
+    "local_showdown_pid": 1058272,
+    "local_showdown_alive": true,
+    "local_showdown_http": 200,
+    "collector_alive": false,
+    "stop_file": true
+  }
+}

@@ -80,6 +80,12 @@ tail /data/poke-sim/collect/status.log      # まとまりごとの結果（何�
 tail -f /data/poke-sim/collect/ladder.log   # 対戦ごとの結果とエラー
 pgrep -af "scripts/ladder.py --battles"     # 動いているか
 ```
+
+品質停止や選択の不一致を調べるときは、対戦JSONに加えて `data/raw/ladder/diagnostics.jsonl`
+を確認してください（`--out` 指定時はその出力先）。要求ID付きの送信試行・送信完了と、
+品質停止の対戦タグ・要求ID・例外の詳細を記録します。対戦終了後に届いた要求もこちらに残ります。
+対戦JSONのadviceには選択ラベル、変換後の注文、送信したコマンドがあり、実行技と比較できます。
+
 停止（今のまとまりを最後まで戦ってから止まります）：
 ```bash
 touch /data/poke-sim/collect/STOP

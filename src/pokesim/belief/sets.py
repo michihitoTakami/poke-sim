@@ -11,10 +11,10 @@ simulator (services/sim-tools/belief.js):
   speed                        when actual priorities match: 1 if speed explains the order, 1/2 on a tie, else 0
   no choice                    0 for a Choice item, else 1 (no simulator needed)
 
-and floored, L = (1 - EPS) * P + EPS: effects the reconstruction does not carry (an unrevealed ability of ours,
-mid-turn changes, a wrong sample of the rest of its set) must not rule a set out for good. The posterior weight of a
-candidate is its prior draw times the product of its likelihoods; the lookahead then draws the opponent's sets from
-it (Lookahead.query(..., belief=)).
+Likelihoods are floored, L = (1 - EPS) * P + EPS, to tolerate imperfect damage reconstruction. Reliable speed
+observations additionally constrain the supported sets when a coherent explanation exists. If the finite prior
+has no compatible set, legal Speed/nature/item proposals expand its support; unresolved contradictions are
+reported. The lookahead draws opponent sets from the resulting posterior (Lookahead.query(..., belief=)).
 """
 import hashlib
 import json
@@ -95,6 +95,7 @@ class SetBelief:
         self.sampler, self.worker, self.n, self.eps, self.seed = sampler, worker, n, eps, seed
         self.observer = Observer(sets, sampler.base_id, role)
         self.cache: dict[tuple[str, str], float] = {}  # (candidate key, observation id) -> likelihood
+        self.support_cache: dict[str, tuple] = {}
         self.rng = random.Random(seed)
 
     @property
@@ -120,15 +121,29 @@ class SetBelief:
         """Posterior weights of the candidates (prior draws: equal) from the observations of this species
         (the first `before` observations of the battle, default all). item_epoch pins the item history for
         pre-observation evaluation; live queries use the observer's current epoch."""
-        base = self.sampler.base_id(species)
-        epoch = self.observer.item_epochs.get(base, 0) if item_epoch is None else item_epoch
-        # Unknown past items cannot be reconstructed from a candidate for the current item.
-        # A past no-Choice observation likewise constrains only the item held at that time.
-        obs = [o for o in self.observations[:before] if o.species == base and (
-            o.item_epoch == epoch or (o.kind != "nochoice" and
-                                     "item" in o.sample["p2"]["mons"][0]))]
+        obs = self.relevant(species, before, item_epoch)
         if not obs:
             return np.full(len(cands), 1 / len(cands))
+        self.cache_results(obs, cands)
+        keys = [key(c) for c in cands]
+        loglik = np.array([sum(np.log((1 - self.eps) * self.cache[(k, o.id)] + self.eps) for o in obs)
+                           for k in keys])
+        # Reliable order evidence is a constraint when a coherent explanation exists. Flooring all likelihoods
+        # otherwise gives many impossible fast sets more mass than a newly proposed slow set.
+        compatible = self.speed_compatible(obs, cands)
+        if compatible.any():
+            loglik[~compatible] = -np.inf
+        w = np.exp(loglik - loglik.max())
+        return w / w.sum()
+
+    def relevant(self, species: str, before=None, item_epoch=None) -> list[Observation]:
+        base = self.sampler.base_id(species)
+        epoch = self.observer.item_epochs.get(base, 0) if item_epoch is None else item_epoch
+        # Unknown past items cannot be reconstructed after an item change.
+        return [o for o in self.observations[:before] if o.species == base and (
+            o.item_epoch == epoch or (o.kind != 'nochoice' and 'item' in o.sample['p2']['mons'][0]))]
+
+    def cache_results(self, obs: list[Observation], cands: list[dict]) -> None:
         keys = [key(c) for c in cands]
         unique = {k: c for k, c in zip(keys, cands)}
         for o in obs:
@@ -142,10 +157,42 @@ class SetBelief:
             for o, res in zip(todo, results):
                 for k, r in zip(ks, res):
                     self.cache[(k, o.id)] = likelihood(o, r)
-        loglik = np.array([sum(np.log((1 - self.eps) * self.cache[(k, o.id)] + self.eps) for o in obs)
-                           for k in keys])
-        w = np.exp(loglik - loglik.max())
-        return w / w.sum()
+
+    def speed_compatible(self, obs: list[Observation], cands: list[dict]) -> np.ndarray:
+        speed = [o for o in obs if o.kind == 'speed']
+        self.cache_results(speed, cands)
+        return np.array([all(self.cache[(key(c), o.id)] > 0 for o in speed) for c in cands])
+
+    def supported_candidates(self, species: str, moves=(), item=None, ability=None) -> list[dict]:
+        """Expand a finite prior when none of its sets explains the observed move order."""
+        tag = json.dumps([species, sorted(moves), item, ability])
+        obs = self.relevant(species)
+        speed = [o for o in obs if o.kind == 'speed']
+        stamp = tuple(o.id for o in speed)
+        saved = self.support_cache.get(tag)
+        if saved and saved[0] == stamp:
+            return saved[1]
+        cands = list(saved[1]) if saved else self.candidates(species, moves, item, ability)
+        compatible = self.speed_compatible(speed, cands)
+        added = 0
+        if speed and not compatible.any():
+            proposals = speed_proposals(cands, unknown_item=item is None,
+                                        mega=bool(speed[-1].sample['p2']['mons'][0].get('mega')))
+            known = {key(c) for c in cands}
+            proposals = [c for c in proposals if key(c) not in known]
+            fits = self.speed_compatible(speed, proposals)
+            repair = [c for c, ok in zip(proposals, fits) if ok][:self.n]
+            added = len(repair)
+            cands.extend(repair)
+            compatible = np.concatenate([compatible, np.ones(added, dtype=bool)])
+        status = {'observations': len(speed), 'candidates': len(cands), 'compatible': int(compatible.sum()),
+                  'added': added, 'unresolved': bool(speed and not compatible.any())}
+        self.support_cache[tag] = stamp, cands, status
+        return cands
+
+    def speed_support(self, species: str, moves=(), item=None, ability=None) -> dict:
+        self.supported_candidates(species, moves, item, ability)
+        return self.support_cache[json.dumps([species, sorted(moves), item, ability])][2]
 
     def predictive(self, obs: Observation, cands: list[dict], weights: np.ndarray) -> float:
         """P(obs) under a weighting of candidates (floored as in the posterior)."""
@@ -159,20 +206,50 @@ class SetBelief:
         return self.worker.run([dict(obs.job(), candidates=cands)])[0]
 
     def draw(self, species: str, moves=(), item: str | None = None, ability: str | None = None) -> dict:
-        cands = self.candidates(species, moves, item, ability)
+        cands = self.supported_candidates(species, moves, item, ability)
         w = self.weights(species, cands)
         return cands[self.rng.choices(range(len(cands)), weights=w)[0]]
 
     def summary(self, species: str, moves=(), item: str | None = None, ability: str | None = None,
                 top: int = 3) -> list[tuple[str, float]]:
         """The most likely item / nature / spread combinations, for display."""
-        cands = self.candidates(species, moves, item, ability)
+        cands = self.supported_candidates(species, moves, item, ability)
         w = self.weights(species, cands)
         agg: dict[str, float] = {}
         for c, p in zip(cands, w):
             label = f"{c['item'] or '-'} / {c['nature']} / {'-'.join(str(c['evs'][s]) for s in c['evs'])}"
             agg[label] = agg.get(label, 0.0) + float(p)
         return sorted(agg.items(), key=lambda kv: -kv[1])[:top]
+
+
+def speed_proposals(cands: list[dict], unknown_item: bool, mega: bool) -> list[dict]:
+    """Bounded legal Champions spreads: retain revealed moves/ability and the known held item.
+
+    Explore all 0..32 Speed points so narrow observed intervals are covered, not just extreme speeds.
+    Item alternatives apply only when unobserved; an already evolved Mega cannot acquire a Choice Scarf.
+    """
+    templates = {}
+    for c in cands:
+        templates.setdefault((c.get('item'), c.get('ability')), c)
+    proposals = {}
+    for c in list(templates.values())[:2]:
+        items = [c.get('item', '')]
+        if unknown_item and not mega:
+            items.extend(['', 'Choice Scarf'])
+        for item in dict.fromkeys(items):
+            for nature in dict.fromkeys([c.get('nature', 'Serious'), 'Timid', 'Quiet']):
+                for points in range(33):
+                    evs = {s: min(32, max(0, c.get('evs', {}).get(s, 0)))
+                           for s in ('hp', 'atk', 'def', 'spa', 'spd', 'spe')}
+                    evs['spe'] = points
+                    excess = max(0, sum(evs.values()) - 66)
+                    for stat in ('def', 'spd', 'hp', 'atk', 'spa'):
+                        take = min(excess, evs[stat])
+                        evs[stat] -= take
+                        excess -= take
+                    proposal = dict(c, item=item, nature=nature, evs=evs)
+                    proposals[key(proposal)] = proposal
+    return list(proposals.values())
 
 
 class Beliefs:
