@@ -15,6 +15,7 @@ policy only as the fallback. A forced switch is searched too (each Pokémon we c
 starts), and a failed search falls back to the policy (Suggestion.status["fallback"]).
 """
 
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -149,11 +150,14 @@ class Advisor:
             # priorVisits / rolloutPolicies: see services/sim-tools/terminal_search.js. The V_ref bootstrap of a
             # root cell keeps the weight of 4 rollouts, and the opponent's rollouts rotate over the scripted
             # disrupt / tactical foes and the same expert policy we use (symmetric rollouts).
+            # workers: Node processes searching the same worlds on independent random streams
+            # (POKESIM_SEARCH_WORKERS, default 4; about 400 MB each).
             self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=8500,
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
                                           lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1',
                                           priorVisits=4,
-                                          rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']})
+                                          rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']},
+                                          workers=int(os.environ.get('POKESIM_SEARCH_WORKERS', 4)))
             self.planner['search'].update({k: v for k, v in requested.items()
                                           if k not in ('plans', 'continuations', 'tiebreak', 'lostPathPenalty')})
             self.planner['search']['value_model'] = value_model.version

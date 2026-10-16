@@ -36,7 +36,7 @@ from poke_env.environment import SinglesEnv
 from poke_env.player import RandomPlayer
 from sb3_contrib import MaskablePPO
 
-from pokesim.config import FORMAT, RAW_DIR, ROOT
+from pokesim.config import FORMAT, PROCESSED_DIR, RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor
 from pokesim.live.selection import LadderLineupModel, MatchupModel, PickModel
 from pokesim.rl.bc import CounterPickHeuristic
@@ -338,11 +338,28 @@ class AdvisorPlayer(TrackedPlayer):
               f"({self.n_won_battles}-{self.n_lost_battles})", flush=True)
 
 
-def code_stamp() -> float:
-    """Latest modification time of the code, the sim scripts and the priors the advisor reads."""
+def code_stamp(extra: list[Path] = ()) -> float:
+    """Latest modification time of the code, the sim scripts, the priors the advisor reads and the model files
+    in use (extra: policies, the value run, the opponent policy, the team), so a new model is picked up between
+    battles. Not whole checkpoint or run directories: training writes there while the collector plays."""
     paths = [*(ROOT / "src").rglob("*.py"), *(ROOT / "services" / "sim-tools").glob("*.js"), Path(__file__),
-             *(ROOT / "data" / "processed").glob("*_priors*.json")]
+             *(ROOT / "data" / "processed").glob("*_priors*.json"), *map(Path, extra)]
     return max((p.stat().st_mtime for p in paths if p.exists()), default=0.0)
+
+
+def model_files(args) -> list[Path]:
+    files = [Path(p) for p in args.policy] + [Path(args.team), PROCESSED_DIR / "matchup_model.json",
+                                             PROCESSED_DIR / "pick_rates.json"]
+    if args.value_run:
+        run = Path(args.value_run)
+        files += [run / "report.json", *run.glob("*.pt")]
+    if args.opponent_policy and args.opponent_policy != "default":
+        files.append(Path(args.opponent_policy))
+    else:
+        from pokesim.live.opponent import DEFAULT_POLICY
+
+        files.append(DEFAULT_POLICY)
+    return files
 
 
 def rounded(pairs) -> list:
@@ -387,7 +404,8 @@ async def run(args) -> None:
                        account_configuration=AccountConfiguration(*cred),
                        server_configuration=ShowdownServerConfiguration, max_concurrent_battles=1,
                        start_timer_on_battle_start=True)
-    stamp = code_stamp()
+    watched = model_files(args)
+    stamp = code_stamp(watched)
     for _ in range(args.battles):
         # A long battle is fine (60 decisions of 8 s take over 10 minutes); a silent connection is not.
         task = asyncio.ensure_future(me.ladder(1))
@@ -402,7 +420,7 @@ async def run(args) -> None:
             print('terminal search quality gate: stop after this battle: ' +
                   ', '.join(sorted(set(me.quality_issues))), flush=True)
             raise SystemExit(78)
-        if code_stamp() != stamp:  # code or priors changed: exit between battles so the caller restarts us
+        if code_stamp(watched) != stamp:  # code, priors or models changed: exit so the caller restarts us
             print("code changed: exiting to reload", flush=True)
             break
     print(f"done: {me.n_won_battles}-{me.n_lost_battles}")

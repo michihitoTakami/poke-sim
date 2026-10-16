@@ -315,3 +315,54 @@ def test_column_weights_follow_the_worker_order_and_zero_dropped_replies():
     weights = column_weights(results, predictor)
     assert seen == [['x', 'z']]
     assert weights == [[.25, 0., .75], [1., 1.]]
+
+
+def reply_with(stats, ready=True, sims=10, wins=()):
+    cells = [[dict(n=n, sum=s, prior=p, speed=sp, priorSpeed=.1, ends=n, failed=f) for n, s, p, sp, f in row]
+             for row in stats]
+    return {'session': 'x', 'pending': [],
+            'summary': {'ready': ready, 'simulations': sims, 'terminal': sims, 'learned': 1, 'censored': 0,
+                        'failed': 0, 'unfinished_at_deadline': 1, 'chance_paths': 0, 'tree_nodes': 5,
+                        'max_tree_decisions': 2, 'max_rollout_turns': 7, 'errors': [], 'immediate_wins': list(wins)},
+            'results': [{'p1': ['a', 'b'], 'p2': ['x'], 'stats': cells, 'payoff': [[0], [0]], 'winSpeed': [[0], [0]],
+                         'visits': [[0], [0]], 'invalid': [[0], [0]]}]}
+
+
+def test_worker_replies_pool_rollouts_average_bootstraps_and_keep_certificates():
+    from pokesim.search.terminal import merge_replies
+
+    first = reply_with([[(3, 1., .6, .3, 0)], [(0, 0., .2, 0., 1)]], sims=10, wins=['b'])
+    second = reply_with([[(1, -1., .4, 0., 0)], [(2, 2., None, .5, 0)]], sims=20)
+    merged = merge_replies([first, second], prior_visits=4)
+    world = merged['results'][0]
+    # cell a/x: prior mean .5 with 4 pseudo visits, rollouts (3 + 1) summing to 0
+    assert world['payoff'][0][0] == pytest.approx((4 * .5 + 0) / (4 + 4))
+    assert world['winSpeed'][0][0] == pytest.approx((4 * .1 + .3) / 8)
+    assert world['visits'][0][0] == 4 and world['invalid'][1][0] == 1
+    # cell b/x: certified by the first worker outranks its rollouts
+    assert world['payoff'][1][0] == 1
+    assert world['stats'][1][0] == {'n': 2, 'sum': 2., 'prior': .2, 'speed': .5, 'priorSpeed': .1, 'ends': 2,
+                                     'failed': 1}
+    s = merged['summary']
+    assert s['simulations'] == 30 and s['unfinished_at_deadline'] == 2 and s['workers'] == 2
+    assert s['worker_simulations'] == [10, 20] and s['immediate_wins'] == ['b'] and s['ready']
+    assert not merge_replies([first, reply_with([[(0, 0, .5, 0, 0)], [(0, 0, .5, 0, 0)]], ready=False)],
+                             0)['summary']['ready']
+
+
+def test_two_workers_search_the_same_position_on_different_streams():
+    req = json.loads((Path(__file__).parent / 'fixtures/terminal-moonblast-turn14.json').read_text())
+    req.update(decisionMs=3000, workers=2, priorVisits=4)
+    engine = Lookahead(None, value_model=FlatValue())
+    try:
+        result = search(engine, req)
+        assert len(engine.extra_workers) == 1
+        advice = plan(result, rho=.3)
+    finally:
+        engine.close()
+    summary = advice.status['terminal_search']
+    assert summary['workers'] == 2 and summary['workers_failed'] == []
+    assert len(summary['worker_simulations']) == 2 and min(summary['worker_simulations']) > 0
+    assert summary['simulations'] == sum(summary['worker_simulations'])
+    assert advice.ranked()[0][0] == 'move:moonblast'
+    assert all(np.isfinite(np.asarray(r['payoff'], float)).all() for r in result)
