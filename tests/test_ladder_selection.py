@@ -93,3 +93,19 @@ def test_thompson_choice_is_reproducible_and_stays_near_the_best_posterior(tmp_p
     empty = LadderLineupModel([])
     lineup, info = empty.choose(ROSTER, random.Random(1), explore=False)
     assert len(lineup) == 3 and info['games'] == 0
+
+
+def test_saved_evidence_counts_behind_the_records_and_decays_with_them(tmp_path):
+    import random
+
+    from pokesim.live.selection import LadderLineupModel
+
+    prior = {'weight': .5, 'ordered': [['scolipede,gholdengo,umbreon', 40, 40], ['umbreon,gholdengo,salamence', 0, 40]]}
+    model = LadderLineupModel([], prior=prior)
+    assert model.prior_games == 40 and model.mean([ROSTER[0], ROSTER[2], ROSTER[1]]) > .8
+    assert model.mean([ROSTER[1], ROSTER[2], ROSTER[3]]) < .2
+    lineup, info = model.choose(ROSTER, random.Random(0), explore=False)
+    assert lineup == [ROSTER[0], ROSTER[1], ROSTER[2]] or lineup == [ROSTER[0], ROSTER[2], ROSTER[1]]
+    assert info['prior_games'] == 40
+    loaded = LadderLineupModel.from_records(tmp_path, ROSTER, prior_path=tmp_path / 'none.json')
+    assert loaded.prior_games == 0
