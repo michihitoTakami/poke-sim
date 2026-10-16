@@ -133,6 +133,10 @@ class Search {
     for (let i = 0; i < this.states[0].p1.length; i++) for (let w = 0; w < this.states.length; w++) {
       for (let j = 0; j < this.states[w].p2.length; j++) this.jobs.push([w, i, j]);
     }
+    // Several workers on the same worlds start their first pass at different points, so together they cover
+    // every root cell about n times sooner; the driver pools their bootstraps (jobOffset in [0, 1)).
+    const offset = Math.floor(Math.min(.999, Math.max(0, Number(req.jobOffset) || 0)) * this.jobs.length);
+    if (offset) this.jobs = [...this.jobs.slice(offset), ...this.jobs.slice(0, offset)];
   }
 
   certify(ms) {
