@@ -146,9 +146,14 @@ class Advisor:
                 raise ValueError('value-run requires lookahead and planner on/shadow')
             value_model = ValueEnsemble(value_run)
             requested = (planner or {}).get('search', {})
+            # priorVisits / rolloutPolicies: see services/sim-tools/terminal_search.js. The V_ref bootstrap of a
+            # root cell keeps the weight of 4 rollouts, and the opponent's rollouts rotate over the scripted
+            # disrupt / tactical foes and the same expert policy we use (symmetric rollouts).
             self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=8500,
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
-                                          lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1')
+                                          lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1',
+                                          priorVisits=4,
+                                          rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']})
             self.planner['search'].update({k: v for k, v in requested.items()
                                           if k not in ('plans', 'continuations', 'tiebreak', 'lostPathPenalty')})
             self.planner['search']['value_model'] = value_model.version
