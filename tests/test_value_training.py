@@ -199,3 +199,44 @@ def test_modified_feature_cache_is_rejected(tmp_path):
     (cache / 'reference_train.npz').write_bytes(b'changed')
     with pytest.raises(ValueError, match='modified prepared'):
         load(cache)
+
+
+def test_a_real_outcome_value_run_loads_into_the_live_ensemble(tmp_path):
+    """A tiny run in the pokesim.learn.train_value layout is accepted and reproduces its torch predictions."""
+    import json
+
+    import numpy as np
+    import torch
+    from test_policy_feature_parity import observe
+
+    from pokesim.config import ROOT
+    from pokesim.learn.value_dataset import DEX, encode_row
+    from pokesim.runtime.bundle import file_hash
+    from pokesim.value.features import Encoder
+    from pokesim.value.model import ValueModel
+    from pokesim.value.runtime import ValueEnsemble
+
+    req = json.loads((ROOT / 'tests/fixtures/terminal-moonblast-turn14.json').read_text())
+    view = observe(req)[0]['p1']['view']
+    encoder = Encoder.load(DEX)
+    public, private, _, _, features = encoder.encode(view)
+    torch.manual_seed(0)
+    model = ValueModel(len(public), len(private), 16)
+    run = tmp_path / 'value-real-test'
+    run.mkdir()
+    path = run / 'real-seed0.pt'
+    torch.save({'schema_version': 1, 'dataset_id': 'x', 'stage': 'real', 'seed': 0, 'model_config': model.config,
+                'state_dict': model.state_dict(), 'features': features, 'reference': {'target': 'real_outcome'}}, path)
+    report = {'provenance': {'target': 'real_outcome', 'feature_version': features['version'], 'features': features,
+                             'feature_code_sha': file_hash(ROOT / 'src/pokesim/value/features.py'),
+                             'dex_sha': file_hash(DEX)},
+              'stages': {'real:0': {'checkpoint': 'real-seed0.pt', 'sha': file_hash(path)}}}
+    (run / 'report.json').write_text(json.dumps(report))
+    ensemble = ValueEnsemble(run)
+    assert ensemble.version['reference'] == {'target': 'real_outcome'}
+    p = ensemble.probabilities([view])
+    with torch.no_grad():
+        expected = torch.sigmoid(model(torch.as_tensor(public)[None], torch.as_tensor(private)[None])).numpy()
+    assert np.allclose(p, expected[0], atol=1e-6)
+    assert encode_row({'view': view, 'outcome': 1, 'turn': 14, 'side': 'p1', 'source': 'ladder',
+                       'battle_id': 'b', 'rating': {'p1': 1100}})['target'] == 1

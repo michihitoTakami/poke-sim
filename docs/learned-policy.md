@@ -39,3 +39,15 @@ uv run python scripts/ladder.py --planner on --value-run runs/terminal-value-v2 
 `net:` を指定すると、相手ネットが p2 の木ノードの事前分布（PUCT）、展開後最初の `rolloutNetTurns` ターンのロールアウト
 （確率 `rolloutMix.opp`）、root予測の学習分（`planner.predict` の `prior`）になり、クローンPPO（bc_human）は読み込まない。
 記録の `versions.opponent_policy.kind` は `net`、`summary.policy_nets` にSHAが入る。ネットが読めない判断は品質停止の対象。
+
+## 実勝敗で学ぶ価値（Stage C）
+```bash
+uv run python -m pokesim.learn.value_dataset --rows data/processed/learn/replays-v1-*.jsonl.gz --sides p1 --out data/processed/learn/value-v1/replays.npz
+uv run python -m pokesim.learn.value_dataset --rows data/processed/learn/ladder-train-v1.jsonl.gz --sides p1 --out data/processed/learn/value-v1/ladder-train.npz
+uv run python -m pokesim.learn.train_value --out runs/value-real-v1 --pretrain .../replays.npz --train .../ladder-train.npz \
+    --dev .../ladder-development.npz --reference-run runs/terminal-value-v2 --device cuda
+```
+特徴量は既存の `observed-value-v1`（`pokesim.value.features`）のまま、教師を参照方策の継続結果ではなく実際の勝敗にする。
+`ValueEnsemble` は `provenance.target == "real_outcome"` の run を読み、`--value-run runs/value-real-v1` でそのまま探索に使える。
+初回（開発108戦）: Brier 定数 0.247 / HP基準 0.211 / 現行V_ref 0.201 / 実勝敗ネット 0.176（ゲートC: 差 ≥ 0.015 かつ90%区間が0を含まない → 合格）。
+これは観測の予測精度であり、探索に入れたときの手の改善は局面セットの後悔とローカル対戦で別に測る。
