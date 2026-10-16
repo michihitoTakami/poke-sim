@@ -95,17 +95,22 @@ def base_label(label: str) -> str:
 
 
 def predict(payoff: np.ndarray, labels: list[str], opponent_model: dict, last_move: str | None,
-            cloned: dict[str, float] | None, cloned_weight: float) -> np.ndarray:
+            cloned: dict[str, float] | None, cloned_weight: float, prior: dict[str, float] | None = None) -> np.ndarray:
     """The opponent's mix in one world, fixed before planning: the search's prediction (equilibrium / softmax best
     response to our equilibrium, see opponent_mix), a share for repeating its last move, then a share for the
-    cloned human policy (its labels have no Mega variants: split over them)."""
+    cloned human policy (its labels have no Mega variants: split over them). prior: a learned opponent policy's
+    probabilities over this world's labels (the worker's p2Prior); when given it takes the cloned policy's share."""
     x, y = solve_zero_sum(payoff)
     q = opponent_mix(payoff, x, y, opponent_model)
     repeat = opponent_model.get("repeat", 0.0)
     if repeat > 0 and last_move in labels:
         q = (1 - repeat) * q
         q[labels.index(last_move)] += repeat
-    if cloned:
+    if prior:
+        learned = np.array([prior.get(lab, 0.0) for lab in labels])
+        if learned.sum() > 0:
+            q = (1 - cloned_weight) * q + cloned_weight * learned / learned.sum()
+    elif cloned:
         bases = [base_label(lab) for lab in labels]
         bc = np.array([cloned.get(b, 0.0) / bases.count(b) for b in bases])
         if bc.sum() > 0:
@@ -142,7 +147,8 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
             continue
         idx = [res["p1"].index(lab) for lab in labels]  # our options are the same in every world
         payoff = payoff[idx]
-        q = predict(payoff, opp, opponent_model or {}, last_move, cloned, cloned_weight)
+        prior = dict(zip(res["p2"], res["p2Prior"], strict=True)) if res.get("p2Prior") else None
+        q = predict(payoff, opp, opponent_model or {}, last_move, cloned, cloned_weight, prior)
         worlds.append(World(payoff, opp, 1.0, q))
         cols = [res["p2"].index(lab) for lab in opp]
         if tree:

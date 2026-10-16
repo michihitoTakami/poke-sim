@@ -18,7 +18,8 @@ def column_weights(results, predictor):
         except ValueError:
             out.append([1.0] * len(res['p2']))
             continue
-        q = predictor(payoff, labels)
+        prior = dict(zip(res['p2'], res['p2Prior'], strict=True)) if res.get('p2Prior') else None
+        q = predictor(payoff, labels, prior) if prior else predictor(payoff, labels)
         weights = dict(zip(labels, (float(x) for x in q), strict=True))
         out.append([weights.get(lab, 0.0) for lab in res['p2']])
     return out
@@ -47,6 +48,9 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
     results = []
     for w, world in enumerate(first['results']):
         merged = {k: v for k, v in world.items() if k not in ('payoff', 'winSpeed', 'visits', 'invalid', 'stats')}
+        priors = [r['results'][w].get('p2Prior') for r in replies if r['results'][w].get('p2Prior')]
+        if priors:
+            merged['p2Prior'] = np.mean(priors, axis=0).tolist()
         payoff, speed, visits, invalid, stats = [], [], [], [], []
         for i, label in enumerate(world['p1']):
             row_p, row_s, row_v, row_i, row_st = [], [], [], [], []

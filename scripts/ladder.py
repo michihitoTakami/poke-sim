@@ -51,13 +51,16 @@ OUT = RAW_DIR / "ladder"
 CREDENTIALS = Path.home() / ".config" / "poke-sim" / "showdown.env"
 
 
-def search_quality_issues(status: dict, elapsed: float) -> list[str]:
+def search_quality_issues(status: dict, elapsed: float, expected_nets: dict | None = None) -> list[str]:
     """Deployment gate for terminal search; failures must not silently become another collection batch."""
     issues = []
     if status.get('fallback'):
         issues.append('search fallback')
-    if status.get('search', {}).get('terminal_search', {}).get('failed', 0):
+    tree = status.get('search', {}).get('terminal_search', {})
+    if tree.get('failed', 0):
         issues.append('simulation failed')
+    if expected_nets and tree and set(expected_nets) - set(tree.get('policy_nets') or {}):
+        issues.append('policy net missing')
     if elapsed > 10:
         issues.append('decision exceeded 10 seconds')
     return issues
@@ -286,7 +289,8 @@ class AdvisorPlayer(TrackedPlayer):
             entry['evaluations'] = advice.evaluations
             entry['win_kind'] = advice.win_kind
             if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
-                self.record_quality(battle, entry, search_quality_issues(advice.status, advice.elapsed))
+                nets = (self.planner or {}).get('search', {}).get('policyNets')
+                self.record_quality(battle, entry, search_quality_issues(advice.status, advice.elapsed, nets))
             if advice.shadow:
                 entry["shadow"] = [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.shadow[:5]]
             legal = [(label, p, a) for label, p in advice.actions
@@ -354,7 +358,7 @@ def model_files(args) -> list[Path]:
         run = Path(args.value_run)
         files += [run / "report.json", *run.glob("*.pt")]
     if args.opponent_policy and args.opponent_policy != "default":
-        files.append(Path(args.opponent_policy))
+        files.append(Path(args.opponent_policy.removeprefix("net:")))
     else:
         from pokesim.live.opponent import DEFAULT_POLICY
 
@@ -431,7 +435,8 @@ def main() -> None:
     ap.add_argument("--battles", type=int, default=30)
     ap.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     ap.add_argument("--opponent-policy", default="default",
-                    help="cloned human policy for the opponent prediction (default: checkpoints/bc_human.zip)")
+                    help="cloned human policy for the opponent prediction (default: checkpoints/bc_human.zip), or "
+                         "net:<exported policy json> for a learned public policy inside the search")
     ap.add_argument("--belief", action=argparse.BooleanOptionalAction, default=True,
                     help="infer opponent sets from damage and move order (default on; --no-belief disables)")
     ap.add_argument('--value-run', type=Path, help='validated terminal-value run; requires planner on/shadow')

@@ -1,9 +1,20 @@
 // Anytime information-set tree search. Legal root replies are covered before selective deepening.
 // Simulation is omniscient; decisions in the tree and rollout only receive the acting player's observation.
 const {createHash} = require('crypto');
-const {PublicObservation} = require('./public_observation');
+const {PublicObservation, legalChoices} = require('./public_observation');
 const {pruneRoot} = require('./action_filter');
 const {choosePublic, chooseBatonPublic, observedStep, VERSION, BATON_VERSION} = require('./public_policy');
+const {loadPolicyNet} = require('./policy_net');
+
+// A small deterministic random source per trial (xorshift32), separate from the engine's PRNG so loading a
+// policy net does not change the chance events of a trial that does not consult it.
+function xorshift(seed) {
+  let x = (seed >>> 0) || 0x9e3779b9;
+  return () => {
+    x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5; x >>>= 0;
+    return x / 4294967296;
+  };
+}
 const hash = x => createHash('sha256').update(typeof x === 'string' ? x : JSON.stringify(x)).digest('hex');
 let session = null;
 
@@ -78,6 +89,25 @@ class Search {
     const custom = req.rolloutPolicies && (req.rolloutPolicies.p1 || req.rolloutPolicies.p2);
     this.policyVersion = this.policyVersion + (custom ?
       `+p1:${this.rolloutPolicies.p1.join(',')}/p2:${this.rolloutPolicies.p2.join(',')}` : '');
+    // Learned public policies (policy_net.js): policyNets {ours, opp} give the tree's priors (PUCT) and, with
+    // probability rolloutMix[side], the rollout choice for the first rolloutNetTurns turns after expansion.
+    this.nets = {p1: null, p2: null};
+    const nets = req.policyNets || {};
+    if (nets.ours) this.nets.p1 = loadPolicyNet(nets.ours);
+    if (nets.opp) this.nets.p2 = loadPolicyNet(nets.opp);
+    const mix = req.rolloutMix || {};
+    this.rolloutMix = {p1: Math.min(1, Math.max(0, Number(mix.ours ?? .5))),
+                       p2: Math.min(1, Math.max(0, Number(mix.opp ?? .7)))};
+    this.rolloutNetTurns = Math.max(0, Number(req.rolloutNetTurns ?? 6));
+    this.rolloutTemperature = {p1: Number((req.rolloutTemperature || {}).ours ?? .5),
+                               p2: Number((req.rolloutTemperature || {}).opp ?? 1)};
+    this.puct = Number(req.puct ?? 1.5);
+    this.policyNets = {};
+    if (this.nets.p1) this.policyNets.ours = this.nets.p1.sha;
+    if (this.nets.p2) this.policyNets.opp = this.nets.p2.sha;
+    if (this.nets.p1 || this.nets.p2) {
+      this.policyVersion += '+nets:' + Object.entries(this.policyNets).map(([k, v]) => `${k}=${v.slice(0, 8)}`).join(',');
+    }
     this.active = null; this.unfinishedAtDeadline = 0;
     this.states = req.samples.map(sample => {
       const b = deps.setUp(sample, req.format, 1);
@@ -85,6 +115,11 @@ class Search {
         p1: deps.choices(b, b.p1), p2: deps.choices(b, b.p2), lastFoe: b.p2.pokemonLeft === 1,
         speed: {ours: b.p1.active[0].getStat('spe'), opponent: b.p2.active[0].getStat('spe'),
           ourAction: b.p1.active[0].getActionSpeed(), opponentAction: b.p2.active[0].getActionSpeed()}};
+      if (this.nets.p2 && !b.ended) {
+        // The opponent net's view of its root replies in this world, for the driver's prediction.
+        const obs = this.observer(b, st);
+        st.p2Prior = this.nets.p2.prior(obs.view(b.p2), b.dex, st.p2);
+      }
       b.destroy(); return st;
     });
     if (!this.states.length || this.states.some(s => JSON.stringify(s.p1) !== JSON.stringify(this.states[0].p1))) {
@@ -139,18 +174,33 @@ class Search {
   }
 
   // Each key is actor-visible JSON only. In particular p1's tree is shared across hidden-set samples.
+  // Without a net for the side: UCT, untried actions first (the hand policy's choice breaking ties).
+  // With a net: PUCT over the net's prior, computed once per node (nodes are keyed by the view).
   treeChoice(b, obs, side, trace) {
     const view = obs.view(side), options = this.deps.choices(b, side);
-    const key = hash([view, options]), prior = this.policy(view, side.id === 'p1' ? 'expert' : 'disrupt', b.dex)[0];
+    const key = hash([view, options]), net = this.nets[side.id];
     let node = this.nodes.get(key);
     if (!node) {
-      node = {n: 0, actions: options.map(([choice]) => ({choice, n: 0, sum: 0}))};
+      node = {n: 0, sum: 0, actions: options.map(([choice]) => ({choice, n: 0, sum: 0}))};
+      if (net) {
+        const priors = net.prior(view, b.dex, options);
+        node.actions.forEach((a, i) => { a.prior = priors[i]; });
+      } else {
+        const prior = this.policy(view, side.id === 'p1' ? 'expert' : 'disrupt', b.dex)[0];
+        node.actions.forEach(a => { a.prior = a.choice === prior ? 1 : 0; });
+      }
       this.nodes.set(key, node);
     }
     let best = null, score = -Infinity;
     for (const action of node.actions) {
-      const q = action.n ? action.sum / action.n + .8 * Math.sqrt(Math.log(node.n + 1) / action.n) :
-        1e6 + (action.choice === prior ? 1 : 0);
+      let q;
+      if (net) {
+        const value = action.n ? action.sum / action.n : (node.n ? node.sum / node.n : 0);
+        q = value + this.puct * action.prior * Math.sqrt(node.n + 1) / (1 + action.n);
+      } else {
+        q = action.n ? action.sum / action.n + .8 * Math.sqrt(Math.log(node.n + 1) / action.n) :
+          1e6 + action.prior;
+      }
       if (q > score) { score = q; best = action; }
     }
     trace.push({node, action: best, sign: side.id === 'p1' ? 1 : -1});
@@ -168,7 +218,7 @@ class Search {
     }
     cell.n++; cell.sum += v; cell.sumSq += v * v;
     if (item.ended) { cell.ends++; cell.speed += p === 1 ? 1 / (1 + item.turns) : 0; }
-    for (const x of item.trace) { x.node.n++; x.action.n++; x.action.sum += x.sign * v; }
+    for (const x of item.trace) { x.node.n++; x.node.sum += x.sign * v; x.action.n++; x.action.sum += x.sign * v; }
   }
 
   feedback(rows) {
@@ -188,8 +238,16 @@ class Search {
     const obs = this.observer(b, st); let at = b.log.length, root = true, decisions = 0, tree = !initial;
     const start = b.turn;
     const names = this.rolloutPolicies, serial = this.serial;
-    const rollout = side => this.policy(obs.view(side),
-      names[side.id][serial % names[side.id].length], b.dex)[0];
+    const random = xorshift(bytes.readUInt32LE(8));
+    let rolloutTurns = 0;
+    const rollout = side => {
+      const view = obs.view(side), net = this.nets[side.id];
+      if (net && rolloutTurns < this.rolloutNetTurns && random() < this.rolloutMix[side.id]) {
+        const legal = legalChoices(view);
+        if (legal.length) return net.sample(view, b.dex, legal, random, this.rolloutTemperature[side.id])[0];
+      }
+      return this.policy(view, names[side.id][serial % names[side.id].length], b.dex)[0];
+    };
     const advance = (a, c) => {
       this.deps.observedStep(b, a, c, this.deps.step, rollout, root ? [] : ['p1', 'p2']);
       root = false; obs.append(b.log.slice(at), true); at = b.log.length;
@@ -207,7 +265,7 @@ class Search {
           a = x.choice; c = y.choice;
           this.maxTreeDepth = Math.max(this.maxTreeDepth, trace.length / 2);
           if (x.fresh || y.fresh) tree = false; // expand once, then use the frozen public rollout policy
-        } else { a = rollout(b.p1); c = rollout(b.p2); }
+        } else { a = rollout(b.p1); c = rollout(b.p2); if (b.requestState === 'move') rolloutTurns++; }
         advance(a, c);
         if (!initial && !b.ended && b.requestState === 'move') yield;
       }
@@ -297,10 +355,11 @@ class Search {
       value_kind: 'bounded-reference-material-utility-v1', calibrated_win_probability: false,
       action_filter: this.actionFilter,
       unfinished_at_deadline: this.unfinishedAtDeadline, predicted_columns: this.columns !== null,
-      chance_paths: this.chancePaths, immediate_wins: this.certified,
+      chance_paths: this.chancePaths, immediate_wins: this.certified, policy_nets: this.policyNets,
+      puct: this.nets.p1 || this.nets.p2 ? this.puct : null,
       certificate_scope: 'all discrete chance paths and legal replies in sampled worlds only'};
     return {session: this.id, pending, summary, results: this.states.map(st => ({
-      p1: st.p1.map(x => x[1]), p2: st.p2.map(x => x[1]),
+      p1: st.p1.map(x => x[1]), p2: st.p2.map(x => x[1]), p2Prior: st.p2Prior || null,
       payoff: st.cells.map((row, i) => row.map(c => this.certified.includes(st.p1[i][1]) ? 1 : this.value(c))),
       winSpeed: st.cells.map(row => row.map(c => this.speed(c))),
       visits: st.cells.map(row => row.map(c => c.n)), invalid: st.cells.map(row => row.map(c => c.failed)),

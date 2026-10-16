@@ -201,7 +201,17 @@ class Advisor:
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
         self.opponent_policy = None
         self.opponent_policy_version: dict | None = None  # which cloned policy predicted the opponent (records)
-        if opponent_policy:
+        if isinstance(opponent_policy, str) and opponent_policy.startswith("net:"):
+            # A learned public policy (pokesim.learn) run inside the worker: tree priors, rollouts and the root
+            # prediction's learned share (planner.predict). The cloned PPO policy is not loaded.
+            net = Path(opponent_policy[4:])
+            if not net.exists():
+                raise FileNotFoundError(f"opponent policy net not found: {net}")
+            if not self.planner or not self.planner["search"].get("terminalSearch"):
+                raise ValueError("an opponent policy net needs the terminal search (planner on with a value run)")
+            self.planner["search"].setdefault("policyNets", {})["opp"] = str(net.resolve())
+            self.opponent_policy_version = {"path": net.name, "sha": file_hash(net), "kind": "net"}
+        elif opponent_policy:
             from pokesim.live.opponent import DEFAULT_POLICY, OpponentPolicy
 
             path = DEFAULT_POLICY if opponent_policy == "default" else Path(opponent_policy)
@@ -376,9 +386,9 @@ class Advisor:
                 extra = {}
                 if planned and getattr(engine, 'value_model', None) is not None:
                     # The same opponent prediction the planner uses, so the search examines replies by it.
-                    def predictor(payoff, labels, last=last):
+                    def predictor(payoff, labels, prior=None, last=last):
                         return predict(payoff, labels, engine.opponent_model, last, cloned or None,
-                                       self.planner["cloned_weight"])
+                                       self.planner["cloned_weight"], prior)
 
                     extra = {'value': True, 'log': log, 'our_role': our_role, 'predictor': predictor}
                 cache[key] = engine.query(b, own, incoming, settings, belief=belief, **extra)
