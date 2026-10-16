@@ -24,6 +24,7 @@ from pokesim.config import PROCESSED_DIR, RAW_DIR
 from pokesim.rl.myteam import to_id
 
 PICK_RATES = PROCESSED_DIR / "pick_rates.json"
+LINEUP_PRIOR = PROCESSED_DIR.parent / "lineup_prior.json"  # data/lineup_prior.json: evidence kept from lost records
 MATCHUP_MODEL = PROCESSED_DIR / "matchup_model.json"
 PRIOR = 2.0  # pseudo-observations at the average rate, for rarely seen species
 LADDER_PRIOR = 12.0  # shrink live results towards the simulated matchup estimate
@@ -275,14 +276,15 @@ class LadderLineupModel:
     breaking ties."""
 
     def __init__(self, rows: list[dict], half_life: float = LINEUP_HALF_LIFE, kappa: float = LINEUP_KAPPA,
-                 preview: bool = True, fit_rows: int = 200):
+                 preview: bool = True, fit_rows: int = 200, prior: dict | None = None):
         """preview: also fit the logistic adjustment on the opponent's preview (PreviewLogistic) from the most
-        recent fit_rows games, each offset by the posterior of the games before it."""
+        recent fit_rows games, each offset by the posterior of the games before it.
+        prior: earlier evidence kept as counts ({"weight": w, "ordered": [[lead,second,third wins games], ...]},
+        see LINEUP_PRIOR), counted with its weight as if older than every row."""
         self.rows, self.half_life, self.kappa = rows, half_life, kappa
         weights = [0.5 ** (age / half_life) for age in range(len(rows))]
         self.games = sum(weights)
         wins = sum(w * r['win'] for w, r in zip(weights, rows))
-        self.global_rate = (1 + wins) / (2 + self.games)
         self.trio: dict[tuple, list[float]] = {}
         self.ordered: dict[tuple, list[float]] = {}
         for w, r in zip(weights, rows):
@@ -290,6 +292,19 @@ class LadderLineupModel:
                 cell = table.setdefault(key, [0.0, 0.0])
                 cell[0] += w * r['win']
                 cell[1] += w
+        self.prior_games = 0.0
+        for key, won, games in (prior or {}).get('ordered', []):
+            ids = tuple(key.split(','))
+            w = float((prior or {}).get('weight', 1.0)) * 0.5 ** (len(rows) / half_life)
+            ordered, trio = (ids[0], *sorted(ids[1:])), tuple(sorted(ids))
+            for table, k in ((self.trio, trio), (self.ordered, ordered)):
+                cell = table.setdefault(k, [0.0, 0.0])
+                cell[0] += w * won
+                cell[1] += w * games
+            wins += w * won
+            self.games += w * games
+            self.prior_games += w * games
+        self.global_rate = (1 + wins) / (2 + self.games)
         self.sha = hashlib.sha256(json.dumps([(r['name'], list(r['ordered']), r['win']) for r in rows])
                                   .encode()).hexdigest()[:16]
         self.logistic = None
@@ -302,8 +317,11 @@ class LadderLineupModel:
             self.logistic.fit(recent, offsets)
 
     @classmethod
-    def from_records(cls, root: Path, roster: list[str], **kw) -> "LadderLineupModel":
-        return cls(ladder_rows(root, roster), **kw)
+    def from_records(cls, root: Path, roster: list[str], prior_path: Path | None = None, **kw) -> "LadderLineupModel":
+        """prior_path (default LINEUP_PRIOR when it exists): saved evidence counted behind the records."""
+        prior_path = LINEUP_PRIOR if prior_path is None else prior_path
+        prior = json.loads(prior_path.read_text()) if prior_path and prior_path.exists() else None
+        return cls(ladder_rows(root, roster), prior=prior, **kw)
 
     def posterior(self, lineup: list[str]) -> tuple[float, float]:
         """Beta(alpha, beta) of winning with this ordered lineup (lead first)."""
@@ -355,7 +373,8 @@ class LadderLineupModel:
         return names, {'method': 'ladder-thompson' if explore else 'ladder-mean', 'posterior_mean': round(m, 4),
                        'sampled': round(sampled, 4), 'best_mean': round(best, 4), 'pool': len(pool),
                        'preview_adjusted': self.logistic is not None and preview is not None,
-                       'games': round(self.games, 2), 'records': len(self.rows), 'sha': self.sha,
+                       'games': round(self.games, 2), 'records': len(self.rows),
+                       'prior_games': round(self.prior_games, 2), 'sha': self.sha,
                        'half_life': self.half_life, 'kappa': self.kappa, 'temper': LINEUP_TEMPER,
                        'margin': LINEUP_MARGIN, **self.evidence(names)}
 

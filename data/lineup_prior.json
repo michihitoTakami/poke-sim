@@ -1,0 +1,16 @@
+{"note": "Rated ladder results of this roster collected 2026-10-14..16 (798 games, all operator versions), kept as prior evidence after the records were lost on 2026-10-17. Counted with weight 0.5 by LadderLineupModel until fresh records outnumber them.",
+ "weight": 0.5,
+ "ordered": [
+  ["umbreon,floetteeternal,scolipede", 44, 162], ["scolipede,gholdengo,umbreon", 8, 69], ["salamence,gholdengo,umbreon", 18, 40],
+  ["gholdengo,floetteeternal,scolipede", 18, 38], ["floetteeternal,skeledirge,umbreon", 15, 32], ["gholdengo,floetteeternal,skeledirge", 14, 21],
+  ["floetteeternal,gholdengo,skeledirge", 5, 7], ["scolipede,gholdengo,salamence", 7, 10], ["gholdengo,salamence,skeledirge", 3, 10],
+  ["salamence,scolipede,umbreon", 5, 10], ["scolipede,salamence,umbreon", 2, 10], ["floetteeternal,salamence,umbreon", 3, 9],
+  ["skeledirge,floetteeternal,umbreon", 5, 8], ["salamence,floetteeternal,umbreon", 1, 8], ["floetteeternal,gholdengo,scolipede", 3, 7],
+  ["skeledirge,gholdengo,umbreon", 3, 7], ["scolipede,gholdengo,skeledirge", 1, 7], ["umbreon,gholdengo,salamence", 3, 7],
+  ["salamence,gholdengo,skeledirge", 4, 7], ["floetteeternal,salamence,skeledirge", 0, 6], ["scolipede,skeledirge,umbreon", 3, 6],
+  ["floetteeternal,gholdengo,salamence", 2, 5], ["umbreon,gholdengo,scolipede", 0, 5], ["umbreon,salamence,scolipede", 1, 4],
+  ["umbreon,salamence,skeledirge", 1, 3], ["umbreon,scolipede,skeledirge", 2, 3], ["salamence,scolipede,skeledirge", 2, 3],
+  ["skeledirge,salamence,umbreon", 2, 3], ["skeledirge,floetteeternal,scolipede", 0, 2], ["gholdengo,scolipede,skeledirge", 1, 2],
+  ["skeledirge,gholdengo,scolipede", 1, 2], ["skeledirge,scolipede,umbreon", 1, 2], ["umbreon,gholdengo,skeledirge", 1, 2],
+  ["floetteeternal,salamence,scolipede", 1, 2], ["gholdengo,salamence,scolipede", 1, 2], ["floetteeternal,scolipede,skeledirge", 1, 2],
+  ["gholdengo,skeledirge,umbreon", 0, 1]]}
