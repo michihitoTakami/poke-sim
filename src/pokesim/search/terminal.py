@@ -3,9 +3,13 @@ import time
 
 import numpy as np
 
+from pokesim.search.evaluation import leaf_value
+
 
 def search(engine, request, *, started=None):
     started = time.monotonic() if started is None else started
+    if request.get('valueUtility', 'reference-material-v1') != 'reference-material-v1':
+        raise ValueError('unsupported search value utility')
     budget = float(request.pop('decisionMs', 8500)) / 1000
     if not .1 <= budget <= 9:
         raise ValueError('decisionMs must be between 100 and 9000')
@@ -21,7 +25,8 @@ def search(engine, request, *, started=None):
             reply = engine._query(request)
             start_inference = time.monotonic()
             probabilities = engine.value_model.probabilities([p['observation'] for p in reply['pending']])
-            feedback = [{'id': row['id'], 'p': float(p)} for row, p in
+            # p on this wire is a normalized bounded utility, not a calibrated human-game win probability.
+            feedback = [{'id': row['id'], 'p': (leaf_value(row['observation'], float(p)) + 1) / 2} for row, p in
                         zip(reply['pending'], probabilities, strict=True)]
             inference_ms += 1000 * (time.monotonic() - start_inference)
             summary = reply['summary']

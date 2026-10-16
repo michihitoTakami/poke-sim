@@ -132,6 +132,8 @@ class Live:
                              "opponent": [{"id": a, "label": self.label(a), "p": round(p, 3)}
                                           for a, p in s.opponent[:6]],
                              "win_prob": s.win_prob, "win_raw": s.win_raw, "win_kind": s.win_kind,
+                             "evaluations": [dict(row, id=row['label'], label=self.label(row['label']))
+                                             for row in s.evaluations],
                              "elapsed": round(s.elapsed, 2), "status": s.status,
                              "win_path": self.named_path(s.status.get("win_path"))}
         return out
@@ -320,6 +322,8 @@ class Live:
         self.history.append({"turn": battle.turn, "force_switch": force_switch,
                              "actions": suggestion.actions[:5], "opponent": suggestion.opponent[:5],
                              "win": suggestion.win_raw, "win_cal": suggestion.win_prob,
+                             "evaluations": suggestion.evaluations,
+                             "win_kind": suggestion.win_kind,
                              "status": suggestion.status,
                              "shadow": [(lab, round(p, 3), round(v, 3)) for lab, p, v in suggestion.shadow[:5]]})
 

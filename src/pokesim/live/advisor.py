@@ -53,6 +53,7 @@ class Suggestion:
     win_kind: str = "policy value (uncalibrated)"
     status: dict = field(default_factory=dict)  # mode, fallback reason, failed branches, solver
     shadow: list[tuple[str, float, float]] = field(default_factory=list)  # planner advice in shadow mode
+    evaluations: list[dict] = field(default_factory=list)  # comparison utilities, separate from action probabilities
 
 
 def action_label(action: int, battle: Battle) -> str | None:
@@ -147,7 +148,7 @@ class Advisor:
             requested = (planner or {}).get('search', {})
             self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=8500,
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
-                                          lostPathPenalty=0)
+                                          lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1')
             self.planner['search'].update({k: v for k, v in requested.items()
                                           if k not in ('plans', 'continuations', 'tiebreak', 'lostPathPenalty')})
             self.planner['search']['value_model'] = value_model.version
@@ -284,6 +285,17 @@ class Advisor:
                 ranked = legal(advice)
                 opponent = sorted(advice.opponent.items(), key=lambda kv: -kv[1])
                 status["search"] = advice.status
+                if 'root_evidence' not in advice.status and not advice.status.get('terminal_search', {}).get(
+                        'immediate_wins'):
+                    # The fixed-depth/legacy API also needs actual scores, not just selection probabilities.
+                    risk = self.planner['rho'] if mode == 'on' else 0.
+                    advice.status['root_evidence'] = [
+                        {'label': label, 'expected': float(advice.value[i]),
+                         'worst': float(advice.worst[i]) if advice.worst is not None else None,
+                         'utility': float((1 - risk) * advice.value[i] + risk * advice.worst[i])
+                         if advice.worst is not None else float(advice.value[i]), 'trials': 0}
+                        for i, label in enumerate(advice.labels)]
+                    advice.status['score_kind'] = 'uncalibrated-fixed-depth-utility'
                 if mode == "shadow":
                     try:
                         planned = self._search(
@@ -325,6 +337,7 @@ class Advisor:
             shadow=shadow,
             win_raw=win_raw,
             win_kind="calibrated" if win is not None else "policy value (uncalibrated)",
+            evaluations=action_evaluations(status, actions[0][0] if actions else None),
         )
 
     def _search(
@@ -409,6 +422,24 @@ class Advisor:
                           "unfinished": {k: r["unfinished"] for k, r in reply["plans"].items() if r["unfinished"]},
                           "cycles": reply["cycles"], "ms": reply["elapsedMs"]}
         return chosen
+
+
+def action_evaluations(status: dict, selected: str | None = None) -> list[dict]:
+    """Scores compare moves; the probability of selecting a move is a separate quantity."""
+    search = status.get('search', {})
+    rows = [dict(row) for row in search.get('root_evidence', [])]
+    if rows:
+        best = max(row['utility'] for row in rows)
+        for row in rows:
+            row['gap'] = best - row['utility']
+            row['selected'] = row['label'] == selected
+        rows.sort(key=lambda row: (not row['selected'], -row['utility']))
+    elif search.get('solver') == 'sampled-world-immediate-win':
+        rows = [{'label': label, 'utility': 1., 'worst': 1., 'expected': 1., 'gap': 0., 'certified': True,
+                 'selected': label == selected}
+                for label in search['terminal_search']['immediate_wins']]
+    excluded = search.get('terminal_search', {}).get('action_filter', {}).get('excluded', [])
+    return rows + [dict(row, utility=None, worst=None, expected=None, gap=None, excluded=True) for row in excluded]
 
 
 def can_set_up(mon) -> bool:

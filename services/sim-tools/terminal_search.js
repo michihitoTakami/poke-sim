@@ -2,6 +2,7 @@
 // Simulation is omniscient; decisions in the tree and rollout only receive the acting player's observation.
 const {createHash} = require('crypto');
 const {PublicObservation} = require('./public_observation');
+const {pruneRoot} = require('./action_filter');
 const {choosePublic, chooseBatonPublic, observedStep, VERSION, BATON_VERSION} = require('./public_policy');
 const hash = x => createHash('sha256').update(typeof x === 'string' ? x : JSON.stringify(x)).digest('hex');
 let session = null;
@@ -50,7 +51,11 @@ class Search {
     this.id = hash([req.samples, this.history]); this.serial = 0; this.cursor = 0; this.simulations = 0;
     this.failures = 0; this.errors = []; this.censored = 0; this.learned = 0; this.terminal = 0;
     this.maxTreeDepth = 0; this.maxRolloutTurns = 0; this.certified = []; this.chancePaths = 0;
-    this.maxTurns = Math.min(200, Math.max(1, req.maxTurns || 120)); this.rootMix = null;
+    // Deep scripted wins against a weak rollout policy are not proofs of a winning position.
+    // Spend the budget on repeated tactical comparisons, with a bounded public-value frontier.
+    this.maxTurns = Math.min(200, Math.max(1, req.maxTurns ?? 8)); this.rootMix = null;
+    this.priorWeight = 4;
+    this.minimumTrials = 2;
     this.active = null; this.unfinishedAtDeadline = 0;
     this.states = req.samples.map(sample => {
       const b = deps.setUp(sample, req.format, 1);
@@ -58,11 +63,14 @@ class Search {
         p1: deps.choices(b, b.p1), p2: deps.choices(b, b.p2), lastFoe: b.p2.pokemonLeft === 1,
         speed: {ours: b.p1.active[0].getStat('spe'), opponent: b.p2.active[0].getStat('spe'),
           ourAction: b.p1.active[0].getActionSpeed(), opponentAction: b.p2.active[0].getActionSpeed()}};
-      st.cells = st.p1.map(() => st.p2.map(() => ({prior: null, n: 0, sum: 0, speed: 0, ends: 0, failed: 0})));
       b.destroy(); return st;
     });
     if (!this.states.length || this.states.some(s => JSON.stringify(s.p1) !== JSON.stringify(this.states[0].p1))) {
       throw Error('terminal search needs common root choices');
+    }
+    this.actionFilter = pruneRoot(this.states, deps);
+    for (const st of this.states) {
+      st.cells = st.p1.map(() => st.p2.map(() => ({prior: null, n: 0, sum: 0, sumSq: 0, speed: 0, ends: 0, failed: 0})));
     }
     this.jobs = [];
     for (let i = 0; i < this.states[0].p1.length; i++) for (let w = 0; w < this.states.length; w++) {
@@ -130,9 +138,13 @@ class Search {
   backup(item, p) {
     const v = 2 * p - 1, cell = item.cell;
     if (item.initial) {
-      cell.prior = v; cell.priorSpeed = item.ended && p === 1 ? 1 / (1 + item.turns) : 0; return;
+      // A root-step terminal result is exact in this sampled branch. Open positions retain their bounded
+      // reference/material anchor instead of being replaced by the first deep rollout's binary result.
+      cell.prior = v;
+      cell.priorSpeed = item.ended && p === 1 ? 1 / (1 + item.turns) : 0;
+      return;
     }
-    cell.n++; cell.sum += v;
+    cell.n++; cell.sum += v; cell.sumSq += v * v;
     if (item.ended) { cell.ends++; cell.speed += p === 1 ? 1 / (1 + item.turns) : 0; }
     for (const x of item.trace) { x.node.n++; x.action.n++; x.action.sum += x.sign * v; }
   }
@@ -195,6 +207,11 @@ class Search {
   }
 
   pickJob() {
+    // Every reply gets repeated evidence before a seemingly good row consumes the remaining budget.
+    const underexplored = this.jobs.filter(([w, i, j]) => {
+      const c = this.states[w].cells[i][j]; return c.n + c.failed < this.minimumTrials;
+    });
+    if (underexplored.length) return underexplored[this.simulations % underexplored.length];
     const n = this.states[0].p1.length, visits = Array(n).fill(0);
     for (const st of this.states) for (let i = 0; i < n; i++) visits[i] += st.cells[i].reduce((s, c) => s + c.n, 0);
     const total = visits.reduce((a, b) => a + b, 0), scores = visits.map((x, i) =>
@@ -226,23 +243,34 @@ class Search {
   }
 
   reply(pending = []) {
-    const ready = this.cursor === this.jobs.length || this.certified.length > 0;
-    const summary = {algorithm: 'public-information-set-uct-v1', particle_id: this.id,
+    const ready = this.states.every(st => st.cells.every(row => row.every(c => c.prior !== null))) ||
+      this.certified.length > 0;
+    const summary = {algorithm: 'public-information-set-uct-v2', particle_id: this.id,
       continuation_policy: this.policyVersion, bootstrap_reference: VERSION,
       root_speed_samples: this.states.map(s => s.speed),
       ready, simulations: this.simulations,
       terminal: this.terminal, learned: this.learned, censored: this.censored,
       failed: this.failures, errors: this.errors,
       tree_nodes: this.nodes.size, max_tree_decisions: this.maxTreeDepth, max_rollout_turns: this.maxRolloutTurns,
+      horizon_turns: this.maxTurns, prior_weight: this.priorWeight, minimum_reply_trials: this.minimumTrials,
+      value_kind: 'bounded-reference-material-utility-v1', calibrated_win_probability: false,
+      action_filter: this.actionFilter,
       unfinished_at_deadline: this.unfinishedAtDeadline,
       chance_paths: this.chancePaths, immediate_wins: this.certified,
       certificate_scope: 'all discrete chance paths and legal replies in sampled worlds only'};
     return {session: this.id, pending, summary, results: this.states.map(st => ({
       p1: st.p1.map(x => x[1]), p2: st.p2.map(x => x[1]),
       payoff: st.cells.map((row, i) => row.map(c => this.certified.includes(st.p1[i][1]) ? 1 :
-        c.n ? c.sum / c.n : c.prior)),
+        c.prior === null ? null : (this.priorWeight * c.prior + c.sum) / (this.priorWeight + c.n))),
       winSpeed: st.cells.map(row => row.map(c => c.n ? c.speed / c.n : c.priorSpeed || 0)),
       visits: st.cells.map(row => row.map(c => c.n)), invalid: st.cells.map(row => row.map(c => c.failed)),
+      // A sampling-error indicator, not a confidence interval: rollouts share a policy and hidden-set particle.
+      uncertainty: st.cells.map(row => row.map(c => {
+        if (c.prior === null) return null;
+        const n = this.priorWeight + c.n, mean = (this.priorWeight * c.prior + c.sum) / n;
+        const second = (this.priorWeight * (c.prior * c.prior + .25) + c.sumSq) / n;
+        return Math.sqrt(Math.max(0, second - mean * mean) / n);
+      })),
       terminal_search: summary,
     }))};
   }

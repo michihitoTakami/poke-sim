@@ -1,0 +1,3682 @@
+{
+  "baseline": {
+    "code": "db80f64",
+    "cutoff": "20261016-220000",
+    "games": 112,
+    "wins": 50,
+    "mean_raw_policy_value": 0.7207615868454533,
+    "interpretation": "Descriptive first-decision PPO reward conversion; not a calibrated win probability; not used to fit new parameters.",
+    "records": [
+      {
+        "file": "20261016-161307-2699318105.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6798260569572449
+      },
+      {
+        "file": "20261016-161506-2699318617.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.5807722210884094
+      },
+      {
+        "file": "20261016-161748-2699319195.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6466827988624573
+      },
+      {
+        "file": "20261016-162032-2699319999.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8763061761856079
+      },
+      {
+        "file": "20261016-162230-2699320769.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6258867979049683
+      },
+      {
+        "file": "20261016-162425-2699321335.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7780205965042114
+      },
+      {
+        "file": "20261016-162556-2699321896.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6296422719955445
+      },
+      {
+        "file": "20261016-163025-2699322342.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.5964282274246215
+      },
+      {
+        "file": "20261016-163305-2699323672.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.656176495552063
+      },
+      {
+        "file": "20261016-163748-2699324617.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7700009107589721
+      },
+      {
+        "file": "20261016-164004-2699325913.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.5198887348175049
+      },
+      {
+        "file": "20261016-164317-2699326761.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7458795070648193
+      },
+      {
+        "file": "20261016-164550-2699327734.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7587745904922485
+      },
+      {
+        "file": "20261016-164803-2699328345.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7458795070648193
+      },
+      {
+        "file": "20261016-165317-2699328990.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7891273736953736
+      },
+      {
+        "file": "20261016-165535-2699330570.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7420882701873779
+      },
+      {
+        "file": "20261016-165734-2699331449.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7780205965042114
+      },
+      {
+        "file": "20261016-165958-2699331962.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.4635197460651398
+      },
+      {
+        "file": "20261016-170315-nybq3fwb54c6cfp0f8owfj870tdo644pw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7873587369918823
+      },
+      {
+        "file": "20261016-170922-2699333835.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.8232656478881836
+      },
+      {
+        "file": "20261016-171146-2699335519.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8372445106506348
+      },
+      {
+        "file": "20261016-171801-2699336134.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7300154685974121
+      },
+      {
+        "file": "20261016-172301-2699338058.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.5864709734916687
+      },
+      {
+        "file": "20261016-172420-2699339575.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6197896599769592
+      },
+      {
+        "file": "20261016-172734-2699339914.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.641453206539154
+      },
+      {
+        "file": "20261016-173036-2699340851.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7739959239959717
+      },
+      {
+        "file": "20261016-173349-2699341720.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8938735246658325
+      },
+      {
+        "file": "20261016-173751-lbrekxcedhfdlcxlm6rc5jl2251bnsfpw.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.3574124455451965
+      },
+      {
+        "file": "20261016-173957-2699343856.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8372445106506348
+      },
+      {
+        "file": "20261016-174351-eo068og9y7x1a2byx8inuk7vnn6o71jpw.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7881929874420166
+      },
+      {
+        "file": "20261016-174605-2699345694.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.4542310953140259
+      },
+      {
+        "file": "20261016-174759-2699346449.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.755658483505249
+      },
+      {
+        "file": "20261016-174939-2699346970.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.6086239218711853
+      },
+      {
+        "file": "20261016-175211-2699347476.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.8038944721221923
+      },
+      {
+        "file": "20261016-175328-2699348283.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.762272834777832
+      },
+      {
+        "file": "20261016-175626-2699348619.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6467792510986328
+      },
+      {
+        "file": "20261016-175933-21npuviownkyba4hlvm3wx6asoms1kfpw.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.9544727325439453
+      },
+      {
+        "file": "20261016-180332-cty5ke8d5wbs4n2ydqrtta4tet8mkxypw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.49110742956399916
+      },
+      {
+        "file": "20261016-180453-2699351631.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8457939624786377
+      },
+      {
+        "file": "20261016-180852-8qx3mp73go4kyna1a95j9x9wb5ix4ljpw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7584700107574462
+      },
+      {
+        "file": "20261016-181200-2699353306.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7535767316818237
+      },
+      {
+        "file": "20261016-181600-qaxtjgvr5vgvy4nfa4veos15kxa0ulwpw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7472659111022949
+      },
+      {
+        "file": "20261016-181926-86a1bq2wa0fyh53gu3thjc6jaq1fetbpw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8926687479019165
+      },
+      {
+        "file": "20261016-182057-2699356697.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6798260569572449
+      },
+      {
+        "file": "20261016-182428-2699357369.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8044750452041626
+      },
+      {
+        "file": "20261016-182806-1ep96cdnpwan3a1k14jfxrjrjnewptupw.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.49994790703058245
+      },
+      {
+        "file": "20261016-183056-qw7c5nmqyo2xo2tesij8kgceyd70532pw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8776254415512085
+      },
+      {
+        "file": "20261016-183436-2699360207.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7525931835174561
+      },
+      {
+        "file": "20261016-183809-2699361269.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8187081813812256
+      },
+      {
+        "file": "20261016-184341-2699362427.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6601030945777893
+      },
+      {
+        "file": "20261016-184859-2699364146.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7338937044143676
+      },
+      {
+        "file": "20261016-185107-2699365953.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7458795070648193
+      },
+      {
+        "file": "20261016-185226-nxspusmlhv0y8qgemmobedq0mjt5smypw.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7888971328735351
+      },
+      {
+        "file": "20261016-185439-vmo2u2rnf3572i65t8xe7d7cvhw86qtpw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.4825411424040794
+      },
+      {
+        "file": "20261016-185838-2699367914.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8372445106506348
+      },
+      {
+        "file": "20261016-190133-2699368773.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7197559833526611
+      },
+      {
+        "file": "20261016-190427-2699369659.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8372445106506348
+      },
+      {
+        "file": "20261016-190643-ryhi7vs815qdtvf6alv74r5s28yvw4apw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7621257305145264
+      },
+      {
+        "file": "20261016-190903-2699371283.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8939961671829224
+      },
+      {
+        "file": "20261016-191446-2699372198.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7381237983703614
+      },
+      {
+        "file": "20261016-191621-qidoicncv1w1u7r2cyk3ufn2kfworp5pw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7813544750213623
+      },
+      {
+        "file": "20261016-191919-2699374324.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.8956149101257325
+      },
+      {
+        "file": "20261016-192214-2699375252.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7352327108383179
+      },
+      {
+        "file": "20261016-192629-2699376252.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6574645400047302
+      },
+      {
+        "file": "20261016-192915-n0skae3j7knjml0w1st9x67xccsgskrpw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.602226448059082
+      },
+      {
+        "file": "20261016-193653-2699378483.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7374893188476562
+      },
+      {
+        "file": "20261016-194018-msqkuo4bjxxnetios6cqr9txnfei5hepw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8640441656112671
+      },
+      {
+        "file": "20261016-194328-2699382021.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6223329663276672
+      },
+      {
+        "file": "20261016-194748-2699383436.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7992438077926636
+      },
+      {
+        "file": "20261016-194848-2699384505.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.8615106582641602
+      },
+      {
+        "file": "20261016-195106-6yyx0mklshems54l1nfs49rdn206vfopw.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.68712819814682
+      },
+      {
+        "file": "20261016-195206-2699385648.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.8615106582641602
+      },
+      {
+        "file": "20261016-195426-2699386083.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7055330991744995
+      },
+      {
+        "file": "20261016-195630-2699386801.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.738383436203003
+      },
+      {
+        "file": "20261016-195914-2699387444.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.6580538630485535
+      },
+      {
+        "file": "20261016-200126-2699388353.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6336125016212464
+      },
+      {
+        "file": "20261016-200334-2699389077.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.9466872215270996
+      },
+      {
+        "file": "20261016-200625-aab8kmeu4i4rpghp7x1s8o7xamxk1aupw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6067182540893554
+      },
+      {
+        "file": "20261016-200734-2699390743.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7780205965042114
+      },
+      {
+        "file": "20261016-201000-sxdiljksfny8qb8rk9u388yl2rvs3s7pw.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6503296017646789
+      },
+      {
+        "file": "20261016-201053-2699391954.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.692020857334137
+      },
+      {
+        "file": "20261016-201302-k055p7pkuaqpfg9j61c2tsrh17xg79opw.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.500918048620224
+      },
+      {
+        "file": "20261016-201632-pilb248g8p04ps7a3vin39r6sf6bownpw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7684708833694458
+      },
+      {
+        "file": "20261016-201930-2699394215.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.8281892776489258
+      },
+      {
+        "file": "20261016-202314-2699395225.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.778843092918396
+      },
+      {
+        "file": "20261016-202808-yditpi7oe5fj4nky7rc8xjapea3n7w6pw.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7248115062713623
+      },
+      {
+        "file": "20261016-203110-2699398168.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7780205965042114
+      },
+      {
+        "file": "20261016-203431-2699399249.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7381237983703614
+      },
+      {
+        "file": "20261016-203531-2699400435.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7780205965042114
+      },
+      {
+        "file": "20261016-203747-jsbomlh7wibkpivtneq7khhvn7oqrdppw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7199190616607666
+      },
+      {
+        "file": "20261016-204025-2699401828.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.5700445771217346
+      },
+      {
+        "file": "20261016-204133-bh5imdovx5igd5cgnmrne968jtrk2hypw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6067182540893554
+      },
+      {
+        "file": "20261016-204256-2699403126.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.9042913913726807
+      },
+      {
+        "file": "20261016-204623-qcaifgaryo84t074cylovad6j221lw0pw.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.4468770742416382
+      },
+      {
+        "file": "20261016-204918-2699404896.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7842003583908081
+      },
+      {
+        "file": "20261016-205405-2699405902.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.5754659652709961
+      },
+      {
+        "file": "20261016-205803-2699407721.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7309343814849854
+      },
+      {
+        "file": "20261016-210015-efqxrxgb5xfi494lefhg7huq49dri9ppw.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.6037111401557922
+      },
+      {
+        "file": "20261016-210330-o9keoabu07kmvmk1wfoo8ml3d5bte3npw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.8631388902664184
+      },
+      {
+        "file": "20261016-210529-2699411402.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.5937171101570129
+      },
+      {
+        "file": "20261016-210712-2699411802.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7780205965042114
+      },
+      {
+        "file": "20261016-211703-2699412584.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7399271965026856
+      },
+      {
+        "file": "20261016-211814-2699416171.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.6045434594154357
+      },
+      {
+        "file": "20261016-212012-2699416649.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.8114102840423584
+      },
+      {
+        "file": "20261016-212126-2699417476.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.6045434594154357
+      },
+      {
+        "file": "20261016-212228-f8qfwb2er17xyia8207bep9i71m794jpw.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7697521209716797
+      },
+      {
+        "file": "20261016-212607-2699418636.json",
+        "result": "win",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.804041075706482
+      },
+      {
+        "file": "20261016-212854-2699419768.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7458795070648193
+      },
+      {
+        "file": "20261016-213119-2699421080.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.822466254234314
+      },
+      {
+        "file": "20261016-213333-2699421862.json",
+        "result": "loss",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.7458795070648193
+      },
+      {
+        "file": "20261016-215559-2699431029.json",
+        "result": "win",
+        "policy": "ppo_baton_v2",
+        "raw_policy_value": 0.5881012797355651
+      },
+      {
+        "file": "20261016-215933-gqye5990e1803kx4bcm6rttqx4lncx7pw.json",
+        "result": "loss",
+        "policy": "ppo_baton_items",
+        "raw_policy_value": 0.7347695350646972
+      }
+    ]
+  },
+  "comparison": {
+    "worlds": "Same six frozen hypotheses and observed prefixes in both versions; current priors, not original historical sampling.",
+    "before": [
+      {
+        "source": "20261016-205803-2699407721.json",
+        "turn": 1,
+        "ranked": [
+          [
+            "switch:umbreon",
+            1.0,
+            1.0
+          ],
+          [
+            "move:moonblast",
+            0.0,
+            0.6711340796860672
+          ],
+          [
+            "move:substitute",
+            0.0,
+            0.902777781818263
+          ],
+          [
+            "move:moonblast:mega",
+            0.0,
+            0.9579356455405756
+          ],
+          [
+            "move:synthesis",
+            0.0,
+            0.5885961339494444
+          ],
+          [
+            "move:synthesis:mega",
+            0.0,
+            0.7500000143250294
+          ],
+          [
+            "move:calmmind",
+            0.0,
+            0.7336340725235517
+          ],
+          [
+            "move:substitute:mega",
+            0.0,
+            0.924849626507201
+          ],
+          [
+            "move:calmmind:mega",
+            0.0,
+            0.8823875831530941
+          ],
+          [
+            "switch:skeledirge",
+            0.0,
+            0.9094571021449052
+          ]
+        ],
+        "status": {
+          "solver": "pure-robust",
+          "objective": 0.9999999999999999,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v1",
+            "particle_id": "de0d4f9689ed3ef1504a142f4ae3b41ebb9df2427d3ceca6cabf0216aa47ee99",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 112,
+                "opponent": 156,
+                "ourAction": 112,
+                "opponentAction": 156
+              },
+              {
+                "ours": 112,
+                "opponent": 157,
+                "ourAction": 112,
+                "opponentAction": 157
+              },
+              {
+                "ours": 112,
+                "opponent": 151,
+                "ourAction": 112,
+                "opponentAction": 151
+              },
+              {
+                "ours": 112,
+                "opponent": 172,
+                "ourAction": 112,
+                "opponentAction": 172
+              },
+              {
+                "ours": 112,
+                "opponent": 157,
+                "ourAction": 112,
+                "opponentAction": 157
+              },
+              {
+                "ours": 112,
+                "opponent": 125,
+                "ourAction": 112,
+                "opponentAction": 125
+              }
+            ],
+            "ready": true,
+            "simulations": 760,
+            "terminal": 760,
+            "learned": 360,
+            "censored": 0,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 795,
+            "max_tree_decisions": 2,
+            "max_rollout_turns": 74,
+            "unfinished_at_deadline": 1,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 8500.0,
+            "elapsed_ms": 7800.586296012625,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:moonblast",
+              "expected": 0.6711340796860672,
+              "worst": 0.16666666666666666,
+              "trials": 45
+            },
+            {
+              "label": "move:moonblast:mega",
+              "expected": 0.9579356455405756,
+              "worst": 0.8333333333333333,
+              "trials": 85
+            },
+            {
+              "label": "move:substitute",
+              "expected": 0.902777781818263,
+              "worst": 0.7777777777777777,
+              "trials": 99
+            },
+            {
+              "label": "move:substitute:mega",
+              "expected": 0.924849626507201,
+              "worst": 0.7222222222222221,
+              "trials": 85
+            },
+            {
+              "label": "move:synthesis",
+              "expected": 0.5885961339494444,
+              "worst": -0.3333333333333333,
+              "trials": 43
+            },
+            {
+              "label": "move:synthesis:mega",
+              "expected": 0.7500000143250294,
+              "worst": 0.33333333333333337,
+              "trials": 49
+            },
+            {
+              "label": "move:calmmind",
+              "expected": 0.7336340725235517,
+              "worst": 0.3333333333333333,
+              "trials": 47
+            },
+            {
+              "label": "move:calmmind:mega",
+              "expected": 0.8823875831530941,
+              "worst": 0.6666666666666666,
+              "trials": 57
+            },
+            {
+              "label": "switch:skeledirge",
+              "expected": 0.9094571021449052,
+              "worst": 0.6666666666666666,
+              "trials": 100
+            },
+            {
+              "label": "switch:umbreon",
+              "expected": 1.0,
+              "worst": 0.9999999999999999,
+              "trials": 150
+            }
+          ]
+        },
+        "payoff": [
+          [
+            [
+              1,
+              1,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              -1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              0.3333333333333333,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              0.3333333333333333,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              -1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              -1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              -1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              0.3333333333333333,
+              1,
+              1,
+              0.3333333333333333,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              -1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0.3333333333333333,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              -1,
+              1,
+              1,
+              1,
+              -1,
+              1
+            ],
+            [
+              0,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              -1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              -1,
+              1,
+              1,
+              1,
+              -1,
+              1
+            ],
+            [
+              -1,
+              0,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              0.3333333333333333,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0.3333333333333333,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              -1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              -1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "source": "20261016-135816-2699280608.json",
+        "turn": 16,
+        "ranked": [
+          [
+            "move:recover",
+            1.0,
+            0.7955025185767747
+          ],
+          [
+            "move:shadowball",
+            0.0,
+            0.548218770932126
+          ],
+          [
+            "move:flashcannon",
+            0.0,
+            0.4078108297443514
+          ],
+          [
+            "move:nastyplot",
+            0.0,
+            -0.21943218576357063
+          ],
+          [
+            "switch:umbreon",
+            0.0,
+            -0.5485480177872947
+          ]
+        ],
+        "status": {
+          "solver": "pure-robust",
+          "objective": 0.7548938436583302,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v1",
+            "particle_id": "738a7b51c67ac2ad8d904c0cf9b99e21b1a05f86e1ac690eca1a0024db5c2098",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 136,
+                "opponent": 112,
+                "ourAction": 136,
+                "opponentAction": 112
+              },
+              {
+                "ours": 136,
+                "opponent": 134,
+                "ourAction": 136,
+                "opponentAction": 134
+              },
+              {
+                "ours": 136,
+                "opponent": 108,
+                "ourAction": 136,
+                "opponentAction": 108
+              },
+              {
+                "ours": 136,
+                "opponent": 135,
+                "ourAction": 136,
+                "opponentAction": 135
+              },
+              {
+                "ours": 136,
+                "opponent": 135,
+                "ourAction": 136,
+                "opponentAction": 135
+              },
+              {
+                "ours": 136,
+                "opponent": 133,
+                "ourAction": 136,
+                "opponentAction": 133
+              }
+            ],
+            "ready": true,
+            "simulations": 1892,
+            "terminal": 1892,
+            "learned": 150,
+            "censored": 0,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 1973,
+            "max_tree_decisions": 4,
+            "max_rollout_turns": 14,
+            "unfinished_at_deadline": 0,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 8500.0,
+            "elapsed_ms": 7801.131138985511,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:shadowball",
+              "expected": 0.548218770932126,
+              "worst": 0.0,
+              "trials": 33
+            },
+            {
+              "label": "move:flashcannon",
+              "expected": 0.4078108297443514,
+              "worst": -0.3333333333333333,
+              "trials": 33
+            },
+            {
+              "label": "move:recover",
+              "expected": 0.7955025185767747,
+              "worst": 0.6601402688486265,
+              "trials": 1761
+            },
+            {
+              "label": "move:nastyplot",
+              "expected": -0.21943218576357063,
+              "worst": -0.8333333333333333,
+              "trials": 33
+            },
+            {
+              "label": "switch:umbreon",
+              "expected": -0.5485480177872947,
+              "worst": -0.9999999999999999,
+              "trials": 32
+            }
+          ]
+        },
+        "payoff": [
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              0.864406779661017,
+              0.8305084745762712,
+              0.8305084745762712,
+              0.9322033898305084,
+              0.423728813559322
+            ],
+            [
+              0,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              -1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              -1,
+              1,
+              1
+            ],
+            [
+              0.9661016949152542,
+              0.864406779661017,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              -1,
+              1,
+              1,
+              1
+            ],
+            [
+              -1,
+              1,
+              -1,
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              -1,
+              -1,
+              1,
+              1
+            ],
+            [
+              -1,
+              -1,
+              1,
+              -1,
+              1
+            ],
+            [
+              0.7966101694915254,
+              0.5932203389830508,
+              0.7966101694915254,
+              0.559322033898305,
+              0.6949152542372882
+            ],
+            [
+              1,
+              -1,
+              1,
+              -1,
+              -1
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          ],
+          [
+            [
+              1,
+              -1,
+              -1,
+              -1,
+              1
+            ],
+            [
+              1,
+              -1,
+              -1,
+              -1,
+              1
+            ],
+            [
+              0.8983050847457628,
+              0.7288135593220338,
+              0.864406779661017,
+              0.5932203389830508,
+              0.423728813559322
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              -1,
+              1
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              0.9661016949152542,
+              0.8275862068965517,
+              1,
+              0.9310344827586207,
+              0.9655172413793104
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              -1,
+              1
+            ],
+            [
+              -1,
+              1,
+              -1,
+              -1,
+              -1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              -1,
+              1
+            ],
+            [
+              0.9655172413793104,
+              0.8620689655172413,
+              0.9310344827586207,
+              0.9310344827586207,
+              0.896551724137931
+            ],
+            [
+              1,
+              -1,
+              1,
+              1,
+              1
+            ],
+            [
+              -1,
+              -1,
+              1,
+              -1,
+              -1
+            ]
+          ]
+        ]
+      },
+      {
+        "source": "20261016-135307-2699279518.json",
+        "turn": 10,
+        "ranked": [
+          [
+            "move:earthquake",
+            1.0,
+            0.5426615614148784
+          ],
+          [
+            "move:doubleedge",
+            0.0,
+            0.4833470641510928
+          ],
+          [
+            "move:dragondance",
+            0.0,
+            0.19464000211218901
+          ],
+          [
+            "move:roost",
+            0.0,
+            0.4685617634372053
+          ],
+          [
+            "switch:scolipede",
+            0.0,
+            -0.8391314140793464
+          ]
+        ],
+        "status": {
+          "solver": "pure-robust",
+          "objective": 0.43186309299041487,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v1",
+            "particle_id": "d04734ff5d277aaea224f6ad117d8003d9c3253ff9ba39b3500861ad0e2c6dae",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 120,
+                "ourAction": 426,
+                "opponentAction": 120
+              },
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 131,
+                "ourAction": 426,
+                "opponentAction": 131
+              }
+            ],
+            "ready": true,
+            "simulations": 1404,
+            "terminal": 1404,
+            "learned": 150,
+            "censored": 0,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 1492,
+            "max_tree_decisions": 4,
+            "max_rollout_turns": 40,
+            "unfinished_at_deadline": 1,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 8500.0,
+            "elapsed_ms": 7800.279575982131,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:doubleedge",
+              "expected": 0.4833470641510928,
+              "worst": -0.6666666666666666,
+              "trials": 43
+            },
+            {
+              "label": "move:earthquake",
+              "expected": 0.5426615614148784,
+              "worst": 0.1733333333333333,
+              "trials": 744
+            },
+            {
+              "label": "move:dragondance",
+              "expected": 0.19464000211218901,
+              "worst": -0.9999999999999999,
+              "trials": 36
+            },
+            {
+              "label": "move:roost",
+              "expected": 0.4685617634372053,
+              "worst": 0.20760233918128654,
+              "trials": 546
+            },
+            {
+              "label": "switch:scolipede",
+              "expected": -0.8391314140793464,
+              "worst": -0.9999999999999999,
+              "trials": 35
+            }
+          ]
+        },
+        "payoff": [
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              -1
+            ],
+            [
+              0.84,
+              1,
+              0.84,
+              0.76,
+              0.84
+            ],
+            [
+              -1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0.7894736842105263,
+              0.8947368421052632
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              0.84,
+              1,
+              0.92,
+              0.84,
+              1
+            ],
+            [
+              -1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              0.7894736842105263,
+              1,
+              1,
+              0.8888888888888888,
+              0.8888888888888888
+            ],
+            [
+              1,
+              -1,
+              -1,
+              1,
+              -1
+            ]
+          ],
+          [
+            [
+              0,
+              1,
+              0,
+              1,
+              -1
+            ],
+            [
+              0.84,
+              0.92,
+              0.76,
+              0.76,
+              0.68
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              1,
+              -1
+            ],
+            [
+              1,
+              1,
+              1,
+              0.8888888888888888,
+              1
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              -1
+            ],
+            [
+              0.6,
+              0.84,
+              0.84,
+              1,
+              -0.36
+            ],
+            [
+              1,
+              -1,
+              1,
+              1,
+              -1
+            ],
+            [
+              0.4444444444444444,
+              0,
+              -0.2222222222222222,
+              0.7777777777777778,
+              -0.5555555555555556
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              -1
+            ],
+            [
+              0.92,
+              0.12,
+              0.44,
+              0.84,
+              0.5833333333333334
+            ],
+            [
+              -1,
+              -1,
+              1,
+              -1,
+              -1
+            ],
+            [
+              0.6666666666666666,
+              0.6666666666666666,
+              0.5555555555555556,
+              0.7777777777777778,
+              -0.1111111111111111
+            ],
+            [
+              1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              -1,
+              -1
+            ],
+            [
+              0.5,
+              0.3333333333333333,
+              0,
+              -1,
+              0.4166666666666667
+            ],
+            [
+              -1,
+              1,
+              1,
+              -1,
+              1
+            ],
+            [
+              -0.1111111111111111,
+              -0.4444444444444444,
+              -0.3333333333333333,
+              0.4444444444444444,
+              -0.5555555555555556
+            ],
+            [
+              -1,
+              -1,
+              -1,
+              1,
+              -1
+            ]
+          ]
+        ]
+      }
+    ],
+    "after": [
+      {
+        "source": "20261016-205803-2699407721.json",
+        "turn": 1,
+        "ranked": [
+          [
+            "move:calmmind:mega",
+            1.0,
+            0.43523456482341777
+          ],
+          [
+            "move:moonblast",
+            0.0,
+            0.41822681977819626
+          ],
+          [
+            "move:substitute",
+            0.0,
+            0.29528096932811476
+          ],
+          [
+            "move:moonblast:mega",
+            0.0,
+            0.5001718811363249
+          ],
+          [
+            "move:substitute:mega",
+            0.0,
+            0.27884053770182443
+          ],
+          [
+            "move:synthesis",
+            0.0,
+            0.313255767334862
+          ],
+          [
+            "move:synthesis:mega",
+            0.0,
+            0.29246560405040045
+          ],
+          [
+            "move:calmmind",
+            0.0,
+            0.4589756153401522
+          ],
+          [
+            "switch:skeledirge",
+            0.0,
+            0.32373174471799604
+          ],
+          [
+            "switch:umbreon",
+            0.0,
+            0.33419657624077304
+          ]
+        ],
+        "status": {
+          "solver": "pure-robust",
+          "objective": 0.38299193576518065,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "tie_margin": 0.1,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v2",
+            "particle_id": "de0d4f9689ed3ef1504a142f4ae3b41ebb9df2427d3ceca6cabf0216aa47ee99",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 112,
+                "opponent": 156,
+                "ourAction": 112,
+                "opponentAction": 156
+              },
+              {
+                "ours": 112,
+                "opponent": 157,
+                "ourAction": 112,
+                "opponentAction": 157
+              },
+              {
+                "ours": 112,
+                "opponent": 151,
+                "ourAction": 112,
+                "opponentAction": 151
+              },
+              {
+                "ours": 112,
+                "opponent": 172,
+                "ourAction": 112,
+                "opponentAction": 172
+              },
+              {
+                "ours": 112,
+                "opponent": 157,
+                "ourAction": 112,
+                "opponentAction": 157
+              },
+              {
+                "ours": 112,
+                "opponent": 125,
+                "ourAction": 112,
+                "opponentAction": 125
+              }
+            ],
+            "ready": true,
+            "simulations": 872,
+            "terminal": 382,
+            "learned": 850,
+            "censored": 490,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 823,
+            "max_tree_decisions": 2,
+            "max_rollout_turns": 8,
+            "horizon_turns": 8,
+            "prior_weight": 4,
+            "minimum_reply_trials": 2,
+            "value_kind": "bounded-reference-material-utility-v1",
+            "calibrated_win_probability": false,
+            "action_filter": {
+              "excluded": [],
+              "all_no_effect": false,
+              "passive_wait": null,
+              "scope": "all sampled worlds and legal root replies"
+            },
+            "unfinished_at_deadline": 1,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 8500.0,
+            "elapsed_ms": 7841.220507980324,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:moonblast",
+              "expected": 0.41822681977819626,
+              "worst": 0.26160957150292885,
+              "utility": 0.371241645295616,
+              "sampling_error": 0.2399508252137986,
+              "trials": 78
+            },
+            {
+              "label": "move:moonblast:mega",
+              "expected": 0.5001718811363249,
+              "worst": 0.3239164135569691,
+              "utility": 0.44729524086251815,
+              "sampling_error": 0.22379406964600576,
+              "trials": 141
+            },
+            {
+              "label": "move:substitute",
+              "expected": 0.29528096932811476,
+              "worst": 0.06088563351613209,
+              "utility": 0.22496236858451996,
+              "sampling_error": 0.23767642092092234,
+              "trials": 73
+            },
+            {
+              "label": "move:substitute:mega",
+              "expected": 0.27884053770182443,
+              "worst": 0.03346874298093795,
+              "utility": 0.2052289992855585,
+              "sampling_error": 0.24644684219905563,
+              "trials": 97
+            },
+            {
+              "label": "move:synthesis",
+              "expected": 0.313255767334862,
+              "worst": 0.17061185414723412,
+              "utility": 0.27046259337857365,
+              "sampling_error": 0.23733903330161987,
+              "trials": 76
+            },
+            {
+              "label": "move:synthesis:mega",
+              "expected": 0.29246560405040045,
+              "worst": 0.05460157682760872,
+              "utility": 0.2211063958835629,
+              "sampling_error": 0.24422584547997916,
+              "trials": 84
+            },
+            {
+              "label": "move:calmmind",
+              "expected": 0.4589756153401522,
+              "worst": 0.31526398193172217,
+              "utility": 0.4158621253176231,
+              "sampling_error": 0.23712592903471053,
+              "trials": 87
+            },
+            {
+              "label": "move:calmmind:mega",
+              "expected": 0.43523456482341777,
+              "worst": 0.2610924679626273,
+              "utility": 0.38299193576518065,
+              "sampling_error": 0.2368282929451969,
+              "trials": 79
+            },
+            {
+              "label": "switch:skeledirge",
+              "expected": 0.32373174471799604,
+              "worst": 0.23574534506192296,
+              "utility": 0.2973358248211741,
+              "sampling_error": 0.2431060459082448,
+              "trials": 77
+            },
+            {
+              "label": "switch:umbreon",
+              "expected": 0.33419657624077304,
+              "worst": 0.2130628103481402,
+              "utility": 0.29785644647298315,
+              "sampling_error": 0.22460364872686686,
+              "trials": 80
+            }
+          ],
+          "score_kind": "bounded-reference-material-utility-v1",
+          "calibrated_win_probability": false
+        },
+        "payoff": [
+          [
+            [
+              0.5735872557114808,
+              0.49020891706291686,
+              0.5005462973354068,
+              0.4989843580846589,
+              0.6706513516459012,
+              0.634154219892009
+            ],
+            [
+              0.6578239965637582,
+              0.6050134198810041,
+              0.5351615096022236,
+              0.618651841117814,
+              0.8135543939788239,
+              0.6944003453044125
+            ],
+            [
+              0.48626085035188266,
+              0.4038859484321348,
+              0.5207034353308156,
+              0.4386765279659639,
+              0.43717358025097125,
+              0.4932987045465238
+            ],
+            [
+              0.468060611806147,
+              0.409948281221238,
+              0.5074867013983205,
+              0.4236634912743262,
+              0.4422856560566353,
+              0.502635160209569
+            ],
+            [
+              0.46990489959716797,
+              0.4440055856146223,
+              0.49369901111104153,
+              0.44322836488860906,
+              0.4988018580845424,
+              0.40318105421405825
+            ],
+            [
+              0.4480061133702596,
+              0.44899086247263414,
+              0.502293150528054,
+              0.39697056701161526,
+              0.416922132174174,
+              0.48954665660858154
+            ],
+            [
+              0.5736936134884743,
+              0.5222601751630099,
+              0.7302801872770871,
+              0.5268866896032259,
+              0.5547121964683123,
+              0.5988501909166563
+            ],
+            [
+              0.5592011414756365,
+              0.503554198895499,
+              0.5855535373915969,
+              0.5161209671523371,
+              0.5383938355038551,
+              0.5869224272956438
+            ],
+            [
+              0.4434070305278042,
+              0.2360558880954731,
+              0.38897450562072394,
+              0.23242901090124432,
+              0.37341980631760996,
+              0.2845705667051031
+            ],
+            [
+              0.43982998984200616,
+              0.4518204528239912,
+              0.4689701725083397,
+              0.41858301252502267,
+              0.4159343401590983,
+              0.4593501408894857
+            ]
+          ],
+          [
+            [
+              0.4974953179841597,
+              0.2737163532260924,
+              0.5005462973354068,
+              0.455303690035244,
+              0.666171298222999,
+              0.4979024507675594
+            ],
+            [
+              0.8690949871161264,
+              0.6844783855877459,
+              0.17512621376576176,
+              0.4482082962079181,
+              0.844078781838728,
+              0.5449289916168863
+            ],
+            [
+              0.4882259372763113,
+              -0.16935805878433116,
+              0.5207034353308156,
+              0.4503798886033173,
+              0.4621735802509712,
+              0.4367239466526436
+            ],
+            [
+              0.47196797568522647,
+              0.07095620139192968,
+              0.5074867013983205,
+              0.35415581782661726,
+              0.09147125825817322,
+              0.41580955100241573
+            ],
+            [
+              0.4294568328130753,
+              0.07969226887211019,
+              0.5186990111110416,
+              0.43430980136372704,
+              0.4402688344319661,
+              0.34612539304486983
+            ],
+            [
+              0.45811681042490465,
+              0.00555420718888285,
+              0.47729315052805404,
+              0.38835837136087875,
+              0.416922132174174,
+              0.3878479798634847
+            ],
+            [
+              0.5708898411025344,
+              0.07027923460527825,
+              0.5958120928038894,
+              0.5386723385085402,
+              0.5547121964683123,
+              0.5329269372214861
+            ],
+            [
+              0.5578116283644973,
+              0.15530476662082313,
+              0.5855535373915969,
+              0.4983598257928827,
+              0.5383938355038551,
+              0.5152000390281267
+            ],
+            [
+              0.448707478149514,
+              0.21622014497816058,
+              0.5145335206426984,
+              0.40688711097218655,
+              0.32754501237555983,
+              0.31785684828859145
+            ],
+            [
+              0.47786200136321844,
+              0.44861137956756414,
+              0.5189701725083397,
+              0.43467791964985986,
+              0.3822767979169165,
+              0.42653090917584663
+            ]
+          ],
+          [
+            [
+              0.18469204586852767,
+              0.5350828833832741,
+              0.5322477804329241,
+              0.4377300751942171,
+              0.19207184471461822,
+              0.5956489729887656
+            ],
+            [
+              0.3301179008418377,
+              0.5742830965817413,
+              0.5499557719936591,
+              0.46665605276445393,
+              0.5157708917294305,
+              0.6444281712548211
+            ],
+            [
+              -0.25131143252305527,
+              0.15082130505048133,
+              0.2819771289935458,
+              0.22144108048885325,
+              -0.036158389417851766,
+              0.5182987045465238
+            ],
+            [
+              0.26562201127840157,
+              -0.03305350156573161,
+              0.3605017657225947,
+              0.19366125050089011,
+              0.43159494325248915,
+              0.3351953168833548
+            ],
+            [
+              0.23221713166822366,
+              0.43835801697367743,
+              0.3160167490172691,
+              0.2033297250732465,
+              0.38115402062733966,
+              0.2866553749478526
+            ],
+            [
+              0.34171335921761187,
+              0.4578336088893618,
+              0.44899086247263414,
+              -0.26769050425476065,
+              0.33241865634918216,
+              0.32914206952495784
+            ],
+            [
+              0.38393088764414185,
+              0.19761195382918828,
+              0.30439477115382046,
+              0.4900032688218163,
+              0.2934063484666472,
+              0.6347287350714197
+            ],
+            [
+              0.3976256782600564,
+              0.5206450629578999,
+              0.5028755024341124,
+              0.4722897618053164,
+              0.006798356716489244,
+              0.32053944731272793
+            ],
+            [
+              0.20937215094280578,
+              0.2174539374464142,
+              0.43101267778680397,
+              0.23340961695258913,
+              0.37940319379170734,
+              0.2738808383323346
+            ],
+            [
+              0.4236113795675642,
+              0.45308539957183663,
+              0.21129429786242726,
+              0.26820520670472026,
+              0.29009643974012994,
+              0.1313529508562664
+            ]
+          ],
+          [
+            [
+              0.15377413753385877,
+              0.24697270822809458,
+              0.5544529612409979,
+              0.2296038294401228,
+              0.0001430620113990323,
+              0.6179628428638991
+            ],
+            [
+              0.11892529167244449,
+              0.44778845934890227,
+              0.6021143462919626,
+              0.12256456408025924,
+              0.1423722994221653,
+              0.8247987455482413
+            ],
+            [
+              -0.0910737211564329,
+              0.0818920753134506,
+              0.4143706325582937,
+              0.23173691143748873,
+              0.13024377211401314,
+              0.43717358025097125
+            ],
+            [
+              -0.13053589695918325,
+              0.061986763368557386,
+              0.3700967554144339,
+              0.3351148948440186,
+              -0.33087938515339016,
+              0.5254642420424764
+            ],
+            [
+              0.1659958838074494,
+              -0.1944834152057822,
+              0.395182308459064,
+              -0.026015160941047683,
+              -0.15320178032213397,
+              0.40953109752837036
+            ],
+            [
+              0.15319128986902672,
+              -0.2565389310549825,
+              0.09470531003619857,
+              0.22606575091025058,
+              0.1252759695997002,
+              0.009478896593674133
+            ],
+            [
+              0.2645363697348102,
+              0.4379366610539949,
+              0.26808008168240127,
+              0.5958120928038894,
+              0.25617029528047647,
+              0.5547121964683123
+            ],
+            [
+              0.12716926529385375,
+              0.19981442901621313,
+              0.5143608357339837,
+              0.35665606112713544,
+              0.23890956973850322,
+              0.5383938355038551
+            ],
+            [
+              0.25088367157947805,
+              0.22076630224000118,
+              0.3565441720898212,
+              0.32859664637295144,
+              0.2032313184264766,
+              0.4369099537531535
+            ],
+            [
+              0.3570709401686864,
+              0.15100163215109622,
+              0.37043280691284003,
+              0.46270190604654865,
+              -0.14379358932734185,
+              0.39093434015909834
+            ]
+          ],
+          [
+            [
+              0.33337824367849983,
+              0.3954985584942247,
+              0.4608157309094505,
+              0.2772889938380969,
+              0.6859091887596458,
+              0.41766585077657054
+            ],
+            [
+              0.4207917466118998,
+              0.3470539680103853,
+              0.49907351304166897,
+              0.6585810823012734,
+              0.6852918435854921,
+              0.4724686687322599
+            ],
+            [
+              0.4634960046325647,
+              0.3677006553827054,
+              0.2729005221610361,
+              0.11639161019612221,
+              0.2726741448276057,
+              0.38353989037060016
+            ],
+            [
+              0.43959407716204213,
+              0.34525775822185745,
+              0.22981484070648905,
+              -0.2663825671929876,
+              0.3779814147018013,
+              0.386860767127904
+            ],
+            [
+              0.3229177179984543,
+              0.31237909793853763,
+              0.20928468665153951,
+              0.34000903989947634,
+              0.37765384829387266,
+              0.3561540206273397
+            ],
+            [
+              0.42811622797622423,
+              0.23744757057654264,
+              0.22532060502935292,
+              0.34171335921761187,
+              0.22086396079525375,
+              0.35741865634918213
+            ],
+            [
+              0.481878059389248,
+              0.4462109767188616,
+              0.48867233850854025,
+              0.3552589638905639,
+              0.4364644694899553,
+              0.48287983365754167
+            ],
+            [
+              0.5401179783489178,
+              0.32686892982537435,
+              0.47335982579288266,
+              0.37029681832048605,
+              0.5714244353231126,
+              0.4637757900148618
+            ],
+            [
+              0.46554403487925644,
+              0.2317861546209324,
+              0.288133386010096,
+              0.1692136045034455,
+              0.2725766656041653,
+              0.2632538572892088
+            ],
+            [
+              0.47167262789528136,
+              0.16961745370530343,
+              0.2404391202986276,
+              0.2869398328423874,
+              0.19024203254421734,
+              0.29479983947198785
+            ]
+          ],
+          [
+            [
+              0.55553942375687,
+              0.5335215083573314,
+              0.5855300920588998,
+              0.3436080570105402,
+              0.5009285430696307,
+              0.593495825296197
+            ],
+            [
+              0.5750365302187382,
+              0.4371135974491618,
+              0.6568910633098514,
+              0.47305875538452635,
+              0.5759276760142072,
+              0.7768514897778759
+            ],
+            [
+              0.38521646970492035,
+              0.35677945493235486,
+              0.4362608503518827,
+              0.4707034353308157,
+              0.3867239466526436,
+              0.46719900043283163
+            ],
+            [
+              0.36060850818791873,
+              0.35022342918456945,
+              0.468060611806147,
+              0.4436466384859698,
+              0.3908095510024157,
+              0.502635160209569
+            ],
+            [
+              0.3957425401296755,
+              0.32266680527823244,
+              0.444904899597168,
+              0.5827742583332811,
+              0.36164108117421473,
+              0.3627449142672097
+            ],
+            [
+              0.39899086247263416,
+              0.22845016127964365,
+              0.2290729331012535,
+              0.4476592894993885,
+              0.33784797986348475,
+              0.3100836920619819
+            ],
+            [
+              0.5251033926270837,
+              0.4900032688218163,
+              0.5486936134884742,
+              0.5958120928038894,
+              0.5329269372214861,
+              0.5738501909166562
+            ],
+            [
+              0.4468592904237246,
+              0.4722897618053164,
+              0.5592011414756365,
+              0.5605535373915969,
+              0.5152000390281267,
+              0.5869224272956438
+            ],
+            [
+              0.40865167141841446,
+              0.4179720208397684,
+              0.4656812747319539,
+              0.48953352064269845,
+              0.3840058406194051,
+              0.504216194152832
+            ],
+            [
+              0.36045719496132306,
+              0.32298890877859865,
+              0.4452927271525065,
+              0.4689701725083397,
+              0.3872104247411092,
+              0.4593501408894857
+            ]
+          ]
+        ]
+      },
+      {
+        "source": "20261016-135816-2699280608.json",
+        "turn": 16,
+        "ranked": [
+          [
+            "move:shadowball",
+            1.0,
+            0.7037346440690279
+          ],
+          [
+            "move:flashcannon",
+            0.0,
+            0.6495556555729948
+          ],
+          [
+            "move:recover",
+            0.0,
+            0.5754582569891392
+          ],
+          [
+            "move:nastyplot",
+            0.0,
+            0.18903357671656026
+          ],
+          [
+            "switch:umbreon",
+            0.0,
+            -0.4793135243420552
+          ]
+        ],
+        "status": {
+          "solver": "pure-robust",
+          "objective": 0.6768950263610782,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "tie_margin": 0.1,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v2",
+            "particle_id": "738a7b51c67ac2ad8d904c0cf9b99e21b1a05f86e1ac690eca1a0024db5c2098",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 136,
+                "opponent": 112,
+                "ourAction": 136,
+                "opponentAction": 112
+              },
+              {
+                "ours": 136,
+                "opponent": 134,
+                "ourAction": 136,
+                "opponentAction": 134
+              },
+              {
+                "ours": 136,
+                "opponent": 108,
+                "ourAction": 136,
+                "opponentAction": 108
+              },
+              {
+                "ours": 136,
+                "opponent": 135,
+                "ourAction": 136,
+                "opponentAction": 135
+              },
+              {
+                "ours": 136,
+                "opponent": 135,
+                "ourAction": 136,
+                "opponentAction": 135
+              },
+              {
+                "ours": 136,
+                "opponent": 133,
+                "ourAction": 136,
+                "opponentAction": 133
+              }
+            ],
+            "ready": true,
+            "simulations": 1962,
+            "terminal": 1624,
+            "learned": 488,
+            "censored": 338,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 1230,
+            "max_tree_decisions": 6,
+            "max_rollout_turns": 8,
+            "horizon_turns": 8,
+            "prior_weight": 4,
+            "minimum_reply_trials": 2,
+            "value_kind": "bounded-reference-material-utility-v1",
+            "calibrated_win_probability": false,
+            "action_filter": {
+              "excluded": [],
+              "all_no_effect": false,
+              "passive_wait": null,
+              "scope": "all sampled worlds and legal root replies"
+            },
+            "unfinished_at_deadline": 1,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 8500.0,
+            "elapsed_ms": 7827.943290001713,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:shadowball",
+              "expected": 0.7037346440690279,
+              "worst": 0.6142692517091958,
+              "utility": 0.6768950263610782,
+              "sampling_error": 0.07502407536551825,
+              "trials": 1563
+            },
+            {
+              "label": "move:flashcannon",
+              "expected": 0.6495556555729948,
+              "worst": 0.4754770626681431,
+              "utility": 0.5973320777015392,
+              "sampling_error": 0.2525954783114172,
+              "trials": 165
+            },
+            {
+              "label": "move:recover",
+              "expected": 0.5754582569891392,
+              "worst": 0.41421537887006993,
+              "utility": 0.5270853935534184,
+              "sampling_error": 0.2621638806598841,
+              "trials": 109
+            },
+            {
+              "label": "move:nastyplot",
+              "expected": 0.18903357671656026,
+              "worst": -0.03724163896016324,
+              "utility": 0.12115101201354321,
+              "sampling_error": 0.29701372449922553,
+              "trials": 63
+            },
+            {
+              "label": "switch:umbreon",
+              "expected": -0.4793135243420552,
+              "worst": -0.6752254028547601,
+              "utility": -0.5380870878958667,
+              "sampling_error": 0.29615498937109586,
+              "trials": 62
+            }
+          ],
+          "score_kind": "bounded-reference-material-utility-v1",
+          "calibrated_win_probability": false
+        },
+        "payoff": [
+          [
+            [
+              0.5753615937574288,
+              0.7048796878316581,
+              0.687093262393672,
+              0.7251412542045599,
+              0.8365229368814192
+            ],
+            [
+              0.6754738784899796,
+              0.7140108483363355,
+              0.5554420628012613,
+              0.5690905847404958,
+              0.8693340033146314
+            ],
+            [
+              0.23640290282087018,
+              0.42248318393713924,
+              0.7346406974840797,
+              0.5536784665443428,
+              0.7877546406929812
+            ],
+            [
+              0.5286960137348696,
+              0.13981483965267705,
+              0.5651978927885413,
+              0.036839426826182096,
+              0.3607115792237554
+            ],
+            [
+              -0.5322739188249769,
+              -0.8061432203908169,
+              -0.4578796096068974,
+              -0.5052149314113689,
+              -0.30736289832785585
+            ]
+          ],
+          [
+            [
+              0.9776443670929952,
+              0.9699246209207847,
+              0.9520426663635845,
+              0.9788705141934387,
+              0.989090909090909
+            ],
+            [
+              0.4904072587358367,
+              0.9238211940969118,
+              0.7015989718746894,
+              0.8419799336363609,
+              0.9333333333333333
+            ],
+            [
+              0.6699186375580604,
+              0.6324288929701805,
+              0.6967322256960911,
+              0.48474024408979016,
+              0.7877546406929812
+            ],
+            [
+              0.5286960137348696,
+              0.3253632808702328,
+              0.5651978927885413,
+              0.5421607770557125,
+              0.6940449125570888
+            ],
+            [
+              -0.5322739188249769,
+              -0.13947655372415016,
+              -0.23504158497282276,
+              -0.1718815980780355,
+              0.14368894429040927
+            ]
+          ],
+          [
+            [
+              0.2990055192537825,
+              0.3970300884099439,
+              0.2586644575929185,
+              0.2742614433388013,
+              0.8334224412926059
+            ],
+            [
+              0.3879039432131208,
+              0.2884141640547704,
+              0.42839387600095913,
+              0.7009828965278105,
+              0.7111111111111111
+            ],
+            [
+              0.6699186375580604,
+              0.6256950673567305,
+              0.6967322256960911,
+              0.4845786367058883,
+              0.5007668674461655
+            ],
+            [
+              0.41067352256938516,
+              0.004391873531396362,
+              0.3351413542439207,
+              -0.12450588961095417,
+              0.3589430465839765
+            ],
+            [
+              -0.5322739188249769,
+              -0.8061432203908169,
+              -0.568374918306156,
+              -0.5052149314113689,
+              -0.31095428652641327
+            ]
+          ],
+          [
+            [
+              0.12981537595779924,
+              0.36687425450094807,
+              0.1439606995767124,
+              0.18222332265830665,
+              0.9527272727272728
+            ],
+            [
+              0.5776922916246553,
+              0.11601702201449068,
+              0.19445117133541315,
+              0.24323145523923026,
+              0.6494761046885152
+            ],
+            [
+              0.6699186375580604,
+              0.638146819424236,
+              0.41101793998180536,
+              0.3933257827814008,
+              0.6558354075216309
+            ],
+            [
+              -0.13797065293179708,
+              -0.19419032598038818,
+              0.23186455945520792,
+              0.294436829808268,
+              0.025609713250643207
+            ],
+            [
+              -0.5322739188249769,
+              -0.8061432203908169,
+              -0.568374918306156,
+              -0.5052149314113689,
+              0.35571238014025336
+            ]
+          ],
+          [
+            [
+              0.8975646071260072,
+              0.9510699111831997,
+              0.9510699111831997,
+              0.8549243381041579,
+              0.989090909090909
+            ],
+            [
+              0.9232051187500327,
+              0.7009828965278105,
+              0.9232051187500327,
+              0.9232051187500327,
+              0.9333333333333333
+            ],
+            [
+              0.3842043518437746,
+              0.6303839364007249,
+              0.5712939593724968,
+              0.3933257827814008,
+              0.7864811531604513
+            ],
+            [
+              0.23902276245030685,
+              -0.08300737071720428,
+              0.2748254699713702,
+              0.5421607770557125,
+              0.3589430465839765
+            ],
+            [
+              -0.5322739188249769,
+              -0.4728098870574835,
+              -0.568374918306156,
+              -0.5052149314113689,
+              0.022379046806920044
+            ]
+          ],
+          [
+            [
+              0.9161778098586197,
+              0.914807078479286,
+              0.9274758838476809,
+              0.9654689571396765,
+              0.979005172097445
+            ],
+            [
+              0.9238211940969118,
+              0.9238211940969118,
+              0.7015989718746894,
+              0.9238211940969118,
+              0.8685363974407777
+            ],
+            [
+              0.5900220312015263,
+              0.6277671695639749,
+              0.6967322256960911,
+              0.6790400684956864,
+              0.5020403549786955
+            ],
+            [
+              0.18920237178947838,
+              -0.1839489551488477,
+              0.5099876001449224,
+              0.29386311261837805,
+              0.3607115792237554
+            ],
+            [
+              -0.5322739188249769,
+              -0.4728098870574835,
+              -0.3911440913589024,
+              -0.5052149314113689,
+              -0.20723525462990444
+            ]
+          ]
+        ]
+      },
+      {
+        "source": "20261016-135307-2699279518.json",
+        "turn": 10,
+        "ranked": [
+          [
+            "move:roost",
+            1.0,
+            0.45687202171961877
+          ],
+          [
+            "move:doubleedge",
+            0.0,
+            0.0006243035363025576
+          ],
+          [
+            "move:earthquake",
+            0.0,
+            0.11644525540856522
+          ],
+          [
+            "move:dragondance",
+            0.0,
+            0.06341805692674048
+          ],
+          [
+            "switch:scolipede",
+            0.0,
+            -0.8399928038620447
+          ]
+        ],
+        "status": {
+          "solver": "pure-robust",
+          "objective": 0.3670547776890386,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "tie_margin": 0.1,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v2",
+            "particle_id": "d04734ff5d277aaea224f6ad117d8003d9c3253ff9ba39b3500861ad0e2c6dae",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 120,
+                "ourAction": 426,
+                "opponentAction": 120
+              },
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 131,
+                "ourAction": 426,
+                "opponentAction": 131
+              }
+            ],
+            "ready": true,
+            "simulations": 1310,
+            "terminal": 1093,
+            "learned": 367,
+            "censored": 217,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 1157,
+            "max_tree_decisions": 4,
+            "max_rollout_turns": 8,
+            "horizon_turns": 8,
+            "prior_weight": 4,
+            "minimum_reply_trials": 2,
+            "value_kind": "bounded-reference-material-utility-v1",
+            "calibrated_win_probability": false,
+            "action_filter": {
+              "excluded": [],
+              "all_no_effect": false,
+              "passive_wait": null,
+              "scope": "all sampled worlds and legal root replies"
+            },
+            "unfinished_at_deadline": 1,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 8500.0,
+            "elapsed_ms": 7769.858626008499,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:doubleedge",
+              "expected": 0.0006243035363025576,
+              "worst": -0.6611675216126784,
+              "utility": -0.19791324400839175,
+              "sampling_error": 0.2984360493470147,
+              "trials": 60
+            },
+            {
+              "label": "move:earthquake",
+              "expected": 0.11644525540856522,
+              "worst": -0.2484884982315743,
+              "utility": 0.0069651293165233635,
+              "sampling_error": 0.3002457878695522,
+              "trials": 66
+            },
+            {
+              "label": "move:dragondance",
+              "expected": 0.06341805692674048,
+              "worst": -0.30570356369355867,
+              "utility": -0.04731842925934927,
+              "sampling_error": 0.29086813759414937,
+              "trials": 62
+            },
+            {
+              "label": "move:roost",
+              "expected": 0.45687202171961877,
+              "worst": 0.15748120828435166,
+              "utility": 0.3670547776890386,
+              "sampling_error": 0.12607098673416564,
+              "trials": 1051
+            },
+            {
+              "label": "switch:scolipede",
+              "expected": -0.8399928038620447,
+              "worst": -0.9,
+              "utility": -0.8579949627034312,
+              "sampling_error": 0.20678070815917962,
+              "trials": 71
+            }
+          ],
+          "score_kind": "bounded-reference-material-utility-v1",
+          "calibrated_win_probability": false
+        },
+        "payoff": [
+          [
+            [
+              -0.20275870864627196,
+              0.2044305793731883,
+              0.3151405463115629,
+              0.28335919077160526,
+              -0.6987898771815658
+            ],
+            [
+              0.24043356011852732,
+              0.1642133387217397,
+              0.27235064998231895,
+              0.06709896619084048,
+              0.5814838444759977
+            ],
+            [
+              -0.17612025751356555,
+              0.22224361110281846,
+              0.3245032666754298,
+              0.296306296053685,
+              0.4564541938398798
+            ],
+            [
+              0.7154808442628103,
+              0.6060749881349328,
+              0.8507059308615933,
+              0.7923945457841941,
+              0.8700858134484698
+            ],
+            [
+              -0.9,
+              -0.8239463151534571,
+              -0.9,
+              -0.9,
+              -0.7931330318300325
+            ]
+          ],
+          [
+            [
+              0.13057462468706138,
+              0.2044305793731883,
+              0.3151405463115629,
+              0.268203046227943,
+              0.496138330759561
+            ],
+            [
+              -0.23756110573845537,
+              0.1642133387217397,
+              0.27235064998231895,
+              0.22560436159913846,
+              0.5612190231084168
+            ],
+            [
+              -0.17612025751356555,
+              0.22224361110281846,
+              0.3245032666754298,
+              0.28083455950968467,
+              0.46413047735835306
+            ],
+            [
+              0.6073727361547022,
+              0.7801807880555464,
+              0.8507059308615933,
+              0.8437324336935593,
+              0.8710857989629301
+            ],
+            [
+              -0.9,
+              -0.49061298182012375,
+              -0.9,
+              -0.8207315606065584,
+              -0.793054754167636
+            ]
+          ],
+          [
+            [
+              0.13057462468706138,
+              0.2044305793731883,
+              0.3151405463115629,
+              0.268203046227943,
+              -0.6987898771815658
+            ],
+            [
+              -0.23756110573845537,
+              0.1642133387217397,
+              0.27235064998231895,
+              0.22560436159913846,
+              0.5280954511946491
+            ],
+            [
+              -0.17612025751356555,
+              -0.11108972223051487,
+              -0.008830066657903535,
+              0.28083455950968467,
+              0.12312086050654643
+            ],
+            [
+              0.7695348983168644,
+              0.7104192800081798,
+              0.8507059308615933,
+              0.8437324336935593,
+              0.8700858134484698
+            ],
+            [
+              -0.9,
+              -0.8239463151534571,
+              -0.9,
+              -0.8200795733370376,
+              -0.7931330318300325
+            ]
+          ],
+          [
+            [
+              0.13057462468706138,
+              0.2044305793731883,
+              -0.018192787021770407,
+              0.22104017368061335,
+              -0.9
+            ],
+            [
+              0.09577222759487795,
+              0.1642133387217397,
+              0.27235064998231895,
+              0.1791872424990236,
+              -0.2830068222082252
+            ],
+            [
+              -0.17612025751356555,
+              -0.11108972223051487,
+              0.3245032666754298,
+              0.23571331331223488,
+              -0.267462446135774
+            ],
+            [
+              -0.00828758671625401,
+              -0.130550865354393,
+              0.3144913214081751,
+              0.06979813380221876,
+              -0.2796843306328817
+            ],
+            [
+              -0.9,
+              -0.8239463151534571,
+              -0.9,
+              -0.9,
+              -0.9
+            ]
+          ],
+          [
+            [
+              0.13057462468706138,
+              0.03885880963336241,
+              0.3151405463115629,
+              0.268203046227943,
+              -0.9
+            ],
+            [
+              0.24043356011852732,
+              -0.02909555990416679,
+              0.27235064998231895,
+              0.22560436159913846,
+              0.0564596676289694
+            ],
+            [
+              -0.17612025751356555,
+              -0.11108972223051487,
+              -0.008830066657903535,
+              -0.05249877382364865,
+              -0.267462446135774
+            ],
+            [
+              -0.03947328453552025,
+              0.34974110595729346,
+              0.7680091831781847,
+              0.4992762476262953,
+              -0.15567328885668005
+            ],
+            [
+              -0.9,
+              -0.8239463151534571,
+              -0.9,
+              -0.8207315606065584,
+              -0.9
+            ]
+          ],
+          [
+            [
+              0.025752718162139976,
+              -0.12573528211615104,
+              0.3151405463115629,
+              -0.7701738184937392,
+              -0.9
+            ],
+            [
+              0.21343572586285461,
+              0.16726088602044564,
+              0.27235064998231895,
+              -0.7708053619909837,
+              -0.27077233037208276
+            ],
+            [
+              0.14824751382770399,
+              0.22224361110281846,
+              0.3245032666754298,
+              -0.7709357173491075,
+              0.3992042205308926
+            ],
+            [
+              -0.0868205873935908,
+              -0.19908066470163852,
+              0.3429523537106922,
+              0.29535639036960054,
+              -0.5436221351021432
+            ],
+            [
+              -0.7309807860435904,
+              -0.8239463151534571,
+              -0.9,
+              -0.2764993681552899,
+              -0.7195129918265146
+            ]
+          ]
+        ]
+      }
+    ],
+    "inputs": "docs/audits/20261016-search-evaluation-inputs.json",
+    "input_sha256": "950c57b896fc9a63047b410a9f28a641051a2fb24863f89494bc8fe8dcfaf6c2"
+  },
+  "local": {
+    "file": "/data/poke-sim/validation/search-evaluation-normal-20261016/20261016-222334-803488.json",
+    "result": "win",
+    "decisions": 8,
+    "max_seconds": 8.05,
+    "fallbacks": [],
+    "errors": [],
+    "simulation_failures": 0,
+    "mismatches": [],
+    "checks": [
+      {
+        "turn": 1,
+        "chosen": "move:batonpass",
+        "executed": "move:batonpass",
+        "matches": true,
+        "sent": "/choose move batonpass|4",
+        "excluded": []
+      },
+      {
+        "turn": 1,
+        "chosen": "switch:gholdengo",
+        "executed": "switch:gholdengo",
+        "matches": true,
+        "sent": "/choose switch Gholdengo|6",
+        "excluded": []
+      },
+      {
+        "turn": 2,
+        "chosen": "move:nastyplot",
+        "executed": "move:nastyplot",
+        "matches": true,
+        "sent": "/choose move nastyplot|8",
+        "excluded": []
+      },
+      {
+        "turn": 3,
+        "chosen": "move:shadowball",
+        "executed": "move:shadowball",
+        "matches": true,
+        "sent": "/choose move shadowball|10",
+        "excluded": []
+      },
+      {
+        "turn": 4,
+        "chosen": "move:flashcannon",
+        "executed": "move:flashcannon",
+        "matches": true,
+        "sent": "/choose move flashcannon|14",
+        "excluded": []
+      },
+      {
+        "turn": 5,
+        "chosen": "move:shadowball",
+        "executed": "move:shadowball",
+        "matches": true,
+        "sent": "/choose move shadowball|18",
+        "excluded": []
+      },
+      {
+        "turn": 6,
+        "chosen": "move:shadowball",
+        "executed": "move:shadowball",
+        "matches": true,
+        "sent": "/choose move shadowball|22",
+        "excluded": []
+      },
+      {
+        "turn": 7,
+        "chosen": "move:shadowball",
+        "executed": "move:shadowball",
+        "matches": true,
+        "sent": "/choose move shadowball|26",
+        "excluded": []
+      }
+    ],
+    "opponent": "local heuristic; no ladder-strength inference"
+  },
+  "finishing_regression_repetitions": [
+    {
+      "run": 1,
+      "mixed": "move:moonblast",
+      "pure": "move:moonblast",
+      "seconds": 2.8243463770486414,
+      "margin": 0.1
+    },
+    {
+      "run": 2,
+      "mixed": "move:moonblast",
+      "pure": "move:moonblast",
+      "seconds": 2.8986995649756864,
+      "margin": 0.1
+    },
+    {
+      "run": 3,
+      "mixed": "move:moonblast",
+      "pure": "move:moonblast",
+      "seconds": 2.899044110032264,
+      "margin": 0.1
+    },
+    {
+      "run": 4,
+      "mixed": "move:moonblast",
+      "pure": "move:moonblast",
+      "seconds": 2.90076783800032,
+      "margin": 0.1
+    },
+    {
+      "run": 5,
+      "mixed": "move:moonblast",
+      "pure": "move:moonblast",
+      "seconds": 2.901235148019623,
+      "margin": 0.09731053498931087
+    }
+  ],
+  "verification": {
+    "pytest": "395 passed in 66.78s",
+    "ruff": "passed",
+    "javascript_syntax": "passed",
+    "html_script_syntax": "passed",
+    "scope": "local checks and frozen-world comparisons, not ladder strength"
+  }
+}

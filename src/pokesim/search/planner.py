@@ -24,6 +24,7 @@ from scipy.optimize import linprog
 from pokesim.search.lookahead import Advice, clean, opponent_mix, solve_zero_sum
 
 RHO = 0.3  # initial guard against a wrong prediction; to be set on development data, not on test results
+TREE_TIE_MARGIN = .02  # a tiny difference between sampled utilities is not a proven winning-probability gain
 
 
 @dataclass
@@ -42,7 +43,8 @@ class Solution:
     status: dict = field(default_factory=dict)
 
 
-def solve_common(worlds: list[World], rho: float = RHO, secondary: np.ndarray | None = None) -> Solution:
+def solve_common(worlds: list[World], rho: float = RHO, secondary: np.ndarray | None = None,
+                 tie_margin: float = 0.) -> Solution:
     """The common mix maximizing the objective above (scipy's HiGHS LP). Falls back to the best action against the
     prediction when the solver fails."""
     n = worlds[0].payoff.shape[0]
@@ -65,11 +67,11 @@ def solve_common(worlds: list[World], rho: float = RHO, secondary: np.ndarray | 
     res = linprog(c, A_ub=np.array(rows), b_ub=np.zeros(len(rows)), A_eq=a_eq, b_eq=[1.0], bounds=bounds,
                   method="highs")
     if res.success:
-        if secondary is not None:
-            # Lexicographic: preserve the optimal win objective, then prefer earlier terminal wins.
-            # No HP reward, discount, or speed bonus can trade away meaningful winning probability.
+        if secondary is not None and np.ptp(secondary) > 1e-12:
+            # Exact matrices preserve the primary objective. Sampled trees may supply a bounded tolerance
+            # for noisy utilities; only inside that band do we prefer earlier terminal wins.
             tie = linprog(-np.r_[secondary, np.zeros(g)],
-                          A_ub=np.vstack([rows, c]), b_ub=np.r_[np.zeros(len(rows)), res.fun + 1e-9],
+                          A_ub=np.vstack([rows, c]), b_ub=np.r_[np.zeros(len(rows)), res.fun + max(1e-9, tie_margin)],
                           A_eq=a_eq, b_eq=[1.0], bounds=bounds, method='highs')
             if tie.success:
                 res = tie
@@ -130,6 +132,7 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
                                   'terminal_search': tree, 'worlds': len(results)}, worst=prob.copy())
     worlds, failed_cells, failed_worlds = [], 0, 0
     speed_terms = []
+    error_terms = []
     extras: list[dict[str, np.ndarray]] = []  # per world: payoff per continuation policy, share resolved
     for res in results:
         try:
@@ -143,7 +146,11 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
         worlds.append(World(payoff, opp, 1.0, q))
         cols = [res["p2"].index(lab) for lab in opp]
         if tree:
-            speed_terms.append(matrix(res['winSpeed'], idx, cols, np.zeros_like(payoff)) @ q)
+            # Secondary progress across legal replies, rather than the fitted opponent mix: a prediction
+            # concentrated on Protect must not erase the immediate finishing opportunities of an attack.
+            speed_terms.append(matrix(res['winSpeed'], idx, cols, np.zeros_like(payoff)).mean(axis=1))
+            if 'uncertainty' in res:
+                error_terms.append(matrix(res['uncertainty'], idx, cols, np.zeros_like(payoff)).max(axis=1))
         extras.append({name: matrix(m, idx, cols, payoff) for name, m in res.get("byContinuation", {}).items()}
                       | ({"_resolved": matrix(res["resolved"], idx, cols, np.zeros_like(payoff))}
                          if "resolved" in res else {}))
@@ -151,12 +158,14 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
     if not worlds:
         raise ValueError("every sampled world failed")
     secondary = np.mean(speed_terms, axis=0) if speed_terms else None
-    sol = solve_common(worlds, rho, secondary)
+    errors = np.mean(error_terms, axis=0) if error_terms else np.zeros(len(labels))
+    tie_margin = min(.1, max(TREE_TIE_MARGIN, 2 * float(errors.max()))) if tree else 0.
+    sol = solve_common(worlds, rho, secondary, tie_margin=tie_margin)
     if pure:
         # The caller plays one top move. Rank actual pure-action utilities, not the largest probability of a
         # mixed equilibrium whose protection requires randomizing between ALL of its actions.
         objective = (1 - rho) * sol.expected + rho * sol.worst
-        candidates = np.flatnonzero(objective >= objective.max() - 1e-9)
+        candidates = np.flatnonzero(objective >= objective.max() - max(1e-9, tie_margin))
         chosen = int(candidates[np.argmax(secondary[candidates])]) if secondary is not None else int(candidates[0])
         sol.prob = np.eye(len(labels))[chosen]
         sol.status.update(solver='pure-robust', objective=float(objective[chosen]))
@@ -167,11 +176,16 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
     status = dict(sol.status, rho=rho, worlds=len(worlds), failed_worlds=failed_worlds, failed_cells=failed_cells)
     status.update(diagnose(sol.prob, worlds, extras))
     if tree:
+        status['tie_margin'] = tie_margin
         status['terminal_search'] = tree
         status['root_evidence'] = [{'label': lab, 'expected': float(sol.expected[i]),
                                     'worst': float(sol.worst[i]),
+                                    'utility': float((1 - rho) * sol.expected[i] + rho * sol.worst[i]),
+                                    'sampling_error': float(errors[i]),
                                     'trials': sum(sum(r['visits'][r['p1'].index(lab)]) for r in results)}
                                    for i, lab in enumerate(labels)]
+        status['score_kind'] = tree.get('value_kind', 'uncalibrated-search-utility')
+        status['calibrated_win_probability'] = False
     return Advice(labels, sol.prob, sol.expected, opponent, status=status, worst=sol.worst)
 
 

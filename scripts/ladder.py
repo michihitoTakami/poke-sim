@@ -266,6 +266,8 @@ class AdvisorPlayer(TrackedPlayer):
                           "lookahead": [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.lookahead[:3]],
                           "opponent": rounded(advice.opponent[:4]), "secs": round(advice.elapsed, 2),
                           "status": advice.status})
+            entry['evaluations'] = advice.evaluations
+            entry['win_kind'] = advice.win_kind
             if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
                 self.record_quality(battle, entry, search_quality_issues(advice.status, advice.elapsed))
             if advice.shadow:
