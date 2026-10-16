@@ -70,3 +70,13 @@ def test_levitate_switch_absorbs_earthquake():
     eq = res["p2"].index("move:earthquake")
     payoff = {lab: row[eq] for lab, row in zip(res["p1"], res["payoff"])}
     assert payoff["switch:rotomwash"] > payoff["move:slackoff"] - 0.5
+
+
+def test_a_cosmetic_forme_missing_from_the_dex_samples_its_base_species():
+    from pokesim.search.lookahead import SetSampler
+
+    sampler = SetSampler(['M-6'], observed={})
+    assert 'furfroustar' not in sampler.species
+    assert sampler.base_id('furfroustar') == 'furfrou'
+    assert sampler.base_id('salamencemega') == 'salamence'
+    assert sampler.sample('furfroustar')['species'].lower().startswith('furfrou')

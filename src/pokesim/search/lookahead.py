@@ -157,10 +157,15 @@ class SetSampler:
         return moves
 
     def base_id(self, species_id: str) -> str:
-        """Team-sheet species for an in-battle forme: megas and battle-only formes (Mimikyu-Busted) -> base."""
+        """Team-sheet species for an in-battle forme: megas and battle-only formes (Mimikyu-Busted) -> base.
+        A cosmetic forme the dex lacks (Furfrou-Star, Vivillon patterns) maps to the longest known species prefix
+        instead of failing the whole search on an unknown name."""
         sp = self.species.get(species_id)
         if sp is None:
-            return species_id
+            known = max((sid for sid in self.species if species_id.startswith(sid)), key=len, default=None)
+            if known is None:
+                return species_id
+            species_id, sp = known, self.species[known]
         if sp.battle_only:
             return to_id(sp.battle_only)
         return to_id(sp.changes_from) if sp.is_mega and sp.changes_from else species_id
