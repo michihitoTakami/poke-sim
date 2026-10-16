@@ -153,3 +153,21 @@ uv run python scripts/replay_frames.py /data/poke-sim/obs_frames/<日付> --reco
 | 操作画面に「OBS 未接続」 | OBS は起動しているか、WebSocket サーバーが有効か、ソース名は合っているか |
 | `/tmp` が満杯（`EDQUOT`） | `du -sh /tmp/*` で、`/tmp` に作った worktree の `.venv` が場所を取っていないか |
 | 同じサーバーが二重に起動している | `pgrep -af "pokemon-showdown start"` / `pgrep -af pokesim.api.server` で確認し、余分なものを止める |
+
+## 2026-10-17 のデータ消失と復旧
+
+開発worktreeで作った `external`・`checkpoints`・`runs`・`data/raw`・`data/processed`・`data/curated` へのシンボリックリンクが
+（`.gitignore` の末尾スラッシュ付きパターンはリンクに一致しないため）コミットされ、本体ツリーの `git pull` で無視対象の
+実ディレクトリが自分自身を指すリンクに置き換えられて消えた。`.gitignore` は末尾スラッシュなしに修正済み（PR #28）。
+
+- **worktreeでリンクを作らない。** 本体のデータを使うときは `POKESIM_SHOWDOWN_DIR` と絶対パスの引数を使う。
+- 復元できたもの: 公開リプレイ（DB `replays` から）、PokeAPI CSV、smogon統計、エンジン（942cda71 を再クローン）、
+  図鑑・各種prior・選出率・チーム群（再生成）、選出の事前証拠（`data/lineup_prior.json`）。
+- 失われたもの: ラダー対戦記録、ライブ記録（OBSの保存画面 `/data/poke-sim/obs_frames` から再構成）、全checkpoint、全run。
+
+復旧後の収集はPPO方策なしで始める:
+```bash
+POLICIES=none PLANNER=on EXTRA="--value-run runs/value-replays-v1 --opponent-policy net:runs/opp-replays-v1/opp-seed0.json" \
+  setsid nohup ./scripts/collect.sh > /dev/null 2>&1 < /dev/null &
+```
+`--policy none` では探索が指し、探索に失敗した判断はランダムな合法手（記録に残る）になる。

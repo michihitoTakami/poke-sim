@@ -393,7 +393,8 @@ async def run(args) -> None:
         me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
                            server_configuration=LocalhostServerConfiguration, max_concurrent_battles=1,
                            account_configuration=AccountConfiguration(f"adv_{tag}", None))
-        pool = TeamPool(load_teams("observed"), args.seed or 0)  # the same seed: the same opponent teams
+        # the same seed: the same opponent teams; the published pool until our own battles produced observed teams
+        pool = TeamPool(load_teams("observed") or load_teams("all"), args.seed or 0)
         if args.local_opponent == "heuristic":
             foe = CounterPickHeuristic(battle_format=FORMAT, team=pool, seed=0, p_counter=0.7,
                                        server_configuration=LocalhostServerConfiguration,
