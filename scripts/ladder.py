@@ -291,7 +291,7 @@ class AdvisorPlayer(TrackedPlayer):
             entry['evaluations'] = advice.evaluations
             entry['win_kind'] = advice.win_kind
             if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
-                nets = (self.planner or {}).get('search', {}).get('policyNets')
+                nets = ((getattr(self, 'planner', None) or {}).get('search') or {}).get('policyNets')
                 self.record_quality(battle, entry, search_quality_issues(advice.status, advice.elapsed, nets))
             if advice.shadow:
                 entry["shadow"] = [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.shadow[:5]]
