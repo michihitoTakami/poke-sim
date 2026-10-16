@@ -197,11 +197,19 @@ function render(s) {
   const a = s.advice;
   const bars = list => list.map(x => `<div class="row"><span style="width:170px">${x.label}</span><span style="width:44px">${pct(x.p)}</span><div class="bar" style="width:${Math.round(x.p * 160)}px"></div></div>`).join('');
   const win = a && (a.win_prob != null ? `推定勝率: ${pct(a.win_prob)}（較正済み）`
-    : `推定勝率: -（${a.status?.calibration?.supported_point === false ? 'この判断時点の較正なし' : '較正データ不足'}）${a.win_raw != null ? ` ・ 方策の評価値 ${pct(a.win_raw)}（勝率ではありません）` : ''}`);
+    : `推定勝率: -（${a.status?.calibration?.supported_point === false ? 'この判断時点の較正なし' : '較正データ不足'}）${a.win_raw != null ? ` ・ 方策の参考値 ${(2 * a.win_raw - 1).toFixed(2)}` : ''}`);
+  const score = v => v == null ? '—' : v.toFixed(3);
+  const reasons = {'full-hp-heal-before-any-damage': '満タンで被弾前に回復',
+    'boosts-already-capped': '能力上昇が上限', 'immune-to-every-sampled-reply': '仮説内の全応答に無効'};
+  const evaluations = a?.evaluations?.length ? '<table><tr><th>行動</th><th>探索評価</th><th>最悪応答</th><th>最大評価との差</th></tr>' +
+    a.evaluations.map(row => `<tr><td>${row.selected ? '★ ' : ''}${row.label}</td><td>${score(row.utility)}</td><td>${score(row.worst)}</td>` +
+      `<td>${row.excluded ? row.reasons.map(r => reasons[r] || r).join('・') : score(row.gap)}</td></tr>`).join('') +
+    '</table><div class="muted">★が推奨。探索評価は勝率ではありません。評価が近い手は早い決着を優先します。</div>' : null;
   const wp = a && a.win_path;
   const path = wp && !wp.error && (wp.no_source ? '<div class="warn">相手の残りにダメージを与えられるポケモンがいません</div>'
     : wp.last_source ? `<div class="warn">攻撃できる残りは ${wp.sources.join('・')} だけです</div>` : '');
-  $('advice').innerHTML = a ? bars(a.actions) + (path || '') + `<div class="muted">${win} ・ 計算 ${a.elapsed}s</div>` : '<span class="muted">-</span>';
+  $('advice').innerHTML = a ? (evaluations || bars(a.actions) + '<div class="muted">棒は行動の選択確率です。</div>') +
+    (path || '') + `<div class="muted">${win} ・ 計算 ${a.elapsed}s</div>` : '<span class="muted">-</span>';
   $('opp-advice').innerHTML = a && a.opponent.length ? bars(a.opponent) : '<span class="muted">-</span>';
 }
 let moveListFor = null;

@@ -15,14 +15,18 @@
 </style>
 </head>
 <body>
-<div class="box" id="me"><div class="title">推奨行動</div><div id="actions">-</div><div class="win" id="win"></div></div>
+<div class="box" id="me"><div class="title" id="me-title">推奨行動</div><div id="actions">-</div><div class="win" id="win"></div></div>
 <div class="box opp" id="opp"><div class="title">相手の次の行動（予測）</div><div id="opponent">-</div></div>
 <script>
 const pct = p => `${Math.round(p * 100)}%`;
 const rows = list => list.slice(0, 3).map(x => `<div class="row"><span class="label">${x.label}</span><span class="p">${pct(x.p)}</span><div class="bar" style="width:${Math.round(x.p * 120)}px"></div></div>`).join('');
+const scores = list => list.filter(x => !x.excluded).slice(0, 3).map(x =>
+  `<div class="row"><span class="label">${x.selected ? '★ ' : ''}${x.label}</span><span class="p">${x.utility.toFixed(3)}</span></div>`).join('');
 function render(s) {
   const a = s.advice;
-  document.getElementById('actions').innerHTML = a ? rows(a.actions) : '-';
+  const evaluated = a?.evaluations?.length;
+  document.getElementById('me-title').textContent = evaluated ? '推奨行動（探索評価・勝率ではありません）' : '推奨行動（選択確率）';
+  document.getElementById('actions').innerHTML = a ? evaluated ? scores(a.evaluations) : rows(a.actions) : '-';
   document.getElementById('opponent').innerHTML = a && a.opponent.length ? rows(a.opponent) : '-';
   document.getElementById('win').textContent = a && a.win_prob != null ? `推定勝率 ${pct(a.win_prob)}` : '';
 }
