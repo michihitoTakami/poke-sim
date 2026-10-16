@@ -348,8 +348,8 @@ def test_worker_replies_pool_rollouts_average_bootstraps_and_keep_certificates()
     s = merged['summary']
     assert s['simulations'] == 30 and s['unfinished_at_deadline'] == 2 and s['workers'] == 2
     assert s['worker_simulations'] == [10, 20] and s['immediate_wins'] == ['b'] and s['ready']
-    assert not merge_replies([first, reply_with([[(0, 0, .5, 0, 0)], [(0, 0, .5, 0, 0)]], ready=False)],
-                             0)['summary']['ready']
+    unready = reply_with([[(0, 0, .5, 0, 0)], [(0, 0, None, 0, 0)]], ready=False)
+    assert not merge_replies([unready, unready], 0)['summary']['ready']
 
 
 def test_two_workers_search_the_same_position_on_different_streams():
@@ -368,3 +368,17 @@ def test_two_workers_search_the_same_position_on_different_streams():
     assert summary['simulations'] == sum(summary['worker_simulations'])
     assert advice.ranked()[0][0] == 'move:moonblast'
     assert all(np.isfinite(np.asarray(r['payoff'], float)).all() for r in result)
+
+
+def test_workers_cover_the_root_cells_together_when_no_single_worker_finishes_its_pass():
+    from pokesim.search.terminal import merge_replies
+
+    def partial(start):  # a worker whose first pass reached only half the cells
+        r = reply_with([[(0, 0., .4, 0., 0)], [(0, 0., None, 0., 0)]], ready=False)
+        if start:
+            r = reply_with([[(0, 0., None, 0., 0)], [(0, 0., .2, 0., 0)]], ready=False)
+        return r
+    merged = merge_replies([partial(0), partial(1)], 4)
+    assert merged['summary']['ready']
+    assert merged['results'][0]['payoff'] == [[.4], [.2]]
+    assert not merge_replies([partial(0), partial(0)], 4)['summary']['ready']

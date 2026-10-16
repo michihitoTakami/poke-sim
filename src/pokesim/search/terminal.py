@@ -41,7 +41,12 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
     for key in MAXED:
         summary[key] = max(r['summary'].get(key, 0) for r in replies)
     summary['errors'] = [e for r in replies for e in r['summary'].get('errors', [])][:5]
-    summary['ready'] = all(r['summary']['ready'] for r in replies)
+    # Ready once the pooled cells all have a bootstrap: workers start their first pass at different offsets.
+    summary['ready'] = any(r['summary']['ready'] for r in replies) or all(
+        c['prior'] is not None for r in [replies[0]] for w in range(len(r['results']))
+        for row in range(len(r['results'][w]['p1'])) for col in range(len(r['results'][w]['p2']))
+        for c in [next((x['results'][w]['stats'][row][col] for x in replies
+                        if x['results'][w]['stats'][row][col]['prior'] is not None), {'prior': None})])
     summary['workers'] = len(replies)
     summary['worker_simulations'] = [r['summary'].get('simulations', 0) for r in replies]
     certified = set(first['summary'].get('immediate_wins') or [])
@@ -150,7 +155,7 @@ def search(engine, request, *, started=None, max_budget=9., predictor=None):
         start = {'op': 'start', 'sliceMs': 400, 'certifyMs': min(1200, budget * 200)}
         requests = {0: dict(request, terminalSearch=start)}
         for k in range(1, count):
-            requests[k] = dict(request, stream=request.get('stream', 0) * 16 + k,
+            requests[k] = dict(request, stream=request.get('stream', 0) * 16 + k, jobOffset=k / count,
                                terminalSearch=dict(start, certifyMs=0))
         feedback: dict[int, list] = {}
         mix, columns, sent_columns = None, None, False
