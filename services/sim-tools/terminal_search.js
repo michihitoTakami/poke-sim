@@ -2,7 +2,7 @@
 // Simulation is omniscient; decisions in the tree and rollout only receive the acting player's observation.
 const {createHash} = require('crypto');
 const {PublicObservation} = require('./public_observation');
-const {choosePublic, observedStep} = require('./public_policy');
+const {choosePublic, chooseBatonPublic, observedStep, VERSION, BATON_VERSION} = require('./public_policy');
 const hash = x => createHash('sha256').update(typeof x === 'string' ? x : JSON.stringify(x)).digest('hex');
 let session = null;
 
@@ -45,6 +45,8 @@ function immediateWin(snapshot, a, c, deps, deadline, limit = 4096) {
 class Search {
   constructor(req, deps) {
     this.deps = deps; this.history = req.observationLog; this.nodes = new Map(); this.pending = new Map();
+    this.policy = req.batonPolicy === false ? choosePublic : chooseBatonPublic;
+    this.policyVersion = req.batonPolicy === false ? VERSION : BATON_VERSION;
     this.id = hash([req.samples, this.history]); this.serial = 0; this.cursor = 0; this.simulations = 0;
     this.failures = 0; this.errors = []; this.censored = 0; this.learned = 0; this.terminal = 0;
     this.maxTreeDepth = 0; this.maxRolloutTurns = 0; this.certified = []; this.chancePaths = 0;
@@ -53,7 +55,9 @@ class Search {
     this.states = req.samples.map(sample => {
       const b = deps.setUp(sample, req.format, 1);
       const st = {snapshot: JSON.stringify(deps.State.serializeBattle(b)), entry: b.pokesimEntryLog || [],
-        p1: deps.choices(b, b.p1), p2: deps.choices(b, b.p2), lastFoe: b.p2.pokemonLeft === 1};
+        p1: deps.choices(b, b.p1), p2: deps.choices(b, b.p2), lastFoe: b.p2.pokemonLeft === 1,
+        speed: {ours: b.p1.active[0].getStat('spe'), opponent: b.p2.active[0].getStat('spe'),
+          ourAction: b.p1.active[0].getActionSpeed(), opponentAction: b.p2.active[0].getActionSpeed()}};
       st.cells = st.p1.map(() => st.p2.map(() => ({prior: null, n: 0, sum: 0, speed: 0, ends: 0, failed: 0})));
       b.destroy(); return st;
     });
@@ -107,7 +111,7 @@ class Search {
   // Each key is actor-visible JSON only. In particular p1's tree is shared across hidden-set samples.
   treeChoice(b, obs, side, trace) {
     const view = obs.view(side), options = this.deps.choices(b, side);
-    const key = hash([view, options]), prior = choosePublic(view, side.id === 'p1' ? 'expert' : 'disrupt', b.dex)[0];
+    const key = hash([view, options]), prior = this.policy(view, side.id === 'p1' ? 'expert' : 'disrupt', b.dex)[0];
     let node = this.nodes.get(key);
     if (!node) {
       node = {n: 0, actions: options.map(([choice]) => ({choice, n: 0, sum: 0}))};
@@ -149,7 +153,7 @@ class Search {
     b.resetRNG([0, 2, 4, 6].map(x => bytes.readUInt16LE(x)));
     const obs = this.observer(b, st); let at = b.log.length, root = true, decisions = 0, tree = !initial;
     const start = b.turn;
-    const rollout = side => choosePublic(obs.view(side), side.id === 'p1' ? 'expert' :
+    const rollout = side => this.policy(obs.view(side), side.id === 'p1' ? 'expert' :
       (this.serial % 2 ? 'disrupt' : 'tactical'), b.dex)[0];
     const advance = (a, c) => {
       this.deps.observedStep(b, a, c, this.deps.step, rollout, root ? [] : ['p1', 'p2']);
@@ -224,6 +228,8 @@ class Search {
   reply(pending = []) {
     const ready = this.cursor === this.jobs.length || this.certified.length > 0;
     const summary = {algorithm: 'public-information-set-uct-v1', particle_id: this.id,
+      continuation_policy: this.policyVersion, bootstrap_reference: VERSION,
+      root_speed_samples: this.states.map(s => s.speed),
       ready, simulations: this.simulations,
       terminal: this.terminal, learned: this.learned, censored: this.censored,
       failed: this.failures, errors: this.errors,

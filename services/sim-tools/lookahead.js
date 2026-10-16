@@ -52,8 +52,11 @@ function choices(battle, side) {
   if (!req || req.wait) return [['pass', 'pass']];
   const out = [];
   if (req.forceSwitch) {
+    const reviving = side.getRequestData().pokemon.some(m => m.reviving);
     side.pokemon.forEach((mon, i) => {
-      if (i > 0 && !mon.fainted) out.push([`switch ${i + 1}`, `switch:${mon.species.id}`]);
+      if (reviving ? mon.fainted : !mon.isActive && !mon.fainted) {
+        out.push([`switch ${i + 1}`, `switch:${mon.species.id}`]);
+      }
     });
     return out.length ? out : [['pass', 'pass']];
   }
@@ -214,7 +217,13 @@ function rawSpeed(mon, speBoost = mon.boosts ? mon.boosts.spe : 0) {
   let v = mon.storedStats.spe * stage(speBoost);
   if (mon.item === 'choicescarf') v *= 1.5;
   if (mon.status === 'par') v *= 0.5;
-  return v;
+  if (mon.side.sideConditions.tailwind) v *= 2;
+  const weather = mon.battle.field.weather;
+  if ((['raindance', 'primordialsea'].includes(weather) && mon.ability === 'swiftswim') ||
+      (['sunnyday', 'desolateland'].includes(weather) && mon.ability === 'chlorophyll') ||
+      (weather === 'sandstorm' && mon.ability === 'sandrush') ||
+      (['snow', 'snowscape', 'hail'].includes(weather) && mon.ability === 'slushrush')) v *= 2;
+  return Math.floor(v);
 }
 
 function speedOf(mon, speBoost = mon.boosts ? mon.boosts.spe : 0) {
@@ -316,9 +325,22 @@ function receiver(battle, side, passing) {
   const scored = (hurts.length ? hurts : bench).map(mon => {
     let v = mon.hp / mon.maxhp;
     if (foe && !foe.fainted) {
-      const dmg = bestDamage(battle, mon, foe);
+      // Damage and survival after entry must see ALL passed stages, including negative ones.
+      const saved = mon.boosts;
+      let dmg, incoming;
+      try {
+        mon.boosts = passing && me ? {...me.boosts} : {...saved};
+        dmg = bestDamage(battle, mon, foe);
+        incoming = bestDamage(battle, foe, mon);
+      } finally { mon.boosts = saved; }
       v += 2 * Math.min(1, dmg / Math.max(1, foe.hp)) + (dmg > 0 ? 0.5 : 0);
+      v -= Math.min(3, incoming / Math.max(1, mon.hp));
       if (speedOf(mon, spe) > foeSpeed) v += 0.5;
+      if (passing && me && !knows(me, new Set(['calmmind'])) && me.boosts.spa < 2 && me.boosts.def >= 2 &&
+          knows(mon, new Set(['batonpass'])) && knows(mon, new Set(['calmmind'])) && incoming * 3 < mon.hp &&
+          bench.some(m => m !== mon && m.moveSlots.some(s => s.pp > 0 &&
+            battle.dex.moves.get(s.id).category === 'Special' && battle.dex.moves.get(s.id).basePower >= 70)) &&
+          !knows(foe, new Set(['haze', 'roar', 'whirlwind', 'encore', 'taunt']))) v += 2;
       if (knows(foe, new Set(['yawn', 'roar', 'whirlwind'])) && mon.ability === 'goodasgold') v += 2;
       if (knows(foe, new Set(['dragontail'])) && mon.hasType('Fairy')) v += 2;
       if (mon.ability === 'unaware') {  // a foe already boosted is the case the principle is for
@@ -348,6 +370,7 @@ function makeExpert({cap: planCap = null, heal = 0.5} = {}) {
     const opts = choices(battle, side);
     const foe = side.foe.active[0], me = side.active[0];
     if (side.activeRequest.forceSwitch) {
+      if (side.getRequestData().pokemon.some(m => m.reviving)) return opts[0][0];
       if (!foe || foe.fainted) return tact(battle, side);
       const passing = me && !me.fainted && me.lastMove && me.lastMove.id === 'batonpass';
       return receiver(battle, side, passing) || tact(battle, side);
@@ -383,9 +406,20 @@ function makeExpert({cap: planCap = null, heal = 0.5} = {}) {
           foe.side.pokemon.every(m => m.fainted || speedOf(m) < slowest)) {
         return tact(battle, side);
       }
-      if (passTo && gained > 0 && incoming >= me.hp && !me.volatiles.substitute) {
-        return pass.choice;  // about to fall: whatever it has
+      const faster = speedOf(me) > foeSpeed;
+      const lethalPriority = foe.moveSlots.some(s => s.pp > 0 && battle.dex.moves.get(s.id).priority > 0 &&
+        damageRoll(battle, foe, me, s.id, 0) >= me.hp);
+      const canAct = !lethalPriority && (faster || worstHit < me.hp || !!me.volatiles.substitute);
+      if (passTo && (gained > 0 || me.volatiles.substitute) && canAct &&
+          (worstHit * 2 >= me.hp || stops || me.volatiles.yawn)) {
+        return pass.choice;  // pass while another setup turn would leave no safe handoff
       }
+      if (!canAct) {  // Baton Pass is slower than a hard switch
+        const target = receiver(battle, side, false);
+        return target && opts.some(([c]) => c === target) ? target : tact(battle, side);
+      }
+      const recovery = moves.find(m => m.move.heal && m.move.target === 'self');
+      if (recovery && me.hp < me.maxhp * heal && worstHit < me.maxhp / 2) return recovery.choice;
       const sub = byId('substitute');
       if (sub && !me.volatiles.substitute && me.hp > subHp && worstHit < subHp && incoming < me.hp - subHp) {
         return sub.choice;  // 5
@@ -396,18 +430,21 @@ function makeExpert({cap: planCap = null, heal = 0.5} = {}) {
       // 2-4: a plan the foe can cut short is passed early; a plan's own cap replaces that judgement
       const cap = planCap ?? (encore || stops ? 2 : 6);
       if (wall && me.boosts[stat] < cap && incoming * 2 < me.hp) return wall.choice;  // 1, 4
+      // A special relay also needs an offensive payload against physical or passive foes.
+      const calm = byId('calmmind');
+      if (calm && me.boosts.spa < Math.min(cap, 2) && !stops && worstHit * 2 < me.hp) return calm.choice;
       if (!physical) {  // 6: stall for Speed until the receiver moves first
         const target = passTo ? side.pokemon[Number(passTo.split(' ')[1]) - 1] : null;
         const fastEnough = target && speedOf(target, me.boosts.spe) > foeSpeed;
         if (!fastEnough && me.boosts.spe < 6) {
           const protect = byId('protect') || byId('detect');
-          if (protect && !lastProtect) return protect.choice;
+          if (protect && me.ability === 'speedboost' && !lastProtect) return protect.choice;
         }
       }
       if (canPass) return pass.choice;
       if (gained > 0 && gained < 2) {  // not yet worth passing: one more turn behind Protect (Speed Boost)
         const protect = byId('protect') || byId('detect');
-        if (protect && !lastProtect) return protect.choice;
+        if (protect && me.ability === 'speedboost' && !lastProtect) return protect.choice;
       }
       return tact(battle, side);
     }

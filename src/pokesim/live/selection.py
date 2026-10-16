@@ -10,6 +10,7 @@ the opponent's predicted picks.
 
 Usage: uv run python -m pokesim.live.selection pick-rates   # rebuild the replay statistics
 """
+import hashlib
 import itertools
 import json
 import sys
@@ -25,6 +26,8 @@ from pokesim.rl.myteam import to_id
 PICK_RATES = PROCESSED_DIR / "pick_rates.json"
 MATCHUP_MODEL = PROCESSED_DIR / "matchup_model.json"
 PRIOR = 2.0  # pseudo-observations at the average rate, for rarely seen species
+LADDER_PRIOR = 12.0  # shrink live results towards the simulated matchup estimate
+LADDER_WINDOW = 200
 
 
 def build_pick_rates() -> dict:
@@ -108,6 +111,44 @@ class MatchupModel:
         data = json.loads(path.read_text()) if path.exists() else {"lineups": {}}
         self.lineups: dict[str, dict] = data["lineups"]
         self.meta: dict = data.get("meta", {})
+        self.evidence: dict[tuple[str, ...], tuple[int, int]] = {}
+
+    def observe_ladder(self, root: Path, roster: list[str]) -> None:
+        """Adapt preview scores to recent rated games of this roster. Never mix in local bot games.
+
+        Pool by trio because the small ladder sample cannot identify lead and matchup effects independently.
+        This is a shrunk selection estimate, not a calibrated win probability or a causal lineup comparison.
+        Called before preview, so only already completed games contribute.
+        """
+        rows = []
+        seen = set()
+        for path in sorted(root.glob('*.json'), reverse=True):
+            try:
+                rec = json.loads(path.read_text())
+            except (OSError, ValueError):
+                continue  # A concurrent writer or damaged record must not prevent team preview.
+            if not isinstance(rec, dict):
+                continue
+            source = rec.get('source')
+            if (rec.get('result') not in ('win', 'loss') or '|rated|' not in rec.get('log', []) or
+                    sorted(map(to_id, rec.get('team', []))) != sorted(map(to_id, roster)) or
+                    not rec.get('lineup') or len(rec['lineup']) != 3 or not source or source in seen):
+                continue
+            seen.add(source)
+            rows.append((path.name, rec))
+            if len(rows) == LADDER_WINDOW:
+                break
+        counts = {}
+        for _, rec in rows:
+            key = tuple(sorted(map(to_id, rec['lineup'])))
+            wins, games = counts.get(key, (0, 0))
+            counts[key] = wins + (rec['result'] == 'win'), games + 1
+        self.evidence = counts
+        self.meta['ladder_evidence'] = {
+            'games': len(rows), 'window': LADDER_WINDOW, 'prior_games': LADDER_PRIOR,
+            'sha': hashlib.sha256(json.dumps([(name, r['lineup'], r['result']) for name, r in rows]).encode())
+                .hexdigest()[:16],
+        }
 
     def check(self, policy: str | Path | None) -> str | None:
         """Why the table may not fit the policy that will play (None when it does, or there is no policy)."""
@@ -140,6 +181,8 @@ class MatchupModel:
             names = [roster[i] for i in trio]
             p = self.win_prob(",".join(to_id(n) for n in names), picks)
             if p is not None:
+                wins, games = self.evidence.get(tuple(sorted(map(to_id, names))), (0, 0))
+                p = (LADDER_PRIOR * p + wins) / (LADDER_PRIOR + games)
                 out.append((names, p))
         return sorted(out, key=lambda kv: -kv[1])
 

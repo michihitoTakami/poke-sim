@@ -44,6 +44,9 @@ def likelihood(obs: Observation, result: dict | None, candidate: dict | None = N
         priorities = result.get("priorities")
         if priorities and priorities[0] != priorities[1]:
             return 1.0  # different priority brackets say nothing about speed
+        fractional = result.get('fractionalPriorities')
+        if fractional and fractional[0] != fractional[1]:
+            return 1.0  # Lagging Tail, Stall, Mycelium Might, etc. do not reveal speed
         ours, theirs = result["speeds"]
         if ours == theirs:
             return 0.5

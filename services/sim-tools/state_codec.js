@@ -26,7 +26,17 @@ function createCodec(dir) {
         }
         if (s.hp !== undefined) mon.hp = Math.max(1, Math.round(s.hp * mon.maxhp));
         mon.clearStatus();
-        if (s.status) mon.setStatus(s.status, null, null, true);
+        if (s.status) {
+          if (mon.isActive) mon.setStatus(s.status, null, null, true);
+          else {
+            // setStatus deliberately rejects inactive targets. This is restoration of an existing status,
+            // not a new infliction: keep it on the bench, including its normal sleep/toxic initial state.
+            const status = battle.dex.conditions.get(s.status);
+            mon.status = status.id;
+            mon.statusState = battle.initEffectState({id: status.id, target: mon});
+            battle.singleEvent('Start', status, mon.statusState, mon, mon);
+          }
+        }
         // PP persists on the bench. Zero is meaningful; never restore it to a fresh full-PP set.
         for (const slot of mon.moveSlots) {
           if (s.ppUsed && s.ppUsed[slot.id] !== undefined) {

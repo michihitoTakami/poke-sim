@@ -78,7 +78,7 @@ class AdvisorPlayer(Player):
 
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
                  planner: dict | None = None, sample: bool = False, seed: int | None = None,
-                 opponent_policy: str = "default", belief: bool = False, value_run=None, **kwargs):
+                 opponent_policy: str = "default", belief: bool = True, value_run=None, **kwargs):
         self.sets, self.out = sets, out
         self.belief = belief
         self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner,
@@ -127,7 +127,9 @@ class AdvisorPlayer(Player):
             print(f'{battle.battle_tag}: matched; value model '
                   f'{self.advisor.engine.value_model.version["dataset_id"][:12]}', flush=True)
         opp = [m.species for m in battle.teampreview_opponent_team]
-        ranking = self.matchups.rank([s["species"] for s in self.sets], self.picks.predict(opp))
+        roster = [s["species"] for s in self.sets]
+        self.matchups.observe_ladder(self.out, roster)
+        ranking = self.matchups.rank(roster, self.picks.predict(opp))
         lineup = ranking[0][0] if ranking else [s["species"] for s in self.sets[:3]]
         self.lineups[battle.battle_tag] = lineup
         order = [next(i for i, s in enumerate(self.sets) if to_id(s["species"]) == to_id(x)) for x in lineup]
@@ -285,8 +287,8 @@ def main() -> None:
     ap.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     ap.add_argument("--opponent-policy", default="default",
                     help="cloned human policy for the opponent prediction (default: checkpoints/bc_human.zip)")
-    ap.add_argument("--belief", action="store_true",
-                    help="infer the opponent's sets from damage and move order (pokesim.belief) for the lookahead")
+    ap.add_argument("--belief", action=argparse.BooleanOptionalAction, default=True,
+                    help="infer opponent sets from damage and move order (default on; --no-belief disables)")
     ap.add_argument('--value-run', type=Path, help='validated terminal-value run; requires planner on/shadow')
     ap.add_argument('--battle-timeout', type=float, default=600,
                     help='restart after a stuck public battle/network connection (seconds)')

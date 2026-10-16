@@ -159,6 +159,7 @@ class PublicObservation {
 
 function legalChoices(view) {
   const req = view.request, mons = req.side.pokemon;
+  const reviving = !!req.forceSwitch && mons.some(m => m.reviving);
   if (req.wait) return [['pass', 'pass']];
   const out = [];
   if (!req.forceSwitch) {
@@ -169,7 +170,9 @@ function legalChoices(view) {
     });
   }
   if (req.forceSwitch || !req.active?.[0]?.trapped) mons.forEach((m, i) => {
-    if (!m.active && health(m.condition).hp > 0) out.push([`switch ${i + 1}`, `switch:${id(m.details.split(',')[0])}`]);
+    if (reviving ? health(m.condition).hp === 0 : !m.active && health(m.condition).hp > 0) {
+      out.push([`switch ${i + 1}`, `switch:${id(m.details.split(',')[0])}`]);
+    }
   });
   return out;
 }

@@ -1,0 +1,15 @@
+{
+  "record": "/tmp/poke-baton-local-validation/20261016-111110-803475.json",
+  "result": "win",
+  "lineup": [
+    "Umbreon",
+    "Scolipede",
+    "Salamence"
+  ],
+  "decisions": 8,
+  "max_secs": 8.01,
+  "fallbacks": 0,
+  "failed": 0,
+  "belief_errors": 0,
+  "baton_attempts": 1
+}

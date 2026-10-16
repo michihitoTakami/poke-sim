@@ -19,12 +19,14 @@ weighted by prior x product of likelihoods. Each likelihood is floored at 0.02 s
 carry cannot rule a set out for good. Damage and speed come from the Showdown simulator itself
 (`services/sim-tools/belief.js`, the same reconstruction as the lookahead), so abilities, items, weather, screens,
 burns and boosts apply. Skipped: multi-hit moves, hits on a Substitute, Focus Sash / Sturdy / Endure / Disguise
-survivals, damage "[from]" an item or ability, turns with a switch before both moved, Quick Claw / Custap / Quash /
-Trick Room starting, and opponent status moves (Prankster).
+survivals, damage "[from]" an item or ability, turns with a switch before both moved, Quick Claw / Custap / Quash,
+and mid-turn changes to speed, status or field. Status moves now supply order evidence when their actual
+priorities match. Different fractional priorities (Lagging Tail, Stall, Mycelium Might) are uninformative about speed.
 
-The lookahead draws the opponent's revealed Pokémon from the posterior when the advisor runs with `belief=True`
-(`scripts/ladder.py --belief`). The advice status shows the active's most likely item / nature / spread. Off by
-default.
+The lookahead draws the opponent's revealed Pokémon from the posterior with `belief=True`, now the default in
+Advisor and the ladder (`--no-belief` disables it). The advice status shows the active's most likely item / nature /
+spread, the number of speed observations and inference time. Terminal-search status also records sampled current
+speeds and action speeds, including Trick Room; these describe the root position before the chosen action.
 
 Each observation freezes the items known at that time, including a known empty item slot. Our active uses its
 current item rather than restoring the original team item. Opponent item loss / acquisition / explicit item reveal
