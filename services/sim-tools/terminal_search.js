@@ -56,8 +56,24 @@ class Search {
     // Deep scripted wins against a weak rollout policy are not proofs of a winning position.
     // Spend the budget on repeated tactical comparisons, with a bounded public-value frontier.
     this.maxTurns = Math.min(200, Math.max(1, req.maxTurns ?? 8)); this.rootMix = null;
-    this.priorWeight = 4;
+    // priorVisits: the V_ref bootstrap of a cell counts as this many rollouts, instead of being discarded after one.
+    this.priorVisits = Math.max(0, Number(req.priorVisits ?? 4));
+    this.priorWeight = this.priorVisits;
     this.minimumTrials = 2;
+    // Rollout policies rotate per trial. The live default plays our Baton Pass plans against two scripted foes;
+    // 'expert' for p2 keeps the rollouts symmetric (the foe sets up and finishes as well as we do).
+    const rotation = (side, fallback) => {
+      const list = req.rolloutPolicies && req.rolloutPolicies[side];
+      if (!Array.isArray(list) || !list.length) return fallback;
+      for (const name of list) if (!['greedy', 'tactical', 'expert', 'disrupt'].includes(name)) {
+        throw Error(`unknown rollout policy ${name}`);
+      }
+      return list;
+    };
+    this.rolloutPolicies = {p1: rotation('p1', ['expert']), p2: rotation('p2', ['disrupt', 'tactical'])};
+    const custom = req.rolloutPolicies && (req.rolloutPolicies.p1 || req.rolloutPolicies.p2);
+    this.policyVersion = this.policyVersion + (custom ?
+      `+p1:${this.rolloutPolicies.p1.join(',')}/p2:${this.rolloutPolicies.p2.join(',')}` : '');
     this.active = null; this.unfinishedAtDeadline = 0;
     this.states = req.samples.map(sample => {
       const b = deps.setUp(sample, req.format, 1);
@@ -167,8 +183,9 @@ class Search {
     b.resetRNG([0, 2, 4, 6].map(x => bytes.readUInt16LE(x)));
     const obs = this.observer(b, st); let at = b.log.length, root = true, decisions = 0, tree = !initial;
     const start = b.turn;
-    const rollout = side => this.policy(obs.view(side), side.id === 'p1' ? 'expert' :
-      (this.serial % 2 ? 'disrupt' : 'tactical'), b.dex)[0];
+    const names = this.rolloutPolicies, serial = this.serial;
+    const rollout = side => this.policy(obs.view(side),
+      names[side.id][serial % names[side.id].length], b.dex)[0];
     const advance = (a, c) => {
       this.deps.observedStep(b, a, c, this.deps.step, rollout, root ? [] : ['p1', 'p2']);
       root = false; obs.append(b.log.slice(at), true); at = b.log.length;
@@ -262,10 +279,11 @@ class Search {
       certificate_scope: 'all discrete chance paths and legal replies in sampled worlds only'};
     return {session: this.id, pending, summary, results: this.states.map(st => ({
       p1: st.p1.map(x => x[1]), p2: st.p2.map(x => x[1]),
-      payoff: st.cells.map((row, i) => row.map(c => this.certified.includes(st.p1[i][1]) ? 1 :
-        c.prior === null ? null : (this.priorWeight * c.prior + c.sum) / (this.priorWeight + c.n))),
-      winSpeed: st.cells.map(row => row.map(c => c.n ? c.speed / c.n : c.priorSpeed || 0)),
+      payoff: st.cells.map((row, i) => row.map(c => this.certified.includes(st.p1[i][1]) ? 1 : this.value(c))),
+      winSpeed: st.cells.map(row => row.map(c => this.speed(c))),
       visits: st.cells.map(row => row.map(c => c.n)), invalid: st.cells.map(row => row.map(c => c.failed)),
+      stats: st.cells.map(row => row.map(c => ({n: c.n, sum: c.sum, sumSq: c.sumSq, prior: c.prior, speed: c.speed,
+        priorSpeed: c.priorSpeed || 0, ends: c.ends, failed: c.failed}))),
       // A sampling-error indicator, not a confidence interval: rollouts share a policy and hidden-set particle.
       uncertainty: st.cells.map(row => row.map(c => {
         if (c.prior === null) return null;
@@ -275,6 +293,19 @@ class Search {
       })),
       terminal_search: summary,
     }))};
+  }
+
+  // A cell's value: rollouts and the V_ref bootstrap weighted by priorVisits. With none, the first rollout
+  // replaces the bootstrap; a single +-1 draw then stands for the cell and the planner's worst case runs on it.
+  value(c) {
+    if (c.prior === null) return null;
+    return (this.priorVisits * c.prior + c.sum) / (this.priorVisits + c.n);
+  }
+
+  speed(c) {
+    const n0 = c.prior === null ? 0 : this.priorVisits, p = c.priorSpeed || 0;
+    if (!c.n) return p;
+    return (n0 * p + c.speed) / (n0 + c.n);
   }
 
   finish() {

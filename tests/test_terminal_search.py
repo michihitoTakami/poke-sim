@@ -222,3 +222,46 @@ console.log(JSON.stringify({paused,pending:pending.length,censored:final.summary
                          capture_output=True, check=True, timeout=10)
     assert json.loads(out.stdout) == {'paused': True, 'pending': 0, 'censored': 0,
                                      'terminal': 0, 'unfinished': 1, 'scored': 0}
+
+
+def cell_values(prior_visits, rollout_policies=None):
+    js = r"""
+const fs=require('fs'),vm=require('vm');
+const sandbox={__dirname:process.cwd()+'/services/sim-tools',
+ require:n=>n==='readline'?{createInterface:()=>({on:()=>{}})}:require(n),
+ process:{argv:['node','worker',process.argv[1]]},module:{exports:{}}};
+vm.runInNewContext(fs.readFileSync('./services/sim-tools/lookahead.js','utf8')+
+ '\nmodule.exports={setUp,step,choices,State,extractChannelMessages};',sandbox);
+const d=sandbox.module.exports, opts=JSON.parse(process.argv[2]);
+const req={...JSON.parse(fs.readFileSync('./tests/fixtures/terminal-moonblast-turn14.json')),...opts};
+const {Search}=require('./services/sim-tools/terminal_search');
+const s=new Search(req,d), cell=s.states[0].cells[0][0];
+cell.prior=.6; cell.priorSpeed=.2;
+const before=s.reply().results[0];
+cell.n=1; cell.sum=-1; cell.speed=0; cell.ends=1;
+const after=s.reply().results[0];
+console.log(JSON.stringify({before:before.payoff[0][0],after:after.payoff[0][0],speed:after.winSpeed[0][0],
+ stats:after.stats[0][0],version:s.policyVersion,policies:s.rolloutPolicies}));
+"""
+    opts = {'priorVisits': prior_visits}
+    if rollout_policies is not None:
+        opts['rolloutPolicies'] = rollout_policies
+    out = subprocess.run(['node', '-e', js, str(SHOWDOWN_DIR), json.dumps(opts)], cwd=ROOT, text=True,
+                         capture_output=True, check=True, timeout=20)
+    return json.loads(out.stdout)
+
+
+def test_the_value_bootstrap_keeps_its_weight_against_a_single_rollout_only_when_asked():
+    plain = cell_values(0)
+    assert plain['before'] == pytest.approx(.6) and plain['after'] == pytest.approx(-1)
+    assert plain['stats'] == {'n': 1, 'sum': -1, 'prior': .6, 'speed': 0, 'priorSpeed': .2, 'ends': 1, 'failed': 0}
+    assert plain['policies'] == {'p1': ['expert'], 'p2': ['disrupt', 'tactical']}
+    assert plain['version'] == 'public-baton-v1'
+    blended = cell_values(4, {'p2': ['disrupt', 'tactical', 'expert']})
+    assert blended['before'] == pytest.approx(.6)
+    assert blended['after'] == pytest.approx((4 * .6 - 1) / 5)
+    assert blended['speed'] == pytest.approx(4 * .2 / 5)
+    assert blended['policies'] == {'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']}
+    assert blended['version'] == 'public-baton-v1+p1:expert/p2:disrupt,tactical,expert'
+    with pytest.raises(subprocess.CalledProcessError):
+        cell_values(0, {'p2': ['random']})
