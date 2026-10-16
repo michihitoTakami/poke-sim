@@ -18,6 +18,7 @@ import gzip
 import hashlib
 import json
 import random
+import re
 import time
 from pathlib import Path
 
@@ -119,22 +120,22 @@ def teacher_of(rec: dict, turn: int) -> dict | None:
     return None
 
 
-def rows_of(battle_id: str, rec: dict, sets: list[dict], engine: Lookahead, own: dict, split: str,
-            sides=('p1', 'p2')) -> tuple[list[dict], dict]:
-    """All normal-turn rows of one record (us = p1), and counts of what was skipped."""
-    log = rec['log']
-    if rec.get('result') not in ('win', 'loss'):
-        return [], {'no_result': 1}
-    session = BattleSession(sets)
-    session.preview(rec['preview']['species'])
-    session.select([next(i for i, s in enumerate(sets) if to_id(s['species']) == to_id(x)) for x in rec['lineup']])
-    start = next(i for i, line in enumerate(log) if line.startswith('|teampreview')) + 1
-    rate = ratings(log)
-    outcome = {'win': 1., 'loss': 0.}.get(rec.get('result'), .5)
+def swap_roles(lines: list[str]) -> list[str]:
+    """The protocol seen with p1 and p2 exchanged (the worker always takes the actor as p1)."""
+    return [re.sub(r'\bp([12])(?=[a-z]?[:|]|$)', lambda m: 'p' + ('2' if m[1] == '1' else '1'), line)
+            for line in lines]
+
+
+def rows_from_session(battle_id: str, session: BattleSession, lines: list[str], role: str, engine: Lookahead,
+                      own: dict, meta: dict, sides=('p1', 'p2'), teacher=None) -> tuple[list[dict], dict]:
+    """Rows of every normal turn: `lines` are applied to `session` (the actor plays `role`), and at each |turn|
+    the actor's view ('p1' in `sides`) and the foe's view ('p2') are taken from one sampled world.
+    meta: fields copied into every row (source, record, started, outcome for the actor, rating, opponent).
+    teacher(turn) -> dict | None: the actor's search evidence at that turn (ladder records)."""
+    foe = 'p2' if role == 'p1' else 'p1'
     rows, skipped = [], {'no_choice': 0, 'unreplayable': 0, 'illegal': 0}
-    turns = sum(line.startswith('|turn|') for line in log)
-    for i in range(start, len(log)):
-        line = log[i]
+    turns = sum(line.startswith('|turn|') for line in lines)
+    for i, line in enumerate(lines):
         if line.startswith('|error|'):
             continue
         try:
@@ -146,7 +147,7 @@ def rows_of(battle_id: str, rec: dict, sets: list[dict], engine: Lookahead, own:
             continue
         turn = int(line.split('|')[2])
         stones: dict = {}
-        actions = turn_actions(log, i, stones)
+        actions = turn_actions(lines, i, stones)
         try:
             battle = session.decision()
             if battle.active_pokemon is None or battle.opponent_active_pokemon is None:
@@ -155,17 +156,18 @@ def rows_of(battle_id: str, rec: dict, sets: list[dict], engine: Lookahead, own:
             engine.sampler.rng = random.Random(int(hashlib.sha256(f'{battle_id}:{turn}'.encode()).hexdigest()[:12],
                                                    16))
             world = {'p1': engine.own_side(battle, own),
-                     'p2': opponent_world(engine, battle, actions['p2'], stones.get('p2')),
+                     'p2': opponent_world(engine, battle, actions[foe], stones.get(foe)),
                      'field': field_state(battle)}
+            history = list(session.log) if role == 'p1' else swap_roles(session.log)
             reply = engine._query({'observe': True, 'format': FORMAT, 'samples': [world],
-                                   'observationLog': list(session.log), 'sides': list(sides)})
+                                   'observationLog': history, 'sides': list(sides)})
         except Exception as e:  # noqa: BLE001 - one turn we cannot rebuild must not drop the battle
             skipped['unreplayable'] += 1
             skipped.setdefault('errors', []).append(f'T{turn}: {e!r}'[:160])
             continue
         views = reply['observations'][0]
         for side in sides:
-            action = actions[side]
+            action = actions[role if side == 'p1' else foe]
             if not action:
                 skipped['no_choice'] += 1
                 continue
@@ -173,15 +175,30 @@ def rows_of(battle_id: str, rec: dict, sets: list[dict], engine: Lookahead, own:
             if action not in legal:
                 skipped['illegal'] += 1
                 continue
-            row = {'schema_version': SCHEMA, 'source': 'ladder', 'battle_id': battle_id,
-                   'record': rec.get('source'), 'started': rec.get('started'), 'turn': turn, 'turns': turns,
-                   'side': side, 'split': split, 'view': views[side]['view'], 'legal': legal, 'action': action,
-                   'outcome': outcome if side == 'p1' else 1 - outcome, 'rating': rate,
-                   'opponent': rec.get('opponent'), 'sample_weight': 1.0}
-            if side == 'p1':
-                row['teacher'] = teacher_of(rec, turn)
+            row = {'schema_version': SCHEMA, **meta, 'battle_id': battle_id, 'turn': turn, 'turns': turns,
+                   'side': side, 'view': views[side]['view'], 'legal': legal, 'action': action,
+                   'outcome': meta['outcome'] if side == 'p1' else 1 - meta['outcome'], 'sample_weight': 1.0}
+            if side == 'p1' and teacher is not None:
+                row['teacher'] = teacher(turn)
             rows.append(row)
     return rows, skipped
+
+
+def rows_of(battle_id: str, rec: dict, sets: list[dict], engine: Lookahead, own: dict, split: str,
+            sides=('p1', 'p2')) -> tuple[list[dict], dict]:
+    """All normal-turn rows of one of our records (us = p1), and counts of what was skipped."""
+    log = rec['log']
+    if rec.get('result') not in ('win', 'loss'):
+        return [], {'no_result': 1}
+    session = BattleSession(sets)
+    session.preview(rec['preview']['species'])
+    session.select([next(i for i, s in enumerate(sets) if to_id(s['species']) == to_id(x)) for x in rec['lineup']])
+    start = next(i for i, line in enumerate(log) if line.startswith('|teampreview')) + 1
+    meta = {'source': 'ladder', 'record': rec.get('source'), 'started': rec.get('started'), 'split': split,
+            'outcome': {'win': 1., 'loss': 0.}.get(rec.get('result'), .5), 'rating': ratings(log),
+            'opponent': rec.get('opponent')}
+    return rows_from_session(battle_id, session, log[start:], 'p1', engine, own, meta, sides,
+                             teacher=lambda turn: teacher_of(rec, turn))
 
 
 def build(args) -> None:
