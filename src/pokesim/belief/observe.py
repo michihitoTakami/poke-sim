@@ -7,8 +7,8 @@ boosts, status, field), then read the lines that follow until the next action:
            survival, no damage "[from]" an item or ability): our Pokémon's HP is exact, the opponent's is a
            percentage. With the critical hit flag from "|-crit|".
   speed    both actives used a move this turn, neither switched before moving, the same priority, no Quick Claw /
-           Custap Berry / Quash / Trick Room starting this turn, and the opponent's move is not a status move (Prankster
-           would change its priority): who went first. The worker checks actual priorities per candidate.
+           Custap Berry / Quash / mid-turn speed changes: who went first. The worker checks actual priorities,
+           including Prankster and items which force a move to go last, per candidate.
 
   no choice two different moves in one stay on the field (Choice items lock the first): not a Choice item.
 
@@ -251,11 +251,19 @@ class Observer:
         # The turn-start sample cannot describe order after an item or forme changes mid-turn.
         if any(x.startswith(("|-item|", "|-enditem|", "|-mega|", "|detailschange|")) for x in lines):
             return
-        if any(s in x for x in lines for s in ORDER_EFFECTS) or any(
-                x.startswith("|-fieldstart|") and "Trick Room" in x for x in lines):
+        if any(s in x for x in lines for s in ORDER_EFFECTS):
             return
+        second_move = max(i for i, _ in first_moves.values())
+        for line in lines[:second_move]:
+            p = line.split('|')
+            if p[1] in ('-boost', '-unboost', '-setboost') and len(p) > 3 and p[3] == 'spe':
+                return
+            if p[1] in ('-clearboost', '-clearallboost', '-swapboost', '-copyboost', '-invertboost',
+                        '-status', '-curestatus', '-weather', '-fieldstart', '-fieldend',
+                        '-sidestart', '-sideend', '-ability', '-formechange'):
+                return
         ours, theirs = move_entry(first_moves[self.role][1]), move_entry(first_moves[self.opp][1])
-        if not ours or not theirs or theirs.get("category") == "Status" or \
+        if not ours or not theirs or \
                 ours.get("priority", 0) != theirs.get("priority", 0):
             return
         self._n += 1

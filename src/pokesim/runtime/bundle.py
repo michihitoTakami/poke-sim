@@ -51,6 +51,6 @@ def describe(policy: str | Path | None = None, matchup_meta: dict | None = None,
         out["policy"] = {"path": Path(policy).name, "sha": file_hash(policy)}
     if matchup_meta is not None:
         out["matchup_model"] = {k: matchup_meta.get(k) for k in ("policy_sha", "policies", "data_sha", "games",
-                                                                 "fitted")}
+                                                                 "fitted", "ladder_evidence")}
     out.update(extra)
     return out

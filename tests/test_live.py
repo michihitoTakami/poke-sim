@@ -152,6 +152,30 @@ def test_shadow_failure_preserves_the_legacy_recommendation(session, monkeypatch
     assert "fallback" not in sug.status
 
 
+def test_planner_does_not_play_argmax_of_a_mix_in_fixed_depth_mode(session):
+    from types import SimpleNamespace
+
+    from pokesim.live.advisor import Advisor
+
+    EventTranslator(session).apply([{'type': 'switch', 'side': 'me', 'species': 'Scolipede'},
+                                   {'type': 'switch', 'side': 'opp', 'species': 'Garchomp'}, {'type': 'turn'}])
+    row = {'p1': ['move:batonpass', 'move:irondefense'], 'p2': ['move:earthquake', 'move:swordsdance'],
+           'payoff': [[1, -.9], [-1, 0]]}
+    advisor = Advisor(session.sets, lookahead=False, opponent_policy=None,
+                      planner={'mode': 'on', 'rho': 1, 'search': {'plans': None}})
+    advisor.engine = SimpleNamespace(opponent_model={}, query=lambda *a, **k: [row])
+    try:
+        suggestion = advisor.advise(session.decision())
+        assert suggestion.actions[0] == ('move:batonpass', 1.)
+        assert suggestion.status['search']['solver'] == 'pure-robust'
+        advisor.sample = True
+        mixed = advisor.advise(session.decision())
+        assert mixed.actions[0][0] == 'move:irondefense'
+        assert 0 < mixed.actions[0][1] < 1
+    finally:
+        advisor.engine = None
+
+
 def test_switch_request_keeps_the_outgoing_state_for_the_simulator(session):
     from types import SimpleNamespace
 

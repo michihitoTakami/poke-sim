@@ -205,6 +205,11 @@ def test_no_passing_back_and_forth_or_passing_a_single_boost():
     assert choose("expert", one, side([WEAK])) != "move:batonpass"  # +1 Speed alone is not worth a turn yet
 
 
+def test_a_passer_cannot_outspeed_a_lethal_priority_move():
+    ours = side([PASSER, GHOLDENGO], [{'hp': .05, 'boosts': {'spe': 6}}, {'hp': 1}])
+    assert choose('expert', ours, side([dict(CHOMP, moves=['Extreme Speed'])])) == 'switch:gholdengo'
+
+
 def test_can_set_up_sees_boosting_moves_and_baton_pass():
     from poke_env.battle import Pokemon
 
@@ -244,3 +249,17 @@ def test_disrupt_sets_trick_room_against_a_faster_foe():
     out = run("const b = setUp(sample, format, 1); console.log(JSON.stringify(label(b, b.p1, disrupt(b, b.p1))));",
               sample)
     assert out != "move:trickroom"  # not again while it is up (that would end it)
+
+
+def test_bench_speed_includes_tailwind_items_status_and_weather_after_the_pass():
+    code = ("const b = setUp(sample, format, 1);"
+            "console.log(JSON.stringify(b.p1.pokemon.map(m=>speedOf(m))));")
+    scarf = dict(GHOLDENGO, item='Choice Scarf')
+    ours = side([scarf, scarf], [{'hp': 1, 'status': 'par'}, {'hp': 1, 'status': 'par'}])
+    ours['conditions'] = {'tailwind': 3}
+    speed = run(code, {'p1': ours, 'p2': side([SLOW_SPECIAL]), 'field': {}})
+    assert speed[0] == speed[1]
+    swimmer = dict(GHOLDENGO, ability='Swift Swim')
+    speed = run(code, {'p1': side([swimmer, swimmer]), 'p2': side([SLOW_SPECIAL]),
+                       'field': {'weather': 'raindance'}})
+    assert speed[0] == speed[1]

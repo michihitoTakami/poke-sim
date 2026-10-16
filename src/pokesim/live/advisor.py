@@ -84,6 +84,7 @@ OPPONENT_POLICY_WEIGHT = 0.5
 # development data.
 PLAN_CANDIDATES = ["expert", "expert@0", "expert@2", "expert@4", "expert@6"]
 PLANNER_SEARCH = {
+    "batonPolicy": True,
     "continuations": ["expert/tactical", "expert/disrupt"],
     "scoring": "terminal",
     "lostPathPenalty": 0.3,
@@ -117,7 +118,7 @@ class Advisor:
         sample: bool = False,
         prior_bundle: dict | None = None,
         sampler: SetSampler | None = None,
-        belief: bool = False,
+        belief: bool = True,
         value_run: str | Path | None = None,
     ):
         """source: where the advice is used ("switch" / "showdown"), for the win calibration.
@@ -258,18 +259,27 @@ class Advisor:
 
         belief = None
         if self.beliefs is not None and log and opp_active is not None:
+            belief_start = time.perf_counter()
             try:
                 belief = self.beliefs.get(battle.battle_tag, log, our_role)
                 status["belief"] = {"observations": len(belief.observations),
+                                    "speed_observations": sum(o.kind == 'speed' for o in belief.observations),
                                     "active": belief.summary(opp_active.species, *revealed(opp_active))}
             except Exception as e:  # noqa: BLE001 - without the belief the lookahead draws from the prior
                 belief = None
                 status["belief"] = {"error": repr(e)[:200]}
+            status["belief"]["elapsed_ms"] = 1000 * (time.perf_counter() - belief_start)
         if can_search:
             try:
                 cache: dict = {}
+                settings = None
+                if mode == 'on' and self.planner['search'].get('terminalSearch'):
+                    # Inference from the observed log is part of this decision's time budget.
+                    settings = dict(self.planner['search'])
+                    settings['decisionMs'] = max(100, settings.get('decisionMs', 8500) -
+                                                 int(1000 * (time.perf_counter() - start)))
                 advice = self._search(battle, last_move, dict(cloned), planned=mode == "on", cache=cache,
-                                      belief=belief, log=log, our_role=our_role)
+                                      belief=belief, log=log, our_role=our_role, settings=settings)
                 ranked = legal(advice)
                 opponent = sorted(advice.opponent.items(), key=lambda kv: -kv[1])
                 status["search"] = advice.status
@@ -351,7 +361,7 @@ class Advisor:
                     self.planner["rho"],
                     cloned or None,
                     self.planner["cloned_weight"],
-                    pure=not self.sample and bool(cache[key][0].get('terminal_search')),
+                    pure=not self.sample,
                 )
                 values = [res['value_status'] for res in cache[key] if 'value_status' in res]
                 if values:

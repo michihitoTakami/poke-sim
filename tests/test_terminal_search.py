@@ -118,6 +118,29 @@ def test_certified_immediate_win_cannot_be_outvoted_by_incomplete_or_optimistic_
     assert advice.status['solver'] == 'sampled-world-immediate-win'
 
 
+@pytest.mark.parametrize('move', ['shadowball', 'moonblast'])
+def test_faster_lethal_attack_is_taken_instead_of_a_fatal_heal_or_setup(move):
+    from test_baton_decisions import CHANDELURE
+    from test_expert_continuation import FLOETTE, GHOLDENGO
+
+    ours, foe = (GHOLDENGO, CHANDELURE) if move == 'shadowball' else (FLOETTE, CHOMP)
+    # No future battle events are supplied. A misleading bootstrap value cannot replace the actual winning hit.
+    log = [f'|switch|p1a: Me|{ours["species"]}, L50|60/175',
+           f'|switch|p2a: Foe|{foe["species"]}, L50|20/100', '|turn|3',
+           '|-boost|p1a: Me|spa|2', '|-boost|p1a: Me|spe|2', '|turn|4']
+    req = dict(format='gen9championsbssregmc', decisionMs=1800, observationLog=log,
+               samples=[{'p1': side([ours], [{'hp': .35, 'boosts': {'spa': 2, 'spe': 2}}]),
+                         'p2': side([foe], [{'hp': .2}]), 'field': {}}])
+    engine = Lookahead(None, value_model=FlatValue())
+    try:
+        advice = plan(search(engine, req), pure=True)
+    finally:
+        engine.close()
+    assert advice.ranked()[0][0] == 'move:' + move
+    assert advice.status['terminal_search']['failed'] == 0
+    assert advice.status['terminal_search']['continuation_policy'] == 'public-baton-v1'
+
+
 def test_playing_one_move_uses_its_own_risk_instead_of_the_largest_mixed_probability():
     row = {'p1': ['a', 'b'], 'p2': ['x', 'y'], 'payoff': [[1, -.9], [-1, 0]]}
     mixed = plan([row], rho=1)

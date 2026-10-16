@@ -1,0 +1,2343 @@
+{
+  "purpose": "Development diagnostics; changed advice is not a win-rate improvement claim",
+  "history": "Only record prefix through the decision turn; train-only prior bundle",
+  "cases": [
+    {
+      "file": "20261016-000346-8ufgk2e0ksfupa9kxu76ba7ccenbhjrpw.json",
+      "turn": 2,
+      "observed_choice": "switch:scolipede",
+      "runs": [
+        {
+          "variant": "frozen-public-v2-no-belief",
+          "actions": [
+            [
+              "move:moonlight",
+              1.0
+            ],
+            [
+              "move:snarl",
+              0.0
+            ],
+            [
+              "move:batonpass",
+              0.0
+            ],
+            [
+              "move:calmmind",
+              0.0
+            ],
+            [
+              "switch:scolipede",
+              0.0
+            ],
+            [
+              "switch:floetteeternal",
+              0.0
+            ]
+          ],
+          "elapsed": 8.019915802986361,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "10b88227fe64971a"
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": -0.1003134736945686,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "e3f31145b437c4818261ca1fa11f0695c7bb055058df2105dfdb5a09a4fa1cd6",
+                "continuation_policy": "public-reference-v2",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 85,
+                    "opponent": 258,
+                    "ourAction": 85,
+                    "opponentAction": 258
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  }
+                ],
+                "ready": true,
+                "simulations": 634,
+                "terminal": 634,
+                "learned": 216,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 722,
+                "max_tree_decisions": 3,
+                "max_rollout_turns": 75,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8500.0,
+                "elapsed_ms": 7788.782827032264,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:snarl",
+                  "expected": -0.06531491027539496,
+                  "worst": -0.5444444444444444,
+                  "trials": 182
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": -0.15427680182770448,
+                  "worst": -0.8333333333333333,
+                  "trials": 80
+                },
+                {
+                  "label": "move:calmmind",
+                  "expected": -0.12071581638402148,
+                  "worst": -0.9999999999999999,
+                  "trials": 41
+                },
+                {
+                  "label": "move:moonlight",
+                  "expected": 0.08458619404177274,
+                  "worst": -0.5317460317460317,
+                  "trials": 236
+                },
+                {
+                  "label": "switch:scolipede",
+                  "expected": -0.3894420286216352,
+                  "worst": -0.6666666666666666,
+                  "trials": 39
+                },
+                {
+                  "label": "switch:floetteeternal",
+                  "expected": -0.18952505565525743,
+                  "worst": -0.8333333333333333,
+                  "trials": 56
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 634,
+                "learned": 216,
+                "failed": 0,
+                "inference_ms": 145.9586679120548
+              }
+            },
+            "win_path": {
+              "sources": [
+                "floetteeternal",
+                "umbreon"
+              ],
+              "blocked": {
+                "pawmot": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 2,
+              "no_source": false,
+              "last_source": false
+            }
+          }
+        },
+        {
+          "variant": "revised",
+          "actions": [
+            [
+              "move:batonpass",
+              1.0
+            ],
+            [
+              "move:snarl",
+              0.0
+            ],
+            [
+              "move:calmmind",
+              0.0
+            ],
+            [
+              "move:moonlight",
+              0.0
+            ],
+            [
+              "switch:scolipede",
+              0.0
+            ],
+            [
+              "switch:floetteeternal",
+              0.0
+            ]
+          ],
+          "elapsed": 8.018997110018972,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "2f002df0239cdcd7"
+            },
+            "belief": {
+              "observations": 2,
+              "speed_observations": 1,
+              "active": [
+                [
+                  "Focus Sash / jolly / 2-32-0-0-0-32",
+                  0.7384036773923947
+                ],
+                [
+                  "Sitrus Berry / jolly / 2-32-0-0-0-32",
+                  0.04763894692854158
+                ],
+                [
+                  "Leppa Berry / jolly / 2-32-0-0-0-32",
+                  0.04763894692854158
+                ]
+              ],
+              "elapsed_ms": 348.9223509677686
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": 0.16651740662894352,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "b3cb6dcef463c7218b71fabdedc340c9fc784cdb66466f8d48eb9e96790c6519",
+                "continuation_policy": "public-baton-v1",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 172,
+                    "ourAction": 85,
+                    "opponentAction": 172
+                  }
+                ],
+                "ready": true,
+                "simulations": 682,
+                "terminal": 682,
+                "learned": 216,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 671,
+                "max_tree_decisions": 4,
+                "max_rollout_turns": 72,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8151.999999999999,
+                "elapsed_ms": 7453.2133609754965,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:snarl",
+                  "expected": 0.17221494503852472,
+                  "worst": -0.9999999999999999,
+                  "trials": 32
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": 0.2908581999461098,
+                  "worst": -0.12361111111111113,
+                  "trials": 563
+                },
+                {
+                  "label": "move:calmmind",
+                  "expected": -0.01756603502571049,
+                  "worst": -0.9999999999999999,
+                  "trials": 33
+                },
+                {
+                  "label": "move:moonlight",
+                  "expected": -0.17778057400101607,
+                  "worst": -0.8190991232792536,
+                  "trials": 19
+                },
+                {
+                  "label": "switch:scolipede",
+                  "expected": -0.3300269771109812,
+                  "worst": -0.8493852640191712,
+                  "trials": 17
+                },
+                {
+                  "label": "switch:floetteeternal",
+                  "expected": -0.26908739609309607,
+                  "worst": -0.7925198674201965,
+                  "trials": 18
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 682,
+                "learned": 216,
+                "failed": 0,
+                "inference_ms": 129.98217617860064
+              }
+            },
+            "win_path": {
+              "sources": [
+                "floetteeternal",
+                "umbreon"
+              ],
+              "blocked": {
+                "pawmot": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 2,
+              "no_source": false,
+              "last_source": false
+            }
+          },
+          "code": {
+            "services/sim-tools/public_policy.js": "8d60a3aade16fdfc",
+            "services/sim-tools/public_observation.js": "f72d55fef376440e",
+            "services/sim-tools/state_codec.js": "359c71590c613efe",
+            "services/sim-tools/lookahead.js": "56ec6da7da6bb8de",
+            "services/sim-tools/terminal_search.js": "4aa36797ea103be1",
+            "services/sim-tools/belief.js": "eaec31413e5ae3df",
+            "src/pokesim/live/advisor.py": "45baa69e13dbb64d",
+            "src/pokesim/belief/observe.py": "6f847353df81adb4",
+            "src/pokesim/belief/sets.py": "e9fdb7d3ce0d383c"
+          }
+        }
+      ]
+    },
+    {
+      "file": "20261016-004658-2698931764.json",
+      "turn": 2,
+      "observed_choice": "switch:floetteeternal",
+      "runs": [
+        {
+          "variant": "frozen-public-v2-no-belief",
+          "actions": [
+            [
+              "move:batonpass",
+              1.0
+            ],
+            [
+              "move:snarl",
+              0.0
+            ],
+            [
+              "move:calmmind",
+              0.0
+            ],
+            [
+              "move:moonlight",
+              0.0
+            ],
+            [
+              "switch:scolipede",
+              0.0
+            ],
+            [
+              "switch:floetteeternal",
+              0.0
+            ]
+          ],
+          "elapsed": 7.957622187968809,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "10b88227fe64971a"
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": 0.5237040537731859,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "62e9d7578306a86fac26c08f33fdd91fc5da5f9a242ace5aca12a617d46365de",
+                "continuation_policy": "public-reference-v2",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 113,
+                    "ourAction": 85,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 113,
+                    "ourAction": 85,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 113,
+                    "ourAction": 85,
+                    "opponentAction": 113
+                  }
+                ],
+                "ready": true,
+                "simulations": 1090,
+                "terminal": 1090,
+                "learned": 216,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 1262,
+                "max_tree_decisions": 4,
+                "max_rollout_turns": 66,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8500.0,
+                "elapsed_ms": 7801.938552991487,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:snarl",
+                  "expected": 0.17490272922579528,
+                  "worst": -0.3553800781567891,
+                  "trials": 25
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": 0.6105825106812708,
+                  "worst": 0.32098765432098764,
+                  "trials": 969
+                },
+                {
+                  "label": "move:calmmind",
+                  "expected": 0.19318973822734925,
+                  "worst": -0.33546946446100867,
+                  "trials": 28
+                },
+                {
+                  "label": "move:moonlight",
+                  "expected": 0.38892714564914066,
+                  "worst": 0.0,
+                  "trials": 34
+                },
+                {
+                  "label": "switch:scolipede",
+                  "expected": -0.2716913599742725,
+                  "worst": -0.4285499279697736,
+                  "trials": 17
+                },
+                {
+                  "label": "switch:floetteeternal",
+                  "expected": -0.13422610304494126,
+                  "worst": -0.3346114804347356,
+                  "trials": 17
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 1090,
+                "learned": 216,
+                "failed": 0,
+                "inference_ms": 133.02462524734437
+              }
+            },
+            "win_path": {
+              "sources": [
+                "floetteeternal",
+                "umbreon"
+              ],
+              "blocked": {
+                "samurotthisui": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 2,
+              "no_source": false,
+              "last_source": false
+            }
+          }
+        },
+        {
+          "variant": "revised",
+          "actions": [
+            [
+              "move:batonpass",
+              1.0
+            ],
+            [
+              "move:snarl",
+              0.0
+            ],
+            [
+              "move:calmmind",
+              0.0
+            ],
+            [
+              "move:moonlight",
+              0.0
+            ],
+            [
+              "switch:scolipede",
+              0.0
+            ],
+            [
+              "switch:floetteeternal",
+              0.0
+            ]
+          ],
+          "elapsed": 7.94786135898903,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "2f002df0239cdcd7"
+            },
+            "belief": {
+              "observations": 2,
+              "speed_observations": 1,
+              "active": [
+                [
+                  "Black Glasses / adamant / 16-32-2-0-6-10",
+                  0.25
+                ],
+                [
+                  "Black Glasses / adamant / 20-32-0-0-4-10",
+                  0.22916666666666669
+                ],
+                [
+                  "Black Glasses / adamant / 18-32-2-0-6-8",
+                  0.22916666666666669
+                ]
+              ],
+              "elapsed_ms": 82.22724799998105
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": 0.0409501839455854,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "0ebac59d5278eb9a2026c03887bd0ddc3bb2daa1cdd6ba1ed21f0b07d69c0ada",
+                "continuation_policy": "public-baton-v1",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 85,
+                    "opponent": 113,
+                    "ourAction": 85,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  }
+                ],
+                "ready": true,
+                "simulations": 864,
+                "terminal": 864,
+                "learned": 216,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 880,
+                "max_tree_decisions": 4,
+                "max_rollout_turns": 100,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8418.0,
+                "elapsed_ms": 7718.602092994843,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:snarl",
+                  "expected": 0.11708704654489552,
+                  "worst": -0.6666666666666666,
+                  "trials": 51
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": 0.14421454849369345,
+                  "worst": -0.2,
+                  "trials": 717
+                },
+                {
+                  "label": "move:calmmind",
+                  "expected": 0.03618848790696687,
+                  "worst": -0.6009523471196493,
+                  "trials": 27
+                },
+                {
+                  "label": "move:moonlight",
+                  "expected": -0.31390525934145264,
+                  "worst": -0.8685713609059652,
+                  "trials": 23
+                },
+                {
+                  "label": "switch:scolipede",
+                  "expected": -0.05467614927371387,
+                  "worst": -0.9195921545227368,
+                  "trials": 24
+                },
+                {
+                  "label": "switch:floetteeternal",
+                  "expected": -0.4715877797824071,
+                  "worst": -0.8379050493240356,
+                  "trials": 22
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 864,
+                "learned": 216,
+                "failed": 0,
+                "inference_ms": 125.5098800174892
+              }
+            },
+            "win_path": {
+              "sources": [
+                "floetteeternal",
+                "umbreon"
+              ],
+              "blocked": {
+                "samurotthisui": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 2,
+              "no_source": false,
+              "last_source": false
+            }
+          },
+          "code": {
+            "services/sim-tools/public_policy.js": "8d60a3aade16fdfc",
+            "services/sim-tools/public_observation.js": "f72d55fef376440e",
+            "services/sim-tools/state_codec.js": "359c71590c613efe",
+            "services/sim-tools/lookahead.js": "56ec6da7da6bb8de",
+            "services/sim-tools/terminal_search.js": "4aa36797ea103be1",
+            "services/sim-tools/belief.js": "eaec31413e5ae3df",
+            "src/pokesim/live/advisor.py": "45baa69e13dbb64d",
+            "src/pokesim/belief/observe.py": "6f847353df81adb4",
+            "src/pokesim/belief/sets.py": "e9fdb7d3ce0d383c"
+          }
+        }
+      ]
+    },
+    {
+      "file": "20261016-001828-cklcrx4dq0xjp6ng5u8j1tqd4go2sk2pw.json",
+      "turn": 22,
+      "observed_choice": "move:moonlight",
+      "runs": [
+        {
+          "variant": "frozen-public-v2-no-belief",
+          "actions": [
+            [
+              "move:snarl",
+              1.0
+            ],
+            [
+              "move:batonpass",
+              0.0
+            ],
+            [
+              "move:calmmind",
+              0.0
+            ],
+            [
+              "move:moonlight",
+              0.0
+            ],
+            [
+              "switch:scolipede",
+              0.0
+            ]
+          ],
+          "elapsed": 7.950202173029538,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "10b88227fe64971a"
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": -0.9999999999999998,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "ded00984dd2f9fbbf4a3551feef182f276fba6ab39e71791b73d04071f2dbc97",
+                "continuation_policy": "public-reference-v2",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 113,
+                    "ourAction": 85,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  }
+                ],
+                "ready": true,
+                "simulations": 1690,
+                "terminal": 1690,
+                "learned": 150,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 1631,
+                "max_tree_decisions": 4,
+                "max_rollout_turns": 38,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8500.0,
+                "elapsed_ms": 7800.856414018199,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:snarl",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 338
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 338
+                },
+                {
+                  "label": "move:calmmind",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 338
+                },
+                {
+                  "label": "move:moonlight",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 338
+                },
+                {
+                  "label": "switch:scolipede",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 338
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 1690,
+                "learned": 150,
+                "failed": 0,
+                "inference_ms": 113.1801029550843
+              }
+            },
+            "win_path": {
+              "sources": [
+                "umbreon"
+              ],
+              "blocked": {
+                "charizardmegay": [
+                  "scolipede"
+                ],
+                "samurotthisui": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 0,
+              "no_source": false,
+              "last_source": true
+            }
+          }
+        },
+        {
+          "variant": "revised",
+          "actions": [
+            [
+              "move:snarl",
+              1.0
+            ],
+            [
+              "move:batonpass",
+              0.0
+            ],
+            [
+              "move:calmmind",
+              0.0
+            ],
+            [
+              "move:moonlight",
+              0.0
+            ],
+            [
+              "switch:scolipede",
+              0.0
+            ]
+          ],
+          "elapsed": 7.942692468001042,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "2f002df0239cdcd7"
+            },
+            "belief": {
+              "observations": 24,
+              "speed_observations": 10,
+              "active": [
+                [
+                  "Black Glasses / adamant / 20-32-0-0-4-10",
+                  0.25
+                ],
+                [
+                  "Black Glasses / adamant / 16-32-2-0-6-10",
+                  0.20833333333333334
+                ],
+                [
+                  "Black Glasses / adamant / 18-32-2-0-6-8",
+                  0.1875
+                ]
+              ],
+              "elapsed_ms": 73.23043298674747
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": -0.9999999999999998,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "f547ddca2edaf8406441856402cc8b79f1c5fb94245d69202d33da22f17cc6a4",
+                "continuation_policy": "public-baton-v1",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 113,
+                    "ourAction": 85,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 115,
+                    "ourAction": 85,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 85,
+                    "opponent": 113,
+                    "ourAction": 85,
+                    "opponentAction": 113
+                  }
+                ],
+                "ready": true,
+                "simulations": 1413,
+                "terminal": 1413,
+                "learned": 150,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 1319,
+                "max_tree_decisions": 3,
+                "max_rollout_turns": 33,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8427.0,
+                "elapsed_ms": 7728.5908900084905,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:snarl",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 283
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 283
+                },
+                {
+                  "label": "move:calmmind",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 283
+                },
+                {
+                  "label": "move:moonlight",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 282
+                },
+                {
+                  "label": "switch:scolipede",
+                  "expected": -0.9999999999999998,
+                  "worst": -0.9999999999999999,
+                  "trials": 282
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 1413,
+                "learned": 150,
+                "failed": 0,
+                "inference_ms": 117.89843993028626
+              }
+            },
+            "win_path": {
+              "sources": [
+                "umbreon"
+              ],
+              "blocked": {
+                "charizardmegay": [
+                  "scolipede"
+                ],
+                "samurotthisui": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 0,
+              "no_source": false,
+              "last_source": true
+            }
+          },
+          "code": {
+            "services/sim-tools/public_policy.js": "8d60a3aade16fdfc",
+            "services/sim-tools/public_observation.js": "f72d55fef376440e",
+            "services/sim-tools/state_codec.js": "359c71590c613efe",
+            "services/sim-tools/lookahead.js": "56ec6da7da6bb8de",
+            "services/sim-tools/terminal_search.js": "4aa36797ea103be1",
+            "services/sim-tools/belief.js": "eaec31413e5ae3df",
+            "src/pokesim/live/advisor.py": "45baa69e13dbb64d",
+            "src/pokesim/belief/observe.py": "6f847353df81adb4",
+            "src/pokesim/belief/sets.py": "e9fdb7d3ce0d383c"
+          }
+        }
+      ]
+    },
+    {
+      "file": "20261016-052245-2699079725.json",
+      "turn": 14,
+      "observed_choice": "move:calmmind",
+      "runs": [
+        {
+          "variant": "frozen-public-v2-no-belief",
+          "actions": [
+            [
+              "move:moonblast",
+              1.0
+            ],
+            [
+              "move:substitute",
+              0.0
+            ],
+            [
+              "move:synthesis",
+              0.0
+            ],
+            [
+              "move:calmmind",
+              0.0
+            ],
+            [
+              "switch:scolipede",
+              0.0
+            ]
+          ],
+          "elapsed": 7.944298618007451,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "10b88227fe64971a"
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": 0.9999999999999998,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "a6e4c39516631b057f37ebc6355a55e9329a74d0d65380d35a89d3b17194349d",
+                "continuation_policy": "public-reference-v2",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 193,
+                    "ourAction": 112,
+                    "opponentAction": 193
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 194,
+                    "ourAction": 112,
+                    "opponentAction": 194
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  }
+                ],
+                "ready": true,
+                "simulations": 2833,
+                "terminal": 2851,
+                "learned": 102,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 2248,
+                "max_tree_decisions": 2,
+                "max_rollout_turns": 10,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 2,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8500.0,
+                "elapsed_ms": 7800.279390008654,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:moonblast",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 567
+                },
+                {
+                  "label": "move:substitute",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 567
+                },
+                {
+                  "label": "move:synthesis",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 567
+                },
+                {
+                  "label": "move:calmmind",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 566
+                },
+                {
+                  "label": "switch:scolipede",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 566
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 2851,
+                "learned": 102,
+                "failed": 0,
+                "inference_ms": 79.19234101427719
+              }
+            },
+            "win_path": {
+              "sources": [
+                "floetteeternal"
+              ],
+              "blocked": {
+                "dragapult": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 0,
+              "no_source": false,
+              "last_source": true
+            }
+          }
+        },
+        {
+          "variant": "revised",
+          "actions": [
+            [
+              "move:moonblast",
+              1.0
+            ],
+            [
+              "move:substitute",
+              0.0
+            ],
+            [
+              "move:synthesis",
+              0.0
+            ],
+            [
+              "move:calmmind",
+              0.0
+            ],
+            [
+              "switch:scolipede",
+              0.0
+            ]
+          ],
+          "elapsed": 7.939303773979191,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "2f002df0239cdcd7"
+            },
+            "belief": {
+              "observations": 10,
+              "speed_observations": 3,
+              "active": [
+                [
+                  "- / timid / 2-0-0-32-0-32",
+                  0.25
+                ],
+                [
+                  "- / adamant / 2-32-0-0-0-32",
+                  0.12499999999999999
+                ],
+                [
+                  "- / jolly / 2-32-0-0-0-32",
+                  0.12499999999999999
+                ]
+              ],
+              "elapsed_ms": 50.0330199720338
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": 0.9999999999999998,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "03b48373b66484cddbdf7bf6938a324a5ac9ea434efde9dfc10775ba4cdc2e25",
+                "continuation_policy": "public-baton-v1",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  },
+                  {
+                    "ours": 112,
+                    "opponent": 213,
+                    "ourAction": 112,
+                    "opponentAction": 213
+                  }
+                ],
+                "ready": true,
+                "simulations": 2623,
+                "terminal": 2641,
+                "learned": 102,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 2087,
+                "max_tree_decisions": 2,
+                "max_rollout_turns": 9,
+                "unfinished_at_deadline": 0,
+                "chance_paths": 2,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8450.0,
+                "elapsed_ms": 7750.379706965759,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:moonblast",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 525
+                },
+                {
+                  "label": "move:substitute",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 525
+                },
+                {
+                  "label": "move:synthesis",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 525
+                },
+                {
+                  "label": "move:calmmind",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 524
+                },
+                {
+                  "label": "switch:scolipede",
+                  "expected": 0.9999999999999999,
+                  "worst": 0.9999999999999999,
+                  "trials": 524
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 2641,
+                "learned": 102,
+                "failed": 0,
+                "inference_ms": 70.47379575669765
+              }
+            },
+            "win_path": {
+              "sources": [
+                "floetteeternal"
+              ],
+              "blocked": {
+                "dragapult": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 0,
+              "no_source": false,
+              "last_source": true
+            }
+          },
+          "code": {
+            "services/sim-tools/public_policy.js": "8d60a3aade16fdfc",
+            "services/sim-tools/public_observation.js": "f72d55fef376440e",
+            "services/sim-tools/state_codec.js": "359c71590c613efe",
+            "services/sim-tools/lookahead.js": "56ec6da7da6bb8de",
+            "services/sim-tools/terminal_search.js": "4aa36797ea103be1",
+            "services/sim-tools/belief.js": "eaec31413e5ae3df",
+            "src/pokesim/live/advisor.py": "45baa69e13dbb64d",
+            "src/pokesim/belief/observe.py": "6f847353df81adb4",
+            "src/pokesim/belief/sets.py": "e9fdb7d3ce0d383c"
+          }
+        }
+      ]
+    },
+    {
+      "file": "20261016-024258-2698995622.json",
+      "turn": 7,
+      "observed_choice": "move:irondefense",
+      "runs": [
+        {
+          "variant": "frozen-public-v2-no-belief",
+          "actions": [
+            [
+              "move:batonpass",
+              1.0
+            ],
+            [
+              "move:irondefense",
+              0.0
+            ],
+            [
+              "move:protect",
+              0.0
+            ],
+            [
+              "move:substitute",
+              0.0
+            ],
+            [
+              "switch:skeledirge",
+              0.0
+            ]
+          ],
+          "elapsed": 7.961876219022088,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "10b88227fe64971a"
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": -0.9894613898997632,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "4ee6b3471fa22c389addd1d1b2e32ffc96b1e1549ae884db4e2315b6fc215911",
+                "continuation_policy": "public-reference-v2",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 255,
+                    "opponent": 138,
+                    "ourAction": 255,
+                    "opponentAction": 138
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 153,
+                    "ourAction": 255,
+                    "opponentAction": 153
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 138,
+                    "ourAction": 255,
+                    "opponentAction": 138
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 153,
+                    "ourAction": 255,
+                    "opponentAction": 153
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 138,
+                    "ourAction": 255,
+                    "opponentAction": 138
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 138,
+                    "ourAction": 255,
+                    "opponentAction": 138
+                  }
+                ],
+                "ready": true,
+                "simulations": 1643,
+                "terminal": 1643,
+                "learned": 180,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 1339,
+                "max_tree_decisions": 4,
+                "max_rollout_turns": 14,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8500.0,
+                "elapsed_ms": 7750.219508016016,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:irondefense",
+                  "expected": -0.9900370602948712,
+                  "worst": -0.9999999999999999,
+                  "trials": 310
+                },
+                {
+                  "label": "move:protect",
+                  "expected": -0.9897809402488715,
+                  "worst": -0.9999999999999999,
+                  "trials": 307
+                },
+                {
+                  "label": "move:substitute",
+                  "expected": -0.9870690812100025,
+                  "worst": -0.9999999999999999,
+                  "trials": 355
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": -0.9849448427139476,
+                  "worst": -0.9999999999999999,
+                  "trials": 376
+                },
+                {
+                  "label": "switch:skeledirge",
+                  "expected": -0.9928643168662911,
+                  "worst": -0.9999999999999999,
+                  "trials": 295
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 1643,
+                "learned": 180,
+                "failed": 0,
+                "inference_ms": 119.27615513559431
+              }
+            },
+            "win_path": {
+              "sources": [
+                "skeledirge"
+              ],
+              "blocked": {
+                "glimmora": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 2,
+              "no_source": false,
+              "last_source": true
+            }
+          }
+        },
+        {
+          "variant": "revised",
+          "actions": [
+            [
+              "move:substitute",
+              1.0
+            ],
+            [
+              "move:irondefense",
+              0.0
+            ],
+            [
+              "move:protect",
+              0.0
+            ],
+            [
+              "move:batonpass",
+              0.0
+            ],
+            [
+              "switch:skeledirge",
+              0.0
+            ]
+          ],
+          "elapsed": 7.953374977980275,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "2f002df0239cdcd7"
+            },
+            "belief": {
+              "observations": 6,
+              "speed_observations": 3,
+              "active": [
+                [
+                  "Glimmoranite / modest / 1-0-1-32-0-32",
+                  0.7708333333333336
+                ],
+                [
+                  "Focus Sash / modest / 1-0-1-32-0-32",
+                  0.22916666666666669
+                ]
+              ],
+              "elapsed_ms": 50.824227975681424
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": -0.9162497687900122,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "d6173689219a469e3733799c7c7d6356facd5069a4c12cbcde45b1f14d129546",
+                "continuation_policy": "public-baton-v1",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 255,
+                    "opponent": 153,
+                    "ourAction": 255,
+                    "opponentAction": 153
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 153,
+                    "ourAction": 255,
+                    "opponentAction": 153
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 153,
+                    "ourAction": 255,
+                    "opponentAction": 153
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 153,
+                    "ourAction": 255,
+                    "opponentAction": 153
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 153,
+                    "ourAction": 255,
+                    "opponentAction": 153
+                  },
+                  {
+                    "ours": 255,
+                    "opponent": 153,
+                    "ourAction": 255,
+                    "opponentAction": 153
+                  }
+                ],
+                "ready": true,
+                "simulations": 1700,
+                "terminal": 1700,
+                "learned": 180,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 1398,
+                "max_tree_decisions": 3,
+                "max_rollout_turns": 18,
+                "unfinished_at_deadline": 0,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8450.0,
+                "elapsed_ms": 7750.713073997758,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:irondefense",
+                  "expected": -0.9550445514669491,
+                  "worst": -0.9999999999999999,
+                  "trials": 184
+                },
+                {
+                  "label": "move:protect",
+                  "expected": -0.9156870825695029,
+                  "worst": -0.9999999999999999,
+                  "trials": 280
+                },
+                {
+                  "label": "move:substitute",
+                  "expected": -0.8982139554143032,
+                  "worst": -0.9583333333333331,
+                  "trials": 842
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": -0.9904858531027017,
+                  "worst": -0.9999999999999999,
+                  "trials": 175
+                },
+                {
+                  "label": "switch:skeledirge",
+                  "expected": -0.965005884351891,
+                  "worst": -0.9999999999999999,
+                  "trials": 219
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 1700,
+                "learned": 180,
+                "failed": 0,
+                "inference_ms": 114.59716595709324
+              }
+            },
+            "win_path": {
+              "sources": [
+                "skeledirge"
+              ],
+              "blocked": {
+                "glimmora": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 2,
+              "no_source": false,
+              "last_source": true
+            }
+          },
+          "code": {
+            "services/sim-tools/public_policy.js": "8d60a3aade16fdfc",
+            "services/sim-tools/public_observation.js": "f72d55fef376440e",
+            "services/sim-tools/state_codec.js": "359c71590c613efe",
+            "services/sim-tools/lookahead.js": "56ec6da7da6bb8de",
+            "services/sim-tools/terminal_search.js": "4aa36797ea103be1",
+            "services/sim-tools/belief.js": "eaec31413e5ae3df",
+            "src/pokesim/live/advisor.py": "45baa69e13dbb64d",
+            "src/pokesim/belief/observe.py": "6f847353df81adb4",
+            "src/pokesim/belief/sets.py": "e9fdb7d3ce0d383c"
+          }
+        }
+      ]
+    },
+    {
+      "file": "20261016-025150-2698999894.json",
+      "turn": 10,
+      "observed_choice": "move:protect",
+      "runs": [
+        {
+          "variant": "frozen-public-v2-no-belief",
+          "actions": [
+            [
+              "move:protect",
+              1.0
+            ],
+            [
+              "move:irondefense",
+              0.0
+            ],
+            [
+              "move:substitute",
+              0.0
+            ],
+            [
+              "move:batonpass",
+              0.0
+            ],
+            [
+              "switch:umbreon",
+              0.0
+            ]
+          ],
+          "elapsed": 7.961557664035354,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "10b88227fe64971a"
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": -0.837891387202494,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "ef9ea9a0e3316972c6b427299affc4cc97cb01e2c1e534c05bd61eccc74fdd02",
+                "continuation_policy": "public-reference-v2",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 340,
+                    "opponent": 113,
+                    "ourAction": 340,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 113,
+                    "ourAction": 340,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 115,
+                    "ourAction": 340,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 115,
+                    "ourAction": 340,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 113,
+                    "ourAction": 340,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 113,
+                    "ourAction": 340,
+                    "opponentAction": 113
+                  }
+                ],
+                "ready": true,
+                "simulations": 1790,
+                "terminal": 1790,
+                "learned": 120,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 1804,
+                "max_tree_decisions": 4,
+                "max_rollout_turns": 25,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8500.0,
+                "elapsed_ms": 7800.738883030135,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:irondefense",
+                  "expected": -0.9229993239142904,
+                  "worst": -0.9999999999999999,
+                  "trials": 202
+                },
+                {
+                  "label": "move:protect",
+                  "expected": -0.7814032804191473,
+                  "worst": -0.9696969696969696,
+                  "trials": 266
+                },
+                {
+                  "label": "move:substitute",
+                  "expected": -0.9794941263442847,
+                  "worst": -0.9999999999999999,
+                  "trials": 153
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": -0.8610328878024004,
+                  "worst": -0.9696969696969696,
+                  "trials": 536
+                },
+                {
+                  "label": "switch:umbreon",
+                  "expected": -0.8265680164150148,
+                  "worst": -0.9230769230769231,
+                  "trials": 633
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 1790,
+                "learned": 120,
+                "failed": 0,
+                "inference_ms": 86.36626892257482
+              }
+            },
+            "win_path": {
+              "sources": [
+                "umbreon"
+              ],
+              "blocked": {
+                "samurotthisui": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 0,
+              "no_source": false,
+              "last_source": true
+            }
+          }
+        },
+        {
+          "variant": "revised",
+          "actions": [
+            [
+              "move:irondefense",
+              1.0
+            ],
+            [
+              "move:protect",
+              0.0
+            ],
+            [
+              "move:substitute",
+              0.0
+            ],
+            [
+              "move:batonpass",
+              0.0
+            ],
+            [
+              "switch:umbreon",
+              0.0
+            ]
+          ],
+          "elapsed": 7.945870846044272,
+          "status": {
+            "mode": "on",
+            "calibration": {
+              "supported_point": false,
+              "context": "2f002df0239cdcd7"
+            },
+            "belief": {
+              "observations": 13,
+              "speed_observations": 3,
+              "active": [
+                [
+                  "Black Glasses / adamant / 16-32-2-0-6-10",
+                  0.29166666666666663
+                ],
+                [
+                  "Black Glasses / adamant / 18-32-2-0-6-8",
+                  0.20833333333333334
+                ],
+                [
+                  "Black Glasses / adamant / 20-32-0-0-4-10",
+                  0.1875
+                ]
+              ],
+              "elapsed_ms": 198.99796601384878
+            },
+            "search": {
+              "solver": "pure-robust",
+              "objective": -0.9999999999999998,
+              "rho": 0.3,
+              "worlds": 6,
+              "failed_worlds": 0,
+              "failed_cells": 0,
+              "terminal_search": {
+                "algorithm": "public-information-set-uct-v1",
+                "particle_id": "5415cc06df26dd0505ef3b3d38d0783773336820c97231b0f1beadc539ed1c1d",
+                "continuation_policy": "public-baton-v1",
+                "bootstrap_reference": "public-reference-v2",
+                "root_speed_samples": [
+                  {
+                    "ours": 340,
+                    "opponent": 113,
+                    "ourAction": 340,
+                    "opponentAction": 113
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 115,
+                    "ourAction": 340,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 115,
+                    "ourAction": 340,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 115,
+                    "ourAction": 340,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 115,
+                    "ourAction": 340,
+                    "opponentAction": 115
+                  },
+                  {
+                    "ours": 340,
+                    "opponent": 115,
+                    "ourAction": 340,
+                    "opponentAction": 115
+                  }
+                ],
+                "ready": true,
+                "simulations": 1606,
+                "terminal": 1606,
+                "learned": 120,
+                "censored": 0,
+                "failed": 0,
+                "errors": [],
+                "tree_nodes": 1663,
+                "max_tree_decisions": 4,
+                "max_rollout_turns": 10,
+                "unfinished_at_deadline": 1,
+                "chance_paths": 0,
+                "immediate_wins": [],
+                "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+                "budget_ms": 8301.0,
+                "elapsed_ms": 7601.334718987346,
+                "hidden_sets_exhaustive": false
+              },
+              "root_evidence": [
+                {
+                  "label": "move:irondefense",
+                  "expected": -0.9999999999999999,
+                  "worst": -0.9999999999999999,
+                  "trials": 322
+                },
+                {
+                  "label": "move:protect",
+                  "expected": -0.9999999999999999,
+                  "worst": -0.9999999999999999,
+                  "trials": 321
+                },
+                {
+                  "label": "move:substitute",
+                  "expected": -0.9999999999999999,
+                  "worst": -0.9999999999999999,
+                  "trials": 321
+                },
+                {
+                  "label": "move:batonpass",
+                  "expected": -0.9999999999999999,
+                  "worst": -0.9999999999999999,
+                  "trials": 321
+                },
+                {
+                  "label": "switch:umbreon",
+                  "expected": -0.9999999999999999,
+                  "worst": -0.9999999999999999,
+                  "trials": 321
+                }
+              ],
+              "value": {
+                "model": {
+                  "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+                  "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+                  "checkpoints": {
+                    "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                    "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                    "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+                  },
+                  "reference": {
+                    "own": "expert",
+                    "opponent_pool": [
+                      "expert/tactical",
+                      "expert/disrupt"
+                    ],
+                    "version": "public-reference-v2"
+                  },
+                  "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+                },
+                "terminal": 1606,
+                "learned": 120,
+                "failed": 0,
+                "inference_ms": 88.09504698729143
+              }
+            },
+            "win_path": {
+              "sources": [
+                "umbreon"
+              ],
+              "blocked": {
+                "samurotthisui": [
+                  "scolipede"
+                ]
+              },
+              "unseen": 0,
+              "no_source": false,
+              "last_source": true
+            }
+          },
+          "code": {
+            "services/sim-tools/public_policy.js": "8d60a3aade16fdfc",
+            "services/sim-tools/public_observation.js": "f72d55fef376440e",
+            "services/sim-tools/state_codec.js": "359c71590c613efe",
+            "services/sim-tools/lookahead.js": "56ec6da7da6bb8de",
+            "services/sim-tools/terminal_search.js": "4aa36797ea103be1",
+            "services/sim-tools/belief.js": "eaec31413e5ae3df",
+            "src/pokesim/live/advisor.py": "45baa69e13dbb64d",
+            "src/pokesim/belief/observe.py": "6f847353df81adb4",
+            "src/pokesim/belief/sets.py": "e9fdb7d3ce0d383c"
+          }
+        }
+      ]
+    }
+  ],
+  "code": {
+    "services/sim-tools/public_policy.js": "2a9f6f71f1896dfc",
+    "services/sim-tools/terminal_search.js": "4aa36797ea103be1",
+    "src/pokesim/live/advisor.py": "45baa69e13dbb64d",
+    "src/pokesim/belief/observe.py": "6f847353df81adb4"
+  },
+  "final_code": {
+    "services/sim-tools/public_policy.js": "8d60a3aade16fdfc",
+    "services/sim-tools/public_observation.js": "f72d55fef376440e",
+    "services/sim-tools/state_codec.js": "359c71590c613efe",
+    "services/sim-tools/lookahead.js": "56ec6da7da6bb8de",
+    "services/sim-tools/terminal_search.js": "4aa36797ea103be1",
+    "services/sim-tools/belief.js": "eaec31413e5ae3df",
+    "src/pokesim/live/advisor.py": "45baa69e13dbb64d",
+    "src/pokesim/belief/observe.py": "6f847353df81adb4",
+    "src/pokesim/belief/sets.py": "e9fdb7d3ce0d383c"
+  }
+}

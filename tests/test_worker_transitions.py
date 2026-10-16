@@ -23,9 +23,9 @@ const sandbox = {__dirname: require('path').dirname(process.argv[1]),
     require: n => n === 'readline' ? {createInterface: () => ({on: () => {}})} : require(n),
     process: {argv: ['node', 'worker', process.argv[2]]}, module: {exports: {}}, console};
 const source = fs.readFileSync(process.argv[1], 'utf8');
-vm.runInNewContext(source + '\\nmodule.exports={setUp,step,evaluate};', sandbox);
+vm.runInNewContext(source + '\\nmodule.exports={setUp,step,evaluate,choices};', sandbox);
 const sample = JSON.parse(process.argv[3]);
-const {setUp,step,evaluate} = sandbox.module.exports;
+const {setUp,step,evaluate,choices} = sandbox.module.exports;
 const format = 'gen9championsbssregmc';
 """ + code
     out = subprocess.run(["node", "-e", js, str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR),
@@ -66,6 +66,27 @@ console.log(JSON.stringify({defense:mon.boosts.def, substitute:!!mon.volatiles.s
                            oldDefense:b.p1.pokemon[1].boosts.def}));
 """, sample_for_switch(baton=True))
     assert result == {"defense": 2, "substitute": True, "oldDefense": 0}
+
+
+@pytest.mark.parametrize('status', ['par', 'brn', 'tox', 'slp'])
+def test_a_bench_status_survives_restoration_and_baton_entry(status):
+    sample = sample_for_switch(baton=True)
+    state = sample['p1']['mons'][1]
+    state.update(status=status, sleepRemaining=2, toxicStage=3)
+    result = worker("""
+const b=setUp(sample,format,1), mon=b.p1.active[0];
+console.log(JSON.stringify({status:mon.status, time:mon.statusState.time, stage:mon.statusState.stage,
+ speed:mon.getStat('spe'), baseSpeed:mon.storedStats.spe}));
+b.destroy();
+""", sample)
+    assert result['status'] == status
+    if status == 'par':
+        assert result['speed'] == result['baseSpeed'] // 2
+    elif status == 'slp':
+        assert result['time'] == 2
+    elif status == 'tox':
+        # Toxic's counter restarts when switching, just as in a real entry.
+        assert result['stage'] == 0
 
 
 def test_an_already_mega_evolved_bench_member_keeps_its_form_on_entry():

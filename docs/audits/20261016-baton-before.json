@@ -1,0 +1,461 @@
+{
+  "totals": {
+    "battles": 78,
+    "selected:scolipede": 50,
+    "selected:umbreon": 57,
+    "all_boosts_lost:switch": 26,
+    "boosts_lost:switch": 7,
+    "attempted_passes": 49,
+    "completed_passes": 37,
+    "fainted:scolipede": 37,
+    "fainted:umbreon": 40,
+    "consecutive_protect": 20,
+    "consecutive_protect_runs": 10,
+    "boosts_lost:faint": 31,
+    "pass_without_positive_stages": 9,
+    "pass_without_stages_or_substitute": 9,
+    "boosts_lost:drag": 2,
+    "uncompleted_pass_attempts": 12
+  },
+  "moves": {
+    "umbreon": {
+      "calmmind": 82,
+      "moonlight": 64,
+      "snarl": 69,
+      "batonpass": 23
+    },
+    "scolipede": {
+      "irondefense": 40,
+      "substitute": 18,
+      "protect": 41,
+      "batonpass": 26
+    },
+    "floetteeternal": {
+      "synthesis": 66,
+      "calmmind": 56,
+      "moonblast": 56,
+      "substitute": 21
+    },
+    "floettemega": {
+      "moonblast": 1,
+      "synthesis": 6,
+      "calmmind": 5,
+      "substitute": 1
+    },
+    "salamence": {
+      "dragondance": 18,
+      "earthquake": 14,
+      "doubleedge": 10,
+      "roost": 9
+    },
+    "skeledirge": {
+      "slackoff": 21,
+      "willowisp": 14,
+      "torchsong": 33,
+      "shadowball": 13
+    },
+    "gholdengo": {
+      "nastyplot": 14,
+      "flashcannon": 7,
+      "shadowball": 19,
+      "recover": 15
+    },
+    "salamencemega": {
+      "doubleedge": 4,
+      "roost": 2,
+      "earthquake": 4,
+      "dragondance": 1
+    }
+  },
+  "recipients": {
+    "floetteeternal": 17,
+    "umbreon": 8,
+    "salamence": 1,
+    "gholdengo": 5,
+    "skeledirge": 4,
+    "salamencemega": 1,
+    "floettemega": 1
+  },
+  "payloads": {
+    "def:+2,spe:+3": 1,
+    "spe:+2": 3,
+    "spe:+5": 1,
+    "spe:+6": 1,
+    "none": 8,
+    "spa:+4,spd:+4": 2,
+    "spa:+2,spd:+2": 4,
+    "spa:+1,spd:+1": 2,
+    "spe:+1": 2,
+    "def:+2,spe:+2": 1,
+    "def:+6,spe:+4": 1,
+    "spa:+3,spd:+3": 3,
+    "def:+2,spe:+1": 7,
+    "def:+4,spe:+2": 1
+  },
+  "modes": {
+    "other": 57,
+    "terminal": 21
+  },
+  "lineups": {
+    "floetteeternal/scolipede/umbreon": {
+      "loss": 12,
+      "win": 1
+    },
+    "floetteeternal/salamence/scolipede": {
+      "win": 2,
+      "loss": 1
+    },
+    "floetteeternal/skeledirge/umbreon": {
+      "loss": 2,
+      "win": 4
+    },
+    "gholdengo/scolipede/skeledirge": {
+      "loss": 1
+    },
+    "gholdengo/scolipede/umbreon": {
+      "loss": 13,
+      "win": 2
+    },
+    "floetteeternal/gholdengo/scolipede": {
+      "loss": 2
+    },
+    "floetteeternal/gholdengo/umbreon": {
+      "win": 4,
+      "loss": 4
+    },
+    "gholdengo/salamence/scolipede": {
+      "win": 4,
+      "loss": 1
+    },
+    "floetteeternal/scolipede/skeledirge": {
+      "win": 5,
+      "loss": 4
+    },
+    "salamence/skeledirge/umbreon": {
+      "win": 2,
+      "loss": 2
+    },
+    "gholdengo/salamence/umbreon": {
+      "loss": 2,
+      "win": 3
+    },
+    "floetteeternal/salamence/umbreon": {
+      "loss": 5
+    },
+    "salamence/scolipede/skeledirge": {
+      "loss": 1
+    },
+    "salamence/scolipede/umbreon": {
+      "win": 1
+    }
+  },
+  "results": {
+    "used_baton": {
+      "loss": 28,
+      "win": 9
+    },
+    "appeared_passer_without_baton": {
+      "loss": 22,
+      "win": 9
+    }
+  },
+  "examples": {
+    "boosts_lost:switch": [
+      {
+        "file": "20261016-000346-8ufgk2e0ksfupa9kxu76ba7ccenbhjrpw.json",
+        "turn": 2,
+        "species": "umbreon",
+        "boosts": {
+          "spa": 1,
+          "spd": 1
+        }
+      },
+      {
+        "file": "20261016-002458-0ikaok353mqh8on5gydfndxnfs0hdnopw.json",
+        "turn": 4,
+        "species": "umbreon",
+        "boosts": {
+          "spa": 1,
+          "spd": 1
+        }
+      },
+      {
+        "file": "20261016-004658-2698931764.json",
+        "turn": 2,
+        "species": "umbreon",
+        "boosts": {
+          "spa": 1,
+          "spd": 1
+        }
+      },
+      {
+        "file": "20261016-005523-2698933883.json",
+        "turn": 18,
+        "species": "umbreon",
+        "boosts": {
+          "spa": 1,
+          "spd": 1
+        }
+      },
+      {
+        "file": "20261016-030102-2699006210.json",
+        "turn": 4,
+        "species": "umbreon",
+        "boosts": {
+          "spa": 2,
+          "spd": 2
+        }
+      }
+    ],
+    "consecutive_protect": [
+      {
+        "file": "20261016-001828-cklcrx4dq0xjp6ng5u8j1tqd4go2sk2pw.json",
+        "turn": 12,
+        "species": "scolipede",
+        "boosts": {
+          "spe": 2
+        }
+      },
+      {
+        "file": "20261016-001828-cklcrx4dq0xjp6ng5u8j1tqd4go2sk2pw.json",
+        "turn": 13,
+        "species": "scolipede",
+        "boosts": {
+          "spe": 3
+        }
+      },
+      {
+        "file": "20261016-002458-0ikaok353mqh8on5gydfndxnfs0hdnopw.json",
+        "turn": 7,
+        "species": "scolipede",
+        "boosts": {
+          "spe": 2
+        }
+      },
+      {
+        "file": "20261016-002458-0ikaok353mqh8on5gydfndxnfs0hdnopw.json",
+        "turn": 8,
+        "species": "scolipede",
+        "boosts": {
+          "spe": 3
+        }
+      },
+      {
+        "file": "20261016-002458-0ikaok353mqh8on5gydfndxnfs0hdnopw.json",
+        "turn": 9,
+        "species": "scolipede",
+        "boosts": {
+          "spe": 4
+        }
+      }
+    ],
+    "boosts_lost:faint": [
+      {
+        "file": "20261016-001828-cklcrx4dq0xjp6ng5u8j1tqd4go2sk2pw.json",
+        "turn": 22,
+        "species": "umbreon",
+        "boosts": {
+          "spe": 5,
+          "spa": 3,
+          "spd": 3
+        }
+      },
+      {
+        "file": "20261016-001828-cklcrx4dq0xjp6ng5u8j1tqd4go2sk2pw.json",
+        "turn": 23,
+        "species": "scolipede",
+        "boosts": {
+          "def": 2
+        }
+      },
+      {
+        "file": "20261016-003427-9gcvbdv32rbif2r50o6aelv9sdymqlmpw.json",
+        "turn": 2,
+        "species": "umbreon",
+        "boosts": {
+          "spa": 1,
+          "spd": 1
+        }
+      },
+      {
+        "file": "20261016-003427-9gcvbdv32rbif2r50o6aelv9sdymqlmpw.json",
+        "turn": 12,
+        "species": "scolipede",
+        "boosts": {
+          "spe": 3
+        }
+      },
+      {
+        "file": "20261016-003759-2698926771.json",
+        "turn": 10,
+        "species": "scolipede",
+        "boosts": {
+          "spe": 1
+        }
+      }
+    ],
+    "pass_without_positive_stages": [
+      {
+        "file": "20261016-003610-2698925852.json",
+        "turn": 1,
+        "species": "scolipede",
+        "boosts": {}
+      },
+      {
+        "file": "20261016-005735-3rety8uur2hwwxst0nusser14nwo7iwpw.json",
+        "turn": 7,
+        "species": "umbreon",
+        "boosts": {}
+      },
+      {
+        "file": "20261016-030932-2699010303.json",
+        "turn": 1,
+        "species": "umbreon",
+        "boosts": {}
+      },
+      {
+        "file": "20261016-032305-2699017517.json",
+        "turn": 1,
+        "species": "umbreon",
+        "boosts": {}
+      },
+      {
+        "file": "20261016-100601-2699200363.json",
+        "turn": 1,
+        "species": "scolipede",
+        "boosts": {}
+      }
+    ],
+    "pass_without_stages_or_substitute": [
+      {
+        "file": "20261016-003610-2698925852.json",
+        "turn": 1,
+        "species": "scolipede",
+        "boosts": {}
+      },
+      {
+        "file": "20261016-005735-3rety8uur2hwwxst0nusser14nwo7iwpw.json",
+        "turn": 7,
+        "species": "umbreon",
+        "boosts": {}
+      },
+      {
+        "file": "20261016-030932-2699010303.json",
+        "turn": 1,
+        "species": "umbreon",
+        "boosts": {}
+      },
+      {
+        "file": "20261016-032305-2699017517.json",
+        "turn": 1,
+        "species": "umbreon",
+        "boosts": {}
+      },
+      {
+        "file": "20261016-100601-2699200363.json",
+        "turn": 1,
+        "species": "scolipede",
+        "boosts": {}
+      }
+    ],
+    "boosts_lost:drag": [
+      {
+        "file": "20261016-032657-2699019268.json",
+        "turn": 10,
+        "species": "umbreon",
+        "boosts": {
+          "spa": 1,
+          "spd": 1
+        }
+      },
+      {
+        "file": "20261016-103210-2699209228.json",
+        "turn": 1,
+        "species": "scolipede",
+        "boosts": {
+          "def": 2
+        }
+      }
+    ]
+  },
+  "files": [
+    "20261016-000346-8ufgk2e0ksfupa9kxu76ba7ccenbhjrpw.json",
+    "20261016-000719-2698909035.json",
+    "20261016-001041-2698910889.json",
+    "20261016-001240-2698912929.json",
+    "20261016-001335-2698913773.json",
+    "20261016-001828-cklcrx4dq0xjp6ng5u8j1tqd4go2sk2pw.json",
+    "20261016-002049-2698917431.json",
+    "20261016-002458-0ikaok353mqh8on5gydfndxnfs0hdnopw.json",
+    "20261016-003106-2698920855.json",
+    "20261016-003234-2698924083.json",
+    "20261016-003427-9gcvbdv32rbif2r50o6aelv9sdymqlmpw.json",
+    "20261016-003610-2698925852.json",
+    "20261016-003759-2698926771.json",
+    "20261016-004140-2698927803.json",
+    "20261016-004404-jvju84ygdhdey639o7rd5999pi2peqrpw.json",
+    "20261016-004508-2698931185.json",
+    "20261016-004658-2698931764.json",
+    "20261016-004905-2698932691.json",
+    "20261016-005523-2698933883.json",
+    "20261016-005735-3rety8uur2hwwxst0nusser14nwo7iwpw.json",
+    "20261016-023350-2698990531.json",
+    "20261016-023615-2698991384.json",
+    "20261016-023945-yel8uikflxf6jc9i5hdttethghkm5ropw.json",
+    "20261016-024102-2698994873.json",
+    "20261016-024258-2698995622.json",
+    "20261016-024459-2698996670.json",
+    "20261016-024721-lm0h46msul9d5kt8kr4m3h09vk09mgkpw.json",
+    "20261016-024807-2698999141.json",
+    "20261016-025150-2698999894.json",
+    "20261016-025712-2699001640.json",
+    "20261016-030000-2699004578.json",
+    "20261016-030102-2699006210.json",
+    "20261016-030210-2699006861.json",
+    "20261016-030357-2699007340.json",
+    "20261016-030510-2699008508.json",
+    "20261016-030724-2699009037.json",
+    "20261016-030932-2699010303.json",
+    "20261016-031054-2699011420.json",
+    "20261016-031506-agqn5ruqg4p0y1barlrvcosydbmb3dfpw.json",
+    "20261016-031706-2699014596.json",
+    "20261016-031919-2699015823.json",
+    "20261016-032028-2699017065.json",
+    "20261016-032305-2699017517.json",
+    "20261016-032657-2699019268.json",
+    "20261016-032800-2699021002.json",
+    "20261016-033006-2699022204.json",
+    "20261016-033331-2699022668.json",
+    "20261016-033925-2699024513.json",
+    "20261016-034221-2699027993.json",
+    "20261016-034327-2699029334.json",
+    "20261016-034430-2699030043.json",
+    "20261016-034608-2699030742.json",
+    "20261016-035108-2699031537.json",
+    "20261016-051445-tgtqgj2rj4slw8jgcxbdxre84b0o3gupw.json",
+    "20261016-051746-2699077248.json",
+    "20261016-051943-2699079286.json",
+    "20261016-052245-2699079725.json",
+    "20261016-055322-2699095436.json",
+    "20261016-094337-2699190809.json",
+    "20261016-094739-2699192418.json",
+    "20261016-095126-2699194090.json",
+    "20261016-095310-2699195373.json",
+    "20261016-095629-2699196089.json",
+    "20261016-100049-2699197472.json",
+    "20261016-100422-2699198961.json",
+    "20261016-100601-2699200363.json",
+    "20261016-100730-2699201034.json",
+    "20261016-100803-2699201539.json",
+    "20261016-100959-2699201743.json",
+    "20261016-101216-2699202505.json",
+    "20261016-101623-8hb75qgrvjxerh13nhmxwisx6eblxehpw.json",
+    "20261016-102018-2699205032.json",
+    "20261016-102130-2699206425.json",
+    "20261016-102508-2699207043.json",
+    "20261016-102709-2699208284.json",
+    "20261016-103210-2699209228.json",
+    "20261016-103402-2699211046.json",
+    "20261016-103752-2699211672.json"
+  ]
+}

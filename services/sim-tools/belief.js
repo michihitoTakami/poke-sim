@@ -32,6 +32,8 @@ function evaluate(job, candidate, format) {
       const priority = battle.singleEvent("ModifyPriority", move, null, source, target, null, move.priority);
       return battle.runEvent("ModifyPriority", source, target, move, priority);
     });
+    out.fractionalPriorities = [p1, p2].map((source, i) => battle.runEvent(
+      'FractionalPriority', source, null, battle.dex.getActiveMove(job.moves[i]), 0));
   }
   if (job.attacker) {
     const [source, target] = job.attacker === 'p1' ? [p1, p2] : [p2, p1];

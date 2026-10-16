@@ -55,8 +55,9 @@ def test_observer_reads_damage_speed_and_choice_evidence():
     got = observations()
     kinds = [(o.kind, o.turn) for o in got]
     # turn 1: both damage events and the order (it moved first); turn 2: Swords Dance after Earthquake rules out
-    # a Choice item, Shadow Ball's damage is not used (Focus Sash), nor is the order (its move was a status move)
-    assert kinds == [("damage", 1), ("damage", 1), ("speed", 1), ("nochoice", 2)]
+    # a Choice item, Shadow Ball's damage is not used (Focus Sash). Status moves now also supply order evidence;
+    # the worker checks ability-modified priority before interpreting it as speed.
+    assert kinds == [("damage", 1), ("damage", 1), ("speed", 1), ("nochoice", 2), ("speed", 2)]
     taken, dealt, speed = got[0], got[1], got[2]
     assert (taken.attacker, taken.move, taken.before, taken.after, taken.crit) == ("p2", "earthquake", 211, 73, False)
     assert (dealt.attacker, dealt.move, dealt.before, dealt.after, dealt.crit) == ("p1", "torchsong", 100, 40, True)
@@ -275,7 +276,7 @@ def test_item_change_turn_has_no_speed_observation():
     change_at = LOG.index("|move|p1a: Skeledirge|Torch Song|p2a: Gliscor")
     log = LOG[:change_at] + ["|-enditem|p2a: Gliscor|Choice Scarf|[from] move: Knock Off"] + LOG[change_at:]
     got = observations(log)
-    assert not any(o.kind == "speed" for o in got)
+    assert not any(o.kind == "speed" and o.turn == 1 for o in got)
     assert [o.item_epoch for o in got if o.kind == "damage"] == [0, 1]
 
 
@@ -286,3 +287,89 @@ def test_offline_scoring_does_not_use_future_item_epoch(worker):
     full = score_battle(SetBelief(SETS, FixedSampler(), worker, n=2), LOG + [
         "|-enditem|p2a: Gliscor|Choice Scarf|[from] move: Knock Off"])
     assert full == prefix
+
+
+@pytest.mark.parametrize('change', [
+    '|-unboost|p1a: Skeledirge|spe|1',
+    '|-status|p1a: Skeledirge|par',
+    '|-sidestart|p2: opp|move: Tailwind',
+    '|-fieldend|move: Trick Room',
+])
+def test_midturn_order_changes_do_not_become_false_speed_evidence(change):
+    index = LOG.index('|move|p1a: Skeledirge|Torch Song|p2a: Gliscor')
+    log = LOG[:index] + [change] + LOG[index:]
+    if change == '|-fieldend|move: Trick Room':
+        start = log.index('|turn|1')
+        log.insert(start, '|-fieldstart|move: Trick Room')
+    got = observations(log)
+    assert not any(o.kind == 'speed' and o.turn == 1 for o in got)
+
+
+@pytest.mark.parametrize('item,ability,move', [
+    ('Lagging Tail', 'Hyper Cutter', 'earthquake'),
+    ('', 'Stall', 'earthquake'),
+    ('', 'Mycelium Might', 'toxic'),
+])
+def test_forced_late_actions_do_not_imply_a_slow_speed(worker, item, ability, move):
+    sample = json.loads(json.dumps(observations()[0].sample))
+    sample['p1']['team'][0]['ability'] = 'Blaze'
+    sample['p2']['mons'][0].pop('item', None)
+    candidate = dict(gliscor('jolly', 32, item), ability=ability)
+    obs = Observation('speed', 'speed', 1, 'gliscor', sample, opponent_first=False,
+                      moves=('slackoff', move))
+    result = worker.run([dict(obs.job(), candidates=[candidate])])[0][0]
+    assert result['fractionalPriorities'][0] != result['fractionalPriorities'][1]
+    assert likelihood(obs, result) == 1
+
+
+def test_order_after_recovery_updates_speed_posterior_including_a_possible_scarf(worker):
+    # A slower, defensive set cannot explain moving before our Gholdengo's Recover.
+    from test_expert_continuation import GHOLDENGO
+
+    log = ['|poke|p1|Gholdengo, L50|', '|poke|p2|Chandelure, L50|', '|teampreview|3',
+           '|switch|p1a: Gholdengo|Gholdengo, L50|150/175',
+           '|switch|p2a: Chandelure|Chandelure, L50|100/100', '|turn|1',
+           '|move|p2a: Chandelure|Will-O-Wisp|p1a: Gholdengo',
+           '|-immune|p1a: Gholdengo', '|move|p1a: Gholdengo|Recover|p1a: Gholdengo', '|turn|2']
+    slow = dict(GHOLDENGO, species='Chandelure', ability='Flash Fire', item='', nature='Modest',
+                moves=['Shadow Ball', 'Flamethrower', 'Will-O-Wisp', 'Energy Ball'],
+                evs={'hp': 32, 'atk': 0, 'def': 0, 'spa': 32, 'spd': 2, 'spe': 0})
+    fast = dict(slow, item='Choice Scarf')
+    belief = SetBelief([GHOLDENGO], FixedSampler(), worker, n=2)
+    belief.feed(log)
+    assert [o.kind for o in belief.observations] == ['speed']
+    weights = belief.weights('chandelure', [slow, fast])
+    assert weights[1] > .95
+
+
+@pytest.mark.parametrize('item,status,conditions,field,opponent_first', [
+    ('', '', {}, {}, False),
+    ('Choice Scarf', '', {}, {}, True),
+    ('Choice Scarf', 'par', {}, {}, False),
+    ('', '', {'tailwind': 3}, {}, True),
+    ('', '', {}, {'trickroom': 3}, True),
+])
+def test_speed_evidence_uses_actual_scarf_paralysis_tailwind_and_trick_room(
+        worker, item, status, conditions, field, opponent_first):
+    from test_baton_decisions import CHANDELURE
+    from test_expert_continuation import GHOLDENGO, side
+
+    sample = {'p1': side([GHOLDENGO]), 'p2': dict(side([CHANDELURE], [{'hp': 1, 'status': status}]),
+                                               conditions=conditions), 'field': field}
+    obs = Observation('speed', 'speed', 1, 'chandelure', sample, opponent_first=opponent_first,
+                      moves=('recover', 'flamethrower'))
+    result = worker.run([dict(obs.job(), candidates=[dict(CHANDELURE, item=item)])])[0][0]
+    assert likelihood(obs, result) == 1
+
+
+def test_an_already_mega_evolved_pokemon_uses_its_new_speed(worker):
+    from test_expert_continuation import GHOLDENGO, side
+
+    mence = next(s for s in SETS if s['species'] == 'Salamence')
+    sample = {'p1': side([mence]), 'p2': side([GHOLDENGO]), 'field': {}}
+    job = dict(sample=sample, candidates=[GHOLDENGO], moves=('doubleedge', 'shadowball'))
+    plain = worker.run([job])[0][0]
+    sample['p1']['mons'][0]['mega'] = True
+    mega = worker.run([job])[0][0]
+    assert plain['speeds'][0] < plain['speeds'][1]
+    assert mega['speeds'][0] > mega['speeds'][1]
