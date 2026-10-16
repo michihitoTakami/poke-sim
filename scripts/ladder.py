@@ -223,12 +223,14 @@ class AdvisorPlayer(TrackedPlayer):
         opp = [m.species for m in battle.teampreview_opponent_team]
         roster = [s["species"] for s in self.sets]
         picks = self.picks.predict(opp)
+        # Lineup evidence is this roster's rated ladder history (OUT), also when records go elsewhere (--out,
+        # local games); unrated local games never count.
         if self.lineup_method == "ladder":
-            model = LadderLineupModel.from_records(self.out, roster)
+            model = LadderLineupModel.from_records(OUT, roster)
             lineup, info = model.choose(roster, self.rng, self.matchups, picks)
             self.selection[battle.battle_tag] = info
         else:
-            self.matchups.observe_ladder(self.out, roster)
+            self.matchups.observe_ladder(OUT, roster)
             ranking = self.matchups.rank(roster, picks)
             lineup = ranking[0][0] if ranking else [s["species"] for s in self.sets[:3]]
             self.selection[battle.battle_tag] = {"method": "matchup", "win_prob": ranking[0][1] if ranking else None}
