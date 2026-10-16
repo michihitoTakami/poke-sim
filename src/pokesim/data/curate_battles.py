@@ -209,8 +209,13 @@ def load(path: Path = CURATED / "battles.jsonl") -> list[Battle]:
 
 
 def main() -> None:
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Build the battle ledger from the raw records.")
+    ap.add_argument("--out", default=str(CURATED), help="ledger directory (a new one keeps the frozen v1 intact)")
+    args = ap.parse_args()
     battles, decisions = curate()
-    out = write(battles, decisions)
+    out = write(battles, decisions, Path(args.out))
     files = sum(len(b.records) for b in battles)
     print(f"{files} records -> {len(battles)} battles, {len(decisions)} saved decisions -> {out}")
     for s in ("switch", "showdown"):

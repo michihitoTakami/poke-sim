@@ -711,7 +711,8 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = req.terminalSearch ? require('./terminal_search').terminalSearch(req,
+    reply = req.observe ? require('./observe').observe(req, {setUp, extractChannelMessages}) :
+      req.terminalSearch ? require('./terminal_search').terminalSearch(req,
       {setUp, choices, step, State, extractChannelMessages}) :
       req.valueLeaves ? require('./value_search').evaluateValue(req,
       {setUp, choices, step, score, State, extractChannelMessages}) :

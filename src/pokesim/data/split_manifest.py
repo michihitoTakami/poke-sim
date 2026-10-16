@@ -58,10 +58,16 @@ def groups(battles: list[Battle]) -> list[list[Battle]]:
 
 
 def make(battles: list[Battle], shares: tuple[float, float, float] = (0.6, 0.2, 0.2),
-         test_from: str | None = None) -> dict:
+         test_from: str | None = None, cap_per_opponent: int | None = None) -> dict:
+    """cap_per_opponent: keep at most this many battles of one opponent group (the earliest ones); the rest are
+    purged so a frequent opponent cannot dominate a split."""
     test_from = test_from or time.strftime("%Y%m%d-%H%M%S")
     before = [b for b in battles if b.started < test_from]
     gs = groups(before)
+    capped: set[str] = set()
+    if cap_per_opponent:
+        for g in gs:
+            capped.update(b.battle_id for b in g[cap_per_opponent:])
     n = sum(len(g) for g in gs)
     bounds = [sum(shares[:k + 1]) / sum(shares) * n for k in range(len(SPLITS))]
     assign: dict[str, str] = {}
@@ -79,12 +85,14 @@ def make(battles: list[Battle], shares: tuple[float, float, float] = (0.6, 0.2, 
         nxt = next((starts[s] for s in SPLITS[k + 1:] if s in starts), None)
         if nxt is not None and b.started >= nxt:
             assign[b.battle_id] = "purged"
+    for b in capped:
+        assign[b] = "purged"
     for b in battles:
         if b.started >= test_from:
             assign[b.battle_id] = "test"
     counts = {s: sum(v == s for v in assign.values()) for s in (*SPLITS, "test", "purged")}
     return {"made": time.strftime("%Y-%m-%d %H:%M:%S"), "test_from": test_from, "shares": list(shares),
-            "split_starts": starts, "counts": counts, "battles": assign}
+            "cap_per_opponent": cap_per_opponent, "split_starts": starts, "counts": counts, "battles": assign}
 
 
 class Splits:
@@ -120,12 +128,16 @@ def main() -> None:
     ap.add_argument("--shares", type=float, nargs=3, default=[0.6, 0.2, 0.2], metavar=("TRAIN", "DEV", "CAL"))
     ap.add_argument("--test-from", help="YYYYMMDD-HHMMSS: battles from then on are test (default: now)")
     ap.add_argument("--out", default=str(MANIFEST))
+    ap.add_argument("--ledger", default=str(CURATED / "battles.jsonl"), help="the ledger to split")
+    ap.add_argument("--cap-per-opponent", type=int, default=None,
+                    help="purge all but the earliest N battles of each opponent group")
     ap.add_argument("--force", action="store_true", help="overwrite an existing manifest (moves its test start)")
     args = ap.parse_args()
     out = Path(args.out)
     if out.exists() and not args.force:
         raise SystemExit(f"{out} exists: the split is fixed once made (use --force to remake it)")
-    manifest = make(load(), tuple(args.shares), args.test_from)
+    manifest = make(load(Path(args.ledger)), tuple(args.shares), args.test_from, args.cap_per_opponent)
+    manifest["ledger"] = str(args.ledger)
     out.write_text(json.dumps(manifest, ensure_ascii=False, indent=1))
     print(f"-> {out}: {manifest['counts']} (test from {manifest['test_from']})")
 
