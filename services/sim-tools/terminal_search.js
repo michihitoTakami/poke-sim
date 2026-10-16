@@ -48,7 +48,9 @@ class Search {
     this.deps = deps; this.history = req.observationLog; this.nodes = new Map(); this.pending = new Map();
     this.policy = req.batonPolicy === false ? choosePublic : chooseBatonPublic;
     this.policyVersion = req.batonPolicy === false ? VERSION : BATON_VERSION;
-    this.id = hash([req.samples, this.history]); this.serial = 0; this.cursor = 0; this.simulations = 0;
+    // stream: an independent random stream over the same worlds (offline oracles merge several; live uses none).
+    this.id = hash(req.stream ? [req.samples, this.history, req.stream] : [req.samples, this.history]);
+    this.serial = 0; this.cursor = 0; this.simulations = 0;
     this.failures = 0; this.errors = []; this.censored = 0; this.learned = 0; this.terminal = 0;
     this.maxTreeDepth = 0; this.maxRolloutTurns = 0; this.certified = []; this.chancePaths = 0;
     // Deep scripted wins against a weak rollout policy are not proofs of a winning position.

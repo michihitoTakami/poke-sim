@@ -16,7 +16,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from pokesim.config import RAW_DIR
-from pokesim.rl.items import ITEM_CLASSES, item_class, load_priors
+from pokesim.rl.items import item_class, load_priors
 from pokesim.rl.myteam import to_id
 
 LADDER = RAW_DIR / "ladder"
@@ -81,6 +81,41 @@ def species_of(log: list[str]) -> dict[str, str]:
     return out
 
 
+def calibration(recs: list[dict]) -> None:
+    """The terminal search's own objective for the played action (as a win chance) against the real result:
+    bins, Brier against a constant, by turn bucket. A constant beating the search means its rollouts mislead it."""
+    from pokesim.evaluation.positions import objective_of
+
+    rows = []
+    for rec in recs:
+        rho = ((rec.get("versions") or {}).get("planner") or {}).get("rho", .3)
+        for a in rec.get("advice", []):
+            if a.get("force"):
+                continue
+            value = objective_of(a, rho)
+            if value is not None:
+                rows.append(((value + 1) / 2, rec["result"] == "win", a["turn"]))
+    if not rows:
+        return
+    won = sum(w for _, w, _ in rows) / len(rows)
+    brier = sum((p - w) ** 2 for p, w, _ in rows) / len(rows)
+    constant = sum((won - w) ** 2 for _, w, _ in rows) / len(rows)
+    print(f"search objective of the played action -> actual result ({len(rows)} decisions): "
+          f"Brier {brier:.4f} vs constant {constant:.4f} ({'worse' if brier > constant else 'better'})")
+    bins = defaultdict(lambda: [0, 0])
+    for p, w, _ in rows:
+        bins[min(int(p * 5), 4)][0] += w
+        bins[min(int(p * 5), 4)][1] += 1
+    for b in sorted(bins):
+        k, n = bins[b]
+        print(f"  {b * 20:3d}-{b * 20 + 20}%: {k}/{n} = {k / n:.0%}")
+    for name, lo, hi in (("early (T<=3)", 0, 3), ("middle (T4-8)", 3, 8), ("late (T>8)", 8, 10 ** 6)):
+        part = [(p, w) for p, w, t in rows if lo < t <= hi]
+        if part:
+            print(f"  {name:14s} predicted {sum(p for p, _ in part) / len(part):.2f} "
+                  f"actual {sum(w for _, w in part) / len(part):.2f} (n={len(part)})")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", default=str(LADDER))
@@ -122,6 +157,8 @@ def main() -> None:
             hits3 += any(match(p, actual) for p in preds[:3])
     if n:
         print(f"opponent prediction: top-1 {hits1 / n:.0%}, top-3 {hits3 / n:.0%} over {n} turns")
+
+    calibration(recs)
 
     buckets = defaultdict(lambda: [0, 0])
     for rec in recs:

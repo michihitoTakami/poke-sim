@@ -366,9 +366,12 @@ class Lookahead:
                 "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
 
     def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None,
-              search: dict | None = None, belief=None, log=None, our_role='p1', value=False) -> list[dict]:
+              search: dict | None = None, belief=None, log=None, our_role='p1', value=False,
+              capture: bool = False) -> list[dict]:
         """Payoff matrices (our options x the opponent's) for sampled opponent sets. search: settings for this query
-        only (as the constructor's). belief: draw the opponent's sets from it (see opponent_side)."""
+        only (as the constructor's). belief: draw the opponent's sets from it (see opponent_side).
+        capture: with the terminal search, return the worker request (worlds, observed history, settings) instead
+        of searching, so the exact live position can be replayed later (pokesim.evaluation.positions)."""
         started = time.monotonic()
         own = self.own_side(battle, own_sets, incoming)
         field = field_state(battle)
@@ -409,6 +412,8 @@ class Lookahead:
             if deep:
                 from pokesim.search.terminal import search as terminal_search
 
+                if capture:
+                    return request
                 return terminal_search(self, request, started=started)
             return self.value_model.apply(self._query(request))
         return self._query(request)["results"]

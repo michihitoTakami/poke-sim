@@ -6,13 +6,14 @@ import numpy as np
 from pokesim.search.evaluation import leaf_value
 
 
-def search(engine, request, *, started=None):
+def search(engine, request, *, started=None, max_budget=9.):
+    """max_budget: the live limit is 9 s (one decision); offline oracles (pokesim.evaluation.positions) raise it."""
     started = time.monotonic() if started is None else started
     if request.get('valueUtility', 'reference-material-v1') != 'reference-material-v1':
         raise ValueError('unsupported search value utility')
     budget = float(request.pop('decisionMs', 8500)) / 1000
-    if not .1 <= budget <= 9:
-        raise ValueError('decisionMs must be between 100 and 9000')
+    if not .1 <= budget <= max_budget:
+        raise ValueError(f'decisionMs must be between 100 and {int(max_budget * 1000)}')
     deadline = started + budget
     request.pop('valueLeaves', None)
     request['terminalSearch'] = {'op': 'start', 'sliceMs': 400, 'certifyMs': min(1200, budget * 200)}
