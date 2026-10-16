@@ -380,13 +380,14 @@ class Search {
   // replaces the bootstrap; a single +-1 draw then stands for the cell and the planner's worst case runs on it.
   value(c) {
     if (c.prior === null) return null;
+    if (!c.n) return c.prior;
     return (this.priorVisits * c.prior + c.sum) / (this.priorVisits + c.n);
   }
 
   speed(c) {
-    const n0 = c.prior === null ? 0 : this.priorVisits, p = c.priorSpeed || 0;
+    const p = c.priorSpeed || 0;
     if (!c.n) return p;
-    return (n0 * p + c.speed) / (n0 + c.n);
+    return (this.priorVisits * p + c.speed) / (this.priorVisits + c.n);
   }
 
   finish() {

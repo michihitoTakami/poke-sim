@@ -254,7 +254,8 @@ console.log(JSON.stringify({before:before.payoff[0][0],after:after.payoff[0][0],
 def test_the_value_bootstrap_keeps_its_weight_against_a_single_rollout_only_when_asked():
     plain = cell_values(0)
     assert plain['before'] == pytest.approx(.6) and plain['after'] == pytest.approx(-1)
-    assert plain['stats'] == {'n': 1, 'sum': -1, 'prior': .6, 'speed': 0, 'priorSpeed': .2, 'ends': 1, 'failed': 0}
+    assert plain['stats'] == {'n': 1, 'sum': -1, 'sumSq': 0, 'prior': .6, 'speed': 0, 'priorSpeed': .2, 'ends': 1,
+                              'failed': 0}
     assert plain['policies'] == {'p1': ['expert'], 'p2': ['disrupt', 'tactical']}
     assert plain['version'] == 'public-baton-v1'
     blended = cell_values(4, {'p2': ['disrupt', 'tactical', 'expert']})
@@ -278,7 +279,7 @@ vm.runInNewContext(fs.readFileSync('./services/sim-tools/lookahead.js','utf8')+
 const d=sandbox.module.exports;
 const req={...JSON.parse(fs.readFileSync('./tests/fixtures/terminal-moonblast-turn14.json')),columnFloor:.2};
 const {Search}=require('./services/sim-tools/terminal_search');
-const s=new Search(req,d); s.rootMix=s.states[0].p1.map((_,i)=>i===0?1e6:0);
+const s=new Search(req,d); s.rootMix=s.states[0].p1.map((_,i)=>i===0?1e6:0); s.minimumTrials=0;
 const replies=s.states[0].p2.length, weights=s.states.map(st=>st.p2.map((_,j)=>j===0?1:0));
 const count=(n)=>{const c={};for(let k=0;k<n;k++){const [w,i,j]=s.pickJob();s.states[w].cells[i][j].n++;
  c[j]=(c[j]||0)+1;}return c;};
@@ -341,8 +342,9 @@ def test_worker_replies_pool_rollouts_average_bootstraps_and_keep_certificates()
     assert world['visits'][0][0] == 4 and world['invalid'][1][0] == 1
     # cell b/x: certified by the first worker outranks its rollouts
     assert world['payoff'][1][0] == 1
-    assert world['stats'][1][0] == {'n': 2, 'sum': 2., 'prior': .2, 'speed': .5, 'priorSpeed': .1, 'ends': 2,
-                                     'failed': 1}
+    assert world['stats'][1][0] == {'n': 2, 'sum': 2., 'sumSq': 0., 'prior': .2, 'speed': .5, 'priorSpeed': .1,
+                                     'ends': 2, 'failed': 1}
+    assert world['uncertainty'][0][0] is not None and world['uncertainty'][0][0] >= 0
     s = merged['summary']
     assert s['simulations'] == 30 and s['unfinished_at_deadline'] == 2 and s['workers'] == 2
     assert s['worker_simulations'] == [10, 20] and s['immediate_wins'] == ['b'] and s['ready']

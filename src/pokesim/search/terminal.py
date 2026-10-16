@@ -47,17 +47,19 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
     certified = set(first['summary'].get('immediate_wins') or [])
     results = []
     for w, world in enumerate(first['results']):
-        merged = {k: v for k, v in world.items() if k not in ('payoff', 'winSpeed', 'visits', 'invalid', 'stats')}
+        merged = {k: v for k, v in world.items()
+                  if k not in ('payoff', 'winSpeed', 'visits', 'invalid', 'stats', 'uncertainty')}
         priors = [r['results'][w].get('p2Prior') for r in replies if r['results'][w].get('p2Prior')]
         if priors:
             merged['p2Prior'] = np.mean(priors, axis=0).tolist()
-        payoff, speed, visits, invalid, stats = [], [], [], [], []
+        payoff, speed, visits, invalid, stats, uncertainty = [], [], [], [], [], []
         for i, label in enumerate(world['p1']):
-            row_p, row_s, row_v, row_i, row_st = [], [], [], [], []
+            row_p, row_s, row_v, row_i, row_st, row_u = [], [], [], [], [], []
             for j in range(len(world['p2'])):
                 cells = [r['results'][w]['stats'][i][j] for r in replies]
                 n = sum(c['n'] for c in cells)
                 total = sum(c['sum'] for c in cells)
+                total_sq = sum(c.get('sumSq', 0.) for c in cells)
                 total_speed = sum(c['speed'] for c in cells)
                 priors = [c['prior'] for c in cells if c['prior'] is not None]
                 prior = float(np.mean(priors)) if priors else None
@@ -74,16 +76,24 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
                 row_s.append(speed_value)
                 row_v.append(n)
                 row_i.append(sum(c['failed'] for c in cells))
-                row_st.append({'n': n, 'sum': total, 'prior': prior, 'speed': total_speed,
+                row_st.append({'n': n, 'sum': total, 'sumSq': total_sq, 'prior': prior, 'speed': total_speed,
                                'priorSpeed': prior_speed, 'ends': sum(c['ends'] for c in cells),
                                'failed': row_i[-1]})
+                if prior is None or n0 + n == 0:
+                    row_u.append(None)
+                else:  # the worker's sampling-error indicator, over the pooled rollouts
+                    count = n0 + n
+                    mean = (n0 * prior + total) / count
+                    second = (n0 * (prior * prior + .25) + total_sq) / count
+                    row_u.append(float(np.sqrt(max(0., second - mean * mean) / count)))
             payoff.append(row_p)
             speed.append(row_s)
             visits.append(row_v)
             invalid.append(row_i)
             stats.append(row_st)
+            uncertainty.append(row_u)
         merged.update(payoff=payoff, winSpeed=speed, visits=visits, invalid=invalid, stats=stats,
-                      terminal_search=summary)
+                      uncertainty=uncertainty, terminal_search=summary)
         results.append(merged)
     return {'session': first['session'], 'pending': [], 'summary': summary, 'results': results}
 

@@ -4,11 +4,11 @@ import subprocess
 
 import numpy as np
 import torch
+from test_policy_feature_parity import observe
 
 from pokesim.config import FORMAT, ROOT, SHOWDOWN_DIR
 from pokesim.learn.features import Features
 from pokesim.learn.model import PolicyNet, export_json, load_checkpoint, save_checkpoint
-from test_policy_feature_parity import observe
 
 
 def test_exported_net_matches_torch_on_fixture_views(tmp_path):
@@ -38,10 +38,11 @@ def test_exported_net_matches_torch_on_fixture_views(tmp_path):
 def test_search_uses_the_net_for_priors_and_rollouts(tmp_path):
     import time
 
+    from test_terminal_search import FlatValue
+
     from pokesim.search.lookahead import Lookahead
     from pokesim.search.planner import plan
     from pokesim.search.terminal import search
-    from test_terminal_search import FlatValue
 
     features = Features.load()
     torch.manual_seed(5)

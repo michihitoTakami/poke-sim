@@ -79,7 +79,8 @@ def test_thompson_choice_is_reproducible_and_stays_near_the_best_posterior(tmp_p
     from pokesim.live.selection import LINEUP_MARGIN, LadderLineupModel
 
     good = [ROSTER[0], ROSTER[1], ROSTER[2]]
-    rows = [dict(name=str(i), started='', win=i % 4 != 0, ordered=(good[0].lower(), *sorted(x.lower() for x in good[1:])),
+    rows = [dict(name=str(i), started='', win=i % 4 != 0,
+                 ordered=(good[0].lower(), *sorted(x.lower() for x in good[1:])),
                  trio=tuple(sorted(x.lower() for x in good)), preview=[]) for i in range(40)]
     model = LadderLineupModel(rows, half_life=1e9)
     picks = [model.choose(ROSTER, random.Random(7))[0] for _ in range(3)]
