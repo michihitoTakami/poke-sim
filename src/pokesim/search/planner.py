@@ -120,8 +120,13 @@ def predict(payoff: np.ndarray, labels: list[str], opponent_model: dict, last_mo
 
 def plan(results: list[dict], opponent_model: dict | None = None, last_move: str | None = None,
          rho: float = RHO, cloned: dict[str, float] | None = None, cloned_weight: float = 0.5,
-         pure: bool = False) -> Advice:
+         pure: bool = False, classes: dict[str, str] | None = None, rho_by_class: dict[str, float] | None = None,
+         near: float | None = None, near_tau: float = .02) -> Advice:
     """Advice from the lookahead's sampled worlds with one common mix (see the module docstring).
+    classes / rho_by_class: a class per label (e.g. 'setup') and the worst-case share to use for it in the pure
+    ranking (a set-up move is judged with more weight on the opponent's best reply). near: with pure, the
+    probability is a softmax (temperature near_tau) over the actions within `near` of the best objective instead
+    of one-hot, so a caller that samples does not repeat the same move against the same opponent.
     value[a] is the expected score against the predicted opponent; the opponent dict the predicted mix averaged
     over worlds. Worlds where every branch failed are left out and counted in status."""
     labels = results[0]["p1"]
@@ -170,11 +175,20 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
     if pure:
         # The caller plays one top move. Rank actual pure-action utilities, not the largest probability of a
         # mixed equilibrium whose protection requires randomizing between ALL of its actions.
-        objective = (1 - rho) * sol.expected + rho * sol.worst
+        rhos = np.array([(rho_by_class or {}).get((classes or {}).get(lab, ''), rho) for lab in labels])
+        objective = (1 - rhos) * sol.expected + rhos * sol.worst
         candidates = np.flatnonzero(objective >= objective.max() - max(1e-9, tie_margin))
         chosen = int(candidates[np.argmax(secondary[candidates])]) if secondary is not None else int(candidates[0])
         sol.prob = np.eye(len(labels))[chosen]
         sol.status.update(solver='pure-robust', objective=float(objective[chosen]))
+        if near is not None and near > 0:
+            close = np.flatnonzero(objective >= objective[chosen] - near)
+            weights = np.exp((objective[close] - objective[chosen]) / max(1e-6, near_tau))
+            sol.prob = np.zeros(len(labels))
+            sol.prob[close] = weights / weights.sum()
+            sol.status.update(solver='pure-near', near=near, near_tau=near_tau, near_actions=int(len(close)))
+        if rho_by_class:
+            sol.status['rho_by_class'] = {lab: float(r) for lab, r in zip(labels, rhos) if r != rho}
     opponent: dict[str, float] = {}
     for wd in worlds:
         for lab, p in zip(wd.opponent, wd.predicted):

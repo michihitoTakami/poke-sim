@@ -378,6 +378,10 @@ async def run(args) -> None:
     planner = None if args.planner == "off" else {"mode": args.planner}
     if planner and args.search:
         planner["search"] = json.loads(args.search)
+    if planner and args.rho_setup is not None:
+        planner["rho_by_class"] = {"setup": args.rho_setup}
+    if planner and args.near is not None:
+        planner["near"] = args.near
     play = {"combine": combine, "planner": planner, "sample": args.sample, "seed": args.seed,
             "opponent_policy": args.opponent_policy, "belief": args.belief, "value_run": args.value_run,
             "lineup": args.lineup}
@@ -459,6 +463,10 @@ def main() -> None:
     ap.add_argument("--lineup", choices=["matchup", "ladder"], default="ladder",
                     help="team preview: the simulated matchup table shrunk to ladder results, or the posterior of "
                          "this roster's own ladder results with Thompson sampling (pokesim.live.selection)")
+    ap.add_argument("--rho-setup", type=float, default=None,
+                    help="worst-case share for set-up moves in the planner's ranking (default: the planner's rho)")
+    ap.add_argument("--near", type=float, default=None,
+                    help="with --sample: draw among actions within this objective margin of the best (softmax)")
     ap.add_argument("--sample", action="store_true", help="draw the action from the advice instead of its top")
     ap.add_argument("--seed", type=int, help="seed for --sample (default: random, saved in each record)")
     asyncio.run(run(ap.parse_args()))

@@ -400,7 +400,10 @@ class Advisor:
                     self.planner["rho"],
                     cloned or None,
                     self.planner["cloned_weight"],
-                    pure=not self.sample,
+                    pure=not self.sample or self.planner.get("near") is not None,
+                    classes=action_classes(b) if self.planner.get("rho_by_class") else None,
+                    rho_by_class=self.planner.get("rho_by_class"),
+                    near=self.planner.get("near"),
                 )
                 values = [res['value_status'] for res in cache[key] if 'value_status' in res]
                 if values:
@@ -465,6 +468,21 @@ def action_evaluations(status: dict, selected: str | None = None) -> list[dict]:
                 for label in search['terminal_search']['immediate_wins']]
     excluded = search.get('terminal_search', {}).get('action_filter', {}).get('excluded', [])
     return rows + [dict(row, utility=None, worst=None, expected=None, gap=None, excluded=True) for row in excluded]
+
+
+def action_classes(battle: Battle) -> dict[str, str]:
+    """'setup' for the active's moves that raise its own stats or Baton Pass (and their Mega variants)."""
+    from poke_env.battle import Target
+
+    mon = battle.active_pokemon
+    if mon is None:
+        return {}
+    out = {}
+    for m in mon.moves.values():
+        if m.id == "batonpass" or (m.target == Target.SELF and m.boosts and any(v > 0 for v in m.boosts.values())):
+            out[f"move:{m.id}"] = "setup"
+            out[f"move:{m.id}:mega"] = "setup"
+    return out
 
 
 def can_set_up(mon) -> bool:

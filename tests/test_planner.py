@@ -99,3 +99,26 @@ def test_solver_fallback_keeps_the_risk_objective(monkeypatch):
     sol = solve_common([world], rho=1.0)
     assert sol.prob.tolist() == [0.0, 1.0]
     assert sol.status["objective"] == pytest.approx(0.4)
+
+
+def test_setup_moves_can_carry_their_own_worst_case_share_and_near_sampling_spreads_close_actions():
+    import numpy as np
+
+    from pokesim.search.planner import plan
+
+    # Nasty Plot wins big against two replies and loses to a third; the attack is steady.
+    row = {'p1': ['move:nastyplot', 'move:shadowball'], 'p2': ['a', 'b', 'c'],
+           'payoff': [[.9, .9, -.9], [.4, .4, .3]], 'visits': [[9, 9, 9], [9, 9, 9]],
+           'winSpeed': [[0, 0, 0], [0, 0, 0]], 'terminal_search': {'immediate_wins': []}}
+    model = {'repeat': .9}  # the opponent is predicted to repeat 'a'
+    default = plan([row], model, 'a', pure=True, rho=.1)
+    assert default.ranked()[0][0] == 'move:nastyplot'
+    guarded = plan([row], model, 'a', pure=True, rho=.1, classes={'move:nastyplot': 'setup'},
+                   rho_by_class={'setup': .7})
+    assert guarded.ranked()[0][0] == 'move:shadowball'
+    assert guarded.status['rho_by_class'] == {'move:nastyplot': .7}
+    near = plan([row], model, 'a', pure=True, rho=.1, near=.5, near_tau=1.)
+    assert near.status['solver'] == 'pure-near' and near.status['near_actions'] == 2
+    assert 0 < near.prob[1] < near.prob[0] and abs(near.prob.sum() - 1) < 1e-9
+    far = plan([row], model, 'a', pure=True, rho=.1, near=.001)
+    assert np.allclose(far.prob, [1, 0])
