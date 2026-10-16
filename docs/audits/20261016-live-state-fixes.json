@@ -1,0 +1,1532 @@
+{
+  "at": "2026-10-16T15:36:10.611002+09:00",
+  "scope": "Offline re-evaluation from observed prefixes; no live moves; current priors",
+  "decisions": [
+    {
+      "file": "20261016-135307-2699279518.json",
+      "turn": 10,
+      "original": "switch:scolipede",
+      "actions": [
+        [
+          "move:roost",
+          1.0
+        ],
+        [
+          "move:doubleedge",
+          0.0
+        ],
+        [
+          "move:earthquake",
+          0.0
+        ],
+        [
+          "move:dragondance",
+          0.0
+        ],
+        [
+          "switch:scolipede",
+          0.0
+        ]
+      ],
+      "elapsed": 8.038338474056218,
+      "active": {
+        "hp": 0.17326732673267325,
+        "mega": true,
+        "ppUsed": {
+          "doubleedge": 0,
+          "earthquake": 1,
+          "dragondance": 0,
+          "roost": 1
+        },
+        "boosts": {
+          "def": 6,
+          "spe": 4
+        },
+        "volatiles": [
+          "substitute"
+        ]
+      },
+      "status": {
+        "mode": "on",
+        "calibration": {
+          "supported_point": false,
+          "context": "2f002df0239cdcd7"
+        },
+        "belief": {
+          "observations": 10,
+          "speed_observations": 2,
+          "speed_support": {
+            "observations": 2,
+            "candidates": 48,
+            "compatible": 48,
+            "added": 0,
+            "unresolved": false
+          },
+          "active": [
+            [
+              "Life Orb / adamant / 26-32-7-0-1-0",
+              0.2708333333333333
+            ],
+            [
+              "Life Orb / adamant / 19-32-10-0-0-4",
+              0.20833333333333334
+            ],
+            [
+              "Life Orb / adamant / 2-32-0-0-0-32",
+              0.1875
+            ]
+          ],
+          "elapsed_ms": 478.70667395181954
+        },
+        "search": {
+          "solver": "pure-robust",
+          "objective": -0.05134091793109994,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v1",
+            "particle_id": "733c0b4078746ee9bbb97597779e56aff204bdfed5e31b22d095fbf36d70b69d",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 426,
+                "opponent": 148,
+                "ourAction": 426,
+                "opponentAction": 148
+              },
+              {
+                "ours": 426,
+                "opponent": 120,
+                "ourAction": 426,
+                "opponentAction": 120
+              },
+              {
+                "ours": 426,
+                "opponent": 120,
+                "ourAction": 426,
+                "opponentAction": 120
+              },
+              {
+                "ours": 426,
+                "opponent": 148,
+                "ourAction": 426,
+                "opponentAction": 148
+              },
+              {
+                "ours": 426,
+                "opponent": 116,
+                "ourAction": 426,
+                "opponentAction": 116
+              },
+              {
+                "ours": 426,
+                "opponent": 148,
+                "ourAction": 426,
+                "opponentAction": 148
+              }
+            ],
+            "ready": true,
+            "simulations": 1022,
+            "terminal": 1022,
+            "learned": 150,
+            "censored": 0,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 1084,
+            "max_tree_decisions": 5,
+            "max_rollout_turns": 10,
+            "unfinished_at_deadline": 1,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 6801.0,
+            "elapsed_ms": 6102.544458990451,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:doubleedge",
+              "expected": -0.3522816957847955,
+              "worst": -0.9968617418780922,
+              "trials": 27
+            },
+            {
+              "label": "move:earthquake",
+              "expected": -0.3073187459659231,
+              "worst": -0.6666666666666666,
+              "trials": 27
+            },
+            {
+              "label": "move:dragondance",
+              "expected": -0.5451025586465531,
+              "worst": -0.9963856913770237,
+              "trials": 27
+            },
+            {
+              "label": "move:roost",
+              "expected": 0.03203217561302159,
+              "worst": -0.24587813620071683,
+              "trials": 915
+            },
+            {
+              "label": "switch:scolipede",
+              "expected": -0.9926043727305793,
+              "worst": -0.9999999999999999,
+              "trials": 26
+            }
+          ],
+          "value": {
+            "model": {
+              "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+              "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+              "checkpoints": {
+                "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+              },
+              "reference": {
+                "own": "expert",
+                "opponent_pool": [
+                  "expert/tactical",
+                  "expert/disrupt"
+                ],
+                "version": "public-reference-v2"
+              },
+              "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+            },
+            "terminal": 1022,
+            "learned": 150,
+            "failed": 0,
+            "inference_ms": 106.43879690906033
+          }
+        },
+        "win_path": {
+          "sources": [
+            "salamencemega"
+          ],
+          "blocked": {
+            "mimikyu": [
+              "scolipede"
+            ]
+          },
+          "unseen": 1,
+          "no_source": false,
+          "last_source": true
+        }
+      }
+    },
+    {
+      "file": "20261016-135816-2699280608.json",
+      "turn": 16,
+      "original": "move:recover",
+      "actions": [
+        [
+          "move:recover",
+          1.0
+        ],
+        [
+          "move:shadowball",
+          0.0
+        ],
+        [
+          "move:flashcannon",
+          0.0
+        ],
+        [
+          "move:nastyplot",
+          0.0
+        ],
+        [
+          "switch:umbreon",
+          0.0
+        ]
+      ],
+      "elapsed": 7.95379546796903,
+      "active": {
+        "hp": 0.5428571428571428,
+        "mega": false,
+        "ppUsed": {
+          "shadowball": 1,
+          "flashcannon": 1,
+          "recover": 1,
+          "nastyplot": 2
+        },
+        "lastMove": "flashcannon",
+        "boosts": {
+          "spa": 3,
+          "spd": 1
+        },
+        "volatiles": []
+      },
+      "status": {
+        "mode": "on",
+        "calibration": {
+          "supported_point": false,
+          "context": "2f002df0239cdcd7"
+        },
+        "belief": {
+          "observations": 23,
+          "speed_observations": 5,
+          "speed_support": {
+            "observations": 3,
+            "candidates": 96,
+            "compatible": 48,
+            "added": 48,
+            "unresolved": false
+          },
+          "active": [
+            [
+              "Floettite / timid / 24-0-0-10-0-0",
+              0.025058446905747614
+            ],
+            [
+              "Floettite / timid / 24-0-0-10-0-1",
+              0.025058446905747614
+            ],
+            [
+              "Floettite / timid / 24-0-0-10-0-2",
+              0.025058446905747614
+            ]
+          ],
+          "elapsed_ms": 749.734694021754
+        },
+        "search": {
+          "solver": "pure-robust",
+          "objective": 0.8051784027984533,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v1",
+            "particle_id": "208ddd70876f6d095166b0dfd55d6a8842fa1972ef84dd2591a17576c7418ce9",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 136,
+                "opponent": 109,
+                "ourAction": 136,
+                "opponentAction": 109
+              },
+              {
+                "ours": 136,
+                "opponent": 114,
+                "ourAction": 136,
+                "opponentAction": 114
+              },
+              {
+                "ours": 136,
+                "opponent": 128,
+                "ourAction": 136,
+                "opponentAction": 128
+              },
+              {
+                "ours": 136,
+                "opponent": 128,
+                "ourAction": 136,
+                "opponentAction": 128
+              },
+              {
+                "ours": 136,
+                "opponent": 101,
+                "ourAction": 136,
+                "opponentAction": 101
+              },
+              {
+                "ours": 136,
+                "opponent": 105,
+                "ourAction": 136,
+                "opponentAction": 105
+              }
+            ],
+            "ready": true,
+            "simulations": 1490,
+            "terminal": 1490,
+            "learned": 150,
+            "censored": 0,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 1374,
+            "max_tree_decisions": 4,
+            "max_rollout_turns": 26,
+            "unfinished_at_deadline": 0,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 6808.0,
+            "elapsed_ms": 6109.14261394646,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:shadowball",
+              "expected": 0.12499640182925639,
+              "worst": -0.6666666666666666,
+              "trials": 29
+            },
+            {
+              "label": "move:flashcannon",
+              "expected": 0.4208267488989986,
+              "worst": 0.0,
+              "trials": 29
+            },
+            {
+              "label": "move:recover",
+              "expected": 0.8305171109681149,
+              "worst": 0.7460547504025765,
+              "trials": 1374
+            },
+            {
+              "label": "move:nastyplot",
+              "expected": 0.2993192678634917,
+              "worst": -0.02736244599024454,
+              "trials": 29
+            },
+            {
+              "label": "switch:umbreon",
+              "expected": -0.8111740354285375,
+              "worst": -0.9999999999999999,
+              "trials": 29
+            }
+          ],
+          "value": {
+            "model": {
+              "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+              "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+              "checkpoints": {
+                "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+              },
+              "reference": {
+                "own": "expert",
+                "opponent_pool": [
+                  "expert/tactical",
+                  "expert/disrupt"
+                ],
+                "version": "public-reference-v2"
+              },
+              "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+            },
+            "terminal": 1490,
+            "learned": 150,
+            "failed": 0,
+            "inference_ms": 113.25747595401481
+          }
+        },
+        "win_path": {
+          "sources": [
+            "gholdengo",
+            "umbreon"
+          ],
+          "blocked": {},
+          "unseen": 0,
+          "no_source": false,
+          "last_source": false
+        }
+      }
+    },
+    {
+      "file": "20261016-135816-2699280608.json",
+      "turn": 18,
+      "original": "move:recover",
+      "actions": [
+        [
+          "move:shadowball",
+          1.0
+        ],
+        [
+          "move:flashcannon",
+          0.0
+        ],
+        [
+          "move:recover",
+          0.0
+        ],
+        [
+          "move:nastyplot",
+          0.0
+        ],
+        [
+          "switch:umbreon",
+          0.0
+        ]
+      ],
+      "elapsed": 7.89182698901277,
+      "active": {
+        "hp": 0.6514285714285715,
+        "mega": false,
+        "ppUsed": {
+          "shadowball": 2,
+          "flashcannon": 1,
+          "recover": 2,
+          "nastyplot": 2
+        },
+        "lastMove": "shadowball",
+        "boosts": {
+          "spa": 3,
+          "spd": 1
+        },
+        "volatiles": []
+      },
+      "status": {
+        "mode": "on",
+        "calibration": {
+          "supported_point": false,
+          "context": "2f002df0239cdcd7"
+        },
+        "belief": {
+          "observations": 27,
+          "speed_observations": 7,
+          "speed_support": {
+            "observations": 5,
+            "candidates": 96,
+            "compatible": 48,
+            "added": 48,
+            "unresolved": false
+          },
+          "active": [
+            [
+              "- / timid / 0-0-4-32-0-0",
+              0.03926446386898764
+            ],
+            [
+              "- / timid / 0-0-4-32-0-1",
+              0.03926446386898764
+            ],
+            [
+              "- / timid / 0-0-4-32-0-2",
+              0.03926446386898764
+            ]
+          ],
+          "elapsed_ms": 1064.066027989611
+        },
+        "search": {
+          "solver": "pure-robust",
+          "objective": 0.8716195913059025,
+          "rho": 0.3,
+          "worlds": 6,
+          "failed_worlds": 0,
+          "failed_cells": 0,
+          "terminal_search": {
+            "algorithm": "public-information-set-uct-v1",
+            "particle_id": "09f6c0d8e450aed807fb46b3d8fab7d94f11ff3bbfeb4a0e3d39e2f4ac4ade0d",
+            "continuation_policy": "public-baton-v1",
+            "bootstrap_reference": "public-reference-v2",
+            "root_speed_samples": [
+              {
+                "ours": 136,
+                "opponent": 129,
+                "ourAction": 136,
+                "opponentAction": 129
+              },
+              {
+                "ours": 136,
+                "opponent": 126,
+                "ourAction": 136,
+                "opponentAction": 126
+              },
+              {
+                "ours": 136,
+                "opponent": 129,
+                "ourAction": 136,
+                "opponentAction": 129
+              },
+              {
+                "ours": 136,
+                "opponent": 125,
+                "ourAction": 136,
+                "opponentAction": 125
+              },
+              {
+                "ours": 136,
+                "opponent": 123,
+                "ourAction": 136,
+                "opponentAction": 123
+              },
+              {
+                "ours": 136,
+                "opponent": 128,
+                "ourAction": 136,
+                "opponentAction": 128
+              }
+            ],
+            "ready": true,
+            "simulations": 1781,
+            "terminal": 1781,
+            "learned": 150,
+            "censored": 0,
+            "failed": 0,
+            "errors": [],
+            "tree_nodes": 1188,
+            "max_tree_decisions": 5,
+            "max_rollout_turns": 27,
+            "unfinished_at_deadline": 1,
+            "chance_paths": 0,
+            "immediate_wins": [],
+            "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+            "budget_ms": 6525.0,
+            "elapsed_ms": 5747.880433977116,
+            "hidden_sets_exhaustive": false
+          },
+          "root_evidence": [
+            {
+              "label": "move:shadowball",
+              "expected": 0.9039383517255191,
+              "worst": 0.7962091503267973,
+              "trials": 1512
+            },
+            {
+              "label": "move:flashcannon",
+              "expected": 0.7878436895636773,
+              "worst": 0.4666666666666666,
+              "trials": 132
+            },
+            {
+              "label": "move:recover",
+              "expected": 0.8597094103173544,
+              "worst": 0.0,
+              "trials": 49
+            },
+            {
+              "label": "move:nastyplot",
+              "expected": 0.4443450193551063,
+              "worst": -0.6666666666666666,
+              "trials": 44
+            },
+            {
+              "label": "switch:umbreon",
+              "expected": -0.9825000026746991,
+              "worst": -0.9999999999999999,
+              "trials": 44
+            }
+          ],
+          "value": {
+            "model": {
+              "dataset_id": "cb2d10dd5bf218341e592e0bf3ba1613de4e87321cf9b2986d80aa48cfaad21f",
+              "report_sha": "76f17bd82b94787eca9102131a8fc729d67b7dc29e043415fb9f88c190242845",
+              "checkpoints": {
+                "pretrained-seed0.pt": "c69d2d18f430088e8ca0a70bb66e1069c96f7079944399705307a63ec6b746fe",
+                "pretrained-seed1.pt": "eee409b3403d5316d82607224c7262424bb26e057b7a2f037131c18cedba762f",
+                "pretrained-seed2.pt": "abec6dddf82b000cb969c97c4c6e6cdb83e3cc7a257e9c81cc74f10f035960d2"
+              },
+              "reference": {
+                "own": "expert",
+                "opponent_pool": [
+                  "expert/tactical",
+                  "expert/disrupt"
+                ],
+                "version": "public-reference-v2"
+              },
+              "run": "/home/michihito/Working/poke-sim/runs/terminal-value-v2"
+            },
+            "terminal": 1781,
+            "learned": 150,
+            "failed": 0,
+            "inference_ms": 115.11709296610206
+          }
+        },
+        "win_path": {
+          "sources": [
+            "gholdengo",
+            "umbreon"
+          ],
+          "blocked": {},
+          "unseen": 0,
+          "no_source": false,
+          "last_source": false
+        }
+      }
+    }
+  ],
+  "local_validation": [
+    {
+      "record": "/data/poke-sim/validation/live-state-20261016/20261016-153711-803486.json",
+      "decision_ms": 1500,
+      "result": "win",
+      "decisions": [
+        {
+          "turn": 1,
+          "force": false,
+          "rqid": 4,
+          "chosen": "move:batonpass",
+          "order": "/choose move batonpass",
+          "sent": "/choose move batonpass|4",
+          "secs": 1.98,
+          "active": {
+            "species": "scolipede",
+            "hp": 165,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:batonpass"
+        },
+        {
+          "turn": 1,
+          "force": true,
+          "rqid": 6,
+          "chosen": "switch:umbreon",
+          "order": "/choose switch Umbreon",
+          "sent": "/choose switch Umbreon|6",
+          "secs": 0.96,
+          "active": {
+            "species": "scolipede",
+            "hp": 165,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "switch:umbreon"
+        },
+        {
+          "turn": 2,
+          "force": false,
+          "rqid": 8,
+          "chosen": "move:calmmind",
+          "order": "/choose move calmmind",
+          "sent": "/choose move calmmind|8",
+          "secs": 0.98,
+          "active": {
+            "species": "umbreon",
+            "hp": 201,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:calmmind"
+        },
+        {
+          "turn": 3,
+          "force": false,
+          "rqid": 10,
+          "chosen": "move:calmmind",
+          "order": "/choose move calmmind",
+          "sent": "/choose move calmmind|10",
+          "secs": 1.85,
+          "active": {
+            "species": "umbreon",
+            "hp": 201,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 1,
+              "spd": 1,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:calmmind"
+        },
+        {
+          "turn": 4,
+          "force": false,
+          "rqid": 12,
+          "chosen": "move:moonlight",
+          "order": "/choose move moonlight",
+          "sent": "/choose move moonlight|12",
+          "secs": 1.71,
+          "active": {
+            "species": "umbreon",
+            "hp": 75,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 2,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:moonlight"
+        },
+        {
+          "turn": 5,
+          "force": false,
+          "rqid": 16,
+          "chosen": "move:moonlight",
+          "order": "/choose move moonlight",
+          "sent": "/choose move moonlight|16",
+          "secs": 1.71,
+          "active": {
+            "species": "umbreon",
+            "hp": 65,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 2,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:moonlight"
+        },
+        {
+          "turn": 6,
+          "force": false,
+          "rqid": 18,
+          "chosen": "move:moonlight",
+          "order": "/choose move moonlight",
+          "sent": "/choose move moonlight|18",
+          "secs": 1.71,
+          "active": {
+            "species": "umbreon",
+            "hp": 88,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 2,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:moonlight"
+        },
+        {
+          "turn": 7,
+          "force": false,
+          "rqid": 20,
+          "chosen": "move:batonpass",
+          "order": "/choose move batonpass",
+          "sent": "/choose move batonpass|20",
+          "secs": 1.71,
+          "active": {
+            "species": "umbreon",
+            "hp": 173,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 2,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:batonpass"
+        },
+        {
+          "turn": 7,
+          "force": true,
+          "rqid": 22,
+          "chosen": "switch:gholdengo",
+          "order": "/choose switch Gholdengo",
+          "sent": "/choose switch Gholdengo|22",
+          "secs": 1.1,
+          "active": {
+            "species": "umbreon",
+            "hp": 173,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 2,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "switch:gholdengo"
+        },
+        {
+          "turn": 8,
+          "force": false,
+          "rqid": 24,
+          "chosen": "move:shadowball",
+          "order": "/choose move shadowball",
+          "sent": "/choose move shadowball|24",
+          "secs": 0.96,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 2,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:shadowball"
+        },
+        {
+          "turn": 9,
+          "force": false,
+          "rqid": 28,
+          "chosen": "switch:umbreon",
+          "order": "/choose switch Umbreon",
+          "sent": "/choose switch Umbreon|28",
+          "secs": 0.96,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 2,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "switch:umbreon"
+        },
+        {
+          "turn": 10,
+          "force": false,
+          "rqid": 30,
+          "chosen": "move:moonlight",
+          "order": "/choose move moonlight",
+          "sent": "/choose move moonlight|30",
+          "secs": 0.97,
+          "active": {
+            "species": "umbreon",
+            "hp": 185,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:moonlight"
+        },
+        {
+          "turn": 11,
+          "force": false,
+          "rqid": 32,
+          "chosen": "move:batonpass",
+          "order": "/choose move batonpass",
+          "sent": "/choose move batonpass|32",
+          "secs": 0.96,
+          "active": {
+            "species": "umbreon",
+            "hp": 201,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:batonpass"
+        },
+        {
+          "turn": 11,
+          "force": true,
+          "rqid": 34,
+          "chosen": "switch:gholdengo",
+          "order": "/choose switch Gholdengo",
+          "sent": "/choose switch Gholdengo|34",
+          "secs": 0.96,
+          "active": {
+            "species": "umbreon",
+            "hp": 201,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "switch:gholdengo"
+        },
+        {
+          "turn": 12,
+          "force": false,
+          "rqid": 36,
+          "chosen": "move:nastyplot",
+          "order": "/choose move nastyplot",
+          "sent": "/choose move nastyplot|36",
+          "secs": 0.97,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:nastyplot"
+        },
+        {
+          "turn": 13,
+          "force": false,
+          "rqid": 38,
+          "chosen": "move:flashcannon",
+          "order": "/choose move flashcannon",
+          "sent": "/choose move flashcannon|38",
+          "secs": 0.96,
+          "active": {
+            "species": "gholdengo",
+            "hp": 139,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:flashcannon"
+        },
+        {
+          "turn": 14,
+          "force": false,
+          "rqid": 40,
+          "chosen": "move:recover",
+          "order": "/choose move recover",
+          "sent": "/choose move recover|40",
+          "secs": 0.96,
+          "active": {
+            "species": "gholdengo",
+            "hp": 100,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:recover"
+        },
+        {
+          "turn": 15,
+          "force": false,
+          "rqid": 42,
+          "chosen": "move:nastyplot",
+          "order": "/choose move nastyplot",
+          "sent": "/choose move nastyplot|42",
+          "secs": 1.72,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:nastyplot"
+        },
+        {
+          "turn": 16,
+          "force": false,
+          "rqid": 44,
+          "chosen": "move:shadowball",
+          "order": "/choose move shadowball",
+          "sent": "/choose move shadowball|44",
+          "secs": 1.06,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 4,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:shadowball"
+        },
+        {
+          "turn": 17,
+          "force": false,
+          "rqid": 48,
+          "chosen": "move:shadowball",
+          "order": "/choose move shadowball",
+          "sent": "/choose move shadowball|48",
+          "secs": 1.03,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 4,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:shadowball"
+        }
+      ],
+      "mismatches": [],
+      "fallbacks": [
+        {
+          "turn": 3,
+          "reason": "search failed: TimeoutError('search worker exceeded response deadline')"
+        },
+        {
+          "turn": 4,
+          "reason": "search failed: TimeoutError('search worker exceeded response deadline')"
+        },
+        {
+          "turn": 5,
+          "reason": "search failed: TimeoutError('search worker exceeded response deadline')"
+        },
+        {
+          "turn": 6,
+          "reason": "search failed: TimeoutError('search worker exceeded response deadline')"
+        },
+        {
+          "turn": 7,
+          "reason": "search failed: TimeoutError('search worker exceeded response deadline')"
+        },
+        {
+          "turn": 15,
+          "reason": "search failed: TimeoutError('search worker exceeded response deadline')"
+        }
+      ],
+      "max_seconds": 1.98,
+      "simulation_failures": 0,
+      "protocol_errors": []
+    },
+    {
+      "record": "/data/poke-sim/validation/live-state-normal-20261016/20261016-154032-803487.json",
+      "decision_ms": 8500,
+      "result": "win",
+      "decisions": [
+        {
+          "turn": 1,
+          "force": false,
+          "rqid": 4,
+          "chosen": "move:irondefense",
+          "order": "/choose move irondefense",
+          "sent": "/choose move irondefense|4",
+          "secs": 8.02,
+          "active": {
+            "species": "scolipede",
+            "hp": 165,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 0,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 0
+            },
+            "effects": []
+          },
+          "executed": "move:irondefense"
+        },
+        {
+          "turn": 2,
+          "force": false,
+          "rqid": 6,
+          "chosen": "move:irondefense",
+          "order": "/choose move irondefense",
+          "sent": "/choose move irondefense|6",
+          "secs": 7.95,
+          "active": {
+            "species": "scolipede",
+            "hp": 90,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 2,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 1
+            },
+            "effects": []
+          },
+          "executed": "move:irondefense"
+        },
+        {
+          "turn": 3,
+          "force": false,
+          "rqid": 8,
+          "chosen": "move:substitute",
+          "order": "/choose move substitute",
+          "sent": "/choose move substitute|8",
+          "secs": 7.95,
+          "active": {
+            "species": "scolipede",
+            "hp": 90,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 2
+            },
+            "effects": []
+          },
+          "executed": "move:substitute"
+        },
+        {
+          "turn": 4,
+          "force": false,
+          "rqid": 10,
+          "chosen": "move:batonpass",
+          "order": "/choose move batonpass",
+          "sent": "/choose move batonpass|10",
+          "secs": 7.95,
+          "active": {
+            "species": "scolipede",
+            "hp": 49,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": [
+              "SUBSTITUTE"
+            ]
+          },
+          "executed": "move:batonpass"
+        },
+        {
+          "turn": 4,
+          "force": true,
+          "rqid": 12,
+          "chosen": "switch:umbreon",
+          "order": "/choose switch Umbreon",
+          "sent": "/choose switch Umbreon|12",
+          "secs": 7.95,
+          "active": {
+            "species": "scolipede",
+            "hp": 49,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": [
+              "SUBSTITUTE"
+            ]
+          },
+          "executed": "switch:umbreon"
+        },
+        {
+          "turn": 5,
+          "force": false,
+          "rqid": 14,
+          "chosen": "move:batonpass",
+          "order": "/choose move batonpass",
+          "sent": "/choose move batonpass|14",
+          "secs": 7.95,
+          "active": {
+            "species": "umbreon",
+            "hp": 201,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": [
+              "SUBSTITUTE"
+            ]
+          },
+          "executed": "move:batonpass"
+        },
+        {
+          "turn": 5,
+          "force": true,
+          "rqid": 16,
+          "chosen": "switch:gholdengo",
+          "order": "/choose switch Gholdengo",
+          "sent": "/choose switch Gholdengo|16",
+          "secs": 7.95,
+          "active": {
+            "species": "umbreon",
+            "hp": 201,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": [
+              "SUBSTITUTE"
+            ]
+          },
+          "executed": "switch:gholdengo"
+        },
+        {
+          "turn": 6,
+          "force": false,
+          "rqid": 18,
+          "chosen": "move:flashcannon",
+          "order": "/choose move flashcannon",
+          "sent": "/choose move flashcannon|18",
+          "secs": 7.93,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": [
+              "SUBSTITUTE"
+            ]
+          },
+          "executed": "move:flashcannon"
+        },
+        {
+          "turn": 7,
+          "force": false,
+          "rqid": 22,
+          "chosen": "move:nastyplot",
+          "order": "/choose move nastyplot",
+          "sent": "/choose move nastyplot|22",
+          "secs": 7.92,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 0,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": [
+              "SUBSTITUTE"
+            ]
+          },
+          "executed": "move:nastyplot"
+        },
+        {
+          "turn": 8,
+          "force": false,
+          "rqid": 24,
+          "chosen": "move:shadowball",
+          "order": "/choose move shadowball",
+          "sent": "/choose move shadowball|24",
+          "secs": 7.93,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": [
+              "SUBSTITUTE"
+            ]
+          },
+          "executed": "move:shadowball"
+        },
+        {
+          "turn": 9,
+          "force": false,
+          "rqid": 26,
+          "chosen": "move:shadowball",
+          "order": "/choose move shadowball",
+          "sent": "/choose move shadowball|26",
+          "secs": 7.95,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": []
+          },
+          "executed": "move:shadowball"
+        },
+        {
+          "turn": 10,
+          "force": false,
+          "rqid": 30,
+          "chosen": "move:shadowball",
+          "order": "/choose move shadowball",
+          "sent": "/choose move shadowball|30",
+          "secs": 7.95,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": []
+          },
+          "executed": "move:shadowball"
+        },
+        {
+          "turn": 11,
+          "force": false,
+          "rqid": 34,
+          "chosen": "move:shadowball",
+          "order": "/choose move shadowball",
+          "sent": "/choose move shadowball|34",
+          "secs": 7.96,
+          "active": {
+            "species": "gholdengo",
+            "hp": 175,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": []
+          },
+          "executed": "move:shadowball"
+        },
+        {
+          "turn": 12,
+          "force": false,
+          "rqid": 36,
+          "chosen": "move:shadowball",
+          "order": "/choose move shadowball",
+          "sent": "/choose move shadowball|36",
+          "secs": 7.95,
+          "active": {
+            "species": "gholdengo",
+            "hp": 167,
+            "boosts": {
+              "accuracy": 0,
+              "atk": 0,
+              "def": 4,
+              "evasion": 0,
+              "spa": 2,
+              "spd": 0,
+              "spe": 3
+            },
+            "effects": []
+          },
+          "executed": "move:shadowball"
+        }
+      ],
+      "mismatches": [],
+      "fallbacks": [],
+      "max_seconds": 8.02,
+      "simulation_failures": 0,
+      "protocol_errors": []
+    }
+  ],
+  "validation_notes": [
+    "1.5 second smoke run had 6 deadline fallbacks and is not a search-quality pass.",
+    "Normal 8.5 second run had no fallbacks, simulation failures, or chosen/executed mismatches.",
+    "Offline decisions and local play validate state/transport, not official ladder strength."
+  ]
+}

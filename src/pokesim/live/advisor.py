@@ -264,6 +264,7 @@ class Advisor:
                 belief = self.beliefs.get(battle.battle_tag, log, our_role)
                 status["belief"] = {"observations": len(belief.observations),
                                     "speed_observations": sum(o.kind == 'speed' for o in belief.observations),
+                                    "speed_support": belief.speed_support(opp_active.species, *revealed(opp_active)),
                                     "active": belief.summary(opp_active.species, *revealed(opp_active))}
             except Exception as e:  # noqa: BLE001 - without the belief the lookahead draws from the prior
                 belief = None

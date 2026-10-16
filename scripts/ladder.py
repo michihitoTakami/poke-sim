@@ -32,7 +32,7 @@ from pathlib import Path
 import numpy as np
 from poke_env import AccountConfiguration, LocalhostServerConfiguration, ShowdownServerConfiguration
 from poke_env.environment import SinglesEnv
-from poke_env.player import Player, RandomPlayer
+from poke_env.player import RandomPlayer
 from sb3_contrib import MaskablePPO
 
 from pokesim.config import FORMAT, RAW_DIR, ROOT
@@ -44,6 +44,7 @@ from pokesim.rl.opponents import LeaguePlayer
 from pokesim.runtime.bundle import describe, file_hash
 from pokesim.search.lookahead import label_to_action
 from pokesim.sim.pool import TeamPool, load_teams
+from pokesim.state.player import TrackedPlayer
 
 OUT = RAW_DIR / "ladder"
 CREDENTIALS = Path.home() / ".config" / "poke-sim" / "showdown.env"
@@ -73,7 +74,7 @@ def credentials() -> tuple[str, str] | None:
     return None
 
 
-class AdvisorPlayer(Player):
+class AdvisorPlayer(TrackedPlayer):
     """With several policies, battles alternate between them (A/B comparison on the same ladder)."""
 
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
@@ -105,14 +106,94 @@ class AdvisorPlayer(Player):
         self.logs: dict[str, list[str]] = {}  # battle tag -> protocol lines
         self.value_logged: set[str] = set()
         self.quality_issues: list[str] = []
+        self.sent_requests: dict[str, tuple] = {}
+        self.retried_requests: dict[str, tuple] = {}
         super().__init__(team=FixedTeam(sets), **kwargs)
 
     async def _handle_battle_message(self, split_messages):
         tag = split_messages[0][0].lstrip(">").strip() if split_messages and split_messages[0] else ""
-        if tag:
-            self.logs.setdefault(tag, []).extend("|".join(m) for m in split_messages[1:]
-                                                 if len(m) > 1 and m[1] not in ("request", "t:", "j", "l", "c"))
-        await super()._handle_battle_message(split_messages)
+        # Append only the prefix already processed. A request inside a packet must not see later events.
+        for message in split_messages[1:]:
+            battle = self._battles.get(tag)
+            kind = message[1] if len(message) > 1 else ''
+            if battle is not None and battle.finished:
+                if kind in {'request', 'error'}:
+                    self.diagnostic(battle, 'finished-message', message=message)
+                continue
+            if kind == 'error' and len(message) > 2 and any(
+                text in message[2] for text in ("There's nothing to choose", 'too late to make a different move')
+            ):
+                if battle is not None:
+                    self.diagnostic(battle, 'stale-choice-error', message=message)
+                continue
+            if kind == 'request' and len(message) > 2 and message[2] and battle is not None:
+                incoming_id = json.loads(message[2]).get('rqid')
+                current_id = battle.last_request.get('rqid')
+                if isinstance(incoming_id, int) and isinstance(current_id, int) and incoming_id < current_id:
+                    self.diagnostic(battle, 'stale-request', incoming_rqid=incoming_id)
+                    continue
+            if tag and kind and kind not in {'request', 't:', 'j', 'l', 'c'}:
+                self.logs.setdefault(tag, []).append('|'.join(message))
+            await super()._handle_battle_message([split_messages[0], message])
+
+    @staticmethod
+    def request_key(battle) -> tuple:
+        return battle.last_request.get('rqid'), battle.turn, bool(battle.force_switch)
+
+    def diagnostic(self, battle, kind: str, **details) -> None:
+        """Survives record finalization, including errors and requests received after the battle ends."""
+        self.out.mkdir(parents=True, exist_ok=True)
+        record = {'time': time.time(), 'battle': battle.battle_tag, 'turn': battle.turn,
+                  'rqid': battle.last_request.get('rqid'), 'kind': kind, **details}
+        with (self.out / 'diagnostics.jsonl').open('a') as stream:
+            stream.write(json.dumps(record, ensure_ascii=False) + '\n')
+
+    def record_quality(self, battle, entry: dict, issues: list[str]) -> None:
+        self.quality_issues.extend(issues)
+        if issues:
+            self.diagnostic(battle, 'quality-failure', issues=issues, advice=entry)
+
+    async def _handle_battle_request(self, battle, maybe_default_order=False):
+        if battle.finished:
+            return
+        if battle._wait:
+            self._waiting.set()
+            return
+        key = self.request_key(battle)
+        tag = battle.battle_tag
+        sent_key = self.sent_requests.get(tag)
+        if sent_key and key[0] is not None and sent_key[0] is not None and key[0] < sent_key[0]:
+            self.diagnostic(battle, 'stale-request', incoming_rqid=key[0])
+            return
+        if sent_key == key or (sent_key and key[0] is not None and sent_key[0] == key[0]):
+            if not maybe_default_order or self.retried_requests.get(tag) == key:
+                self.diagnostic(battle, 'duplicate-request', retry=maybe_default_order)
+                return
+            # A genuinely rejected current choice gets one legal server default. Stale errors are filtered above.
+            self.retried_requests[tag] = key
+            message = self.choose_default_move().message
+            entry = {'turn': battle.turn, 'force': bool(battle.force_switch), 'rqid': key[0],
+                     'chosen': 'default', 'order': message, 'retry': True}
+            self.advice.setdefault(tag, []).append(entry)
+            if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
+                self.record_quality(battle, entry, ['choice rejected'])
+        elif battle.teampreview:
+            message = self.teampreview(battle)
+        else:
+            order = await self.choose_move(battle)
+            message = order.message if order is not None else ''
+        if not message or battle.finished or battle._wait or self.request_key(battle) != key:
+            self.diagnostic(battle, 'discarded-order', order=message, request_key=key)
+            return
+        # Bind every choice to the request it was computed for. The server rejects a late command instead of
+        # applying it to a different turn (poke-env's default sender omits rqid).
+        command = message + (f'|{key[0]}' if key[0] is not None else '')
+        self.diagnostic(battle, 'send-attempt', command=command, request_key=key)
+        await self.ps_client.send_message(command, tag)
+        self.sent_requests[tag] = key
+        if self.advice.get(tag):
+            self.advice[tag][-1]['sent'] = command
+        self.diagnostic(battle, 'sent-order', command=command, request_key=key)
 
     def policy_for(self, battle) -> str:
         if battle.battle_tag not in self.assigned:
@@ -152,17 +233,25 @@ class AdvisorPlayer(Player):
         self.advisor.calibration = self.calibrations[policy_path]
 
     async def choose_move(self, battle):
+        if battle.finished or battle._wait:
+            self.diagnostic(battle, 'discarded-request')
+            return None
+        key = self.request_key(battle)
         mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
         self.activate_policy(self.policy_for(battle))
-        entry = {"turn": battle.turn, "force": bool(battle.force_switch)}
+        active = battle.active_pokemon
+        entry = {"turn": battle.turn, "force": bool(battle.force_switch), 'rqid': key[0],
+                 'active': None if active is None else {'species': active.species, 'hp': active.current_hp,
+                     'boosts': dict(active.boosts), 'effects': [e.name for e in active.effects]}}
         self.advice.setdefault(battle.battle_tag, []).append(entry)
         try:
             advice = await asyncio.to_thread(self.advisor.advise, battle, self.last_opponent_move(battle),
-                                              self.logs.get(battle.battle_tag, []), battle.player_role)
+                                              list(self.logs.get(battle.battle_tag, [])), battle.player_role)
+            if battle.finished or battle._wait or self.request_key(battle) != key:
+                self.diagnostic(battle, 'discarded-result', request_key=key, elapsed=advice.elapsed)
+                return None
             value = advice.status.get('search', {}).get('value', {})
             tree = advice.status.get('search', {}).get('terminal_search', {})
-            if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
-                self.quality_issues.extend(search_quality_issues(advice.status, advice.elapsed))
             if tree and battle.battle_tag not in self.value_logged:
                 self.value_logged.add(battle.battle_tag)
                 print(f'{battle.battle_tag}: terminal search active ({tree["terminal"]} ends, '
@@ -177,6 +266,8 @@ class AdvisorPlayer(Player):
                           "lookahead": [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.lookahead[:3]],
                           "opponent": rounded(advice.opponent[:4]), "secs": round(advice.elapsed, 2),
                           "status": advice.status})
+            if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
+                self.record_quality(battle, entry, search_quality_issues(advice.status, advice.elapsed))
             if advice.shadow:
                 entry["shadow"] = [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.shadow[:5]]
             legal = [(label, p, a) for label, p in advice.actions
@@ -186,14 +277,21 @@ class AdvisorPlayer(Player):
                 if self.sample and sum(q for _, q, _ in legal) > 0:
                     label, p, action = self.rng.choices(legal, weights=[q for _, q, _ in legal])[0]
                 entry.update({"chosen": label, "chosen_p": round(float(p), 4)})
-                return SinglesEnv.action_to_order(np.int64(action), battle, strict=False)
+                order = SinglesEnv.action_to_order(np.int64(action), battle, strict=True)
+                entry['order'] = order.message
+                return order
         except Exception as e:  # noqa: BLE001 - never stall a live battle
+            if battle.finished or battle._wait or self.request_key(battle) != key:
+                self.diagnostic(battle, 'discarded-error', request_key=key, error=repr(e))
+                return None
             print("advice failed:", repr(e)[:200], flush=True)
             entry["error"] = repr(e)[:200]
         if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
-            self.quality_issues.append('advice failed or had no legal action')
+            self.record_quality(battle, entry, ['advice failed or had no legal action'])
         entry["chosen"] = "random"
-        return self.choose_random_move(battle)
+        order = self.choose_random_move(battle)
+        entry['order'] = order.message
+        return order
 
     def _battle_finished_callback(self, battle) -> None:
         self.out.mkdir(parents=True, exist_ok=True)
