@@ -6,8 +6,29 @@ import numpy as np
 from pokesim.search.evaluation import leaf_value
 
 
-def search(engine, request, *, started=None, max_budget=9.):
-    """max_budget: the live limit is 9 s (one decision); offline oracles (pokesim.evaluation.positions) raise it."""
+def column_weights(results, predictor):
+    """Per world, the predicted likelihood of each of the opponent's root replies in the worker's order.
+    predictor(payoff, opponent_labels) -> mix over the labels kept by clean(); dropped (failed) replies get 0."""
+    from pokesim.search.lookahead import clean
+
+    out = []
+    for res in results:
+        try:
+            payoff, labels, _ = clean(res)
+        except ValueError:
+            out.append([1.0] * len(res['p2']))
+            continue
+        q = predictor(payoff, labels)
+        weights = dict(zip(labels, (float(x) for x in q), strict=True))
+        out.append([weights.get(lab, 0.0) for lab in res['p2']])
+    return out
+
+
+def search(engine, request, *, started=None, max_budget=9., predictor=None):
+    """max_budget: the live limit is 9 s (one decision); offline oracles (pokesim.evaluation.positions) raise it.
+    predictor: the opponent prediction the planner will use (pokesim.search.planner.predict with its models);
+    once every root cell has its first trial, the worker allocates the opponent's replies by it (column_weights).
+    """
     started = time.monotonic() if started is None else started
     if request.get('valueUtility', 'reference-material-v1') != 'reference-material-v1':
         raise ValueError('unsupported search value utility')
@@ -18,7 +39,7 @@ def search(engine, request, *, started=None, max_budget=9.):
     request.pop('valueLeaves', None)
     request['terminalSearch'] = {'op': 'start', 'sliceMs': 400, 'certifyMs': min(1200, budget * 200)}
     old_timeout = getattr(engine, 'query_timeout', 30.)
-    feedback, mix = [], None
+    feedback, mix, columns = [], None, None
     inference_ms = 0.
     try:
         while True:
@@ -41,9 +62,12 @@ def search(engine, request, *, started=None, max_budget=9.):
                     scores = np.mean([.7 * m.mean(axis=1) + .3 * m.min(axis=1) for m in matrices], axis=0)
                     weights = np.exp((scores - scores.max()) / .15)
                     mix = (weights / weights.sum()).tolist()
+                if predictor is not None and columns is None:
+                    columns = column_weights(reply['results'], predictor)
             request = {'terminalSearch': {'op': 'advance', 'session': reply['session'],
-                                         'feedback': feedback, 'mix': mix,
+                                         'feedback': feedback, 'mix': mix, 'columns': columns,
                                          'sliceMs': min(500, max(1, int((remaining - .7) * 1000)))}}
+            columns = None  # sent once; the worker keeps it
         engine.query_timeout = max(.1, deadline - time.monotonic() + .2)
         final = engine._query({'terminalSearch': {'op': 'finish', 'session': reply['session'],
                                                  'feedback': feedback}})

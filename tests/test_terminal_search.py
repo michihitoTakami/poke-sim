@@ -265,3 +265,53 @@ def test_the_value_bootstrap_keeps_its_weight_against_a_single_rollout_only_when
     assert blended['version'] == 'public-baton-v1+p1:expert/p2:disrupt,tactical,expert'
     with pytest.raises(subprocess.CalledProcessError):
         cell_values(0, {'p2': ['random']})
+
+
+def test_predicted_replies_get_more_trials_while_a_floor_keeps_the_others_examined():
+    js = r"""
+const fs=require('fs'),vm=require('vm');
+const sandbox={__dirname:process.cwd()+'/services/sim-tools',
+ require:n=>n==='readline'?{createInterface:()=>({on:()=>{}})}:require(n),
+ process:{argv:['node','worker',process.argv[1]]},module:{exports:{}}};
+vm.runInNewContext(fs.readFileSync('./services/sim-tools/lookahead.js','utf8')+
+ '\nmodule.exports={setUp,step,choices,State,extractChannelMessages};',sandbox);
+const d=sandbox.module.exports;
+const req={...JSON.parse(fs.readFileSync('./tests/fixtures/terminal-moonblast-turn14.json')),columnFloor:.2};
+const {Search}=require('./services/sim-tools/terminal_search');
+const s=new Search(req,d); s.rootMix=s.states[0].p1.map((_,i)=>i===0?1e6:0);
+const replies=s.states[0].p2.length, weights=s.states.map(st=>st.p2.map((_,j)=>j===0?1:0));
+const count=(n)=>{const c={};for(let k=0;k<n;k++){const [w,i,j]=s.pickJob();s.states[w].cells[i][j].n++;
+ c[j]=(c[j]||0)+1;}return c;};
+const uniform=count(replies*10);
+for(const st of s.states) for(const row of st.cells) for(const c of row) c.n=0;
+s.setColumns(weights);
+const weighted=count(replies*25);
+let bad=false; try{s.setColumns([[1]]);}catch(e){bad=true;}
+console.log(JSON.stringify({replies,uniform,weighted,bad}));
+"""
+    out = subprocess.run(['node', '-e', js, str(SHOWDOWN_DIR)], cwd=ROOT, text=True,
+                         capture_output=True, check=True, timeout=20)
+    r = json.loads(out.stdout)
+    replies = r['replies']
+    assert replies >= 2
+    assert max(r['uniform'].values()) - min(r['uniform'].values()) <= 1  # evenly covered without a prediction
+    predicted, others = r['weighted']['0'], [v for k, v in r['weighted'].items() if k != '0']
+    assert predicted > 2 * max(others)  # the predicted reply gets most of the budget
+    assert min(others) >= 1  # the floor keeps every reply examined
+    assert r['bad']
+
+
+def test_column_weights_follow_the_worker_order_and_zero_dropped_replies():
+    from pokesim.search.terminal import column_weights
+
+    results = [{'p1': ['a'], 'p2': ['x', 'y', 'z'], 'payoff': [[.5, None, -.5]]},
+               {'p1': ['a'], 'p2': ['x', 'y'], 'payoff': [[None, None]]}]
+    seen = []
+
+    def predictor(payoff, labels):
+        seen.append(labels)
+        return np.array([.25, .75])
+
+    weights = column_weights(results, predictor)
+    assert seen == [['x', 'z']]
+    assert weights == [[.25, 0., .75], [1., 1.]]

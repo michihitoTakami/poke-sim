@@ -60,6 +60,10 @@ class Search {
     this.priorVisits = Math.max(0, Number(req.priorVisits ?? 4));
     this.priorWeight = this.priorVisits;
     this.minimumTrials = 2;
+    // columns: per world, the predicted likelihood of each opponent reply (sent by the driver once every cell has
+    // its first trial). Replies then get trials in proportion, with columnFloor of the row's budget spread evenly
+    // so an unexpected reply is still examined. Without columns every reply is covered equally.
+    this.columns = null; this.columnFloor = Math.min(1, Math.max(0, Number(req.columnFloor ?? .3)));
     // Rollout policies rotate per trial. The live default plays our Baton Pass plans against two scripted foes;
     // 'expert' for p2 keeps the rollouts symmetric (the foe sets up and finishes as well as we do).
     const rotation = (side, fallback) => {
@@ -237,15 +241,33 @@ class Search {
       (this.rootMix?.[i] || 0) + Math.sqrt(2 * Math.log(total + 2) / (1 + x)));
     const row = scores.indexOf(Math.max(...scores));
     let job, least = Infinity;
-    for (let w = 0; w < this.states.length; w++) for (let j = 0; j < this.states[w].p2.length; j++) {
-      const c = this.states[w].cells[row][j], count = c.n + c.failed;
-      if (count < least) { job = [w, row, j]; least = count; }
+    for (let w = 0; w < this.states.length; w++) {
+      const replies = this.states[w].p2.length, weights = this.columns?.[w];
+      for (let j = 0; j < replies; j++) {
+        const c = this.states[w].cells[row][j], count = c.n + c.failed;
+        // Visits relative to the reply's target share: least-visited when no prediction was given.
+        const target = weights ? this.columnFloor / replies + (1 - this.columnFloor) * weights[j] : 1;
+        const score = (count + 1) / Math.max(target, 1e-9);
+        if (score < least) { job = [w, row, j]; least = score; }
+      }
     }
     return job;
   }
 
-  advance(ms, mix) {
+  setColumns(columns) {
+    if (!columns) return;
+    if (!Array.isArray(columns) || columns.length !== this.states.length) throw Error('invalid column weights');
+    this.columns = columns.map((weights, w) => {
+      if (!Array.isArray(weights) || weights.length !== this.states[w].p2.length ||
+          weights.some(x => !Number.isFinite(x) || x < 0)) throw Error('invalid column weights');
+      const total = weights.reduce((a, b) => a + b, 0);
+      return total > 0 ? weights.map(x => x / total) : weights.map(() => 1 / weights.length);
+    });
+  }
+
+  advance(ms, mix, columns) {
     this.rootMix = mix || this.rootMix;
+    this.setColumns(columns);
     const deadline = Date.now() + ms, pending = [];
     while (Date.now() < deadline && !this.certified.length) {
       if (!this.active) {
@@ -274,7 +296,7 @@ class Search {
       horizon_turns: this.maxTurns, prior_weight: this.priorWeight, minimum_reply_trials: this.minimumTrials,
       value_kind: 'bounded-reference-material-utility-v1', calibrated_win_probability: false,
       action_filter: this.actionFilter,
-      unfinished_at_deadline: this.unfinishedAtDeadline,
+      unfinished_at_deadline: this.unfinishedAtDeadline, predicted_columns: this.columns !== null,
       chance_paths: this.chancePaths, immediate_wins: this.certified,
       certificate_scope: 'all discrete chance paths and legal replies in sampled worlds only'};
     return {session: this.id, pending, summary, results: this.states.map(st => ({
@@ -322,7 +344,7 @@ function terminalSearch(req, deps) {
   } else if (!session || session.id !== op.session) throw Error('unknown terminal search session');
   session.feedback(op.feedback);
   if (op.op === 'finish') { const reply = session.finish(); session = null; return reply; }
-  return session.advance(Math.min(1000, Math.max(1, op.sliceMs || 500)), op.mix);
+  return session.advance(Math.min(1000, Math.max(1, op.sliceMs || 500)), op.mix, op.columns);
 }
 
 module.exports = {terminalSearch, immediateWin, Search};

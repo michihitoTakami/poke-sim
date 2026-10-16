@@ -360,7 +360,7 @@ class Advisor:
         """The legacy aggregate or the planner (planned) on the lookahead's worlds; cache keeps the worlds of one
         position (by incoming Pokémon). settings: worker settings for these queries (shadow mode evaluates the
         planner's worlds with its own settings, so it measures the new method as a whole)."""
-        from pokesim.search.planner import plan
+        from pokesim.search.planner import plan, predict
 
         engine = self.engine
         cache = {} if cache is None else cache
@@ -369,8 +369,14 @@ class Advisor:
         def solve(b, own, last, incoming=None):
             key = None if incoming is None else incoming.species
             if key not in cache:
-                extra = ({'value': True, 'log': log, 'our_role': our_role}
-                         if planned and getattr(engine, 'value_model', None) is not None else {})
+                extra = {}
+                if planned and getattr(engine, 'value_model', None) is not None:
+                    # The same opponent prediction the planner uses, so the search examines replies by it.
+                    def predictor(payoff, labels, last=last):
+                        return predict(payoff, labels, engine.opponent_model, last, cloned or None,
+                                       self.planner["cloned_weight"])
+
+                    extra = {'value': True, 'log': log, 'our_role': our_role, 'predictor': predictor}
                 cache[key] = engine.query(b, own, incoming, settings, belief=belief, **extra)
             if planned:
                 advice = plan(

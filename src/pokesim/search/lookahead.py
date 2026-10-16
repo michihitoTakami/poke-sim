@@ -367,11 +367,12 @@ class Lookahead:
 
     def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None,
               search: dict | None = None, belief=None, log=None, our_role='p1', value=False,
-              capture: bool = False) -> list[dict]:
+              capture: bool = False, predictor=None) -> list[dict]:
         """Payoff matrices (our options x the opponent's) for sampled opponent sets. search: settings for this query
         only (as the constructor's). belief: draw the opponent's sets from it (see opponent_side).
         capture: with the terminal search, return the worker request (worlds, observed history, settings) instead
-        of searching, so the exact live position can be replayed later (pokesim.evaluation.positions)."""
+        of searching, so the exact live position can be replayed later (pokesim.evaluation.positions).
+        predictor: the opponent prediction for the terminal search's reply allocation (pokesim.search.terminal)."""
         started = time.monotonic()
         own = self.own_side(battle, own_sets, incoming)
         field = field_state(battle)
@@ -414,7 +415,7 @@ class Lookahead:
 
                 if capture:
                     return request
-                return terminal_search(self, request, started=started)
+                return terminal_search(self, request, started=started, predictor=predictor)
             return self.value_model.apply(self._query(request))
         return self._query(request)["results"]
 
