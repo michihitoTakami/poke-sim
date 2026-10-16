@@ -32,7 +32,9 @@ def load_bundle(path: Path = DEFAULT, scope: DatasetScope | None = None) -> dict
     return json.loads(Path(path).read_text())
 
 
-def build(scope: DatasetScope, out: Path = DEFAULT) -> dict:
+def build(scope: DatasetScope, out: Path = DEFAULT, allow_empty: bool = False) -> dict:
+    """allow_empty: build from the published sets alone when the ledger has no train battles yet (a fresh
+    collection); the bundle is still versioned against the (empty) train split."""
     from pokesim.live.observed import collect
     from pokesim.rl.items import build_priors as item_priors
     from pokesim.rl.myteam import COUNTER_ABILITIES, COUNTER_GROUPS
@@ -40,7 +42,7 @@ def build(scope: DatasetScope, out: Path = DEFAULT) -> dict:
     from pokesim.search.lookahead import SetSampler
 
     records = scope.records("train")
-    if not records:
+    if not records and not allow_empty:
         raise ValueError("no eligible train records")
     engine = SetSampler(["M-6"], observed=collect([r for _, r in records]))
     items, _ = item_priors(engine)
@@ -66,8 +68,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     add_scope_args(parser)
     parser.add_argument("--out", type=Path, default=DEFAULT)
+    parser.add_argument("--allow-empty", action="store_true", help="no train battles yet: published sets only")
     args = parser.parse_args()
-    build(scope_from(args), args.out)
+    build(scope_from(args), args.out, args.allow_empty)
     print(f"train-only priors -> {args.out}")
 
 

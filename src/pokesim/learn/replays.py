@@ -81,8 +81,14 @@ def build(args) -> None:
     paths = [p for i, p in enumerate(paths) if i % shards == shard]
     if args.limit:
         paths = paths[:args.limit]
-    bundle = load_bundle(Path(args.priors))
-    engine = Lookahead(sampler(bundle))
+    if args.priors == 'live':
+        # No frozen train-only bundle (e.g. before any of our own battles exist): the live prior.
+        from pokesim.search.lookahead import SetSampler
+
+        engine = Lookahead(SetSampler(['M-6']))
+    else:
+        bundle = load_bundle(Path(args.priors))
+        engine = Lookahead(sampler(bundle))
     sides = Sides(sampler=engine.sampler)
     out.parent.mkdir(parents=True, exist_ok=True)
     total, skipped_all, started = 0, {}, time.perf_counter()
@@ -107,7 +113,7 @@ def build(args) -> None:
 
     write_metadata(out, {'schema_version': 2, 'rows_schema': SCHEMA, 'rows': total, 'replays': len(paths),
                          'shard': args.shard, 'excluded_own_games': len(excluded), 'skipped': skipped_all,
-                         'prior_sha': file_hash(Path(args.priors)),
+                         'prior_sha': file_hash(Path(args.priors)) if args.priors != 'live' else 'live',
                          'observe_sha': file_hash(ROOT / 'services/sim-tools/observe.js'),
                          'replays_sha': hashlib.sha256('\n'.join(p.name for p in paths).encode()).hexdigest()[:16]})
     print(f'{total} rows from {len(paths)} replays -> {out} (skipped {skipped_all})')

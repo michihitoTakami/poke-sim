@@ -102,7 +102,7 @@ class AdvisorPlayer(TrackedPlayer):
         roster = [s["species"] for s in sets]
         self.policies = {policies[0]: (self.advisor.model, self.advisor.extra)}
         self.calibrations = {policies[0]: self.advisor.calibration}
-        for path in policies[1:]:
+        for path in [p for p in policies[1:] if p]:
             model = MaskablePPO.load(path, device="cpu")
             self.policies[path] = (model, TeamFeatures.for_model(model, roster))
             self.calibrations[path] = self.advisor.calibrations.get("showdown", file_hash(path),
@@ -111,7 +111,7 @@ class AdvisorPlayer(TrackedPlayer):
         self.advice: dict[str, list[dict]] = {}  # battle tag -> per-decision advice
         self.picks, self.matchups = PickModel(), MatchupModel()
         for path in policies:
-            if warning := self.matchups.check(path):
+            if path and (warning := self.matchups.check(path)):
                 print(f"lineup table vs {Path(path).name}:", warning, flush=True)
         self.lineups: dict[str, list[str]] = {}
         self.logs: dict[str, list[str]] = {}  # battle tag -> protocol lines
@@ -330,7 +330,7 @@ class AdvisorPlayer(TrackedPlayer):
                   "preview": {"species": [m.species for m in battle.teampreview_opponent_team]},
                   "lineup": self.lineups.get(battle.battle_tag), "log": log,
                   "advice": self.advice.pop(battle.battle_tag, []),
-                  "policy": Path(self.assigned.get(battle.battle_tag, "")).stem,
+                  "policy": Path(self.assigned.get(battle.battle_tag) or "").stem or "none",
                   "source": f"showdown {battle.battle_tag}", "opponent": battle.opponent_username,
                   "rating": getattr(battle, "rating", None),
                   "versions": describe(self.assigned.get(battle.battle_tag), self.matchups.meta,
@@ -354,7 +354,7 @@ def code_stamp(extra: list[Path] = ()) -> float:
 
 
 def model_files(args) -> list[Path]:
-    files = [Path(p) for p in args.policy] + [Path(args.team), PROCESSED_DIR / "matchup_model.json",
+    files = [Path(p) for p in args.policy if p] + [Path(args.team), PROCESSED_DIR / "matchup_model.json",
                                              PROCESSED_DIR / "pick_rates.json"]
     if args.value_run:
         run = Path(args.value_run)
@@ -374,6 +374,9 @@ def rounded(pairs) -> list:
 
 async def run(args) -> None:
     sets = json.loads(Path(args.team).read_text())
+    # --policy none: no PPO policy at all; the planner's search decides and a failed search plays a random
+    # legal move (recorded as such). Collection can start before any policy is trained.
+    args.policy = [None if p in ("none", "") else p for p in args.policy]
     combine = json.loads(args.combine) if args.combine else None
     planner = None if args.planner == "off" else {"mode": args.planner}
     if planner and args.search:

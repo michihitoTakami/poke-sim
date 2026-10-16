@@ -214,8 +214,14 @@ def build(args) -> None:
     if not records:
         raise ValueError(f'no eligible {args.split} records')
     sets = json.loads(Path(args.team).read_text())
-    bundle = load_bundle(Path(args.priors))
-    engine = Lookahead(sampler(bundle))
+    if args.priors == 'live':
+        # No frozen train-only bundle (e.g. before any of our own battles exist): the live prior.
+        from pokesim.search.lookahead import SetSampler
+
+        engine = Lookahead(SetSampler(['M-6']))
+    else:
+        bundle = load_bundle(Path(args.priors))
+        engine = Lookahead(sampler(bundle))
     own = {engine.sampler.base_id(to_id(s['species'])): s for s in sets}
     out.parent.mkdir(parents=True, exist_ok=True)
     total, skipped_all, started = 0, {}, time.perf_counter()
@@ -238,7 +244,8 @@ def build(args) -> None:
     from pokesim.runtime.bundle import file_hash
 
     write_metadata(out, dict(scope.metadata(args.split), rows=total, battles=len(records), skipped=skipped_all,
-                             rows_schema=SCHEMA, prior_sha=file_hash(Path(args.priors)),
+                             rows_schema=SCHEMA,
+                             prior_sha=file_hash(Path(args.priors)) if args.priors != 'live' else 'live',
                              observe_sha=file_hash(ROOT / 'services/sim-tools/observe.js'),
                              observation_sha=file_hash(ROOT / 'services/sim-tools/public_observation.js'),
                              team=str(args.team)))
