@@ -1,11 +1,11 @@
 .venv/
 __pycache__/
 *.pyc
-external/
-data/raw/
-data/processed/
-data/curated/
-checkpoints/
-runs/
+external
+data/raw
+data/processed
+data/curated
+checkpoints
+runs
 node_modules/
 .env
