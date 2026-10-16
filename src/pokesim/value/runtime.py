@@ -12,10 +12,16 @@ from pokesim.value.model import load_checkpoint
 
 
 class ValueEnsemble:
+    """The value model the search calls on open leaves: either the fixed-reference V_ref run
+    (pokesim.value.train) or a run trained on real game outcomes (pokesim.learn.train_value)."""
+
     def __init__(self, run):
         run = Path(run).resolve()
         report = json.loads((run / 'report.json').read_text())
         cfg = report['provenance']
+        if cfg.get('target') == 'real_outcome':
+            self._load_real(run, report, cfg)
+            return
         data = Path(cfg['settings']['data'])
         meta = json.loads((data / 'manifest.json').read_text())
         if (file_sha(data / 'manifest.json') != cfg['data_manifest_sha'] or
@@ -45,6 +51,34 @@ class ValueEnsemble:
             raise ValueError('empty value ensemble')
         self.version = {'dataset_id': cfg['dataset_id'], 'report_sha': file_sha(run / 'report.json'),
                         'checkpoints': hashes, 'reference': expected, 'run': str(run)}
+
+    def _load_real(self, run, report, cfg):
+        """Runs written by pokesim.learn.train_value hash files with pokesim.runtime.bundle.file_hash."""
+        from pokesim.learn.value_dataset import DEX
+        from pokesim.runtime.bundle import file_hash
+
+        if cfg['feature_code_sha'] != file_hash(Path(__file__).with_name('features.py')):
+            raise ValueError('value features differ from training')
+        if cfg['dex_sha'] != file_hash(DEX):
+            raise ValueError('value dex differs from training')
+        self.encoder = Encoder.load(DEX)
+        self.features = cfg['features']
+        self.models, hashes = [], {}
+        torch.set_num_threads(2)
+        for name, item in report['stages'].items():
+            path = run / item['checkpoint']
+            if path.parent != run or file_hash(path) != item['sha']:
+                raise ValueError('modified value checkpoint')
+            model, saved = load_checkpoint(path)
+            if saved.get('stage') != 'real' or saved['features'] != self.features:
+                raise ValueError('value checkpoint contract mismatch')
+            self.models.append(model)
+            hashes[path.name] = item['sha']
+        if not self.models:
+            raise ValueError('empty value ensemble')
+        self.version = {'dataset_id': cfg['feature_code_sha'][:16], 'report_sha': file_sha(run / 'report.json'),
+                        'checkpoints': hashes, 'reference': {'target': 'real_outcome'}, 'run': str(run),
+                        'feature_version': cfg['feature_version']}
 
     def probabilities(self, observations):
         if not observations:

@@ -95,17 +95,22 @@ def base_label(label: str) -> str:
 
 
 def predict(payoff: np.ndarray, labels: list[str], opponent_model: dict, last_move: str | None,
-            cloned: dict[str, float] | None, cloned_weight: float) -> np.ndarray:
+            cloned: dict[str, float] | None, cloned_weight: float, prior: dict[str, float] | None = None) -> np.ndarray:
     """The opponent's mix in one world, fixed before planning: the search's prediction (equilibrium / softmax best
     response to our equilibrium, see opponent_mix), a share for repeating its last move, then a share for the
-    cloned human policy (its labels have no Mega variants: split over them)."""
+    cloned human policy (its labels have no Mega variants: split over them). prior: a learned opponent policy's
+    probabilities over this world's labels (the worker's p2Prior); when given it takes the cloned policy's share."""
     x, y = solve_zero_sum(payoff)
     q = opponent_mix(payoff, x, y, opponent_model)
     repeat = opponent_model.get("repeat", 0.0)
     if repeat > 0 and last_move in labels:
         q = (1 - repeat) * q
         q[labels.index(last_move)] += repeat
-    if cloned:
+    if prior:
+        learned = np.array([prior.get(lab, 0.0) for lab in labels])
+        if learned.sum() > 0:
+            q = (1 - cloned_weight) * q + cloned_weight * learned / learned.sum()
+    elif cloned:
         bases = [base_label(lab) for lab in labels]
         bc = np.array([cloned.get(b, 0.0) / bases.count(b) for b in bases])
         if bc.sum() > 0:
@@ -115,8 +120,13 @@ def predict(payoff: np.ndarray, labels: list[str], opponent_model: dict, last_mo
 
 def plan(results: list[dict], opponent_model: dict | None = None, last_move: str | None = None,
          rho: float = RHO, cloned: dict[str, float] | None = None, cloned_weight: float = 0.5,
-         pure: bool = False) -> Advice:
+         pure: bool = False, classes: dict[str, str] | None = None, rho_by_class: dict[str, float] | None = None,
+         near: float | None = None, near_tau: float = .02) -> Advice:
     """Advice from the lookahead's sampled worlds with one common mix (see the module docstring).
+    classes / rho_by_class: a class per label (e.g. 'setup') and the worst-case share to use for it in the pure
+    ranking (a set-up move is judged with more weight on the opponent's best reply). near: with pure, the
+    probability is a softmax (temperature near_tau) over the actions within `near` of the best objective instead
+    of one-hot, so a caller that samples does not repeat the same move against the same opponent.
     value[a] is the expected score against the predicted opponent; the opponent dict the predicted mix averaged
     over worlds. Worlds where every branch failed are left out and counted in status."""
     labels = results[0]["p1"]
@@ -142,7 +152,8 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
             continue
         idx = [res["p1"].index(lab) for lab in labels]  # our options are the same in every world
         payoff = payoff[idx]
-        q = predict(payoff, opp, opponent_model or {}, last_move, cloned, cloned_weight)
+        prior = dict(zip(res["p2"], res["p2Prior"], strict=True)) if res.get("p2Prior") else None
+        q = predict(payoff, opp, opponent_model or {}, last_move, cloned, cloned_weight, prior)
         worlds.append(World(payoff, opp, 1.0, q))
         cols = [res["p2"].index(lab) for lab in opp]
         if tree:
@@ -164,11 +175,20 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
     if pure:
         # The caller plays one top move. Rank actual pure-action utilities, not the largest probability of a
         # mixed equilibrium whose protection requires randomizing between ALL of its actions.
-        objective = (1 - rho) * sol.expected + rho * sol.worst
+        rhos = np.array([(rho_by_class or {}).get((classes or {}).get(lab, ''), rho) for lab in labels])
+        objective = (1 - rhos) * sol.expected + rhos * sol.worst
         candidates = np.flatnonzero(objective >= objective.max() - max(1e-9, tie_margin))
         chosen = int(candidates[np.argmax(secondary[candidates])]) if secondary is not None else int(candidates[0])
         sol.prob = np.eye(len(labels))[chosen]
         sol.status.update(solver='pure-robust', objective=float(objective[chosen]))
+        if near is not None and near > 0:
+            close = np.flatnonzero(objective >= objective[chosen] - near)
+            weights = np.exp((objective[close] - objective[chosen]) / max(1e-6, near_tau))
+            sol.prob = np.zeros(len(labels))
+            sol.prob[close] = weights / weights.sum()
+            sol.status.update(solver='pure-near', near=near, near_tau=near_tau, near_actions=int(len(close)))
+        if rho_by_class:
+            sol.status['rho_by_class'] = {lab: float(r) for lab, r in zip(labels, rhos) if r != rho}
     opponent: dict[str, float] = {}
     for wd in worlds:
         for lab, p in zip(wd.opponent, wd.predicted):

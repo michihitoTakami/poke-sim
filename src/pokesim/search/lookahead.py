@@ -263,6 +263,57 @@ def field_state(battle: Battle) -> dict:
     return out
 
 
+class Worker:
+    """One Node search worker process (services/sim-tools/lookahead.js): one request line, one reply line."""
+
+    def __init__(self):
+        self.proc: subprocess.Popen | None = None
+        self.start()
+
+    def start(self) -> None:
+        self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
+                                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
+
+    def alive(self) -> bool:
+        return self.proc is not None and self.proc.poll() is None
+
+    def kill(self) -> None:
+        if self.proc is not None:
+            self.proc.kill()
+            self.proc.wait(timeout=5)
+
+    def send(self, request: dict) -> None:
+        if not self.alive():
+            self.start()
+        self.proc.stdin.write(json.dumps(request) + "\n")
+        self.proc.stdin.flush()
+
+    def recv(self, timeout: float) -> dict:
+        """The next reply within `timeout` seconds; a late or dead worker is killed (it restarts on the next send)."""
+        deadline = time.monotonic() + timeout
+        chunks = []
+        while True:
+            remaining = deadline - time.monotonic()
+            ready, _, _ = io_select.select([self.proc.stdout], [], [], max(0, remaining))
+            if not ready or remaining <= 0:
+                self.kill()
+                raise TimeoutError('search worker exceeded response deadline')
+            part = os.read(self.proc.stdout.fileno(), 65536)
+            if not part:
+                raise RuntimeError('search worker exited before replying')
+            chunks.append(part)
+            if b'\n' in part:
+                break
+        reply = json.loads(b''.join(chunks))
+        if "error" in reply:
+            raise RuntimeError(reply["error"])
+        return reply
+
+    def query(self, request: dict, timeout: float) -> dict:
+        self.send(request)
+        return self.recv(timeout)
+
+
 class Lookahead:
     """Runs the Node lookahead worker and turns battles into recommendations."""
 
@@ -276,38 +327,31 @@ class Lookahead:
         self.search = dict(search or {})
         self.value_model = value_model
         self.opponent_model = opponent_model or {}
-        self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
-                                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
+        self.worker = Worker()
+        self.extra_workers: list[Worker] = []  # started on demand by pool() for the parallel terminal search
+
+    @property
+    def proc(self):
+        return self.worker.proc
+
+    @proc.setter
+    def proc(self, value):  # tests substitute the worker process
+        self.worker = Worker.__new__(Worker)
+        self.worker.proc = value
+        self.extra_workers = []
 
     def close(self) -> None:
-        self.proc.kill()
-        self.proc.wait(timeout=5)
+        for worker in [self.worker, *self.extra_workers]:
+            worker.kill()
+
+    def pool(self, n: int) -> list[Worker]:
+        """n workers (the main one first); extra ones are started once and kept for later decisions."""
+        while len(self.extra_workers) < n - 1:
+            self.extra_workers.append(Worker())
+        return [self.worker, *self.extra_workers[:max(0, n - 1)]]
 
     def _query(self, request: dict) -> dict:
-        if self.proc.poll() is not None:
-            self.proc = subprocess.Popen(["node", str(ROOT / "services/sim-tools/lookahead.js"), str(SHOWDOWN_DIR)],
-                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
-        self.proc.stdin.write(json.dumps(request) + "\n")
-        self.proc.stdin.flush()
-        deadline = time.monotonic() + getattr(self, 'query_timeout', 30.)
-        chunks = []
-        while True:
-            remaining = deadline - time.monotonic()
-            ready, _, _ = io_select.select([self.proc.stdout], [], [], max(0, remaining))
-            if not ready or remaining <= 0:
-                self.proc.kill()
-                self.proc.wait(timeout=5)
-                raise TimeoutError('search worker exceeded response deadline')
-            part = os.read(self.proc.stdout.fileno(), 65536)
-            if not part:
-                raise RuntimeError('search worker exited before replying')
-            chunks.append(part)
-            if b'\n' in part:
-                break
-        reply = json.loads(b''.join(chunks))
-        if "error" in reply:
-            raise RuntimeError(reply["error"])
-        return reply
+        return self.worker.query(request, getattr(self, 'query_timeout', 30.))
 
     def own_side(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None) -> dict:
         """Keep the outgoing active first; the worker executes incoming's actual switch-in transition."""
@@ -372,11 +416,12 @@ class Lookahead:
 
     def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None,
               search: dict | None = None, belief=None, log=None, our_role='p1', value=False,
-              capture: bool = False) -> list[dict]:
+              capture: bool = False, predictor=None) -> list[dict]:
         """Payoff matrices (our options x the opponent's) for sampled opponent sets. search: settings for this query
         only (as the constructor's). belief: draw the opponent's sets from it (see opponent_side).
         capture: with the terminal search, return the worker request (worlds, observed history, settings) instead
-        of searching, so the exact live position can be replayed later (pokesim.evaluation.positions)."""
+        of searching, so the exact live position can be replayed later (pokesim.evaluation.positions).
+        predictor: the opponent prediction for the terminal search's reply allocation (pokesim.search.terminal)."""
         started = time.monotonic()
         own = self.own_side(battle, own_sets, incoming)
         field = field_state(battle)
@@ -419,7 +464,7 @@ class Lookahead:
 
                 if capture:
                     return request
-                return terminal_search(self, request, started=started)
+                return terminal_search(self, request, started=started, predictor=predictor)
             return self.value_model.apply(self._query(request))
         return self._query(request)["results"]
 

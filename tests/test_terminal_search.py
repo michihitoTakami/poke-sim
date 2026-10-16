@@ -222,3 +222,149 @@ console.log(JSON.stringify({paused,pending:pending.length,censored:final.summary
                          capture_output=True, check=True, timeout=10)
     assert json.loads(out.stdout) == {'paused': True, 'pending': 0, 'censored': 0,
                                      'terminal': 0, 'unfinished': 1, 'scored': 0}
+
+
+def cell_values(prior_visits, rollout_policies=None):
+    js = r"""
+const fs=require('fs'),vm=require('vm');
+const sandbox={__dirname:process.cwd()+'/services/sim-tools',
+ require:n=>n==='readline'?{createInterface:()=>({on:()=>{}})}:require(n),
+ process:{argv:['node','worker',process.argv[1]]},module:{exports:{}}};
+vm.runInNewContext(fs.readFileSync('./services/sim-tools/lookahead.js','utf8')+
+ '\nmodule.exports={setUp,step,choices,State,extractChannelMessages};',sandbox);
+const d=sandbox.module.exports, opts=JSON.parse(process.argv[2]);
+const req={...JSON.parse(fs.readFileSync('./tests/fixtures/terminal-moonblast-turn14.json')),...opts};
+const {Search}=require('./services/sim-tools/terminal_search');
+const s=new Search(req,d), cell=s.states[0].cells[0][0];
+cell.prior=.6; cell.priorSpeed=.2;
+const before=s.reply().results[0];
+cell.n=1; cell.sum=-1; cell.speed=0; cell.ends=1;
+const after=s.reply().results[0];
+console.log(JSON.stringify({before:before.payoff[0][0],after:after.payoff[0][0],speed:after.winSpeed[0][0],
+ stats:after.stats[0][0],version:s.policyVersion,policies:s.rolloutPolicies}));
+"""
+    opts = {'priorVisits': prior_visits}
+    if rollout_policies is not None:
+        opts['rolloutPolicies'] = rollout_policies
+    out = subprocess.run(['node', '-e', js, str(SHOWDOWN_DIR), json.dumps(opts)], cwd=ROOT, text=True,
+                         capture_output=True, check=True, timeout=20)
+    return json.loads(out.stdout)
+
+
+def test_the_value_bootstrap_keeps_its_weight_against_a_single_rollout_only_when_asked():
+    plain = cell_values(0)
+    assert plain['before'] == pytest.approx(.6) and plain['after'] == pytest.approx(-1)
+    assert plain['stats'] == {'n': 1, 'sum': -1, 'sumSq': 0, 'prior': .6, 'speed': 0, 'priorSpeed': .2, 'ends': 1,
+                              'failed': 0}
+    assert plain['policies'] == {'p1': ['expert'], 'p2': ['disrupt', 'tactical']}
+    assert plain['version'] == 'public-baton-v1'
+    blended = cell_values(4, {'p2': ['disrupt', 'tactical', 'expert']})
+    assert blended['before'] == pytest.approx(.6)
+    assert blended['after'] == pytest.approx((4 * .6 - 1) / 5)
+    assert blended['speed'] == pytest.approx(4 * .2 / 5)
+    assert blended['policies'] == {'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']}
+    assert blended['version'] == 'public-baton-v1+p1:expert/p2:disrupt,tactical,expert'
+    with pytest.raises(subprocess.CalledProcessError):
+        cell_values(0, {'p2': ['random']})
+
+
+def test_predicted_replies_get_more_trials_while_a_floor_keeps_the_others_examined():
+    js = r"""
+const fs=require('fs'),vm=require('vm');
+const sandbox={__dirname:process.cwd()+'/services/sim-tools',
+ require:n=>n==='readline'?{createInterface:()=>({on:()=>{}})}:require(n),
+ process:{argv:['node','worker',process.argv[1]]},module:{exports:{}}};
+vm.runInNewContext(fs.readFileSync('./services/sim-tools/lookahead.js','utf8')+
+ '\nmodule.exports={setUp,step,choices,State,extractChannelMessages};',sandbox);
+const d=sandbox.module.exports;
+const req={...JSON.parse(fs.readFileSync('./tests/fixtures/terminal-moonblast-turn14.json')),columnFloor:.2};
+const {Search}=require('./services/sim-tools/terminal_search');
+const s=new Search(req,d); s.rootMix=s.states[0].p1.map((_,i)=>i===0?1e6:0); s.minimumTrials=0;
+const replies=s.states[0].p2.length, weights=s.states.map(st=>st.p2.map((_,j)=>j===0?1:0));
+const count=(n)=>{const c={};for(let k=0;k<n;k++){const [w,i,j]=s.pickJob();s.states[w].cells[i][j].n++;
+ c[j]=(c[j]||0)+1;}return c;};
+const uniform=count(replies*10);
+for(const st of s.states) for(const row of st.cells) for(const c of row) c.n=0;
+s.setColumns(weights);
+const weighted=count(replies*25);
+let bad=false; try{s.setColumns([[1]]);}catch(e){bad=true;}
+console.log(JSON.stringify({replies,uniform,weighted,bad}));
+"""
+    out = subprocess.run(['node', '-e', js, str(SHOWDOWN_DIR)], cwd=ROOT, text=True,
+                         capture_output=True, check=True, timeout=20)
+    r = json.loads(out.stdout)
+    replies = r['replies']
+    assert replies >= 2
+    assert max(r['uniform'].values()) - min(r['uniform'].values()) <= 1  # evenly covered without a prediction
+    predicted, others = r['weighted']['0'], [v for k, v in r['weighted'].items() if k != '0']
+    assert predicted > 2 * max(others)  # the predicted reply gets most of the budget
+    assert min(others) >= 1  # the floor keeps every reply examined
+    assert r['bad']
+
+
+def test_column_weights_follow_the_worker_order_and_zero_dropped_replies():
+    from pokesim.search.terminal import column_weights
+
+    results = [{'p1': ['a'], 'p2': ['x', 'y', 'z'], 'payoff': [[.5, None, -.5]]},
+               {'p1': ['a'], 'p2': ['x', 'y'], 'payoff': [[None, None]]}]
+    seen = []
+
+    def predictor(payoff, labels):
+        seen.append(labels)
+        return np.array([.25, .75])
+
+    weights = column_weights(results, predictor)
+    assert seen == [['x', 'z']]
+    assert weights == [[.25, 0., .75], [1., 1.]]
+
+
+def reply_with(stats, ready=True, sims=10, wins=()):
+    cells = [[dict(n=n, sum=s, prior=p, speed=sp, priorSpeed=.1, ends=n, failed=f) for n, s, p, sp, f in row]
+             for row in stats]
+    return {'session': 'x', 'pending': [],
+            'summary': {'ready': ready, 'simulations': sims, 'terminal': sims, 'learned': 1, 'censored': 0,
+                        'failed': 0, 'unfinished_at_deadline': 1, 'chance_paths': 0, 'tree_nodes': 5,
+                        'max_tree_decisions': 2, 'max_rollout_turns': 7, 'errors': [], 'immediate_wins': list(wins)},
+            'results': [{'p1': ['a', 'b'], 'p2': ['x'], 'stats': cells, 'payoff': [[0], [0]], 'winSpeed': [[0], [0]],
+                         'visits': [[0], [0]], 'invalid': [[0], [0]]}]}
+
+
+def test_worker_replies_pool_rollouts_average_bootstraps_and_keep_certificates():
+    from pokesim.search.terminal import merge_replies
+
+    first = reply_with([[(3, 1., .6, .3, 0)], [(0, 0., .2, 0., 1)]], sims=10, wins=['b'])
+    second = reply_with([[(1, -1., .4, 0., 0)], [(2, 2., None, .5, 0)]], sims=20)
+    merged = merge_replies([first, second], prior_visits=4)
+    world = merged['results'][0]
+    # cell a/x: prior mean .5 with 4 pseudo visits, rollouts (3 + 1) summing to 0
+    assert world['payoff'][0][0] == pytest.approx((4 * .5 + 0) / (4 + 4))
+    assert world['winSpeed'][0][0] == pytest.approx((4 * .1 + .3) / 8)
+    assert world['visits'][0][0] == 4 and world['invalid'][1][0] == 1
+    # cell b/x: certified by the first worker outranks its rollouts
+    assert world['payoff'][1][0] == 1
+    assert world['stats'][1][0] == {'n': 2, 'sum': 2., 'sumSq': 0., 'prior': .2, 'speed': .5, 'priorSpeed': .1,
+                                     'ends': 2, 'failed': 1}
+    assert world['uncertainty'][0][0] is not None and world['uncertainty'][0][0] >= 0
+    s = merged['summary']
+    assert s['simulations'] == 30 and s['unfinished_at_deadline'] == 2 and s['workers'] == 2
+    assert s['worker_simulations'] == [10, 20] and s['immediate_wins'] == ['b'] and s['ready']
+    assert not merge_replies([first, reply_with([[(0, 0, .5, 0, 0)], [(0, 0, .5, 0, 0)]], ready=False)],
+                             0)['summary']['ready']
+
+
+def test_two_workers_search_the_same_position_on_different_streams():
+    req = json.loads((Path(__file__).parent / 'fixtures/terminal-moonblast-turn14.json').read_text())
+    req.update(decisionMs=3000, workers=2, priorVisits=4)
+    engine = Lookahead(None, value_model=FlatValue())
+    try:
+        result = search(engine, req)
+        assert len(engine.extra_workers) == 1
+        advice = plan(result, rho=.3)
+    finally:
+        engine.close()
+    summary = advice.status['terminal_search']
+    assert summary['workers'] == 2 and summary['workers_failed'] == []
+    assert len(summary['worker_simulations']) == 2 and min(summary['worker_simulations']) > 0
+    assert summary['simulations'] == sum(summary['worker_simulations'])
+    assert advice.ranked()[0][0] == 'move:moonblast'
+    assert all(np.isfinite(np.asarray(r['payoff'], float)).all() for r in result)

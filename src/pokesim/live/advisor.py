@@ -15,6 +15,7 @@ policy only as the fallback. A forced switch is searched too (each Pokémon we c
 starts), and a failed search falls back to the policy (Suggestion.status["fallback"]).
 """
 
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -146,9 +147,17 @@ class Advisor:
                 raise ValueError('value-run requires lookahead and planner on/shadow')
             value_model = ValueEnsemble(value_run)
             requested = (planner or {}).get('search', {})
+            # priorVisits / rolloutPolicies: see services/sim-tools/terminal_search.js. The V_ref bootstrap of a
+            # root cell keeps the weight of 4 rollouts, and the opponent's rollouts rotate over the scripted
+            # disrupt / tactical foes and the same expert policy we use (symmetric rollouts).
+            # workers: Node processes searching the same worlds on independent random streams
+            # (POKESIM_SEARCH_WORKERS, default 4; about 400 MB each).
             self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=8500,
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
-                                          lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1')
+                                          lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1',
+                                          priorVisits=4,
+                                          rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']},
+                                          workers=int(os.environ.get('POKESIM_SEARCH_WORKERS', 4)))
             self.planner['search'].update({k: v for k, v in requested.items()
                                           if k not in ('plans', 'continuations', 'tiebreak', 'lostPathPenalty')})
             self.planner['search']['value_model'] = value_model.version
@@ -192,7 +201,17 @@ class Advisor:
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
         self.opponent_policy = None
         self.opponent_policy_version: dict | None = None  # which cloned policy predicted the opponent (records)
-        if opponent_policy:
+        if isinstance(opponent_policy, str) and opponent_policy.startswith("net:"):
+            # A learned public policy (pokesim.learn) run inside the worker: tree priors, rollouts and the root
+            # prediction's learned share (planner.predict). The cloned PPO policy is not loaded.
+            net = Path(opponent_policy[4:])
+            if not net.exists():
+                raise FileNotFoundError(f"opponent policy net not found: {net}")
+            if not self.planner or not self.planner["search"].get("terminalSearch"):
+                raise ValueError("an opponent policy net needs the terminal search (planner on with a value run)")
+            self.planner["search"].setdefault("policyNets", {})["opp"] = str(net.resolve())
+            self.opponent_policy_version = {"path": net.name, "sha": file_hash(net), "kind": "net"}
+        elif opponent_policy:
             from pokesim.live.opponent import DEFAULT_POLICY, OpponentPolicy
 
             path = DEFAULT_POLICY if opponent_policy == "default" else Path(opponent_policy)
@@ -355,7 +374,7 @@ class Advisor:
         """The legacy aggregate or the planner (planned) on the lookahead's worlds; cache keeps the worlds of one
         position (by incoming Pokémon). settings: worker settings for these queries (shadow mode evaluates the
         planner's worlds with its own settings, so it measures the new method as a whole)."""
-        from pokesim.search.planner import plan
+        from pokesim.search.planner import plan, predict
 
         engine = self.engine
         cache = {} if cache is None else cache
@@ -364,8 +383,14 @@ class Advisor:
         def solve(b, own, last, incoming=None):
             key = None if incoming is None else incoming.species
             if key not in cache:
-                extra = ({'value': True, 'log': log, 'our_role': our_role}
-                         if planned and getattr(engine, 'value_model', None) is not None else {})
+                extra = {}
+                if planned and getattr(engine, 'value_model', None) is not None:
+                    # The same opponent prediction the planner uses, so the search examines replies by it.
+                    def predictor(payoff, labels, prior=None, last=last):
+                        return predict(payoff, labels, engine.opponent_model, last, cloned or None,
+                                       self.planner["cloned_weight"], prior)
+
+                    extra = {'value': True, 'log': log, 'our_role': our_role, 'predictor': predictor}
                 cache[key] = engine.query(b, own, incoming, settings, belief=belief, **extra)
             if planned:
                 advice = plan(
@@ -375,7 +400,10 @@ class Advisor:
                     self.planner["rho"],
                     cloned or None,
                     self.planner["cloned_weight"],
-                    pure=not self.sample,
+                    pure=not self.sample or self.planner.get("near") is not None,
+                    classes=action_classes(b) if self.planner.get("rho_by_class") else None,
+                    rho_by_class=self.planner.get("rho_by_class"),
+                    near=self.planner.get("near"),
                 )
                 values = [res['value_status'] for res in cache[key] if 'value_status' in res]
                 if values:
@@ -440,6 +468,21 @@ def action_evaluations(status: dict, selected: str | None = None) -> list[dict]:
                 for label in search['terminal_search']['immediate_wins']]
     excluded = search.get('terminal_search', {}).get('action_filter', {}).get('excluded', [])
     return rows + [dict(row, utility=None, worst=None, expected=None, gap=None, excluded=True) for row in excluded]
+
+
+def action_classes(battle: Battle) -> dict[str, str]:
+    """'setup' for the active's moves that raise its own stats or Baton Pass (and their Mega variants)."""
+    from poke_env.battle import Target
+
+    mon = battle.active_pokemon
+    if mon is None:
+        return {}
+    out = {}
+    for m in mon.moves.values():
+        if m.id == "batonpass" or (m.target == Target.SELF and m.boosts and any(v > 0 for v in m.boosts.values())):
+            out[f"move:{m.id}"] = "setup"
+            out[f"move:{m.id}:mega"] = "setup"
+    return out
 
 
 def can_set_up(mon) -> bool:

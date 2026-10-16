@@ -10,11 +10,12 @@
   # local test against a random player
   uv run python scripts/ladder.py --local --battles 2
 
-Team preview: the lineup ranked best by the matchup model for the opponent's 6. Each turn: the advisor's top
-legal action, or with --sample an action drawn from its distribution (the seed and the chosen action's probability
-are saved: a mixed strategy played as argmax is no longer mixed). --planner shadow|on runs the common-strategy
-planner (pokesim.search.planner) next to / instead of the current advice. Each record says which code, policy and
-lineup table played (pokesim.runtime.bundle).
+Team preview: a lineup drawn from the posterior of this roster's own rated results against the opponent's 6
+(pokesim.live.selection.LadderLineupModel; --lineup matchup: the simulated matchup table instead). Each turn: the
+advisor's top legal action, or with --sample an action drawn from its distribution (the seed and the chosen
+action's probability are saved: a mixed strategy played as argmax is no longer mixed). --planner shadow|on runs
+the common-strategy planner (pokesim.search.planner) next to / instead of the current advice. Each record says
+which code, policy and lineup model played (pokesim.runtime.bundle).
 Records go to data/raw/ladder/<time>.json in the format of data/raw/live/logs (opponent preview, lineup, protocol
 log, result), so pokesim.live.observed and scripts/eval_records.py can use them.
 Showdown is not the Switch game: mechanics follow Showdown's Champions format and opponents are Showdown players.
@@ -35,9 +36,9 @@ from poke_env.environment import SinglesEnv
 from poke_env.player import RandomPlayer
 from sb3_contrib import MaskablePPO
 
-from pokesim.config import FORMAT, RAW_DIR, ROOT
+from pokesim.config import FORMAT, PROCESSED_DIR, RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor
-from pokesim.live.selection import MatchupModel, PickModel
+from pokesim.live.selection import LadderLineupModel, MatchupModel, PickModel
 from pokesim.rl.bc import CounterPickHeuristic
 from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, to_id
 from pokesim.rl.opponents import LeaguePlayer
@@ -50,13 +51,16 @@ OUT = RAW_DIR / "ladder"
 CREDENTIALS = Path.home() / ".config" / "poke-sim" / "showdown.env"
 
 
-def search_quality_issues(status: dict, elapsed: float) -> list[str]:
+def search_quality_issues(status: dict, elapsed: float, expected_nets: dict | None = None) -> list[str]:
     """Deployment gate for terminal search; failures must not silently become another collection batch."""
     issues = []
     if status.get('fallback'):
         issues.append('search fallback')
-    if status.get('search', {}).get('terminal_search', {}).get('failed', 0):
+    tree = status.get('search', {}).get('terminal_search', {})
+    if tree.get('failed', 0):
         issues.append('simulation failed')
+    if expected_nets and tree and set(expected_nets) - set(tree.get('policy_nets') or {}):
+        issues.append('policy net missing')
     if elapsed > 10:
         issues.append('decision exceeded 10 seconds')
     return issues
@@ -79,8 +83,15 @@ class AdvisorPlayer(TrackedPlayer):
 
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
                  planner: dict | None = None, sample: bool = False, seed: int | None = None,
-                 opponent_policy: str = "default", belief: bool = True, value_run=None, **kwargs):
+                 opponent_policy: str = "default", belief: bool = True, value_run=None, lineup: str = "ladder",
+                 **kwargs):
+        """lineup: "matchup" ranks lineups by the simulated table shrunk towards recent ladder results;
+        "ladder" draws them from the posterior of this roster's own rated results (LadderLineupModel)."""
         self.sets, self.out = sets, out
+        if lineup not in ("matchup", "ladder"):
+            raise ValueError(f"unknown lineup method {lineup}")
+        self.lineup_method = lineup
+        self.selection: dict[str, dict] = {}  # battle tag -> how the lineup was chosen
         self.belief = belief
         self.advisor = Advisor(sets, policy=policies[0], combine=combine, planner=planner,
                                source="showdown", sample=sample, opponent_policy=opponent_policy,
@@ -108,9 +119,11 @@ class AdvisorPlayer(TrackedPlayer):
         self.quality_issues: list[str] = []
         self.sent_requests: dict[str, tuple] = {}
         self.retried_requests: dict[str, tuple] = {}
+        self.last_activity = time.monotonic()  # last battle message: the inactivity timeout in run() watches it
         super().__init__(team=FixedTeam(sets), **kwargs)
 
     async def _handle_battle_message(self, split_messages):
+        self.last_activity = time.monotonic()
         tag = split_messages[0][0].lstrip(">").strip() if split_messages and split_messages[0] else ""
         # Append only the prefix already processed. A request inside a packet must not see later events.
         for message in split_messages[1:]:
@@ -209,9 +222,18 @@ class AdvisorPlayer(TrackedPlayer):
                   f'{self.advisor.engine.value_model.version["dataset_id"][:12]}', flush=True)
         opp = [m.species for m in battle.teampreview_opponent_team]
         roster = [s["species"] for s in self.sets]
-        self.matchups.observe_ladder(self.out, roster)
-        ranking = self.matchups.rank(roster, self.picks.predict(opp))
-        lineup = ranking[0][0] if ranking else [s["species"] for s in self.sets[:3]]
+        picks = self.picks.predict(opp)
+        # Lineup evidence is this roster's rated ladder history (OUT), also when records go elsewhere (--out,
+        # local games); unrated local games never count.
+        if self.lineup_method == "ladder":
+            model = LadderLineupModel.from_records(OUT, roster)
+            lineup, info = model.choose(roster, self.rng, self.matchups, picks)
+            self.selection[battle.battle_tag] = info
+        else:
+            self.matchups.observe_ladder(OUT, roster)
+            ranking = self.matchups.rank(roster, picks)
+            lineup = ranking[0][0] if ranking else [s["species"] for s in self.sets[:3]]
+            self.selection[battle.battle_tag] = {"method": "matchup", "win_prob": ranking[0][1] if ranking else None}
         self.lineups[battle.battle_tag] = lineup
         order = [next(i for i, s in enumerate(self.sets) if to_id(s["species"]) == to_id(x)) for x in lineup]
         order += [i for i in range(len(self.sets)) if i not in order]
@@ -269,7 +291,8 @@ class AdvisorPlayer(TrackedPlayer):
             entry['evaluations'] = advice.evaluations
             entry['win_kind'] = advice.win_kind
             if self.advisor.engine is not None and self.advisor.engine.value_model is not None:
-                self.record_quality(battle, entry, search_quality_issues(advice.status, advice.elapsed))
+                nets = ((getattr(self, 'planner', None) or {}).get('search') or {}).get('policyNets')
+                self.record_quality(battle, entry, search_quality_issues(advice.status, advice.elapsed, nets))
             if advice.shadow:
                 entry["shadow"] = [(lab, round(p, 3), round(v, 3)) for lab, p, v in advice.shadow[:5]]
             legal = [(label, p, a) for label, p in advice.actions
@@ -313,18 +336,36 @@ class AdvisorPlayer(TrackedPlayer):
                   "versions": describe(self.assigned.get(battle.battle_tag), self.matchups.meta,
                                        planner=self.planner, sample=self.sample, seed=self.seed,
                                        opponent_policy=self.advisor.opponent_policy_version, belief=self.belief,
-                                       calibration_context=self.advisor.calibration_context)}
+                                       calibration_context=self.advisor.calibration_context,
+                                       selection=self.selection.pop(battle.battle_tag, None))}
         (self.out / f"{stamp}-{battle.battle_tag.split('-')[-1]}.json").write_text(
             json.dumps(record, ensure_ascii=False, indent=1))
         print(f"{battle.battle_tag}: {record['result']} vs {battle.opponent_username} [{record['policy']}]  "
               f"({self.n_won_battles}-{self.n_lost_battles})", flush=True)
 
 
-def code_stamp() -> float:
-    """Latest modification time of the code, the sim scripts and the priors the advisor reads."""
+def code_stamp(extra: list[Path] = ()) -> float:
+    """Latest modification time of the code, the sim scripts, the priors the advisor reads and the model files
+    in use (extra: policies, the value run, the opponent policy, the team), so a new model is picked up between
+    battles. Not whole checkpoint or run directories: training writes there while the collector plays."""
     paths = [*(ROOT / "src").rglob("*.py"), *(ROOT / "services" / "sim-tools").glob("*.js"), Path(__file__),
-             *(ROOT / "data" / "processed").glob("*_priors*.json")]
+             *(ROOT / "data" / "processed").glob("*_priors*.json"), *map(Path, extra)]
     return max((p.stat().st_mtime for p in paths if p.exists()), default=0.0)
+
+
+def model_files(args) -> list[Path]:
+    files = [Path(p) for p in args.policy] + [Path(args.team), PROCESSED_DIR / "matchup_model.json",
+                                             PROCESSED_DIR / "pick_rates.json"]
+    if args.value_run:
+        run = Path(args.value_run)
+        files += [run / "report.json", *run.glob("*.pt")]
+    if args.opponent_policy and args.opponent_policy != "default":
+        files.append(Path(args.opponent_policy.removeprefix("net:")))
+    else:
+        from pokesim.live.opponent import DEFAULT_POLICY
+
+        files.append(DEFAULT_POLICY)
+    return files
 
 
 def rounded(pairs) -> list:
@@ -337,8 +378,13 @@ async def run(args) -> None:
     planner = None if args.planner == "off" else {"mode": args.planner}
     if planner and args.search:
         planner["search"] = json.loads(args.search)
+    if planner and args.rho_setup is not None:
+        planner["rho_by_class"] = {"setup": args.rho_setup}
+    if planner and args.near is not None:
+        planner["near"] = args.near
     play = {"combine": combine, "planner": planner, "sample": args.sample, "seed": args.seed,
-            "opponent_policy": args.opponent_policy, "belief": args.belief, "value_run": args.value_run}
+            "opponent_policy": args.opponent_policy, "belief": args.belief, "value_run": args.value_run,
+            "lineup": args.lineup}
     if args.local:
         tag = uuid.uuid4().hex[:6]
         me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
@@ -368,14 +414,23 @@ async def run(args) -> None:
                        account_configuration=AccountConfiguration(*cred),
                        server_configuration=ShowdownServerConfiguration, max_concurrent_battles=1,
                        start_timer_on_battle_start=True)
-    stamp = code_stamp()
+    watched = model_files(args)
+    stamp = code_stamp(watched)
     for _ in range(args.battles):
-        await asyncio.wait_for(me.ladder(1), timeout=args.battle_timeout)
+        # A long battle is fine (60 decisions of 8 s take over 10 minutes); a silent connection is not.
+        task = asyncio.ensure_future(me.ladder(1))
+        me.last_activity = time.monotonic()
+        while not task.done():
+            await asyncio.wait({task}, timeout=15)
+            if not task.done() and time.monotonic() - me.last_activity > args.battle_timeout:
+                task.cancel()
+                raise TimeoutError(f'no battle message for {args.battle_timeout:.0f} seconds')
+        task.result()
         if me.quality_issues:
             print('terminal search quality gate: stop after this battle: ' +
                   ', '.join(sorted(set(me.quality_issues))), flush=True)
             raise SystemExit(78)
-        if code_stamp() != stamp:  # code or priors changed: exit between battles so the caller restarts us
+        if code_stamp(watched) != stamp:  # code, priors or models changed: exit so the caller restarts us
             print("code changed: exiting to reload", flush=True)
             break
     print(f"done: {me.n_won_battles}-{me.n_lost_battles}")
@@ -386,12 +441,14 @@ def main() -> None:
     ap.add_argument("--battles", type=int, default=30)
     ap.add_argument("--team", default=str(ROOT / "data/my_teams/baton.json"))
     ap.add_argument("--opponent-policy", default="default",
-                    help="cloned human policy for the opponent prediction (default: checkpoints/bc_human.zip)")
+                    help="cloned human policy for the opponent prediction (default: checkpoints/bc_human.zip), or "
+                         "net:<exported policy json> for a learned public policy inside the search")
     ap.add_argument("--belief", action=argparse.BooleanOptionalAction, default=True,
                     help="infer opponent sets from damage and move order (default on; --no-belief disables)")
     ap.add_argument('--value-run', type=Path, help='validated terminal-value run; requires planner on/shadow')
     ap.add_argument('--battle-timeout', type=float, default=600,
-                    help='restart after a stuck public battle/network connection (seconds)')
+                    help='restart when no battle message arrives for this long (seconds); a long battle itself '
+                         'is not interrupted')
     ap.add_argument("--policy", nargs="+", default=[str(ROOT / "checkpoints/ppo_baton_v2.zip")],
                     help="one or more policies; with several, battles alternate between them")
     ap.add_argument("--out", default=str(OUT))
@@ -403,6 +460,13 @@ def main() -> None:
                     help="common-strategy planner: shadow records it next to the current advice, on plays it")
     ap.add_argument("--search", help='JSON overriding the planner\'s worker settings (PLANNER_SEARCH), e.g. '
                                       '\'{"continuations": ["expert/tactical", "expert/disrupt"]}\'')
+    ap.add_argument("--lineup", choices=["matchup", "ladder"], default="ladder",
+                    help="team preview: the simulated matchup table shrunk to ladder results, or the posterior of "
+                         "this roster's own ladder results with Thompson sampling (pokesim.live.selection)")
+    ap.add_argument("--rho-setup", type=float, default=None,
+                    help="worst-case share for set-up moves in the planner's ranking (default: the planner's rho)")
+    ap.add_argument("--near", type=float, default=None,
+                    help="with --sample: draw among actions within this objective margin of the best (softmax)")
     ap.add_argument("--sample", action="store_true", help="draw the action from the advice instead of its top")
     ap.add_argument("--seed", type=int, help="seed for --sample (default: random, saved in each record)")
     asyncio.run(run(ap.parse_args()))

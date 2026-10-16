@@ -11,7 +11,7 @@ def test_expected_best():
 def test_effects_block():
     from poke_env.battle import Effect, Pokemon
 
-    from pokesim.rl.threats import N_OWN, N_OPP, SIZE, ThreatFeatures
+    from pokesim.rl.threats import N_OPP, N_OWN, SIZE, ThreatFeatures
 
     mon = Pokemon(gen=9, species="umbreon")
     mon._effects = {Effect.CURSE: 1, Effect.PERISH2: 1}
