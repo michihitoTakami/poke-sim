@@ -236,8 +236,8 @@ def predictor_of(fixture: dict):
 
     meta = fixture['meta']
 
-    def predictor(payoff, labels):
-        return predict(payoff, labels, OPPONENT_MODEL, meta.get('last_move'), meta.get('cloned') or None, .5)
+    def predictor(payoff, labels, prior=None):
+        return predict(payoff, labels, OPPONENT_MODEL, meta.get('last_move'), meta.get('cloned') or None, .5, prior)
     return predictor
 
 

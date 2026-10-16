@@ -173,7 +173,7 @@ def main() -> None:
         'train': [{'path': p, 'sha': file_hash(Path(p))} for p in args.train],
         'dev': [{'path': p, 'sha': file_hash(Path(p))} for p in args.dev],
         'pretrain': [{'path': p, 'sha': file_hash(Path(p))} for p in args.pretrain],
-        'settings': vars(args), 'torch': torch.__version__, 'device': str(device)},
+        'settings': vars(args), 'torch': str(torch.__version__), 'device': str(device)},
         'rows': {'train': int(len(train['target'])), 'dev': int(len(dev['target'])),
                  'pretrain': int(len(pretrain['target'])) if pretrain else 0},
         'battles': {'train': int(len(set(train['group']))), 'dev': int(len(set(dev['group'])))},
