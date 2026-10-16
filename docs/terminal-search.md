@@ -88,3 +88,25 @@ uv run python scripts/ladder.py --local --local-opponent heuristic --battles 1 \
 今回の戦術上限・途中評価・候補除外は通常の時間制限付き木探索が対象。
 [今回の比較と検証](audits/20261016-search-evaluation.md)、
 [v1導入時の検証JSON](audits/20261016-terminal-search.json)は別々に参照する。
+
+## 2026-10-17 の拡張（探索工学）
+
+113戦の照合で、探索自身の勝率推定が定数予測より悪く校正されていること（Brier 0.262 対 定数 0.243、評価0.8帯の実勝率47%）、
+root予算の中央値66%が先頭候補に集中し代替手は（世界×応手）セルあたり約1試行しか評価されないこと、
+V_refの事前値が1試行で捨てられることを確認した。以下はその対策で、すべて `--search` のJSONで上書きできる。
+
+| 設定 | 既定（value run あり） | 意味 |
+|---|---|---|
+| `priorVisits` | 4 | セルのV_ref事前値を何試行分の重みで残すか。PR #22 の `prior_weight` と同じ値を共有する |
+| `rolloutPolicies` | `{"p1":["expert"],"p2":["disrupt","tactical","expert"]}` | 試行ごとに回す継続方策。相手にも `expert` を混ぜて対称にする |
+| `columnFloor` | 0.3 | 全セルの初回試行後、相手の応手を計画者の予測 `q` に比例して配分する際、一様に残す割合 |
+| `workers` | `POKESIM_SEARCH_WORKERS`（既定4） | 同じ世界を別の乱数列で探索するNodeワーカー数。セル統計を合算する（`merge_replies`） |
+| `stream` | なし | オフラインのオラクル用の乱数列番号。`particle_id` に入る |
+| `policyNets` | なし | `{"opp": <json>, "ours": <json>}`。学習した公開方策（`services/sim-tools/policy_net.js`） |
+| `rolloutMix` / `rolloutNetTurns` / `rolloutTemperature` / `puct` | 0.7(opp)・0.5(ours) / 6 / 1.0・0.5 / 1.5 | ネットをロールアウト（展開後の最初のmターン）と木の事前分布（PUCT）に使う割合 |
+
+応答には `stats`（セルごとの生統計）、`uncertainty`、`p2Prior`（相手ネットのroot応手確率）、
+`summary.worker_simulations` / `workers_failed` / `predicted_columns` / `policy_nets` が加わる。
+
+候補設定の優劣は実戦勝率ではなく、固定局面セットに対するオラクル後悔で判定する
+（[局面セットとオラクル後悔](positions-oracle.md)）。

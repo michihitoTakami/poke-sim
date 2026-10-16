@@ -67,9 +67,13 @@ PLANNER=on setsid nohup ~/Working/poke-sim/scripts/collect.sh > /dev/null 2>&1 <
 | `POLICIES` | 使う方策。複数指定すると対戦ごとに交互に使う | `checkpoints/ppo_baton_v2.zip checkpoints/ppo_baton_items.zip` |
 | `EXTRA` | `ladder.py` に追加で渡すオプション | なし |
 | `PYTHON` | 既存venvのPythonを直接使う場合の実行ファイル。未指定なら`uv run python` | 未指定 |
+| `POKESIM_SEARCH_WORKERS` | 1判断で同じ世界を別乱数列で探索するNodeワーカー数（1本≈400MB） | `4` |
+| `MIN_FREE_MB` | まとまりの開始前に待つ空きメモリの下限 | `4096` |
 | `COLLECT_DIR` | ログと停止ファイルの置き場所 | `/data/poke-sim/collect` |
 
 `EXTRA` の例は `EXTRA="--belief --opponent-policy checkpoints/bc_human_v2b.zip"` です。
+選出は既定で `--lineup ladder`（この構築の実戦結果の事後分布＋相手の見せ合いで条件付け、Thompson抽選）。
+旧来の模擬対戦表は `--lineup matchup`。`--battle-timeout` は対戦の総時間ではなく、対戦メッセージが途絶えた時間で判定します。
 勝敗価値を探索で使う場合は`EXTRA="--value-run runs/terminal-value-v2"`と`PLANNER=on`を指定します。
 この指定の現在の既定は、[1判断8.5秒の終局探索](terminal-search.md)です。
 参照方策の版を含む検証条件と起動例は[価値探索の接続手順](value-search-runtime.md)を参照してください。
