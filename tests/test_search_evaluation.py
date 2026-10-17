@@ -77,6 +77,23 @@ def test_estimated_tiny_score_differences_prefer_finishing_but_meaningful_gains_
     assert plan([row], pure=True).ranked()[0][0] == 'slow'
 
 
+def test_near_ties_use_immediate_progress_before_deep_rollout_win_speed():
+    from pokesim.search.planner import plan
+
+    row = {'p1': ['move:nastyplot', 'move:shadowball'], 'p2': ['reply'],
+           'payoff': [[.55], [.54]], 'winSpeed': [[.5], [.1]], 'rootProgress': [[0.], [.4]],
+           'visits': [[30], [30]], 'terminal_search': {'immediate_wins': []}}
+    assert plan([row], pure=True).ranked()[0][0] == 'move:shadowball'
+    # A meaningful estimated advantage still overrides this secondary preference.
+    row['payoff'][0][0] = .9
+    assert plan([row], pure=True).ranked()[0][0] == 'move:nastyplot'
+    # A beneficial recovery is progress too; the rule is not a blanket ban on status moves.
+    row['p1'] = ['move:recover', 'move:shadowball']
+    row['payoff'] = [[.55], [.54]]
+    row['rootProgress'] = [[.3], [-.7]]
+    assert plan([row], pure=True).ranked()[0][0] == 'move:recover'
+
+
 def test_overlay_shows_move_utilities_instead_of_one_hot_percentages():
     script = (ROOT / 'web/overlay.html').read_text().split('<script>')[1].split('</script>')[0]
     code = """

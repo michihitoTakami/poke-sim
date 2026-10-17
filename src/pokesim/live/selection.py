@@ -16,6 +16,7 @@ import json
 import sys
 from collections import Counter
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -133,7 +134,8 @@ class MatchupModel:
             source = rec.get('source')
             if (rec.get('result') not in ('win', 'loss') or '|rated|' not in rec.get('log', []) or
                     sorted(map(to_id, rec.get('team', []))) != sorted(map(to_id, roster)) or
-                    not rec.get('lineup') or len(rec['lineup']) != 3 or not source or source in seen):
+                    not rec.get('lineup') or len(rec['lineup']) != 3 or not source or source in seen or
+                    not consistent_lineup(rec)):
                 continue
             seen.add(source)
             rows.append((path.name, rec))
@@ -206,13 +208,15 @@ def sigmoid(x: float) -> float:
 
 
 class PreviewLogistic:
-    """logit P(win) = offset + sum over the opponent's shown species of theta[our lead][species].
-    The offset is the Beta posterior's logit; theta is ridge-regularised (PREVIEW_L2) and fitted by gradient
-    descent on the rows given. Leads or species outside the fitted tables contribute nothing."""
+    """Offset + lead/preview interactions + the trio's mean member/preview interactions.
+    The offset is the Beta posterior's logit; both coefficient tables use ridge regularisation (PREVIEW_L2).
+    Unseen members or opponent species contribute no learned adjustment; static coverage can still rank them.
+    """
 
     def __init__(self, species: list[str], leads: list[str], l2: float = PREVIEW_L2):
         self.species, self.leads, self.l2 = list(species), list(leads), l2
         self.theta = np.zeros((len(self.leads), len(self.species)))
+        self.member_theta = np.zeros_like(self.theta)
 
     def design(self, lead: str, preview: list[str]) -> tuple[int, np.ndarray]:
         shown = set(preview)
@@ -221,24 +225,59 @@ class PreviewLogistic:
 
     def fit(self, rows: list[dict], offsets: list[float], steps: int = 300, lr: float = 0.05) -> None:
         self.theta[:] = 0
-        designs = [(self.design(r['ordered'][0], r['preview']), o, float(r['win'])) for r, o in zip(rows, offsets)]
-        designs = [(lead, x, o, y) for (lead, x), o, y in designs if lead >= 0]
+        self.member_theta[:] = 0
+        designs = [(self.design(r['ordered'][0], r['preview']), o, float(r['win']), r['trio'])
+                   for r, o in zip(rows, offsets)]
+        designs = [(lead, x, o, y, members) for (lead, x), o, y, members in designs if lead >= 0]
         if not designs:
             return
         lead = np.array([d[0] for d in designs])
         x = np.array([d[1] for d in designs])
         offset = np.array([d[2] for d in designs])
         y = np.array([d[3] for d in designs])
+        members = np.array([[float(s in d[4]) / 3 for s in self.leads] for d in designs])
         for _ in range(steps):
-            p = 1 / (1 + np.exp(-(offset + np.einsum('ij,ij->i', self.theta[lead], x))))
+            logits = offset + np.einsum('ij,ij->i', self.theta[lead], x)
+            logits += np.einsum('ij,jk,ik->i', members, self.member_theta, x)
+            p = 1 / (1 + np.exp(-np.clip(logits, -30, 30)))
             grad = self.l2 * self.theta
             np.add.at(grad, lead, (p - y)[:, None] * x)
             self.theta -= lr * grad / len(designs)
+            member_grad = self.l2 * self.member_theta + members.T @ ((p - y)[:, None] * x)
+            self.member_theta -= lr * member_grad / len(designs)
 
-    def adjust(self, lead: str, preview: list[str]) -> float:
-        """The change of the win logit for our lead against this preview (0 without a fitted lead)."""
+    def adjust(self, lead: str, preview: list[str], lineup: list[str] | None = None) -> float:
+        """The fitted logit adjustment for the lead and, when given, all three brought members."""
         index, x = self.design(lead, preview)
-        return 0.0 if index < 0 else float(self.theta[index] @ x)
+        shift = 0.0 if index < 0 else float(self.theta[index] @ x)
+        if lineup:
+            members = np.array([float(s in lineup) / 3 for s in self.leads])
+            shift += float(members @ self.member_theta @ x)
+        return shift
+
+
+@lru_cache(maxsize=1)
+def _battle_formes():
+    path = PROCESSED_DIR / 'dex.json'
+    if not path.exists():
+        return {}
+    return {s['id']: to_id(s.get('battleOnly') or s.get('changesFrom') or s['name'])
+            for s in json.loads(path.read_text())['species'] if isinstance(s.get('battleOnly'), (str, type(None)))}
+
+
+def consistent_lineup(rec):
+    """Keep unreliable roster labels out of both the empirical selection model and its preview adjustments."""
+    selected = set(map(to_id, rec['lineup']))
+    if len(selected) != 3 or not selected <= set(map(to_id, rec.get('team', []))):
+        return False
+    formes = _battle_formes()
+    for line in rec.get('log', []):
+        parts = line.split('|')
+        if len(parts) > 3 and parts[1] in ('switch', 'drag') and parts[2].startswith('p1'):
+            sid = to_id(parts[3].split(',')[0])
+            if formes.get(sid, sid) not in selected:
+                return False
+    return True
 
 
 def ladder_rows(root: Path, roster: list[str]) -> list[dict]:
@@ -255,7 +294,8 @@ def ladder_rows(root: Path, roster: list[str]) -> list[dict]:
         source = rec.get('source')
         if (rec.get('result') not in ('win', 'loss') or '|rated|' not in rec.get('log', []) or
                 sorted(map(to_id, rec.get('team', []))) != sorted(map(to_id, roster)) or
-                not rec.get('lineup') or len(rec['lineup']) != 3 or not source or source in seen):
+                not rec.get('lineup') or len(rec['lineup']) != 3 or not source or source in seen or
+                not consistent_lineup(rec)):
             continue
         seen.add(source)
         lineup = [to_id(x) for x in rec['lineup']]
@@ -305,15 +345,17 @@ class LadderLineupModel:
             self.games += w * games
             self.prior_games += w * games
         self.global_rate = (1 + wins) / (2 + self.games)
-        self.sha = hashlib.sha256(json.dumps([(r['name'], list(r['ordered']), r['win']) for r in rows])
-                                  .encode()).hexdigest()[:16]
+        self.sha = hashlib.sha256(json.dumps({'version': 'lineup-members-v2', 'prior': prior,
+                                             'half_life': half_life, 'kappa': kappa,
+                                             'rows': [(r['name'], list(r['ordered']), r['win'], r['preview'])
+                                                      for r in rows]}, sort_keys=True).encode()).hexdigest()[:16]
         self.logistic = None
         if preview and rows:
             species = [s for s, _ in Counter(s for r in rows for s in r['preview']).most_common(PREVIEW_SPECIES)]
             recent = rows[:fit_rows]
             offsets = [logit(LadderLineupModel(rows[i + 1:], half_life, kappa, preview=False)
                              .mean(list(r['ordered']))) for i, r in enumerate(recent)]
-            self.logistic = PreviewLogistic(species, sorted({r['ordered'][0] for r in rows}))
+            self.logistic = PreviewLogistic(species, sorted({s for r in rows for s in r['trio']}))
             self.logistic.fit(recent, offsets)
 
     @classmethod
@@ -337,7 +379,8 @@ class LadderLineupModel:
         a, b = self.posterior(lineup)
         if preview is None or self.logistic is None:
             return a / (a + b)
-        return sigmoid(logit(a / (a + b)) + self.logistic.adjust(to_id(lineup[0]), [to_id(s) for s in preview]))
+        return sigmoid(logit(a / (a + b)) + self.logistic.adjust(to_id(lineup[0]), [to_id(s) for s in preview],
+                                                               list(map(to_id, lineup))))
 
     def evidence(self, lineup: list[str]) -> dict:
         ids = [to_id(x) for x in lineup]
@@ -345,12 +388,8 @@ class LadderLineupModel:
         return {'ordered_games': round(self.ordered.get(ordered, (0.0, 0.0))[1], 2),
                 'trio_games': round(self.trio.get(trio, (0.0, 0.0))[1], 2)}
 
-    def choose(self, roster: list[str], rng, reference: "MatchupModel | None" = None,
-               picks: OpponentPicks | None = None, explore: bool = True) -> tuple[list[str], dict]:
-        """The lineup to bring and how it was chosen. picks: the opponent's preview (its species condition the
-        logistic adjustment). explore: Thompson sampling (tempered by LINEUP_TEMPER) among the lineups whose
-        adjusted posterior mean is within LINEUP_MARGIN of the best; otherwise the best mean. reference: the
-        simulated matchup table's win chance, used only to break ties between lineups of equal mean."""
+    def candidates(self, roster, reference=None, picks=None, coverage=None):
+        """All 60 distinct lead/trio choices; coverage is a ranking adjustment, not a calibrated win rate."""
         preview = [to_id(s) for s in picks.species] if picks is not None else None
         candidates = []
         for trio in itertools.permutations(range(len(roster)), 3):
@@ -358,25 +397,43 @@ class LadderLineupModel:
                 continue
             names = [roster[i] for i in trio]
             a, b = self.posterior(names)
-            shift = self.logistic.adjust(to_id(names[0]), preview) if preview and self.logistic else 0.0
+            shift = self.logistic.adjust(to_id(names[0]), preview, list(map(to_id, names))) \
+                if preview and self.logistic else 0.0
+            coverage_info = None
+            if coverage is not None and picks is not None:
+                adjustment, coverage_info = coverage.score(names, picks)
+                shift += adjustment
             tie = 0.0
             if reference is not None and picks is not None:
                 tie = reference.win_prob(','.join(to_id(n) for n in names), picks) or 0.0
-            candidates.append((names, a, b, sigmoid(logit(a / (a + b)) + shift), shift, tie))
+            candidates.append((names, a, b, sigmoid(logit(a / (a + b)) + shift), shift, tie, coverage_info))
+        return candidates
+
+    def rank(self, roster, picks, coverage=None, reference=None):
+        return [(c[0], c[3], c[6]) for c in sorted(self.candidates(roster, reference, picks, coverage),
+                                                 key=lambda c: (c[3], c[5]), reverse=True)]
+
+    def choose(self, roster: list[str], rng, reference: "MatchupModel | None" = None,
+               picks: OpponentPicks | None = None, explore: bool = True, coverage=None) -> tuple[list[str], dict]:
+        """Thompson selection among competitive scores; static coverage never becomes a win-rate estimate."""
+        candidates = self.candidates(roster, reference, picks, coverage)
+        preview = [to_id(s) for s in picks.species] if picks is not None else None
         best = max(c[3] for c in candidates)
         pool = [c for c in candidates if c[3] >= best - LINEUP_MARGIN]
         scored = []
-        for names, a, b, m, shift, tie in pool:
+        for names, a, b, m, shift, tie, coverage_info in pool:
             draw = sigmoid(logit(rng.betavariate(LINEUP_TEMPER * a, LINEUP_TEMPER * b)) + shift) if explore else m
-            scored.append((draw, m, tie, names))
-        sampled, m, tie, names = max(scored, key=lambda s: (s[0], s[1], s[2]))
-        return names, {'method': 'ladder-thompson' if explore else 'ladder-mean', 'posterior_mean': round(m, 4),
+            scored.append((draw, m, tie, names, coverage_info))
+        sampled, m, tie, names, coverage_info = max(scored, key=lambda s: (s[0], s[1], s[2]))
+        return names, {'method': 'ladder-thompson' if explore else 'ladder-mean',
+                       'posterior_mean': round(self.mean(names, preview), 4),
+                       'selection_score': round(m, 4), 'score_kind': 'preview-rank-utility-v1',
                        'sampled': round(sampled, 4), 'best_mean': round(best, 4), 'pool': len(pool),
                        'preview_adjusted': self.logistic is not None and preview is not None,
                        'games': round(self.games, 2), 'records': len(self.rows),
                        'prior_games': round(self.prior_games, 2), 'sha': self.sha,
                        'half_life': self.half_life, 'kappa': self.kappa, 'temper': LINEUP_TEMPER,
-                       'margin': LINEUP_MARGIN, **self.evidence(names)}
+                       'margin': LINEUP_MARGIN, 'coverage': coverage_info, **self.evidence(names)}
 
 
 def main() -> None:

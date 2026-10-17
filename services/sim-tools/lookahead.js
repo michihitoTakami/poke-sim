@@ -79,14 +79,22 @@ function choices(battle, side) {
 // lowest; null the mean of the highest and the lowest. A query must not change the battle: getDamage draws the damage
 // roll (and a critical hit) from the battle's PRNG, so the PRNG and the active move are saved and restored, and a
 // policy thinking about its options does not change the random numbers the rest of the branch plays with.
-function damageRoll(battle, source, target, moveId, roll = null) {
-  const move = battle.dex.getActiveMove(moveId);
+function damageRoll(battle, source, target, moveId, roll = null, preview = false) {
+  let move = battle.dex.getActiveMove(moveId);
   if (move.category === 'Status') return 0;
   const seed = battle.prng.getSeed();
   const saved = [battle.randomizer, battle.activeMove, battle.activePokemon, battle.activeTarget];
   const tr = battle.trunc;
   const at = r => d => tr(tr(d * (100 - r)) / 100);
   try {
+    if (preview) {
+      battle.singleEvent('ModifyType', move, null, source, target, move, move);
+      move = battle.runEvent('ModifyType', source, target, move, move);
+      battle.singleEvent('ModifyMove', move, null, source, target, move, move);
+      move = battle.runEvent('ModifyMove', source, target, move, move);
+      if (!move) return 0;
+      if (!canHurt(battle, source, target, moveId, move)) return 0;
+    }
     battle.activeMove = move; battle.activePokemon = source; battle.activeTarget = target;
     move.willCrit = false;
     const hit = r => {
@@ -103,12 +111,13 @@ function damageRoll(battle, source, target, moveId, roll = null) {
   }
 }
 
-function expectedDamage(battle, source, target, moveId) {
+function expectedDamage(battle, source, target, moveId, preview = false) {
   const move = battle.dex.moves.get(moveId);
   if (move.category === 'Status') return 0;
   const hits = Array.isArray(move.multihit) ? (move.multihit[0] === 2 && move.multihit[1] === 5 ? 3.1 : move.multihit[0])
     : (move.multihit || 1);
-  return damageRoll(battle, source, target, moveId) * hits * (move.accuracy === true ? 1 : move.accuracy / 100);
+  return damageRoll(battle, source, target, moveId, null, preview) * hits *
+    (move.accuracy === true ? 1 : move.accuracy / 100);
 }
 
 // Greedy policy for rollouts: the move with the highest expected damage, or the bench mon that hits hardest.
@@ -473,8 +482,8 @@ function policy(name) {
 }
 
 // Damage-source possibility, not a KO prediction. Include type-changing and immunity abilities in sampled worlds.
-function canHurt(battle, source, target, moveId) {
-  const move = battle.dex.getActiveMove(moveId);
+function canHurt(battle, source, target, moveId, modifiedMove = null) {
+  const move = modifiedMove || battle.dex.getActiveMove(moveId);
   if (move.category === 'Status') return false;
   // Bench capabilities describe the Pokemon after entering, rather than its currently inactive ability.
   const ability = mon => mon.isActive && mon.ignoringAbility() ? '' : mon.ability;
@@ -711,7 +720,9 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = req.observe ? require('./observe').observe(req, {setUp, extractChannelMessages}) :
+    reply = req.previewMatchups ? require('./preview_matchups').previewMatchups(req,
+      {setUp, expectedDamage: (b, source, target, move) => expectedDamage(b, source, target, move, true)}) :
+      req.observe ? require('./observe').observe(req, {setUp, extractChannelMessages}) :
       req.terminalSearch ? require('./terminal_search').terminalSearch(req,
       {setUp, choices, step, State, extractChannelMessages}) :
       req.valueLeaves ? require('./value_search').evaluateValue(req,

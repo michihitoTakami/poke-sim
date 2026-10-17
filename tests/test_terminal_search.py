@@ -352,6 +352,19 @@ def test_worker_replies_pool_rollouts_average_bootstraps_and_keep_certificates()
     assert not merge_replies([unready, unready], 0)['summary']['ready']
 
 
+def test_root_progress_pools_trial_counts_and_counts_the_bootstrap_once():
+    from pokesim.search.terminal import merge_replies
+
+    first = reply_with([[(2, 0., .5, 0., 0)], [(0, 0., .5, 0., 0)]], sims=2)
+    second = reply_with([[(6, 0., .5, 0., 0)], [(0, 0., .5, 0., 0)]], sims=6)
+    for reply, n, total, prior in ((first, 2, .4, .3), (second, 6, 3.6, .5)):
+        res = reply['results'][0]
+        res['rootProgress'] = [[0.]]
+        res['stats'][0][0].update(progressN=n, progressSum=total, priorProgress=prior)
+    merged = merge_replies([first, second], prior_visits=4)['results'][0]
+    assert merged['rootProgress'][0][0] == pytest.approx((4 * .4 + .4 + 3.6) / 12)
+
+
 def test_two_workers_search_the_same_position_on_different_streams():
     req = json.loads((Path(__file__).parent / 'fixtures/terminal-moonblast-turn14.json').read_text())
     req.update(decisionMs=3000, workers=2, priorVisits=4)

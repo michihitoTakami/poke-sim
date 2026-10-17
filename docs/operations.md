@@ -73,6 +73,10 @@ PLANNER=on setsid nohup ~/Working/poke-sim/scripts/collect.sh > /dev/null 2>&1 <
 
 `EXTRA` の例は `EXTRA="--belief --opponent-policy checkpoints/bc_human_v2b.zip"` です。
 選出は既定で `--lineup ladder`（この構築の実戦結果の事後分布＋相手の見せ合いで条件付け、Thompson抽選）。
+2026-10-18以降は、相手の見せ合いに対する先発と控えの相性を学習し、仮説の型に対する3体全体の攻守も比較する。
+メガシンカは1体に割り当てた場合ごとに評価する。相性補正だけを外した比較は`--no-preview-coverage`。
+対戦サポート画面も同じ候補順位を使い、「相性評価」として表示する。表示値は勝率ではない。
+検証結果と制限は[積み判断と選出の改善](audits/20261018-selection-tactics.md)を参照。
 旧来の模擬対戦表は `--lineup matchup`。`--battle-timeout` は対戦の総時間ではなく、対戦メッセージが途絶えた時間で判定します。
 勝敗価値を探索で使う場合は`EXTRA="--value-run runs/terminal-value-v2"`と`PLANNER=on`を指定します。
 この指定の現在の既定は、[1判断8.5秒の終局探索](terminal-search.md)です。
