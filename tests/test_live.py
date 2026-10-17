@@ -210,3 +210,34 @@ def test_first_decision_calibration_is_not_applied_to_late_or_forced_positions(s
     assert advisor.advise(session.decision(force_switch=True)).win_prob is None
     EventTranslator(session).apply([{"type": "turn"}])
     assert advisor.advise(session.decision()).win_prob is None
+
+
+def test_double_faint_forced_switch_is_searched(session, monkeypatch):
+    """Both actives fainted the same turn: the opponent's active is fainted while we pick a replacement. The
+    simulator rebuilds that as two forced switches, so the search runs instead of leaving no advice (which, with
+    --policy none, became a random switch and a quality-gate stop of ladder collection)."""
+    from types import SimpleNamespace
+
+    import numpy as np
+
+    from pokesim.live.advisor import Advisor
+    from pokesim.search.lookahead import Advice
+
+    EventTranslator(session).apply([{"type": "switch", "side": "me", "species": "Scolipede"},
+                                   {"type": "switch", "side": "opp", "species": "Garchomp"}, {"type": "turn"},
+                                   {"type": "faint", "side": "opp"}, {"type": "faint", "side": "me"}])
+    battle = session.decision(force_switch=True)
+    assert battle.force_switch and battle.opponent_active_pokemon.fainted
+    advisor = Advisor(session.sets, policy=None, lookahead=False, opponent_policy=None, planner={"mode": "on"})
+    advisor.engine = SimpleNamespace()
+    searched = []
+
+    def search(b, *args, **kwargs):
+        searched.append(b.force_switch)
+        return Advice(["switch:gholdengo", "switch:floetteeternal"], np.array([1.0, 0.0]), np.array([0.6, 0.4]))
+
+    monkeypatch.setattr(advisor, "_search", search)
+    sug = advisor.advise(battle)
+    assert searched == [True]
+    assert sug.actions[0] == ("switch:gholdengo", 1.0)
+    assert "fallback" not in sug.status
