@@ -85,11 +85,12 @@ class AdvisorPlayer(TrackedPlayer):
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
                  planner: dict | None = None, sample: bool = False, seed: int | None = None,
                  opponent_policy: str = "default", belief: bool = True, value_run=None, lineup: str = "ladder",
-                 preview_coverage: bool = True,
+                 preview_coverage: bool = True, control_mode: str = "unknown",
                  **kwargs):
         """lineup: "matchup" ranks lineups by the simulated table shrunk towards recent ladder results;
         "ladder" draws them from the posterior of this roster's own rated results (LadderLineupModel)."""
         self.sets, self.out = sets, out
+        self.control_mode = control_mode
         if lineup not in ("matchup", "ladder"):
             raise ValueError(f"unknown lineup method {lineup}")
         self.lineup_method = lineup
@@ -101,6 +102,9 @@ class AdvisorPlayer(TrackedPlayer):
         self.planner, self.sample = self.advisor.planner, sample
         self.preview_coverage = PreviewCoverage(sets, self.advisor.engine) \
             if preview_coverage and self.advisor.engine else None
+        from pokesim.live.lineup_search import LineupSearch
+
+        self.lineup_search = LineupSearch(sets, self.advisor.engine) if self.preview_coverage else None
         self.seed = seed if seed is not None else random.SystemRandom().randrange(2 ** 31)
         self.rng = random.Random(self.seed)
         roster = [s["species"] for s in sets]
@@ -210,6 +214,8 @@ class AdvisorPlayer(TrackedPlayer):
         self.sent_requests[tag] = key
         if self.advice.get(tag):
             self.advice[tag][-1]['sent'] = command
+            self.advice[tag][-1]['submission'] = {
+                'source': 'ai', 'action': self.advice[tag][-1].get('chosen'), 'command': command, 'rqid': key[0]}
         self.diagnostic(battle, 'sent-order', command=command, request_key=key)
 
     def policy_for(self, battle) -> str:
@@ -240,6 +246,15 @@ class AdvisorPlayer(TrackedPlayer):
                 except Exception as e:  # noqa: BLE001 - retain a valid historical selection if static estimates fail
                     coverage_error = repr(e)[:200]
             lineup, info = model.choose(roster, self.rng, self.matchups, picks, coverage=coverage)
+            if self.lineup_search:
+                try:
+                    ranking, continuation = self.lineup_search.rerank(model.rank(roster, picks, coverage), picks)
+                    lineup = ranking[0][0]
+                    info = {'method': 'public-continuation', 'continuation': continuation, 'static_selector': info,
+                            'selection_score': ranking[0][1], 'coverage': ranking[0][2],
+                            'score_kind': continuation.get('score_kind', 'static-preview-fallback')}
+                except Exception as e:  # noqa: BLE001 - preserve valid preview submission
+                    info['continuation_error'] = repr(e)[:200]
             if coverage_error:
                 info['coverage_error'] = coverage_error
             self.selection[battle.battle_tag] = info
@@ -278,7 +293,8 @@ class AdvisorPlayer(TrackedPlayer):
         mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
         self.activate_policy(self.policy_for(battle))
         active = battle.active_pokemon
-        entry = {"turn": battle.turn, "force": bool(battle.force_switch), 'rqid': key[0],
+        entry = {"turn": battle.turn, "request": battle.last_request,
+                 "force": bool(battle.force_switch), 'rqid': key[0],
                  'active': None if active is None else {'species': active.species, 'hp': active.current_hp,
                      'boosts': dict(active.boosts), 'effects': [e.name for e in active.effects]}}
         self.advice.setdefault(battle.battle_tag, []).append(entry)
@@ -317,7 +333,7 @@ class AdvisorPlayer(TrackedPlayer):
                 label, p, action = legal[0]
                 if self.sample and sum(q for _, q, _ in legal) > 0:
                     label, p, action = self.rng.choices(legal, weights=[q for _, q, _ in legal])[0]
-                entry.update({"chosen": label, "chosen_p": round(float(p), 4)})
+                entry.update({"chosen": label, "suggested": label, "chosen_p": round(float(p), 4)})
                 order = SinglesEnv.action_to_order(np.int64(action), battle, strict=True)
                 entry['order'] = order.message
                 return order
@@ -341,7 +357,8 @@ class AdvisorPlayer(TrackedPlayer):
             log = [re.sub(r"\bp([12])(?=[a-z]?[:|]|$)", lambda m: "p" + ("2" if m.group(1) == "1" else "1"), line)
                    for line in log]
         stamp = time.strftime("%Y%m%d-%H%M%S")
-        record = {"started": stamp, "result": "win" if battle.won else "loss" if battle.lost else None,
+        record = {"control_mode": self.control_mode, "started": stamp,
+                  "result": "win" if battle.won else "loss" if battle.lost else None,
                   "team": [s["species"] for s in self.sets],
                   "preview": {"species": [m.species for m in battle.teampreview_opponent_team]},
                   "lineup": self.lineups.get(battle.battle_tag), "log": log,
@@ -354,6 +371,14 @@ class AdvisorPlayer(TrackedPlayer):
                                        opponent_policy=self.advisor.opponent_policy_version, belief=self.belief,
                                        calibration_context=self.advisor.calibration_context,
                                        selection=self.selection.pop(battle.battle_tag, None))}
+        from pokesim.live.provenance import actual_lineup, execution_rows, request_lineup
+
+        names = request_lineup(battle.last_request)
+        record['suggested_lineup'] = record['lineup']
+        record['actual_lineup'] = ({'species': names, 'complete': True, 'evidence': 'private_request',
+                                    'source': 'ai' if self.control_mode == 'autonomous_ai' else 'unknown'}
+                                   if names else actual_lineup(record))
+        record['executions'] = execution_rows(record)
         (self.out / f"{stamp}-{battle.battle_tag.split('-')[-1]}.json").write_text(
             json.dumps(record, ensure_ascii=False, indent=1))
         print(f"{battle.battle_tag}: {record['result']} vs {battle.opponent_username} [{record['policy']}]  "
@@ -403,7 +428,7 @@ async def run(args) -> None:
         planner["near"] = args.near
     play = {"combine": combine, "planner": planner, "sample": args.sample, "seed": args.seed,
             "opponent_policy": args.opponent_policy, "belief": args.belief, "value_run": args.value_run,
-            "lineup": args.lineup, "preview_coverage": args.preview_coverage}
+            "lineup": args.lineup, "preview_coverage": args.preview_coverage, "control_mode": args.control_mode}
     if args.local:
         tag = uuid.uuid4().hex[:6]
         me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
@@ -483,6 +508,8 @@ def main() -> None:
     ap.add_argument("--lineup", choices=["matchup", "ladder"], default="ladder",
                     help="team preview: the simulated matchup table shrunk to ladder results, or the posterior of "
                          "this roster's own ladder results with Thompson sampling (pokesim.live.selection)")
+    ap.add_argument('--control-mode', choices=['autonomous_ai', 'assisted', 'unknown'], default='unknown',
+                    help='declare autonomous operation only when no manual choices can override the bot')
     ap.add_argument('--preview-coverage', action=argparse.BooleanOptionalAction, default=True,
                     help='rank whole-trio matchup coverage at preview (disable for an offline A/B)')
     ap.add_argument("--rho-setup", type=float, default=None,

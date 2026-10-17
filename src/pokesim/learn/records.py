@@ -205,22 +205,29 @@ def rows_of(battle_id: str, rec: dict, sets: list[dict], engine: Lookahead, own:
     log = rec['log']
     if rec.get('result') not in ('win', 'loss'):
         return [], {'no_result': 1}
-    selected = {engine.sampler.base_id(to_id(s)) for s in rec['lineup']}
-    for line in log:
-        parts = line.split('|')
-        if len(parts) > 3 and parts[1] in ('switch', 'drag') and parts[2].startswith('p1'):
-            if engine.sampler.base_id(to_id(parts[3].split(',')[0])) not in selected:
-                # Do not invent the unobserved bench or overwrite the original record using future reveals.
-                return [], {'lineup_mismatch': 1}
+    from pokesim.live.provenance import base, execution_rows, reconstruction_lineup
+
+    lineup, lineup_info = reconstruction_lineup(rec)
+    if not rec.get('preview') or not sets:
+        return [], {'missing_team_or_preview': 1}
     session = BattleSession(sets)
     session.preview(rec['preview']['species'])
-    session.select([next(i for i, s in enumerate(sets) if to_id(s['species']) == to_id(x)) for x in rec['lineup']])
+    session.select([next(i for i, s in enumerate(sets) if base(s['species']) == base(x)) for x in lineup])
     start = next(i for i, line in enumerate(log) if line.startswith('|teampreview')) + 1
     meta = {'source': 'ladder', 'record': rec.get('source'), 'started': rec.get('started'), 'split': split,
             'outcome': {'win': 1., 'loss': 0.}.get(rec.get('result'), .5), 'rating': ratings(log),
-            'opponent': rec.get('opponent')}
-    return rows_from_session(battle_id, session, log[start:], 'p1', engine, own, meta, sides,
-                             teacher=lambda turn: teacher_of(rec, turn))
+            'opponent': rec.get('opponent'), 'lineup_provenance': lineup_info}
+    if not lineup_info['complete'] and lineup_info['evidence'] == 'partial_public_reveals':
+        # Grow only from the public prefix; never invent an unobserved bench for a mismatched suggestion.
+        session.select([])
+        session.partial_lineup = True
+    rows, skipped = rows_from_session(battle_id, session, log[start:], 'p1', engine, own, meta, sides,
+                                      teacher=lambda turn: teacher_of(rec, turn))
+    executions = {e['turn']: e for e in execution_rows(rec)}
+    for row in rows:
+        if row['side'] == 'p1':
+            row['execution'] = executions.get(row['turn'])
+    return rows, skipped
 
 
 def build(args) -> None:
@@ -229,7 +236,7 @@ def build(args) -> None:
         raise ValueError('choose a new output file')
     scope = DatasetScope(ledger=Path(args.ledger), manifest=Path(args.manifest))
     records = [(b, rec) for b, rec in scope.records(args.split)
-               if rec.get('lineup') and rec.get('preview') and rec.get('log')]
+               if (rec.get('lineup') or rec.get('actual_lineup')) and rec.get('preview') and rec.get('log')]
     records = [(b, rec) for b, rec in records if (rec.get('source') or '').startswith('showdown')]
     if args.limit:
         records = records[:args.limit]

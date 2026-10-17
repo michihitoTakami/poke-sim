@@ -155,7 +155,7 @@ class Advisor:
             self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=8500,
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
                                           lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1',
-                                          priorVisits=4, rootProgress=True,
+                                          priorVisits=4, rootProgress=False, focusTopTwo=False,
                                           rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']},
                                           workers=int(os.environ.get('POKESIM_SEARCH_WORKERS', 4)))
             self.planner['search'].update({k: v for k, v in requested.items()
@@ -197,6 +197,12 @@ class Advisor:
             from pokesim.belief.sets import Beliefs
 
             self.beliefs = Beliefs(sets, self.engine.sampler)
+        if self.engine and getattr(self.engine.value_model, 'branch_policy', None):
+            self.planner['search'].setdefault('policyNets', {})['ours'] = self.engine.value_model.branch_policy
+            if self.engine.value_model.version['reference'].get('policy_sha'):
+                self.planner['search'].setdefault('rolloutMix', {})['ours'] = 1.
+                self.planner['search'].setdefault('rolloutTemperature', {})['ours'] = 0.
+                self.planner['search']['rolloutNetTurns'] = 200
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
         self.opponent_policy = None
@@ -410,6 +416,7 @@ class Advisor:
                     classes=action_classes(b) if self.planner.get("rho_by_class") else None,
                     rho_by_class=self.planner.get("rho_by_class"),
                     near=self.planner.get("near"),
+                    tie_margin=self.planner.get("tie_margin"),
                 )
                 values = [res['value_status'] for res in cache[key] if 'value_status' in res]
                 if values:

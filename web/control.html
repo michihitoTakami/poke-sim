@@ -203,10 +203,10 @@ function render(s) {
   const score = v => v == null ? '—' : v.toFixed(3);
   const reasons = {'full-hp-heal-before-any-damage': '満タンで被弾前に回復',
     'boosts-already-capped': '能力上昇が上限', 'immune-to-every-sampled-reply': '仮説内の全応答に無効'};
-  const evaluations = a?.evaluations?.length ? '<table><tr><th>行動</th><th>探索評価</th><th>最悪応答</th><th>最大評価との差</th></tr>' +
+  const evaluations = a?.evaluations?.length ? '<table><tr><th>行動</th><th>探索評価</th><th>最悪応答</th><th>最大評価との差</th><th>先に行動</th></tr>' +
     a.evaluations.map(row => `<tr><td>${row.selected ? '★ ' : ''}${row.label}</td><td>${score(row.utility)}</td><td>${score(row.worst)}</td>` +
-      `<td>${row.excluded ? row.reasons.map(r => reasons[r] || r).join('・') : score(row.gap)}</td></tr>`).join('') +
-    '</table><div class="muted">★が推奨。探索評価は勝率ではありません。評価が近い手は早い決着を優先します。</div>' : null;
+      `<td>${row.excluded ? row.reasons.map(r => reasons[r] || r).join('・') : score(row.gap)}</td><td>${row.acts_first == null ? '—' : pct(row.acts_first)}</td></tr>`).join('') +
+    '</table><div class="muted">★が推奨。探索評価は勝率ではありません。先に行動する割合は相手の型・応答の仮説内の値です（先制技・同速を含む）。</div>' : null;
   const wp = a && a.win_path;
   const path = wp && !wp.error && (wp.no_source ? '<div class="warn">相手の残りにダメージを与えられるポケモンがいません</div>'
     : wp.last_source ? `<div class="warn">攻撃できる残りは ${wp.sources.join('・')} だけです</div>` : '');

@@ -24,7 +24,7 @@ from scipy.optimize import linprog
 from pokesim.search.lookahead import Advice, clean, opponent_mix, solve_zero_sum
 
 RHO = 0.3  # initial guard against a wrong prediction; to be set on development data, not on test results
-TREE_TIE_MARGIN = .02  # a tiny difference between sampled utilities is not a proven winning-probability gain
+TREE_TIE_MARGIN = .03  # a tiny difference between sampled utilities is not a proven winning-probability gain
 
 
 @dataclass
@@ -121,7 +121,7 @@ def predict(payoff: np.ndarray, labels: list[str], opponent_model: dict, last_mo
 def plan(results: list[dict], opponent_model: dict | None = None, last_move: str | None = None,
          rho: float = RHO, cloned: dict[str, float] | None = None, cloned_weight: float = 0.5,
          pure: bool = False, classes: dict[str, str] | None = None, rho_by_class: dict[str, float] | None = None,
-         near: float | None = None, near_tau: float = .02) -> Advice:
+         near: float | None = None, near_tau: float = .02, tie_margin: float | None = None) -> Advice:
     """Advice from the lookahead's sampled worlds with one common mix (see the module docstring).
     classes / rho_by_class: a class per label (e.g. 'setup') and the worst-case share to use for it in the pure
     ranking (a set-up move is judged with more weight on the opponent's best reply). near: with pure, the
@@ -142,6 +142,7 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
                                   'terminal_search': tree, 'worlds': len(results)}, worst=prob.copy())
     worlds, failed_cells, failed_worlds = [], 0, 0
     speed_terms = []
+    order_terms = []
     error_terms = []
     extras: list[dict[str, np.ndarray]] = []  # per world: payoff per continuation policy, share resolved
     for res in results:
@@ -166,6 +167,10 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
             speed_terms.append(speed)
             if 'uncertainty' in res:
                 error_terms.append(matrix(res['uncertainty'], idx, cols, np.zeros_like(payoff)).max(axis=1))
+        if 'actionOrder' in res:
+            order = np.array([[c['first'] / c['trials'] if c['trials'] else np.nan for c in row]
+                              for row in res['actionOrder']])[np.ix_(idx, cols)]
+            order_terms.append(order @ q)
         extras.append({name: matrix(m, idx, cols, payoff) for name, m in res.get("byContinuation", {}).items()}
                       | ({"_resolved": matrix(res["resolved"], idx, cols, np.zeros_like(payoff))}
                          if "resolved" in res else {}))
@@ -174,7 +179,8 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
         raise ValueError("every sampled world failed")
     secondary = np.mean(speed_terms, axis=0) if speed_terms else None
     errors = np.mean(error_terms, axis=0) if error_terms else np.zeros(len(labels))
-    tie_margin = min(.1, max(TREE_TIE_MARGIN, 2 * float(errors.max()))) if tree else 0.
+    # Sampling uncertainty calls for more evidence, not permission to sacrifice the primary objective.
+    tie_margin = max(0., float(tie_margin if tie_margin is not None else TREE_TIE_MARGIN)) if tree else 0.
     sol = solve_common(worlds, rho, secondary, tie_margin=tie_margin)
     if pure:
         # The caller plays one top move. Rank actual pure-action utilities, not the largest probability of a
@@ -208,6 +214,12 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
                                     'sampling_error': float(errors[i]),
                                     'trials': sum(sum(r['visits'][r['p1'].index(lab)]) for r in results)}
                                    for i, lab in enumerate(labels)]
+        if len(order_terms) == len(worlds):
+            for i, evidence in enumerate(status['root_evidence']):
+                observed = [float(v[i]) for v in order_terms if np.isfinite(v[i])]
+                evidence['acts_first'] = float(np.mean(observed)) if observed else None
+                evidence['acts_first_range'] = [min(observed), max(observed)] if observed else None
+                evidence['order_scope'] = 'sampled-sets-and-predicted-replies; priority-and-ties-in-engine'
         status['score_kind'] = tree.get('value_kind', 'uncalibrated-search-utility')
         status['calibrated_win_probability'] = False
     return Advice(labels, sol.prob, sol.expected, opponent, status=status, worst=sol.worst)

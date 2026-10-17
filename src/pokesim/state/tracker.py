@@ -37,8 +37,11 @@ class ProtocolTracker:
         self.active = {}
         self.states = {}
         self.total_fainted: dict[str, int] = {}
+        self.turn = 0
 
     def apply(self, parts: list[str]) -> None:
+        if parts[1:2] == ['turn']:
+            self.turn = int(parts[2])
         if len(parts) < 3 or ": " not in parts[2]:
             return
         kind, ident = parts[1], parts[2]
@@ -61,15 +64,27 @@ class ProtocolTracker:
         if kind == "move" and len(parts) > 3 and not any(p.startswith("[from]") for p in parts[4:]):
             state["lastMove"] = move_id(parts[3])
         if kind == "-start" and len(parts) > 3:
+            effect = move_id(parts[3].removeprefix('move: '))
+            if effect == 'yawn':
+                state['yawnTurn'] = self.turn
+            if effect.startswith('fallen') and effect[6:].isdigit():
+                state['fallen'] = int(effect[6:])
+                self.total_fainted[role] = max(self.total_fainted.get(role, 0), state['fallen'])
             if parts[3] == "Disable" and len(parts) > 4:
                 state["disabledMove"] = move_id(parts[4])
             elif parts[3] == "Encore" and state.get("lastMove"):
                 state["encore"] = state["lastMove"]
         if kind == "-end" and len(parts) > 3:
+            if move_id(parts[3].removeprefix('move: ')) == 'yawn':
+                state.pop('yawnTurn', None)
             state.pop({"Disable": "disabledMove", "Encore": "encore"}.get(parts[3], ""), None)
 
     def locks(self, role: str, name: str) -> dict:
-        return {k: v for k, v in self.states.get((role, name), {}).items() if k in {"disabledMove", "encore"}}
+        state = self.states.get((role, name), {})
+        out = {k: v for k, v in state.items() if k in {"disabledMove", "encore", "fallen", "transform"}}
+        if 'yawnTurn' in state:
+            out['volatileTurns'] = {'yawn': max(1, 2 - (self.turn - state['yawnTurn']))}
+        return out
 
 
 class TrackedBattle(Battle):
@@ -118,6 +133,16 @@ class TrackedBattle(Battle):
             self._pending_baton.clear()
 
         self.state_tracker.apply(parts)
+        if kind == '-transform' and len(parts) > 3:
+            from pokesim.sim.formes import current_forme
+
+            target = self.active_pokemon if parts[3][:2] == self.player_role else self.opponent_active_pokemon
+            if target is not None:
+                name = ident.split(': ', 1)[1]
+                self.state_tracker.states[(role, name)]['transform'] = {
+                    'sourceSide': parts[3][:2], 'sourceSpecies': target.species, 'species': current_forme(target),
+                    'moves': list(target.moves), 'ability': target.ability,
+                    'stats': {k: v for k, v in target.stats.items() if v is not None and k != 'hp'}}
         # Showdown sends |-mega|ident|base species|stone. poke-env reads the fourth field as the stone.
         # Preserve the raw protocol in the caller's log; only adapt the parser input here.
         parsed = parts[:3] + parts[4:] if kind == '-mega' and len(parts) > 4 else parts

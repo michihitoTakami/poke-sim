@@ -41,12 +41,15 @@ class BattleSession:
     def __init__(self, sets: list[dict], username: str = "me", opponent: str = "opponent", role: str = "p1",
                  format_id: str = FORMAT):
         self.sets, self.username, self.role = sets, username, role
+        self.format_id = format_id
+        self.forme_stats = {}
         self.opp_role = "p2" if role == "p1" else "p1"
         self.info = team_stats(sets, format_id)
         self.battle = TrackedBattle(f"live-{uuid.uuid4().hex[:8]}", username, logging.getLogger("live"), gen=9)
         self.log: list[str] = []
         self.pp_used: dict[str, dict[str, int]] = {}
         self.rqid = 0
+        self.partial_lineup = False
         self.selected: list[int] | None = None  # team indices brought (lead first), set at team preview
         self.apply([f"|player|{role}|{username}|", f"|player|{self.opp_role}|{opponent}|", "|gen|9",
                     "|gametype|singles"])
@@ -59,6 +62,18 @@ class BattleSession:
             self.log.append(line)
             split = line.split("|")
             kind = split[1] if len(split) > 1 else ""
+            if self.partial_lineup and kind in {'switch', 'drag', 'replace'} and split[2].startswith(self.role):
+                from pokesim.live.provenance import base
+
+                index = next((i for i, s in enumerate(self.sets) if base(s['species']) == base(split[3])), None)
+                if index is not None and index not in self.selected:
+                    self.selected.append(index)
+            if kind == '-transform' and split[3].startswith(self.role):
+                target = self.battle.active_pokemon
+                if target is not None:
+                    info = next((i for i in self.info if i['name'] == target.name), None)
+                    if info:
+                        target.stats.update(self._current_stats(info, target))
             if kind == "win":
                 self.battle.won_by(split[2])
             elif kind == "tie":
@@ -135,6 +150,17 @@ class BattleSession:
                         "disabled": disabled})
         return out
 
+    def _current_stats(self, info, mon):
+        from pokesim.sim.formes import current_forme
+
+        if mon is None or current_forme(mon) == info['species'].lower().replace('-', ''):
+            return info['stats']
+        key = (info['name'], current_forme(mon))
+        if key not in self.forme_stats:
+            original = self.sets[self.info.index(info)]
+            self.forme_stats[key] = team_stats([dict(original, species=current_forme(mon))], self.format_id)[0]['stats']
+        return self.forme_stats[key]
+
     def request(self, force_switch: bool = False, team_preview: bool = False) -> dict:
         self.rqid += 1
         pokemon, active_info = [], None
@@ -156,9 +182,10 @@ class BattleSession:
             # its observed forme when poke-env refreshes the next request.
             details = mon._last_details if mon is not None and mon._last_details else info['details']
             pokemon.append({"ident": f"{self.role}: {info['name']}", "details": details,
-                            "condition": condition, "active": active, "stats": info["stats"],
+                            "condition": condition, "active": active, "stats": self._current_stats(info, mon),
                             "moves": [m["id"] for m in info["moves"]], "baseAbility": info["ability"],
-                            "item": item, "pokeball": "pokeball", "ability": info["ability"]})
+                            "item": item, "pokeball": "pokeball",
+                            "ability": mon.ability if mon is not None and mon.ability else info["ability"]})
         pokemon.sort(key=lambda p: not p["active"])
         req: dict = {"side": {"name": self.username, "id": self.role, "pokemon": pokemon}, "rqid": self.rqid}
         if team_preview:

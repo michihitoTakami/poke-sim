@@ -200,6 +200,9 @@ def run_case(engine: Lookahead, sets: list[dict], own_sets: dict, rec: dict, cas
     branches = {"seeds": cfg["seeds"], "continuations": cfg["continuations"], "maxTurns": cfg["max_turns"]}
     if cfg.get("information_scope") == "public_observation":
         branches.update(informationScope="public_observation", observationLog=session.log)
+    if cfg.get("policy_nets"):
+        branches["policyNets"] = cfg["policy_nets"]
+        branches["continuationNetSha"] = cfg.get("continuation_net_sha")
     if case["actions"] is not None:
         branches["actions"] = case["actions"]
     request = {"format": FORMAT, "samples": samples, "branches": branches}

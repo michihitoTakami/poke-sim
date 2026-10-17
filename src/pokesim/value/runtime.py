@@ -15,10 +15,13 @@ class ValueEnsemble:
     """The value model the search calls on open leaves: either the fixed-reference V_ref run
     (pokesim.value.train) or a run trained on real game outcomes (pokesim.learn.train_value)."""
 
-    def __init__(self, run):
+    def __init__(self, run, *, allow_candidate=False):
         run = Path(run).resolve()
         report = json.loads((run / 'report.json').read_text())
         cfg = report['provenance']
+        if cfg.get('target') == 'terminal_branch_continuation':
+            self._load_branch(run, report, cfg, allow_candidate)
+            return
         if cfg.get('target') == 'real_outcome':
             self._load_real(run, report, cfg)
             return
@@ -51,6 +54,40 @@ class ValueEnsemble:
             raise ValueError('empty value ensemble')
         self.version = {'dataset_id': cfg['dataset_id'], 'report_sha': file_sha(run / 'report.json'),
                         'checkpoints': hashes, 'reference': expected, 'run': str(run)}
+
+    def _load_branch(self, run, report, cfg, allow_candidate):
+        from pokesim.config import ROOT
+        from pokesim.evaluation.branch_matches import tree_sha
+        from pokesim.learn.value_dataset import DEX
+        from pokesim.runtime.bundle import file_hash
+
+        if not allow_candidate and (not report.get('gate', {}).get('passed') or
+                                    not cfg['reference'].get('policy_sha')):
+            raise ValueError('branch candidate has not passed the untouched calibration gate')
+        if (cfg['feature_code_sha'] != file_hash(Path(__file__).with_name('features.py')) or
+                cfg['dex_sha'] != file_hash(DEX) or
+                cfg['worker_code_sha'] != tree_sha(ROOT / 'services/sim-tools', {'.js'})):
+            raise ValueError('branch features, dex or continuation code differ from training')
+        self.encoder, self.features = Encoder.load(DEX), cfg['features']
+        self.models, hashes = [], {}
+        torch.set_num_threads(2)
+        for item in report['stages'].values():
+            path = run / item['checkpoint']
+            if path.parent != run or file_hash(path) != item['sha']:
+                raise ValueError('modified branch checkpoint')
+            model, saved = load_checkpoint(path)
+            if saved.get('reference') != cfg['reference'] or saved['features'] != self.features:
+                raise ValueError('branch value continuation mismatch')
+            self.models.append(model)
+            hashes[path.name] = item['sha']
+        policy = run / report['policy']['path']
+        if policy.parent != run or file_hash(policy) != report['policy']['sha']:
+            raise ValueError('modified branch ranking policy')
+        if cfg['reference'].get('policy_sha') and file_sha(policy) != cfg['reference']['policy_sha']:
+            raise ValueError('value target was generated under a different actor')
+        self.branch_policy = str(policy.resolve())
+        self.version = {'dataset_id': cfg['source_split_sha'], 'report_sha': file_sha(run / 'report.json'),
+                        'checkpoints': hashes, 'reference': cfg['reference'], 'run': str(run)}
 
     def _load_real(self, run, report, cfg):
         """Runs written by pokesim.learn.train_value hash files with pokesim.runtime.bundle.file_hash."""

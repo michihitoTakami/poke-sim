@@ -4,6 +4,7 @@ const {createHash} = require('crypto');
 const {PublicObservation, legalChoices} = require('./public_observation');
 const {pruneRoot} = require('./action_filter');
 const {choosePublic, chooseBatonPublic, observedStep, VERSION, BATON_VERSION} = require('./public_policy');
+const {PlanPolicy, choosePlannedPublic, VERSION: PLAN_VERSION} = require('./public_plans');
 const {loadPolicyNet} = require('./policy_net');
 const {VERSION: STATE_VERSION} = require('./state_codec');
 
@@ -59,8 +60,8 @@ class Search {
   constructor(req, deps) {
     this.deps = deps; this.history = req.observationLog; this.nodes = new Map(); this.pending = new Map();
     this.opponentSelection = req.opponentSelection || null;
-    this.policy = req.batonPolicy === false ? choosePublic : chooseBatonPublic;
-    this.policyVersion = req.batonPolicy === false ? VERSION : BATON_VERSION;
+    this.policy = req.batonPolicy === false ? choosePublic : choosePlannedPublic;
+    this.policyVersion = req.batonPolicy === false ? VERSION : PLAN_VERSION;
     // stream: an independent random stream over the same worlds (offline oracles merge several; live uses none).
     this.id = hash(req.stream ? [req.samples, this.history, req.stream] : [req.samples, this.history]);
     this.serial = 0; this.cursor = 0; this.simulations = 0;
@@ -82,7 +83,7 @@ class Search {
     const rotation = (side, fallback) => {
       const list = req.rolloutPolicies && req.rolloutPolicies[side];
       if (!Array.isArray(list) || !list.length) return fallback;
-      for (const name of list) if (!['greedy', 'tactical', 'expert', 'disrupt'].includes(name)) {
+      for (const name of list) if (!['greedy', 'tactical', 'expert', 'disrupt', 'planned'].includes(name)) {
         throw Error(`unknown rollout policy ${name}`);
       }
       return list;
@@ -111,7 +112,8 @@ class Search {
       this.policyVersion += '+nets:' + Object.entries(this.policyNets).map(([k, v]) => `${k}=${v.slice(0, 8)}`).join(',');
     }
     this.active = null; this.unfinishedAtDeadline = 0;
-    this.rootProgress = req.rootProgress !== false;
+    this.rootProgress = req.rootProgress === true;
+    this.focus = null;
     this.states = req.samples.map(sample => {
       const b = deps.setUp(sample, req.format, 1);
       const st = {snapshot: JSON.stringify(deps.State.serializeBattle(b)), entry: b.pokesimEntryLog || [],
@@ -131,7 +133,7 @@ class Search {
     this.actionFilter = pruneRoot(this.states, deps);
     for (const st of this.states) {
       st.cells = st.p1.map(() => st.p2.map(() => ({prior: null, n: 0, sum: 0, sumSq: 0, speed: 0, ends: 0, failed: 0,
-        progressSum: 0, progressN: 0, priorProgress: null})));
+        progressSum: 0, progressN: 0, priorProgress: null, orderFirst: 0, orderN: 0})));
     }
     this.jobs = [];
     for (let i = 0; i < this.states[0].p1.length; i++) for (let w = 0; w < this.states.length; w++) {
@@ -194,7 +196,7 @@ class Search {
         const priors = net.prior(view, b.dex, options);
         node.actions.forEach((a, i) => { a.prior = priors[i]; });
       } else {
-        const prior = this.policy(view, side.id === 'p1' ? 'expert' : 'disrupt', b.dex)[0];
+        const prior = this.policy(view, this.rolloutPolicies[side.id][0], b.dex)[0];
         node.actions.forEach(a => { a.prior = a.choice === prior ? 1 : 0; });
       }
       this.nodes.set(key, node);
@@ -217,6 +219,7 @@ class Search {
 
   backup(item, p) {
     const v = 2 * p - 1, cell = item.cell;
+    if (item.first !== null && item.first !== undefined) { cell.orderFirst += item.first; cell.orderN++; }
     if (item.initial) {
       // A root-step terminal result is exact in this sampled branch. Open positions retain their bounded
       // reference/material anchor instead of being replaced by the first deep rollout's binary result.
@@ -253,20 +256,33 @@ class Search {
       const total = side => side.pokemon.reduce((v, m) => v + (m.hp > 0 ? .7 : 0) + .35 * m.hp / m.maxhp, 0);
       return total(b.p1) - total(b.p2);
     };
-    const initialMaterial = material(); let progress = null;
+    const initialMaterial = material(); let progress = null, first = null;
     const names = this.rolloutPolicies, serial = this.serial;
     const random = xorshift(bytes.readUInt32LE(8));
     let rolloutTurns = 0;
+    const controllers = {p1: new PlanPolicy(), p2: new PlanPolicy()};
     const rollout = side => {
       const view = obs.view(side), net = this.nets[side.id];
       if (net && rolloutTurns < this.rolloutNetTurns && random() < this.rolloutMix[side.id]) {
         const legal = legalChoices(view);
-        if (legal.length) return net.sample(view, b.dex, legal, random, this.rolloutTemperature[side.id])[0];
+        if (legal.length) {
+          if (this.rolloutTemperature[side.id] <= 0) {
+            const weights = net.prior(view, b.dex, legal);
+            return legal[weights.indexOf(Math.max(...weights))][0];
+          }
+          return net.sample(view, b.dex, legal, random, this.rolloutTemperature[side.id])[0];
+        }
       }
-      return this.policy(view, names[side.id][serial % names[side.id].length], b.dex)[0];
+      const name = names[side.id][serial % names[side.id].length];
+      return (name === 'planned' ? controllers[side.id].choose(view, b.dex) : this.policy(view, name, b.dex))[0];
     };
     const advance = (a, c) => {
       this.deps.observedStep(b, a, c, this.deps.step, rollout, root ? [] : ['p1', 'p2']);
+      if (root) {
+        const event = b.log.slice(at).map(l => l.split('|')).find(p =>
+          ['move', 'switch', 'cant'].includes(p[1]) && /^p[12]a:/.test(p[2] || '') && !p.some(x => x.startsWith('[from]')));
+        if (event) first = event[2].startsWith('p1') ? 1 : 0;
+      }
       root = false; obs.append(b.log.slice(at), true); at = b.log.length;
       if (progress === null && (b.ended || b.requestState === 'move')) progress = material() - initialMaterial;
     };
@@ -287,7 +303,7 @@ class Search {
         advance(a, c);
         if (!initial && !b.ended && b.requestState === 'move') yield;
       }
-      const item = {cell, trace, initial, ended: b.ended, turns: b.turn - start, progress};
+      const item = {cell, trace, initial, ended: b.ended, turns: b.turn - start, progress, first};
       this.maxRolloutTurns = Math.max(this.maxRolloutTurns, item.turns);
       if (b.ended) {
         this.backup(item, b.winner === 'p1' ? 1 : b.winner === 'p2' ? 0 : .5); this.terminal++;
@@ -308,14 +324,16 @@ class Search {
   pickJob() {
     // Every reply gets repeated evidence before a seemingly good row consumes the remaining budget.
     const underexplored = this.jobs.filter(([w, i, j]) => {
-      const c = this.states[w].cells[i][j]; return c.n + c.failed < this.minimumTrials;
+      const c = this.states[w].cells[i][j];
+      return (!this.focus || this.focus.includes(i)) && c.n + c.failed < this.minimumTrials;
     });
     if (underexplored.length) return underexplored[this.simulations % underexplored.length];
     const n = this.states[0].p1.length, visits = Array(n).fill(0);
     for (const st of this.states) for (let i = 0; i < n; i++) visits[i] += st.cells[i].reduce((s, c) => s + c.n, 0);
     const total = visits.reduce((a, b) => a + b, 0), scores = visits.map((x, i) =>
       (this.rootMix?.[i] || 0) + Math.sqrt(2 * Math.log(total + 2) / (1 + x)));
-    const row = scores.indexOf(Math.max(...scores));
+    const allowed = this.focus?.length ? this.focus : Array.from({length: n}, (_, i) => i);
+    const row = allowed.reduce((a, b) => scores[b] > scores[a] ? b : a);
     let job, least = Infinity;
     for (let w = 0; w < this.states.length; w++) {
       const replies = this.states[w].p2.length, weights = this.columns?.[w];
@@ -341,7 +359,8 @@ class Search {
     });
   }
 
-  advance(ms, mix, columns) {
+  advance(ms, mix, columns, focus) {
+    if (focus) this.focus = focus;
     this.rootMix = mix || this.rootMix;
     this.setColumns(columns);
     const deadline = Date.now() + ms, pending = [];
@@ -366,6 +385,7 @@ class Search {
       state_codec: STATE_VERSION,
       opponent_selection: this.opponentSelection,
       continuation_policy: this.policyVersion, bootstrap_reference: VERSION,
+      focused_actions: this.focus,
       root_speed_samples: this.states.map(s => s.speed),
       ready, simulations: this.simulations,
       terminal: this.terminal, learned: this.learned, censored: this.censored,
@@ -382,6 +402,7 @@ class Search {
     return {session: this.id, pending, summary, results: this.states.map(st => ({
       p1: st.p1.map(x => x[1]), p2: st.p2.map(x => x[1]), p2Prior: st.p2Prior || null,
       payoff: st.cells.map((row, i) => row.map(c => this.certified.includes(st.p1[i][1]) ? 1 : this.value(c))),
+      actionOrder: st.cells.map(row => row.map(c => ({first: c.orderFirst, trials: c.orderN}))),
       winSpeed: st.cells.map(row => row.map(c => this.speed(c))),
       ...(this.rootProgress ? {rootProgress: st.cells.map(row => row.map(c => c.progressN ?
         ((c.priorProgress ?? 0) * this.priorVisits + c.progressSum) / (this.priorVisits + c.progressN) :
@@ -430,7 +451,7 @@ function terminalSearch(req, deps) {
   } else if (!session || session.id !== op.session) throw Error('unknown terminal search session');
   session.feedback(op.feedback);
   if (op.op === 'finish') { const reply = session.finish(); session = null; return reply; }
-  return session.advance(Math.min(1000, Math.max(1, op.sliceMs || 500)), op.mix, op.columns);
+  return session.advance(Math.min(1000, Math.max(1, op.sliceMs || 500)), op.mix, op.columns, op.focus);
 }
 
 module.exports = {terminalSearch, immediateWin, Search};

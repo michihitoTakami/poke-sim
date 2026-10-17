@@ -69,6 +69,9 @@ def own_sample_side(battle, own_sets: dict, base_id) -> dict:
         current["item"] = active.item or ""
     sets = [current] + [s for s in own_sets.values() if s is not original][:2]
     state = mon_state(active, True, own=True)
+    state.update(battle.state_tracker.locks(battle.player_role, active.name))
+    if 'transform' in state:
+        state['transform'] = dict(state['transform'], sourceSide='p2')
     for k in ("ppUsed", "pp", "choiceMove"):  # damage and speed do not depend on them; avoid PP mismatches
         state.pop(k, None)
     return {"team": sets, "mons": [state, {"hp": 1.0}, {"hp": 1.0}], "megaUsed": battle.used_mega_evolve,
@@ -80,6 +83,9 @@ def opponent_sample_side(battle) -> dict:
     """The opponent's active first; its set (team[0]) is filled in per candidate. Padding repeats the slot."""
     active = battle.opponent_active_pokemon
     state = mon_state(active, True)
+    state.update(battle.state_tracker.locks(battle.opponent_role, active.name))
+    if 'transform' in state:
+        state['transform'] = dict(state['transform'], sourceSide='p1')
     item = revealed(active)[1]
     if item is not None:
         state["item"] = item  # empty string means known to have none

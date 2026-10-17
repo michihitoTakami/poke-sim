@@ -8,6 +8,7 @@ from poke_env.data import GenData
 
 _original = Pokemon.forme_change
 _original_mega = Pokemon.mega_evolve
+_original_transform = Pokemon.transform
 
 
 def _forme_change(self, species: str):
@@ -51,3 +52,14 @@ def current_forme(mon: Pokemon) -> str:
     """Species id of the forme it is in (e.g. "mimikyubusted"), else its species id."""
     details = mon._last_details.split(",")[0] if mon._last_details else ""
     return "".join(c for c in details.lower() if c.isalnum()) or mon.species
+
+
+def _transform(self, into):
+    _original_transform(self, into)
+    # The target's species id can still be its base after a Mega change. Copy its CURRENT public forme.
+    self._temporary_base_stats = dict(into.base_stats)
+    self._temporary_types = list(into.types)
+
+
+if getattr(Pokemon.transform, '__name__', '') != '_transform':
+    Pokemon.transform = _transform
