@@ -262,11 +262,17 @@ class Advisor:
         if self.opponent_policy is not None and log and battle.opponent_active_pokemon is not None:
             cloned = self.opponent_policy.predict(log, our_role)
         opp_active = battle.opponent_active_pokemon
+        # After a double KO both actives are fainted and both sides pick a replacement at once; the simulator
+        # rebuilds that as two forced switches, so ours is still searched. Without a policy (--policy none) it
+        # would otherwise be a random switch, and the quality gate stops collection. (A forced switch of a live
+        # active while the opponent's is fainted, a U-turn KO, is not searched: the rebuilt root has no switch.)
+        ours = battle.active_pokemon
+        double_ko = battle.force_switch and (ours is None or ours.fainted)
         can_search = (
             self.engine
             and opp_active is not None
-            and not opp_active.fainted
-            and (battle.active_pokemon is not None or battle.force_switch)
+            and (not opp_active.fainted or double_ko)
+            and (ours is not None or battle.force_switch)
         )
         mask = np.array(SinglesEnv.get_action_mask(battle), dtype=bool)
 
