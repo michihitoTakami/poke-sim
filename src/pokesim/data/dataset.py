@@ -21,6 +21,7 @@ def observation_code() -> dict:
         "rl/threats.py",
         "sim/damage.py",
         "sim/effectiveness.py",
+        "sim/formes.py",
         "live/session.py",
         "state/codec.py",
         "state/tracker.py",

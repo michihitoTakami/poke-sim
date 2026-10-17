@@ -136,9 +136,14 @@ def test_faster_lethal_attack_is_taken_instead_of_a_fatal_heal_or_setup(move):
         advice = plan(search(engine, req), pure=True)
     finally:
         engine.close()
-    assert advice.ranked()[0][0] == 'move:' + move
-    assert advice.status['terminal_search']['failed'] == 0
-    assert advice.status['terminal_search']['continuation_policy'] == 'public-baton-v1'
+    chosen = advice.ranked()[0][0]
+    summary = advice.status['terminal_search']
+    # Flash Cannon also KOs this 20%-HP Chandelure. If the anytime certificate finds it first,
+    # accepting that proven win is the contract; the test must not demand a particular winning label.
+    alternative_win = move == 'shadowball' and chosen == 'move:flashcannon' and chosen in summary['immediate_wins']
+    assert chosen == 'move:' + move or alternative_win
+    assert summary['failed'] == 0
+    assert summary['continuation_policy'] == 'public-baton-v1'
 
 
 def test_playing_one_move_uses_its_own_risk_instead_of_the_largest_mixed_probability():

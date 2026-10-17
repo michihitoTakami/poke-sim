@@ -15,7 +15,7 @@ import itertools
 import json
 import sys
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 
@@ -87,6 +87,8 @@ class OpponentPicks:
     species: list[str]
     brought: np.ndarray  # P(brought), sums to 3
     lead: np.ndarray  # P(lead), sums to 1
+    lineups: list[tuple[list[str], float]] = field(default_factory=list)  # coherent 3-member/lead distribution
+    context: dict = field(default_factory=dict)
 
 
 class PickModel:
@@ -94,12 +96,25 @@ class PickModel:
         data = json.loads(path.read_text()) if path.exists() else {"mean": {"brought": 0.5, "lead": 1 / 6},
                                                                       "species": {}}
         self.mean, self.rates = data["mean"], data["species"]
+        self.prior_sha = hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()[:16]
+        self._conditional = None
 
-    def predict(self, species: list[str]) -> OpponentPicks:
+    def predict(self, species: list[str], roster: list[str] | None = None,
+                records: Path | None = None) -> OpponentPicks:
         ids = [to_id(s) for s in species]
         b = np.array([self.rates.get(s, self.mean)["brought"] for s in ids])
         lead = np.array([self.rates.get(s, self.mean)["lead"] for s in ids])
-        return OpponentPicks(list(species), scale_to(b, 3.0), lead / lead.sum())
+        base = OpponentPicks(list(species), scale_to(b, 3.0), lead / lead.sum())
+        if roster is None or len(ids) < 3 or len(set(ids)) != len(ids):
+            return base
+        from pokesim.live.opponent_selection import VERSION, OpponentLineups, pick_rows
+
+        rows = pick_rows(records or RAW_DIR / 'ladder', roster)
+        stamp = hashlib.sha256(json.dumps([VERSION, self.prior_sha, sorted(map(to_id, roster)), rows],
+                                         sort_keys=True).encode()).hexdigest()
+        if self._conditional is None or self._conditional.signature != stamp:
+            self._conditional = OpponentLineups(rows, self, signature=stamp)
+        return self._conditional.predict(base)
 
 
 class MatchupModel:

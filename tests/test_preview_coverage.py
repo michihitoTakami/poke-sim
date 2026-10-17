@@ -142,6 +142,7 @@ def test_api_preview_uses_the_same_trio_ranking_when_the_old_table_is_empty(monk
     live.reset = lambda: None
     live.name = lambda sid: sid
     live.picks_model = PickModel()
+    live.advisor = SimpleNamespace(engine=None)
     live.matchups = None
     live.preview_coverage = SimpleNamespace(profile=lambda _: profile)
 

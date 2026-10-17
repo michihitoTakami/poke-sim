@@ -1,0 +1,24 @@
+[
+ {
+  "record": "/tmp/pokesim-state-local/20261018-043416-2.json",
+  "sha256": "33322175a9d7a50610fc81e4178f762948a82ea95340a63b6b20cd57709f2c5e",
+  "result": "win",
+  "decisions": 7,
+  "max_seconds": 4.11,
+  "fallbacks": 0,
+  "simulation_errors": 0,
+  "state_codec": "observed-state-v2",
+  "selection": null
+ },
+ {
+  "record": "/tmp/pokesim-selection-local/20261018-044254-3.json",
+  "sha256": "61c16d2c5313eb69ef7aaf660fa238797123b3ed7edb3cde6a611a424c3a28a0",
+  "result": "win",
+  "decisions": 11,
+  "max_seconds": 4.03,
+  "fallbacks": 0,
+  "simulation_errors": 0,
+  "state_codec": "observed-state-v2",
+  "selection": null
+ }
+]

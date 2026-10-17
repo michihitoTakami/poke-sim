@@ -46,7 +46,9 @@ def git_commit(repo: str = str(ROOT)) -> dict:
 
 def describe(policy: str | Path | None = None, matchup_meta: dict | None = None, **extra) -> dict:
     """Version info for a battle record."""
-    out = {"code": git_commit(), "engine": git_commit(str(SHOWDOWN_DIR))}
+    from pokesim.state.codec import VERSION
+
+    out = {"code": git_commit(), "engine": git_commit(str(SHOWDOWN_DIR)), "state_codec": VERSION}
     if policy:
         out["policy"] = {"path": Path(policy).name, "sha": file_hash(policy)}
     if matchup_meta is not None:

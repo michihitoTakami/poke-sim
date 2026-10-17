@@ -1,25 +1,46 @@
 // Simulator reconstruction boundary. Explicit fields carry known/sample state; unknown counters stay sampled.
 const path = require('path');
+const VERSION = 'observed-state-v2';
 
 function createCodec(dir) {
   const { Battle, Teams } = require(path.resolve(dir, 'dist/sim'));
   function setUp(sample, format, seed) {
     const battle = new Battle({ formatid: format, seed: [seed, seed + 1, seed + 2, seed + 3] });
-    battle.setPlayer('p1', { name: 'p1', team: Teams.pack(sample.p1.team) });
-    battle.setPlayer('p2', { name: 'p2', team: Teams.pack(sample.p2.team) });
+    // Current items override the team sheet before entry events. Restoring them afterwards resurrects
+    // consumed balloons/berries during setup, and a removed stone incorrectly keeps Mega available.
+    for (const id of ['p1', 'p2']) {
+      const spec = sample[id];
+      const team = spec.team.map((set, i) => Object.hasOwn(spec.mons[i] || {}, 'item') ?
+        {...set, item: spec.mons[i].item} : set);
+      battle.setPlayer(id, {name: id, team: Teams.pack(team)});
+    }
     battle.choose('p1', 'team 123');
     battle.choose('p2', 'team 123');
     for (const sideId of ['p1', 'p2']) {
       const side = battle[sideId], spec = sample[sideId];
+      const fainted = spec.mons.filter(s => s.hp !== undefined && s.hp <= 0).length;
+      const totalFainted = spec.totalFainted ?? fainted;
+      if (!Number.isInteger(totalFainted) || totalFainted < fainted || totalFainted > 100) {
+        throw new Error('Invalid cumulative faint count');
+      }
+      side.totalFainted = totalFainted;
       side.pokemon.forEach((mon, i) => {
         const s = spec.mons[i] || {};
-        if (s.mega) {
+        if (s.forme) {
+          // An observed forme is a fact, independent of the sampled original item (notably X/Y/Z).
+          const forme = battle.dex.species.get(s.forme);
+          if (!forme.exists || !mon.formeChange(forme.name, null, true)) throw new Error('Invalid observed forme');
+          if (forme.isMega) mon.canMegaEvo = null;
+        } else if (s.mega || s.tryMega) {
           // A previously evolved bench member remains Mega when it comes back in, even after the right was used.
           mon.canMegaEvo = battle.actions.canMegaEvo(mon);
+          if (!mon.canMegaEvo && s.mega) throw new Error('Observed Mega forme needs its forme or stone');
           if (mon.canMegaEvo) battle.actions.runMegaEvo(mon);
         }
         if (spec.megaUsed) mon.canMegaEvo = null;
-        if (s.forme) mon.formeChange(s.forme, null, true);  // battle-only forme it is in (Mimikyu-Busted, ...)
+        // This ability's entry multiplier depends on previous faints. Setup entry ran before the roster was
+        // restored; future real entries still run the simulator's onStart normally.
+        if (mon.isActive && mon.ability === 'supremeoverlord') mon.abilityState.fallen = Math.min(totalFainted, 5);
         if (s.hp !== undefined && s.hp <= 0) {
           mon.hp = 0; mon.fainted = true; mon.status = 'fnt'; side.pokemonLeft--;
           return;
@@ -168,4 +189,4 @@ function createCodec(dir) {
 
   return {setUp};
 }
-module.exports = {createCodec};
+module.exports = {createCodec, VERSION};

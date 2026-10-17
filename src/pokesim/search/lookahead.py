@@ -27,6 +27,7 @@ from pokesim.data.summarize_sets import SpeciesSummary, summarize
 from pokesim.db.models import Item, Learnset, Move, Species
 from pokesim.db.session import Session
 from pokesim.sim.formes import current_forme
+from pokesim.state.codec import fainted_count
 
 STATS = ["hp", "atk", "def", "spa", "spd", "spe"]
 WEATHER_IDS = {"RAINDANCE": "raindance", "SUNNYDAY": "sunnyday", "SANDSTORM": "sandstorm", "SNOWSCAPE": "snowscape",
@@ -214,7 +215,8 @@ def revealed(mon: Pokemon) -> tuple[tuple[str, ...], str | None, str | None]:
     """An opponent's Pokémon's revealed moves, item ("" when known to have none, None when unknown) and ability."""
     item = None if mon.item == "unknown_item" else (mon.item or "")
     if mega_evolved(mon) and not item:
-        item = None
+        # Evolution publicly reveals the stone, even if poke-env did not put it into the item slot.
+        item = to_id(GenData.from_gen(9).pokedex.get(current_forme(mon), {}).get("requiredItem", "")) or None
     return tuple(mon.moves), item, mon.ability
 
 
@@ -223,8 +225,12 @@ def mon_state(mon: Pokemon, active: bool, own: bool = False) -> dict:
 
     out = {"hp": 0.0 if mon.fainted else mon.current_hp_fraction, "mega": mega_evolved(mon)}
     out.update(known_counters(mon, active, own))
+    if out["mega"] and not out.get("item"):
+        stone = revealed(mon)[1]
+        if stone:
+            out["item"] = stone
     entry = GenData.from_gen(9).pokedex.get(current_forme(mon), {})
-    if entry.get("battleOnly") and not mega_evolved(mon):  # e.g. Mimikyu-Busted (no Disguise left), Aegislash-Blade
+    if entry.get("battleOnly") or (entry.get("forme") or "").startswith("Mega"):
         out["forme"] = entry["name"]
     if mon.status and not mon.fainted:
         out["status"] = mon.status.name.lower()
@@ -381,6 +387,7 @@ class Lookahead:
             states[0].update(battle.state_tracker.locks(battle.player_role, active.name))
         out = {"team": [own_sets[self.sampler.base_id(m.species)] for m in mons],
                 "mons": states,
+                "totalFainted": fainted_count(battle, battle.player_role, mons),
                 "megaUsed": battle.used_mega_evolve, "conditions": side_conditions(battle.side_conditions,
                                                                                     battle.turn)}
         if incoming is not None:
@@ -393,11 +400,23 @@ class Lookahead:
         """belief (pokesim.belief.sets.SetBelief): draw the revealed Pokémon's sets from what the battle showed
         instead of from the prior alone."""
         active = battle.opponent_active_pokemon
-        seen = [active] + [m for m in battle.opponent_team.values() if m is not active]
+        # poke-env leaves a zero-HP/zero-max-HP placeholder for the species an Illusion imitated.
+        # It is still an unknown preview candidate, not a selected fainted opponent or a fourth slot.
+        seen = [active] + [m for m in battle.opponent_team.values()
+                           if m is not active and (m.fainted or m.max_hp > 0)]
         seen_ids = {self.sampler.base_id(m.species) for m in seen}
         unseen = [m.species for m in battle.teampreview_opponent_team
                   if self.sampler.base_id(m.species) not in seen_ids]
-        self.sampler.rng.shuffle(unseen)
+        picks = getattr(self, 'opponent_picks', {}).get(getattr(battle, 'battle_tag', ''))
+        predicted = None
+        if picks is not None:
+            from pokesim.live.opponent_selection import draw_unseen
+
+            predicted = draw_unseen(picks, seen_ids, self.sampler.rng)
+        if predicted is not None:
+            unseen = predicted
+        else:
+            self.sampler.rng.shuffle(unseen)
         team, mons = [], []
         for i, m in enumerate(seen[:3]):
             moves, item, ability = revealed(m)
@@ -412,7 +431,15 @@ class Lookahead:
             team.append(self.sampler.sample(sid))
             mons.append({"hp": 1.0})
         return {"team": team, "mons": mons, "megaUsed": battle.opponent_used_mega_evolve,
+                "totalFainted": fainted_count(battle, battle.opponent_role, seen),
                 "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
+
+    def set_opponent_picks(self, tag, picks):
+        if not hasattr(self, 'opponent_picks'):
+            self.opponent_picks = {}
+        self.opponent_picks[tag] = picks
+        while len(self.opponent_picks) > 16:
+            del self.opponent_picks[next(iter(self.opponent_picks))]
 
     def query(self, battle: Battle, own_sets: dict[str, dict], incoming: Pokemon | None = None,
               search: dict | None = None, belief=None, log=None, our_role='p1', value=False,
@@ -444,6 +471,9 @@ class Lookahead:
                 if previous_belief_rng is not None:
                     belief.rng = previous_belief_rng
         request = {"format": FORMAT, "seeds": self.seeds, "rollout": self.rollout, "samples": samples}
+        picks = getattr(self, 'opponent_picks', {}).get(getattr(battle, 'battle_tag', ''))
+        if picks is not None:
+            request['opponentSelection'] = picks.context
         if self.win_decay is not None:
             request["winDecay"] = self.win_decay
         request.update(self.search)

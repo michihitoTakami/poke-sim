@@ -38,6 +38,10 @@ def continuation_context(sets: list[dict], planner: dict | None, combine: dict, 
     """Identify the continuation that produced the outcome, independently of the policy's input/value identity."""
     config = {"team": sets, "planner": planner, "combine": combine, "reward": reward,
               "lookahead": search, "sample": sample}
+    if search:
+        from pokesim.state.codec import VERSION
+
+        config['state_codec'] = VERSION
     return hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()[:16]
 
 

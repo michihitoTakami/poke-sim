@@ -1,6 +1,7 @@
 """Protocol state shared by live requests, replay reconstruction and opponent beliefs."""
 import json
 import subprocess
+from copy import deepcopy
 from functools import cache
 
 from poke_env.battle import Battle, Effect
@@ -35,6 +36,7 @@ class ProtocolTracker:
     def __init__(self):
         self.active = {}
         self.states = {}
+        self.total_fainted: dict[str, int] = {}
 
     def apply(self, parts: list[str]) -> None:
         if len(parts) < 3 or ": " not in parts[2]:
@@ -42,11 +44,18 @@ class ProtocolTracker:
         kind, ident = parts[1], parts[2]
         role, name = ident[:2], ident.split(": ", 1)[1]
         key = (role, name)
+        if kind == "faint":
+            self.total_fainted[role] = min(100, self.total_fainted.get(role, 0) + 1)
         if kind in {"switch", "drag"}:
             previous = self.active.get(role)
             if previous:
                 self.states.pop((role, previous), None)
             self.states.pop(key, None)
+            self.active[role] = name
+        elif kind == 'replace':
+            previous = self.active.get(role)
+            if previous and previous != name:
+                self.states[key] = self.states.pop((role, previous), {})
             self.active[role] = name
         state = self.states.setdefault(key, {})
         if kind == "move" and len(parts) > 3 and not any(p.startswith("[from]") for p in parts[4:]):
@@ -64,12 +73,13 @@ class ProtocolTracker:
 
 
 class TrackedBattle(Battle):
-    __slots__ = ("state_tracker", "_pending_baton")
+    __slots__ = ("state_tracker", "_pending_baton", "_illusion_entry")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.state_tracker = ProtocolTracker()
         self._pending_baton: dict[str, str] = {}
+        self._illusion_entry: dict[str, dict] = {}
 
     def parse_message(self, split_message: list[str]) -> None:
         parts = split_message
@@ -77,6 +87,19 @@ class TrackedBattle(Battle):
         ident = parts[2] if len(parts) > 2 else ''
         role = ident[:2]
         outgoing = self.active_pokemon if role == self.player_role else self.opponent_active_pokemon
+        table = self.team if role == self.player_role else self.opponent_team
+        if kind in {'switch', 'drag'} and ': ' in ident:
+            key = f'{role}: {ident.split(": ", 1)[1]}'
+            # If this entry later proves to be an Illusion, restore what was known about the imitated species
+            # before it entered. It may really have appeared earlier; do not erase its genuine history.
+            self._illusion_entry[role] = {'key': key, 'before': deepcopy(table.get(key)),
+                                          'moves': {}, 'item': False, 'ability': False}
+        entry = self._illusion_entry.get(role)
+        illusion = None
+        if kind == 'replace' and outgoing is not None and entry:
+            illusion = {'boosts': dict(outgoing.boosts), 'effects': dict(outgoing.effects),
+                        'item': outgoing.item, 'ability': outgoing.ability, 'last_move': outgoing.last_move,
+                        'protect_counter': outgoing.protect_counter}
         passed = None
         if kind in {'switch', 'drag'}:
             pending = self._pending_baton.pop(role, None)
@@ -95,7 +118,38 @@ class TrackedBattle(Battle):
             self._pending_baton.clear()
 
         self.state_tracker.apply(parts)
-        super().parse_message(parts)
+        # Showdown sends |-mega|ident|base species|stone. poke-env reads the fourth field as the stone.
+        # Preserve the raw protocol in the caller's log; only adapt the parser input here.
+        parsed = parts[:3] + parts[4:] if kind == '-mega' and len(parts) > 4 else parts
+        super().parse_message(parsed)
+        current = self.active_pokemon if role == self.player_role else self.opponent_active_pokemon
+        if entry and kind == 'move' and len(parts) > 3 and current is not None:
+            mid = move_id(parts[3])
+            if mid in current.moves:
+                entry['moves'][mid] = deepcopy(current.moves[mid])
+        elif entry and kind in {'-item', '-enditem'}:
+            entry['item'] = True
+        elif entry and kind == '-ability':
+            entry['ability'] = True
+        if illusion is not None and current is not None and current is not outgoing:
+            current.moves.update(entry['moves'])
+            current.boosts.update(illusion['boosts'])
+            current.effects.update(illusion['effects'])
+            last = illusion['last_move']
+            for mid, move in current.moves.items():
+                move._is_last_used = last is not None and mid == last.id
+            if entry['item']:
+                current.item = illusion['item']
+            if entry['ability']:
+                current.ability = illusion['ability']
+            current._protect_counter = illusion['protect_counter']
+            real_key = f'{role}: {current.name}'
+            if entry['key'] != real_key:
+                if entry['before'] is None:
+                    table.pop(entry['key'], None)
+                else:
+                    table[entry['key']] = entry['before']
+            self._illusion_entry.pop(role, None)
         if passed is not None:
             incoming = self.active_pokemon if role == self.player_role else self.opponent_active_pokemon
             incoming.boosts.update(passed[0])

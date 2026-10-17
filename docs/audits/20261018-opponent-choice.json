@@ -1,0 +1,3265 @@
+{
+ "until": "20261018-042024",
+ "available_games": 208,
+ "metrics": {
+  "event_log_loss": {
+   "games": 40,
+   "old": 3.765258638364326,
+   "new": 3.3926293307887256
+  },
+  "lead_correct": {
+   "games": 40,
+   "old": 0.225,
+   "new": 0.25
+  },
+  "member_brier": {
+   "games": 32,
+   "old": 0.24664615192949702,
+   "new": 0.2174532306342042
+  }
+ },
+ "comparisons": [
+  {
+   "record": "20261018-023119-2700095195.json",
+   "earlier_games": 168,
+   "compatible_lineups": 4,
+   "preview": [
+    "inteleon",
+    "crabominable",
+    "pyroar",
+    "decidueyehisui",
+    "trevenant",
+    "raichu"
+   ],
+   "old_event_log_loss": 4.928427019738185,
+   "new_event_log_loss": 4.786579982891598,
+   "old_lead": "trevenant",
+   "new_lead": "trevenant",
+   "actual_lead": [
+    "decidueyehisui"
+   ],
+   "top_lineups": [
+    [
+     [
+      "trevenant",
+      "pyroar",
+      "raichu"
+     ],
+     0.06869323306757738
+    ],
+    [
+     [
+      "trevenant",
+      "decidueyehisui",
+      "raichu"
+     ],
+     0.06334452976201002
+    ],
+    [
+     [
+      "trevenant",
+      "inteleon",
+      "raichu"
+     ],
+     0.053558551694370654
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_choice": [
+    "Salamence",
+    "Scolipede",
+    "Floette-Eternal"
+   ],
+   "new_choice": [
+    "Salamence",
+    "Scolipede",
+    "Floette-Eternal"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "88a4b6a9db18fa3c",
+    "logit_adjustment": 0.8452,
+    "mega": "salamence",
+    "selection_worst": 0.4108,
+    "uncovered": [],
+    "minimum_incoming": {
+     "crabominable": 0.505,
+     "decidueyehisui": 0.184,
+     "inteleon": 0.38,
+     "pyroar": 0.41,
+     "raichu": 0.359,
+     "trevenant": 0.18
+    }
+   }
+  },
+  {
+   "record": "20261018-023523-2700096203.json",
+   "earlier_games": 169,
+   "compatible_lineups": 1,
+   "preview": [
+    "mamoswine",
+    "primarina",
+    "mimikyu",
+    "sneasler",
+    "dragonite",
+    "golisopod"
+   ],
+   "old_event_log_loss": 3.113622768314285,
+   "new_event_log_loss": 2.7863896181323393,
+   "old_lead": "mamoswine",
+   "new_lead": "primarina",
+   "actual_lead": [
+    "primarina"
+   ],
+   "top_lineups": [
+    [
+     [
+      "primarina",
+      "mimikyu",
+      "dragonite"
+     ],
+     0.06164336874257622
+    ],
+    [
+     [
+      "dragonite",
+      "primarina",
+      "mimikyu"
+     ],
+     0.053118541214564885
+    ],
+    [
+     [
+      "primarina",
+      "mimikyu",
+      "golisopod"
+     ],
+     0.03893723913887919
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": true,
+   "old_member_brier": 0.1709285957094415,
+   "new_member_brier": 0.13997549817183289,
+   "old_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "c2bf6b46927788ad",
+    "logit_adjustment": 0.4062,
+    "mega": "floetteeternal",
+    "selection_worst": 0.233,
+    "uncovered": [],
+    "minimum_incoming": {
+     "dragonite": 0.276,
+     "golisopod": 0.254,
+     "mamoswine": 0.452,
+     "mimikyu": 0.369,
+     "primarina": 0.348,
+     "sneasler": 0.289
+    }
+   }
+  },
+  {
+   "record": "20261018-023749-2700097880.json",
+   "earlier_games": 170,
+   "compatible_lineups": 1,
+   "preview": [
+    "rillaboom",
+    "primarina",
+    "glimmora",
+    "annihilape",
+    "garchomp",
+    "manectric"
+   ],
+   "old_event_log_loss": 3.030124383140519,
+   "new_event_log_loss": 3.1293952756123242,
+   "old_lead": "manectric",
+   "new_lead": "manectric",
+   "actual_lead": [
+    "manectric"
+   ],
+   "top_lineups": [
+    [
+     [
+      "manectric",
+      "primarina",
+      "garchomp"
+     ],
+     0.10247396294660199
+    ],
+    [
+     [
+      "glimmora",
+      "garchomp",
+      "manectric"
+     ],
+     0.07065566433054882
+    ],
+    [
+     [
+      "manectric",
+      "glimmora",
+      "garchomp"
+     ],
+     0.06410232324496792
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": true,
+   "old_member_brier": 0.18497598409712013,
+   "new_member_brier": 0.1673773305574645,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "7e284bbd4516e5ba",
+    "logit_adjustment": 0.6331,
+    "mega": "floetteeternal",
+    "selection_worst": 0.378,
+    "uncovered": [],
+    "minimum_incoming": {
+     "annihilape": 0.196,
+     "garchomp": 0.169,
+     "glimmora": 0.252,
+     "manectric": 0.378,
+     "primarina": 0.412,
+     "rillaboom": 0.275
+    }
+   }
+  },
+  {
+   "record": "20261018-024153-2700099362.json",
+   "earlier_games": 171,
+   "compatible_lineups": 1,
+   "preview": [
+    "dragalge",
+    "corviknight",
+    "scovillain",
+    "clefable",
+    "garchomp",
+    "primarina"
+   ],
+   "old_event_log_loss": 2.294274570760233,
+   "new_event_log_loss": 2.0405134377471668,
+   "old_lead": "scovillain",
+   "new_lead": "scovillain",
+   "actual_lead": [
+    "scovillain"
+   ],
+   "top_lineups": [
+    [
+     [
+      "scovillain",
+      "garchomp",
+      "primarina"
+     ],
+     0.12996196636608776
+    ],
+    [
+     [
+      "primarina",
+      "scovillain",
+      "garchomp"
+     ],
+     0.08286279154210005
+    ],
+    [
+     [
+      "garchomp",
+      "scovillain",
+      "primarina"
+     ],
+     0.07668020854766523
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": true,
+   "old_member_brier": 0.12390638342906261,
+   "new_member_brier": 0.08641332624236568,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "f0c6ef65637fa0cf",
+    "logit_adjustment": 0.3484,
+    "mega": "floetteeternal",
+    "selection_worst": 0.1626,
+    "uncovered": [],
+    "minimum_incoming": {
+     "clefable": 0.231,
+     "corviknight": 0.079,
+     "dragalge": 0.371,
+     "garchomp": 0.382,
+     "primarina": 0.405,
+     "scovillain": 0.214
+    }
+   }
+  },
+  {
+   "record": "20261018-024413-2700101152.json",
+   "earlier_games": 172,
+   "compatible_lineups": 1,
+   "preview": [
+    "empoleon",
+    "cinderace",
+    "pawmot",
+    "garchomp",
+    "metagross",
+    "meowscarada"
+   ],
+   "old_event_log_loss": 3.551425870079464,
+   "new_event_log_loss": 3.0719075730757797,
+   "old_lead": "empoleon",
+   "new_lead": "empoleon",
+   "actual_lead": [
+    "cinderace"
+   ],
+   "top_lineups": [
+    [
+     [
+      "empoleon",
+      "pawmot",
+      "garchomp"
+     ],
+     0.09967600354296809
+    ],
+    [
+     [
+      "empoleon",
+      "cinderace",
+      "garchomp"
+     ],
+     0.05599918889303556
+    ],
+    [
+     [
+      "cinderace",
+      "pawmot",
+      "garchomp"
+     ],
+     0.046332687518062465
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.20926203278938912,
+   "new_member_brier": 0.19093777185494631,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "c04c549113995035",
+    "logit_adjustment": 0.5095,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2257,
+    "uncovered": [],
+    "minimum_incoming": {
+     "cinderace": 0.194,
+     "empoleon": 0.358,
+     "garchomp": 0.251,
+     "meowscarada": 0.226,
+     "metagross": 0.397,
+     "pawmot": 0.336
+    }
+   }
+  },
+  {
+   "record": "20261018-024926-2700101810.json",
+   "earlier_games": 173,
+   "compatible_lineups": 1,
+   "preview": [
+    "sableye",
+    "garchomp",
+    "milotic",
+    "clefable",
+    "gholdengo",
+    "espathra"
+   ],
+   "old_event_log_loss": 3.9164774331789327,
+   "new_event_log_loss": 3.8531980580437044,
+   "old_lead": "espathra",
+   "new_lead": "espathra",
+   "actual_lead": [
+    "espathra"
+   ],
+   "top_lineups": [
+    [
+     [
+      "espathra",
+      "sableye",
+      "garchomp"
+     ],
+     0.04938568573258332
+    ],
+    [
+     [
+      "sableye",
+      "garchomp",
+      "espathra"
+     ],
+     0.04796887484943675
+    ],
+    [
+     [
+      "espathra",
+      "garchomp",
+      "milotic"
+     ],
+     0.04481366957103815
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": true,
+   "old_member_brier": 0.27605968544990717,
+   "new_member_brier": 0.27319666065218934,
+   "old_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "429f81ea6f749dbd",
+    "logit_adjustment": 0.7107,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2399,
+    "uncovered": [],
+    "minimum_incoming": {
+     "clefable": 0.157,
+     "espathra": 0.126,
+     "garchomp": 0.301,
+     "gholdengo": 0.223,
+     "milotic": 0.163,
+     "sableye": 0.022
+    }
+   }
+  },
+  {
+   "record": "20261018-025349-2700104423.json",
+   "earlier_games": 174,
+   "compatible_lineups": 1,
+   "preview": [
+    "salamence",
+    "primarina",
+    "rillaboom",
+    "rotomheat",
+    "basculegion",
+    "metagross"
+   ],
+   "old_event_log_loss": 5.6636450563660805,
+   "new_event_log_loss": 3.720172007853566,
+   "old_lead": "rotomheat",
+   "new_lead": "primarina",
+   "actual_lead": [
+    "metagross"
+   ],
+   "top_lineups": [
+    [
+     [
+      "primarina",
+      "salamence",
+      "basculegion"
+     ],
+     0.06284983126437095
+    ],
+    [
+     [
+      "rotomheat",
+      "primarina",
+      "basculegion"
+     ],
+     0.05069937690063706
+    ],
+    [
+     [
+      "primarina",
+      "basculegion",
+      "metagross"
+     ],
+     0.049478192589235366
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.3053801578641404,
+   "new_member_brier": 0.20920650476501443,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "a8487b653392a590",
+    "logit_adjustment": 0.3125,
+    "mega": "floetteeternal",
+    "selection_worst": 0.1785,
+    "uncovered": [],
+    "minimum_incoming": {
+     "basculegion": 0.669,
+     "metagross": 0.333,
+     "primarina": 0.4,
+     "rillaboom": 0.433,
+     "rotomheat": 0.25,
+     "salamence": 0.434
+    }
+   }
+  },
+  {
+   "record": "20261018-025645-2700105840.json",
+   "earlier_games": 175,
+   "compatible_lineups": 1,
+   "preview": [
+    "cinderace",
+    "whimsicott",
+    "polteageistantique",
+    "floetteeternal",
+    "gyarados",
+    "aegislash"
+   ],
+   "old_event_log_loss": 3.5595459643925143,
+   "new_event_log_loss": 3.489018662197398,
+   "old_lead": "whimsicott",
+   "new_lead": "whimsicott",
+   "actual_lead": [
+    "whimsicott"
+   ],
+   "top_lineups": [
+    [
+     [
+      "whimsicott",
+      "polteageistantique",
+      "gyarados"
+     ],
+     0.06657432845312554
+    ],
+    [
+     [
+      "whimsicott",
+      "polteageistantique",
+      "aegislash"
+     ],
+     0.0546678262952197
+    ],
+    [
+     [
+      "gyarados",
+      "whimsicott",
+      "polteageistantique"
+     ],
+     0.04191669729789835
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": true,
+   "old_member_brier": 0.2325674867563378,
+   "new_member_brier": 0.23300290571367577,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "12994dc48f7304c7",
+    "logit_adjustment": 0.5405,
+    "mega": "floetteeternal",
+    "selection_worst": 0.013,
+    "uncovered": [],
+    "minimum_incoming": {
+     "aegislash": 0.624,
+     "cinderace": 0.218,
+     "floetteeternal": 0.308,
+     "gyarados": 0.372,
+     "polteageistantique": 0.0,
+     "whimsicott": 0.111
+    }
+   }
+  },
+  {
+   "record": "20261018-025904-2700107028.json",
+   "earlier_games": 176,
+   "compatible_lineups": 1,
+   "preview": [
+    "salamence",
+    "golisopod",
+    "glimmora",
+    "garchomp",
+    "primarina",
+    "gholdengo"
+   ],
+   "old_event_log_loss": 3.956492493566584,
+   "new_event_log_loss": 4.1411120627020015,
+   "old_lead": "glimmora",
+   "new_lead": "glimmora",
+   "actual_lead": [
+    "garchomp"
+   ],
+   "top_lineups": [
+    [
+     [
+      "glimmora",
+      "garchomp",
+      "primarina"
+     ],
+     0.08289757028469337
+    ],
+    [
+     [
+      "glimmora",
+      "salamence",
+      "garchomp"
+     ],
+     0.0565330164652888
+    ],
+    [
+     [
+      "glimmora",
+      "salamence",
+      "primarina"
+     ],
+     0.046253448021093456
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.27213051548165157,
+   "new_member_brier": 0.2761773388432916,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "8a55b2ad7a2939bd",
+    "logit_adjustment": 0.5626,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2049,
+    "uncovered": [],
+    "minimum_incoming": {
+     "garchomp": 0.282,
+     "gholdengo": 0.451,
+     "glimmora": 0.274,
+     "golisopod": 0.16,
+     "primarina": 0.41,
+     "salamence": 0.336
+    }
+   }
+  },
+  {
+   "record": "20261018-030130-2700107992.json",
+   "earlier_games": 177,
+   "compatible_lineups": 1,
+   "preview": [
+    "meganium",
+    "gardevoir",
+    "krookodile",
+    "lucario",
+    "salamence",
+    "greninja"
+   ],
+   "old_event_log_loss": 4.765682086938068,
+   "new_event_log_loss": 5.045743579244029,
+   "old_lead": "greninja",
+   "new_lead": "greninja",
+   "actual_lead": [
+    "salamence"
+   ],
+   "top_lineups": [
+    [
+     [
+      "greninja",
+      "lucario",
+      "salamence"
+     ],
+     0.07926979077394802
+    ],
+    [
+     [
+      "greninja",
+      "meganium",
+      "salamence"
+     ],
+     0.07088073483378453
+    ],
+    [
+     [
+      "greninja",
+      "gardevoir",
+      "salamence"
+     ],
+     0.06616556353496562
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.25594633884210083,
+   "new_member_brier": 0.2580646105563959,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "9f57632af84d4952",
+    "logit_adjustment": 0.5488,
+    "mega": "floetteeternal",
+    "selection_worst": 0.4119,
+    "uncovered": [],
+    "minimum_incoming": {
+     "gardevoir": 0.291,
+     "greninja": 0.341,
+     "krookodile": 0.404,
+     "lucario": 0.503,
+     "meganium": 0.314,
+     "salamence": 0.302
+    }
+   }
+  },
+  {
+   "record": "20261018-030303-2700108954.json",
+   "earlier_games": 178,
+   "compatible_lineups": 1,
+   "preview": [
+    "cinderace",
+    "whimsicott",
+    "polteageistantique",
+    "floetteeternal",
+    "gyarados",
+    "aegislash"
+   ],
+   "old_event_log_loss": 4.648017952951909,
+   "new_event_log_loss": 4.4805761008020255,
+   "old_lead": "whimsicott",
+   "new_lead": "whimsicott",
+   "actual_lead": [
+    "cinderace"
+   ],
+   "top_lineups": [
+    [
+     [
+      "whimsicott",
+      "polteageistantique",
+      "gyarados"
+     ],
+     0.07409376080088008
+    ],
+    [
+     [
+      "whimsicott",
+      "polteageistantique",
+      "aegislash"
+     ],
+     0.06066736217604975
+    ],
+    [
+     [
+      "gyarados",
+      "whimsicott",
+      "polteageistantique"
+     ],
+     0.04135881134382138
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.2872097066655616,
+   "new_member_brier": 0.3065187693513026,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "12994dc48f7304c7",
+    "logit_adjustment": 0.5599,
+    "mega": "floetteeternal",
+    "selection_worst": 0.0223,
+    "uncovered": [],
+    "minimum_incoming": {
+     "aegislash": 0.624,
+     "cinderace": 0.218,
+     "floetteeternal": 0.308,
+     "gyarados": 0.372,
+     "polteageistantique": 0.0,
+     "whimsicott": 0.111
+    }
+   }
+  },
+  {
+   "record": "20261018-030513-2700109638.json",
+   "earlier_games": 179,
+   "compatible_lineups": 1,
+   "preview": [
+    "salamence",
+    "annihilape",
+    "grimmsnarl",
+    "politoed",
+    "archaludon",
+    "golisopod"
+   ],
+   "old_event_log_loss": 4.286980792257156,
+   "new_event_log_loss": 4.125338312222116,
+   "old_lead": "grimmsnarl",
+   "new_lead": "archaludon",
+   "actual_lead": [
+    "grimmsnarl"
+   ],
+   "top_lineups": [
+    [
+     [
+      "grimmsnarl",
+      "salamence",
+      "archaludon"
+     ],
+     0.0645983761188189
+    ],
+    [
+     [
+      "grimmsnarl",
+      "politoed",
+      "archaludon"
+     ],
+     0.059710574775561506
+    ],
+    [
+     [
+      "archaludon",
+      "salamence",
+      "politoed"
+     ],
+     0.05852548123659945
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": false,
+   "old_member_brier": 0.3214321989739966,
+   "new_member_brier": 0.33093273447345867,
+   "old_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "0881cd9745aed5eb",
+    "logit_adjustment": 0.7372,
+    "mega": "floetteeternal",
+    "selection_worst": 0.4853,
+    "uncovered": [],
+    "minimum_incoming": {
+     "annihilape": 0.146,
+     "archaludon": 0.41,
+     "golisopod": 0.288,
+     "grimmsnarl": 0.186,
+     "politoed": 0.261,
+     "salamence": 0.451
+    }
+   }
+  },
+  {
+   "record": "20261018-030823-2700110528.json",
+   "earlier_games": 180,
+   "compatible_lineups": 1,
+   "preview": [
+    "cinderace",
+    "whimsicott",
+    "polteageistantique",
+    "floetteeternal",
+    "gyarados",
+    "aegislash"
+   ],
+   "old_event_log_loss": 3.5954946926572995,
+   "new_event_log_loss": 3.6995664479837886,
+   "old_lead": "whimsicott",
+   "new_lead": "whimsicott",
+   "actual_lead": [
+    "cinderace"
+   ],
+   "top_lineups": [
+    [
+     [
+      "whimsicott",
+      "polteageistantique",
+      "gyarados"
+     ],
+     0.06714568120467997
+    ],
+    [
+     [
+      "whimsicott",
+      "polteageistantique",
+      "aegislash"
+     ],
+     0.05495029718329775
+    ],
+    [
+     [
+      "whimsicott",
+      "polteageistantique",
+      "floetteeternal"
+     ],
+     0.04134022616730924
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.19784443650616623,
+   "new_member_brier": 0.22186303529218263,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "12994dc48f7304c7",
+    "logit_adjustment": 0.5544,
+    "mega": "floetteeternal",
+    "selection_worst": 0.0264,
+    "uncovered": [],
+    "minimum_incoming": {
+     "aegislash": 0.624,
+     "cinderace": 0.218,
+     "floetteeternal": 0.308,
+     "gyarados": 0.372,
+     "polteageistantique": 0.0,
+     "whimsicott": 0.111
+    }
+   }
+  },
+  {
+   "record": "20261018-031319-2700112824.json",
+   "earlier_games": 181,
+   "compatible_lineups": 4,
+   "preview": [
+    "rillaboom",
+    "raichu",
+    "primarina",
+    "glimmora",
+    "araquanid",
+    "garchomp"
+   ],
+   "old_event_log_loss": 2.5315455081653226,
+   "new_event_log_loss": 2.6037708353202897,
+   "old_lead": "glimmora",
+   "new_lead": "glimmora",
+   "actual_lead": [
+    "araquanid"
+   ],
+   "top_lineups": [
+    [
+     [
+      "glimmora",
+      "primarina",
+      "garchomp"
+     ],
+     0.06585412117493288
+    ],
+    [
+     [
+      "glimmora",
+      "raichu",
+      "garchomp"
+     ],
+     0.053111521717343096
+    ],
+    [
+     [
+      "glimmora",
+      "raichu",
+      "primarina"
+     ],
+     0.04399514220618537
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "f22bc9372022a62a",
+    "logit_adjustment": 0.5372,
+    "mega": "floetteeternal",
+    "selection_worst": 0.237,
+    "uncovered": [],
+    "minimum_incoming": {
+     "araquanid": 0.54,
+     "garchomp": 0.286,
+     "glimmora": 0.246,
+     "primarina": 0.384,
+     "raichu": 0.277,
+     "rillaboom": 0.324
+    }
+   }
+  },
+  {
+   "record": "20261018-031532-2700113819.json",
+   "earlier_games": 182,
+   "compatible_lineups": 1,
+   "preview": [
+    "empoleon",
+    "cinderace",
+    "pawmot",
+    "garchomp",
+    "metagross",
+    "meowscarada"
+   ],
+   "old_event_log_loss": 3.551425870079464,
+   "new_event_log_loss": 2.692387326665055,
+   "old_lead": "empoleon",
+   "new_lead": "empoleon",
+   "actual_lead": [
+    "cinderace"
+   ],
+   "top_lineups": [
+    [
+     [
+      "empoleon",
+      "pawmot",
+      "garchomp"
+     ],
+     0.08767295076262316
+    ],
+    [
+     [
+      "cinderace",
+      "pawmot",
+      "garchomp"
+     ],
+     0.06771907867919869
+    ],
+    [
+     [
+      "empoleon",
+      "cinderace",
+      "garchomp"
+     ],
+     0.05405885213646582
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.20926203278938912,
+   "new_member_brier": 0.16388744958083132,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "c04c549113995035",
+    "logit_adjustment": 0.5057,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2255,
+    "uncovered": [],
+    "minimum_incoming": {
+     "cinderace": 0.194,
+     "empoleon": 0.358,
+     "garchomp": 0.251,
+     "meowscarada": 0.226,
+     "metagross": 0.397,
+     "pawmot": 0.336
+    }
+   }
+  },
+  {
+   "record": "20261018-032046-2700115004.json",
+   "earlier_games": 183,
+   "compatible_lineups": 1,
+   "preview": [
+    "salamence",
+    "meowscarada",
+    "gengar",
+    "volcarona",
+    "corviknight",
+    "pawmot"
+   ],
+   "old_event_log_loss": 4.939745804209482,
+   "new_event_log_loss": 5.079848669897422,
+   "old_lead": "salamence",
+   "new_lead": "gengar",
+   "actual_lead": [
+    "corviknight"
+   ],
+   "top_lineups": [
+    [
+     [
+      "gengar",
+      "salamence",
+      "pawmot"
+     ],
+     0.06403811800686528
+    ],
+    [
+     [
+      "salamence",
+      "gengar",
+      "pawmot"
+     ],
+     0.05632040340506631
+    ],
+    [
+     [
+      "gengar",
+      "volcarona",
+      "pawmot"
+     ],
+     0.04835442905609865
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.24021795194477988,
+   "new_member_brier": 0.2638145819569394,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "367fb23987629ac1",
+    "logit_adjustment": 0.4936,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2418,
+    "uncovered": [],
+    "minimum_incoming": {
+     "corviknight": 0.133,
+     "gengar": 0.468,
+     "meowscarada": 0.171,
+     "pawmot": 0.312,
+     "salamence": 0.453,
+     "volcarona": 0.221
+    }
+   }
+  },
+  {
+   "record": "20261018-032236-2700116855.json",
+   "earlier_games": 184,
+   "compatible_lineups": 4,
+   "preview": [
+    "salamence",
+    "metagross",
+    "mamoswine",
+    "hydreigon",
+    "primarina",
+    "gholdengo"
+   ],
+   "old_event_log_loss": 2.8374563670870963,
+   "new_event_log_loss": 2.9280091709400193,
+   "old_lead": "hydreigon",
+   "new_lead": "hydreigon",
+   "actual_lead": [
+    "salamence"
+   ],
+   "top_lineups": [
+    [
+     [
+      "hydreigon",
+      "salamence",
+      "primarina"
+     ],
+     0.1012392355860423
+    ],
+    [
+     [
+      "hydreigon",
+      "primarina",
+      "gholdengo"
+     ],
+     0.07883033262758687
+    ],
+    [
+     [
+      "hydreigon",
+      "salamence",
+      "gholdengo"
+     ],
+     0.06867859315522858
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "6b7f1d38dd463e18",
+    "logit_adjustment": 0.5011,
+    "mega": "floetteeternal",
+    "selection_worst": 0.1916,
+    "uncovered": [],
+    "minimum_incoming": {
+     "gholdengo": 0.466,
+     "hydreigon": 0.169,
+     "mamoswine": 0.229,
+     "metagross": 0.367,
+     "primarina": 0.408,
+     "salamence": 0.383
+    }
+   }
+  },
+  {
+   "record": "20261018-032426-ju2s0micsyc7dx7ixihbxch7qudhw8fpw.json",
+   "earlier_games": 185,
+   "compatible_lineups": 4,
+   "preview": [
+    "garchomp",
+    "gholdengo",
+    "mamoswine",
+    "gyarados",
+    "glimmora",
+    "lucario"
+   ],
+   "old_event_log_loss": 2.764706969855521,
+   "new_event_log_loss": 2.445825074782019,
+   "old_lead": "glimmora",
+   "new_lead": "glimmora",
+   "actual_lead": [
+    "gyarados"
+   ],
+   "top_lineups": [
+    [
+     [
+      "glimmora",
+      "garchomp",
+      "gyarados"
+     ],
+     0.06232022439074611
+    ],
+    [
+     [
+      "glimmora",
+      "garchomp",
+      "lucario"
+     ],
+     0.053130506524482396
+    ],
+    [
+     [
+      "glimmora",
+      "garchomp",
+      "gholdengo"
+     ],
+     0.04757731303995479
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "1df2366b627f3a5b",
+    "logit_adjustment": 0.7052,
+    "mega": "floetteeternal",
+    "selection_worst": 0.302,
+    "uncovered": [],
+    "minimum_incoming": {
+     "garchomp": 0.286,
+     "gholdengo": 0.646,
+     "glimmora": 0.141,
+     "gyarados": 0.261,
+     "lucario": 0.421,
+     "mamoswine": 0.176
+    }
+   }
+  },
+  {
+   "record": "20261018-032812-2700119502.json",
+   "earlier_games": 186,
+   "compatible_lineups": 4,
+   "preview": [
+    "mimikyu",
+    "golisopod",
+    "pelipper",
+    "swampert",
+    "archaludon",
+    "pawmot"
+   ],
+   "old_event_log_loss": 2.59204278998974,
+   "new_event_log_loss": 2.4065558313815893,
+   "old_lead": "archaludon",
+   "new_lead": "archaludon",
+   "actual_lead": [
+    "pelipper"
+   ],
+   "top_lineups": [
+    [
+     [
+      "archaludon",
+      "swampert",
+      "pawmot"
+     ],
+     0.03980117530402059
+    ],
+    [
+     [
+      "archaludon",
+      "mimikyu",
+      "swampert"
+     ],
+     0.039651183506722934
+    ],
+    [
+     [
+      "archaludon",
+      "mimikyu",
+      "pawmot"
+     ],
+     0.0375830371006858
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "b7197cd1f2de0c3d",
+    "logit_adjustment": 0.448,
+    "mega": "floetteeternal",
+    "selection_worst": 0.1242,
+    "uncovered": [],
+    "minimum_incoming": {
+     "archaludon": 0.411,
+     "golisopod": 0.19,
+     "mimikyu": 0.432,
+     "pawmot": 0.312,
+     "pelipper": 0.285,
+     "swampert": 0.554
+    }
+   }
+  },
+  {
+   "record": "20261018-032932-2700119973.json",
+   "earlier_games": 187,
+   "compatible_lineups": 4,
+   "preview": [
+    "glaceon",
+    "mawile",
+    "glimmora",
+    "gourgeistsuper",
+    "gliscor",
+    "swampert"
+   ],
+   "old_event_log_loss": 1.2164972596589154,
+   "new_event_log_loss": 1.1901403086297029,
+   "old_lead": "glimmora",
+   "new_lead": "glimmora",
+   "actual_lead": [
+    "glimmora"
+   ],
+   "top_lineups": [
+    [
+     [
+      "glimmora",
+      "gourgeistsuper",
+      "swampert"
+     ],
+     0.13901480975427527
+    ],
+    [
+     [
+      "glimmora",
+      "mawile",
+      "swampert"
+     ],
+     0.11408721382252111
+    ],
+    [
+     [
+      "swampert",
+      "mawile",
+      "gourgeistsuper"
+     ],
+     0.06140520904877501
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": true,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "208b4e708b1b0ebb",
+    "logit_adjustment": 0.4937,
+    "mega": "floetteeternal",
+    "selection_worst": 0.1282,
+    "uncovered": [],
+    "minimum_incoming": {
+     "glaceon": 0.143,
+     "glimmora": 0.175,
+     "gliscor": 0.297,
+     "gourgeistsuper": 0.117,
+     "mawile": 0.768,
+     "swampert": 0.532
+    }
+   }
+  },
+  {
+   "record": "20261018-033352-2700120849.json",
+   "earlier_games": 188,
+   "compatible_lineups": 1,
+   "preview": [
+    "rillaboom",
+    "ninetalesalola",
+    "archaludon",
+    "arcaninehisui",
+    "metagross",
+    "hydreigon"
+   ],
+   "old_event_log_loss": 5.408663828637753,
+   "new_event_log_loss": 4.5011536246291195,
+   "old_lead": "hydreigon",
+   "new_lead": "hydreigon",
+   "actual_lead": [
+    "ninetalesalola"
+   ],
+   "top_lineups": [
+    [
+     [
+      "hydreigon",
+      "archaludon",
+      "arcaninehisui"
+     ],
+     0.07124825640861569
+    ],
+    [
+     [
+      "hydreigon",
+      "ninetalesalola",
+      "archaludon"
+     ],
+     0.06708450141848175
+    ],
+    [
+     [
+      "ninetalesalola",
+      "archaludon",
+      "hydreigon"
+     ],
+     0.05297332592140529
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.37436507975659533,
+   "new_member_brier": 0.32541147983010554,
+   "old_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "4b13a57378306257",
+    "logit_adjustment": 0.3257,
+    "mega": "floetteeternal",
+    "selection_worst": -0.0489,
+    "uncovered": [],
+    "minimum_incoming": {
+     "arcaninehisui": 0.424,
+     "archaludon": 0.436,
+     "hydreigon": 0.18,
+     "metagross": 0.245,
+     "ninetalesalola": 0.154,
+     "rillaboom": 0.447
+    }
+   }
+  },
+  {
+   "record": "20261018-033753-2700122537.json",
+   "earlier_games": 189,
+   "compatible_lineups": 1,
+   "preview": [
+    "salamence",
+    "metagross",
+    "milotic",
+    "swampert",
+    "blaziken",
+    "sceptile"
+   ],
+   "old_event_log_loss": 5.562787540889505,
+   "new_event_log_loss": 5.183369896106228,
+   "old_lead": "milotic",
+   "new_lead": "swampert",
+   "actual_lead": [
+    "salamence"
+   ],
+   "top_lineups": [
+    [
+     [
+      "milotic",
+      "salamence",
+      "swampert"
+     ],
+     0.049189665341563056
+    ],
+    [
+     [
+      "swampert",
+      "salamence",
+      "milotic"
+     ],
+     0.03900338358316422
+    ],
+    [
+     [
+      "milotic",
+      "swampert",
+      "blaziken"
+     ],
+     0.03694089136006886
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.35259302659899133,
+   "new_member_brier": 0.32354325670810297,
+   "old_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "0f0eaa6288c8031c",
+    "logit_adjustment": 0.4359,
+    "mega": "floetteeternal",
+    "selection_worst": 0.1234,
+    "uncovered": [],
+    "minimum_incoming": {
+     "blaziken": 0.299,
+     "metagross": 0.261,
+     "milotic": 0.164,
+     "salamence": 0.44,
+     "sceptile": 0.311,
+     "swampert": 0.53
+    }
+   }
+  },
+  {
+   "record": "20261018-034053-2700123999.json",
+   "earlier_games": 190,
+   "compatible_lineups": 1,
+   "preview": [
+    "archaludon",
+    "basculegion",
+    "gengar",
+    "umbreon",
+    "garchomp",
+    "corviknight"
+   ],
+   "old_event_log_loss": 4.17317155851033,
+   "new_event_log_loss": 3.5570782826810237,
+   "old_lead": "archaludon",
+   "new_lead": "archaludon",
+   "actual_lead": [
+    "gengar"
+   ],
+   "top_lineups": [
+    [
+     [
+      "archaludon",
+      "gengar",
+      "garchomp"
+     ],
+     0.05783651040053142
+    ],
+    [
+     [
+      "archaludon",
+      "umbreon",
+      "garchomp"
+     ],
+     0.050759413445545534
+    ],
+    [
+     [
+      "archaludon",
+      "gengar",
+      "umbreon"
+     ],
+     0.050403091423885875
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.23667200840420147,
+   "new_member_brier": 0.19786085575188936,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "f6bb9f6dc6637881",
+    "logit_adjustment": 0.4666,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2122,
+    "uncovered": [],
+    "minimum_incoming": {
+     "archaludon": 0.424,
+     "basculegion": 0.547,
+     "corviknight": 0.146,
+     "garchomp": 0.172,
+     "gengar": 0.475,
+     "umbreon": 0.104
+    }
+   }
+  },
+  {
+   "record": "20261018-034318-2700125232.json",
+   "earlier_games": 191,
+   "compatible_lineups": 1,
+   "preview": [
+    "staraptor",
+    "indeedee",
+    "rillaboom",
+    "blaziken",
+    "rotomheat",
+    "baxcalibur"
+   ],
+   "old_event_log_loss": 3.863676373907988,
+   "new_event_log_loss": 3.4704681805803848,
+   "old_lead": "indeedee",
+   "new_lead": "indeedee",
+   "actual_lead": [
+    "blaziken"
+   ],
+   "top_lineups": [
+    [
+     [
+      "indeedee",
+      "blaziken",
+      "baxcalibur"
+     ],
+     0.05379048538340379
+    ],
+    [
+     [
+      "indeedee",
+      "rotomheat",
+      "baxcalibur"
+     ],
+     0.04927582624440159
+    ],
+    [
+     [
+      "indeedee",
+      "staraptor",
+      "baxcalibur"
+     ],
+     0.041030142649633713
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.219935878793995,
+   "new_member_brier": 0.16909861978650775,
+   "old_choice": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "e335bfd89da1684f",
+    "logit_adjustment": 0.5939,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2657,
+    "uncovered": [],
+    "minimum_incoming": {
+     "baxcalibur": 0.39,
+     "blaziken": 0.4,
+     "indeedee": 0.236,
+     "rillaboom": 0.313,
+     "rotomheat": 0.297,
+     "staraptor": 0.306
+    }
+   }
+  },
+  {
+   "record": "20261018-034803-c10l9c47vk5ixuad1hriyambtog704tpw.json",
+   "earlier_games": 192,
+   "compatible_lineups": 1,
+   "preview": [
+    "floetteeternal",
+    "hippowdon",
+    "toxapex",
+    "garchomp",
+    "samurotthisui",
+    "gholdengo"
+   ],
+   "old_event_log_loss": 3.3488216273948934,
+   "new_event_log_loss": 3.4384948321374607,
+   "old_lead": "samurotthisui",
+   "new_lead": "samurotthisui",
+   "actual_lead": [
+    "garchomp"
+   ],
+   "top_lineups": [
+    [
+     [
+      "samurotthisui",
+      "toxapex",
+      "garchomp"
+     ],
+     0.06875543858719055
+    ],
+    [
+     [
+      "hippowdon",
+      "toxapex",
+      "garchomp"
+     ],
+     0.05222567117539615
+    ],
+    [
+     [
+      "garchomp",
+      "toxapex",
+      "gholdengo"
+     ],
+     0.047721534203407356
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.1851757477192523,
+   "new_member_brier": 0.1711555094484708,
+   "old_choice": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "3e09bc585adad440",
+    "logit_adjustment": 0.6135,
+    "mega": "floetteeternal",
+    "selection_worst": 0.1685,
+    "uncovered": [],
+    "minimum_incoming": {
+     "floetteeternal": 0.249,
+     "garchomp": 0.157,
+     "gholdengo": 0.864,
+     "hippowdon": 0.028,
+     "samurotthisui": 0.143,
+     "toxapex": 0.131
+    }
+   }
+  },
+  {
+   "record": "20261018-034938-2700128252.json",
+   "earlier_games": 193,
+   "compatible_lineups": 1,
+   "preview": [
+    "primarina",
+    "salamence",
+    "mimikyu",
+    "glimmora",
+    "vanilluxe",
+    "metagross"
+   ],
+   "old_event_log_loss": 5.0030884250134315,
+   "new_event_log_loss": 4.323690021715552,
+   "old_lead": "glimmora",
+   "new_lead": "glimmora",
+   "actual_lead": [
+    "mimikyu"
+   ],
+   "top_lineups": [
+    [
+     [
+      "glimmora",
+      "salamence",
+      "mimikyu"
+     ],
+     0.07358590612599988
+    ],
+    [
+     [
+      "glimmora",
+      "primarina",
+      "mimikyu"
+     ],
+     0.049091262417350894
+    ],
+    [
+     [
+      "primarina",
+      "salamence",
+      "mimikyu"
+     ],
+     0.04159117255861321
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.3305032650090843,
+   "new_member_brier": 0.2761747712963645,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "9332fe878a293b95",
+    "logit_adjustment": 0.6513,
+    "mega": "floetteeternal",
+    "selection_worst": 0.3366,
+    "uncovered": [],
+    "minimum_incoming": {
+     "glimmora": 0.148,
+     "metagross": 0.419,
+     "mimikyu": 0.414,
+     "primarina": 0.473,
+     "salamence": 0.318,
+     "vanilluxe": 0.264
+    }
+   }
+  },
+  {
+   "record": "20261018-035124-2700128922.json",
+   "earlier_games": 194,
+   "compatible_lineups": 4,
+   "preview": [
+    "armarouge",
+    "glimmora",
+    "scrafty",
+    "toxtricity",
+    "corviknight",
+    "garchomp"
+   ],
+   "old_event_log_loss": 1.600919958833445,
+   "new_event_log_loss": 1.6081399142428612,
+   "old_lead": "glimmora",
+   "new_lead": "glimmora",
+   "actual_lead": [
+    "glimmora"
+   ],
+   "top_lineups": [
+    [
+     [
+      "glimmora",
+      "armarouge",
+      "scrafty"
+     ],
+     0.10101540844903918
+    ],
+    [
+     [
+      "glimmora",
+      "armarouge",
+      "garchomp"
+     ],
+     0.08943194846521778
+    ],
+    [
+     [
+      "garchomp",
+      "armarouge",
+      "scrafty"
+     ],
+     0.07904898790256232
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": true,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "b60221ec5b969b04",
+    "logit_adjustment": 0.647,
+    "mega": "floetteeternal",
+    "selection_worst": 0.362,
+    "uncovered": [],
+    "minimum_incoming": {
+     "armarouge": 0.427,
+     "corviknight": 0.146,
+     "garchomp": 0.177,
+     "glimmora": 0.274,
+     "scrafty": 0.305,
+     "toxtricity": 0.386
+    }
+   }
+  },
+  {
+   "record": "20261018-035254-2700129642.json",
+   "earlier_games": 195,
+   "compatible_lineups": 1,
+   "preview": [
+    "meowscarada",
+    "archaludon",
+    "salamence",
+    "hippowdon",
+    "primarina",
+    "pawmot"
+   ],
+   "old_event_log_loss": 4.370799052315202,
+   "new_event_log_loss": 3.7388184912666667,
+   "old_lead": "archaludon",
+   "new_lead": "archaludon",
+   "actual_lead": [
+    "salamence"
+   ],
+   "top_lineups": [
+    [
+     [
+      "archaludon",
+      "primarina",
+      "pawmot"
+     ],
+     0.047796545828441755
+    ],
+    [
+     [
+      "archaludon",
+      "salamence",
+      "pawmot"
+     ],
+     0.03903163071073754
+    ],
+    [
+     [
+      "hippowdon",
+      "salamence",
+      "pawmot"
+     ],
+     0.03434969424133027
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.26629585876507994,
+   "new_member_brier": 0.21833989151026423,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "02493b5a7c6f0943",
+    "logit_adjustment": 0.4683,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2655,
+    "uncovered": [],
+    "minimum_incoming": {
+     "archaludon": 0.547,
+     "hippowdon": 0.056,
+     "meowscarada": 0.252,
+     "pawmot": 0.325,
+     "primarina": 0.366,
+     "salamence": 0.474
+    }
+   }
+  },
+  {
+   "record": "20261018-035541-2700130480.json",
+   "earlier_games": 196,
+   "compatible_lineups": 1,
+   "preview": [
+    "glaceon",
+    "aegislash",
+    "azumarill",
+    "tyranitar",
+    "musharna",
+    "dragapult"
+   ],
+   "old_event_log_loss": 4.474468223496944,
+   "new_event_log_loss": 4.160380665332516,
+   "old_lead": "dragapult",
+   "new_lead": "dragapult",
+   "actual_lead": [
+    "aegislash"
+   ],
+   "top_lineups": [
+    [
+     [
+      "dragapult",
+      "tyranitar",
+      "musharna"
+     ],
+     0.06527393820935252
+    ],
+    [
+     [
+      "dragapult",
+      "aegislash",
+      "tyranitar"
+     ],
+     0.052147357098350076
+    ],
+    [
+     [
+      "tyranitar",
+      "aegislash",
+      "musharna"
+     ],
+     0.04382742261352737
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.24070320669760525,
+   "new_member_brier": 0.22112512682852734,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "02ebbe3a9297e14c",
+    "logit_adjustment": 0.6279,
+    "mega": "floetteeternal",
+    "selection_worst": 0.3261,
+    "uncovered": [],
+    "minimum_incoming": {
+     "aegislash": 0.35,
+     "azumarill": 0.356,
+     "dragapult": 0.197,
+     "glaceon": 0.294,
+     "musharna": 0.168,
+     "tyranitar": 0.347
+    }
+   }
+  },
+  {
+   "record": "20261018-035831-2700131460.json",
+   "earlier_games": 197,
+   "compatible_lineups": 1,
+   "preview": [
+    "raichu",
+    "dragapult",
+    "sneasler",
+    "vanilluxe",
+    "primarina",
+    "lucario"
+   ],
+   "old_event_log_loss": 4.949460101376707,
+   "new_event_log_loss": 4.04037312193246,
+   "old_lead": "raichu",
+   "new_lead": "dragapult",
+   "actual_lead": [
+    "primarina"
+   ],
+   "top_lineups": [
+    [
+     [
+      "raichu",
+      "primarina",
+      "lucario"
+     ],
+     0.047236528319210803
+    ],
+    [
+     [
+      "dragapult",
+      "raichu",
+      "primarina"
+     ],
+     0.045212020020001194
+    ],
+    [
+     [
+      "dragapult",
+      "primarina",
+      "lucario"
+     ],
+     0.040693981391585914
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.3484168187003422,
+   "new_member_brier": 0.2878461407496394,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "8469eb348041aad5",
+    "logit_adjustment": 0.5986,
+    "mega": "floetteeternal",
+    "selection_worst": 0.3443,
+    "uncovered": [],
+    "minimum_incoming": {
+     "dragapult": 0.32,
+     "lucario": 0.391,
+     "primarina": 0.326,
+     "raichu": 0.311,
+     "sneasler": 0.313,
+     "vanilluxe": 0.241
+    }
+   }
+  },
+  {
+   "record": "20261018-040018-2700132619.json",
+   "earlier_games": 198,
+   "compatible_lineups": 1,
+   "preview": [
+    "glaceon",
+    "aegislash",
+    "azumarill",
+    "tyranitar",
+    "musharna",
+    "dragapult"
+   ],
+   "old_event_log_loss": 3.207378306587805,
+   "new_event_log_loss": 3.103126001918217,
+   "old_lead": "dragapult",
+   "new_lead": "dragapult",
+   "actual_lead": [
+    "tyranitar"
+   ],
+   "top_lineups": [
+    [
+     [
+      "dragapult",
+      "tyranitar",
+      "musharna"
+     ],
+     0.06246702661086607
+    ],
+    [
+     [
+      "dragapult",
+      "aegislash",
+      "tyranitar"
+     ],
+     0.049140618640253354
+    ],
+    [
+     [
+      "tyranitar",
+      "aegislash",
+      "musharna"
+     ],
+     0.044908598379167934
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.18353850431136695,
+   "new_member_brier": 0.15838227178658557,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "02ebbe3a9297e14c",
+    "logit_adjustment": 0.621,
+    "mega": "floetteeternal",
+    "selection_worst": 0.3189,
+    "uncovered": [],
+    "minimum_incoming": {
+     "aegislash": 0.35,
+     "azumarill": 0.356,
+     "dragapult": 0.197,
+     "glaceon": 0.294,
+     "musharna": 0.168,
+     "tyranitar": 0.347
+    }
+   }
+  },
+  {
+   "record": "20261018-040249-2700133323.json",
+   "earlier_games": 199,
+   "compatible_lineups": 1,
+   "preview": [
+    "empoleon",
+    "cinderace",
+    "pawmot",
+    "garchomp",
+    "metagross",
+    "meowscarada"
+   ],
+   "old_event_log_loss": 3.551425870079464,
+   "new_event_log_loss": 2.3523784151943143,
+   "old_lead": "empoleon",
+   "new_lead": "empoleon",
+   "actual_lead": [
+    "cinderace"
+   ],
+   "top_lineups": [
+    [
+     [
+      "empoleon",
+      "pawmot",
+      "garchomp"
+     ],
+     0.09886947694377073
+    ],
+    [
+     [
+      "cinderace",
+      "pawmot",
+      "garchomp"
+     ],
+     0.09514260428228308
+    ],
+    [
+     [
+      "garchomp",
+      "cinderace",
+      "pawmot"
+     ],
+     0.05508177167425114
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.20926203278938912,
+   "new_member_brier": 0.13870833709723288,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "c04c549113995035",
+    "logit_adjustment": 0.5107,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2288,
+    "uncovered": [],
+    "minimum_incoming": {
+     "cinderace": 0.194,
+     "empoleon": 0.358,
+     "garchomp": 0.251,
+     "meowscarada": 0.226,
+     "metagross": 0.397,
+     "pawmot": 0.336
+    }
+   }
+  },
+  {
+   "record": "20261018-040521-2700134728.json",
+   "earlier_games": 200,
+   "compatible_lineups": 1,
+   "preview": [
+    "armarouge",
+    "glimmora",
+    "scrafty",
+    "toxtricity",
+    "corviknight",
+    "garchomp"
+   ],
+   "old_event_log_loss": 2.3945902980822416,
+   "new_event_log_loss": 2.2552066060075275,
+   "old_lead": "glimmora",
+   "new_lead": "glimmora",
+   "actual_lead": [
+    "glimmora"
+   ],
+   "top_lineups": [
+    [
+     [
+      "glimmora",
+      "armarouge",
+      "garchomp"
+     ],
+     0.10485187847028439
+    ],
+    [
+     [
+      "glimmora",
+      "armarouge",
+      "scrafty"
+     ],
+     0.09930068431350149
+    ],
+    [
+     [
+      "glimmora",
+      "scrafty",
+      "garchomp"
+     ],
+     0.08779066313346867
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": true,
+   "old_member_brier": 0.1543954621167119,
+   "new_member_brier": 0.14098958856610597,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "b60221ec5b969b04",
+    "logit_adjustment": 0.6579,
+    "mega": "floetteeternal",
+    "selection_worst": 0.3674,
+    "uncovered": [],
+    "minimum_incoming": {
+     "armarouge": 0.427,
+     "corviknight": 0.146,
+     "garchomp": 0.177,
+     "glimmora": 0.274,
+     "scrafty": 0.305,
+     "toxtricity": 0.386
+    }
+   }
+  },
+  {
+   "record": "20261018-040700-2700135413.json",
+   "earlier_games": 201,
+   "compatible_lineups": 1,
+   "preview": [
+    "mimikyu",
+    "golisopod",
+    "pelipper",
+    "swampert",
+    "archaludon",
+    "pawmot"
+   ],
+   "old_event_log_loss": 4.017397595475617,
+   "new_event_log_loss": 3.3999089378046388,
+   "old_lead": "archaludon",
+   "new_lead": "archaludon",
+   "actual_lead": [
+    "pelipper"
+   ],
+   "top_lineups": [
+    [
+     [
+      "pelipper",
+      "swampert",
+      "pawmot"
+     ],
+     0.036240366813652426
+    ],
+    [
+     [
+      "archaludon",
+      "swampert",
+      "pawmot"
+     ],
+     0.03551231235342987
+    ],
+    [
+     [
+      "pelipper",
+      "mimikyu",
+      "swampert"
+     ],
+     0.03337630914193023
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.2475731323301575,
+   "new_member_brier": 0.21062678220181477,
+   "old_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "b7197cd1f2de0c3d",
+    "logit_adjustment": 0.4501,
+    "mega": "floetteeternal",
+    "selection_worst": 0.1216,
+    "uncovered": [],
+    "minimum_incoming": {
+     "archaludon": 0.411,
+     "golisopod": 0.19,
+     "mimikyu": 0.432,
+     "pawmot": 0.312,
+     "pelipper": 0.285,
+     "swampert": 0.554
+    }
+   }
+  },
+  {
+   "record": "20261018-040806-uf7ke4tfa89y8pf73ogq8hfwwns7cbdpw.json",
+   "earlier_games": 202,
+   "compatible_lineups": 10,
+   "preview": [
+    "golisopod",
+    "farigiraf",
+    "rillaboom",
+    "milotic",
+    "incineroar",
+    "raichu"
+   ],
+   "old_event_log_loss": 2.115782338302959,
+   "new_event_log_loss": 1.6762932244227942,
+   "old_lead": "raichu",
+   "new_lead": "milotic",
+   "actual_lead": [
+    "incineroar"
+   ],
+   "top_lineups": [
+    [
+     [
+      "milotic",
+      "incineroar",
+      "raichu"
+     ],
+     0.0383315005644195
+    ],
+    [
+     [
+      "raichu",
+      "milotic",
+      "incineroar"
+     ],
+     0.03794312816896451
+    ],
+    [
+     [
+      "milotic",
+      "farigiraf",
+      "raichu"
+     ],
+     0.03638507063180195
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_choice": [
+    "Salamence",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Salamence",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "172f47629ab571e1",
+    "logit_adjustment": 0.8773,
+    "mega": "salamence",
+    "selection_worst": 0.5979,
+    "uncovered": [],
+    "minimum_incoming": {
+     "farigiraf": 0.075,
+     "golisopod": 0.233,
+     "incineroar": 0.218,
+     "milotic": 0.194,
+     "raichu": 0.338,
+     "rillaboom": 0.158
+    }
+   }
+  },
+  {
+   "record": "20261018-041016-2700136564.json",
+   "earlier_games": 203,
+   "compatible_lineups": 1,
+   "preview": [
+    "garchomp",
+    "baxcalibur",
+    "charizard",
+    "scizor",
+    "basculegion",
+    "floetteeternal"
+   ],
+   "old_event_log_loss": 2.95373900858434,
+   "new_event_log_loss": 2.4378149949901378,
+   "old_lead": "charizard",
+   "new_lead": "charizard",
+   "actual_lead": [
+    "charizard"
+   ],
+   "top_lineups": [
+    [
+     [
+      "charizard",
+      "baxcalibur",
+      "basculegion"
+     ],
+     0.08735150657442464
+    ],
+    [
+     [
+      "charizard",
+      "garchomp",
+      "baxcalibur"
+     ],
+     0.0740826561922171
+    ],
+    [
+     [
+      "charizard",
+      "garchomp",
+      "basculegion"
+     ],
+     0.06560245695457405
+    ]
+   ],
+   "old_lead_correct": true,
+   "new_lead_correct": true,
+   "old_member_brier": 0.19803425681080192,
+   "new_member_brier": 0.1599412660580746,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "ab3089c4d112f09a",
+    "logit_adjustment": 0.2718,
+    "mega": "floetteeternal",
+    "selection_worst": -0.0122,
+    "uncovered": [],
+    "minimum_incoming": {
+     "basculegion": 0.626,
+     "baxcalibur": 0.363,
+     "charizard": 0.365,
+     "floetteeternal": 0.154,
+     "garchomp": 0.224,
+     "scizor": 0.172
+    }
+   }
+  },
+  {
+   "record": "20261018-041239-2700137871.json",
+   "earlier_games": 204,
+   "compatible_lineups": 1,
+   "preview": [
+    "raichu",
+    "dragapult",
+    "sneasler",
+    "vanilluxe",
+    "primarina",
+    "lucario"
+   ],
+   "old_event_log_loss": 4.949460101376707,
+   "new_event_log_loss": 3.2112818513589074,
+   "old_lead": "raichu",
+   "new_lead": "primarina",
+   "actual_lead": [
+    "primarina"
+   ],
+   "top_lineups": [
+    [
+     [
+      "raichu",
+      "primarina",
+      "lucario"
+     ],
+     0.04604980253855635
+    ],
+    [
+     [
+      "primarina",
+      "raichu",
+      "lucario"
+     ],
+     0.041732596090587354
+    ],
+    [
+     [
+      "primarina",
+      "sneasler",
+      "lucario"
+     ],
+     0.040304915234146484
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": true,
+   "old_member_brier": 0.3484168187003422,
+   "new_member_brier": 0.23601545747942984,
+   "old_choice": [
+    "Salamence",
+    "Scolipede",
+    "Umbreon"
+   ],
+   "new_choice": [
+    "Salamence",
+    "Scolipede",
+    "Umbreon"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "8469eb348041aad5",
+    "logit_adjustment": 0.4649,
+    "mega": "salamence",
+    "selection_worst": 0.1012,
+    "uncovered": [],
+    "minimum_incoming": {
+     "dragapult": 0.288,
+     "lucario": 0.465,
+     "primarina": 0.414,
+     "raichu": 0.382,
+     "sneasler": 0.332,
+     "vanilluxe": 0.276
+    }
+   }
+  },
+  {
+   "record": "20261018-041412-2700138466.json",
+   "earlier_games": 205,
+   "compatible_lineups": 1,
+   "preview": [
+    "meowscarada",
+    "archaludon",
+    "salamence",
+    "hippowdon",
+    "primarina",
+    "pawmot"
+   ],
+   "old_event_log_loss": 4.370799052315202,
+   "new_event_log_loss": 3.4476306700075026,
+   "old_lead": "archaludon",
+   "new_lead": "archaludon",
+   "actual_lead": [
+    "salamence"
+   ],
+   "top_lineups": [
+    [
+     [
+      "primarina",
+      "salamence",
+      "pawmot"
+     ],
+     0.0451044108519536
+    ],
+    [
+     [
+      "archaludon",
+      "primarina",
+      "pawmot"
+     ],
+     0.0430566013234899
+    ],
+    [
+     [
+      "hippowdon",
+      "salamence",
+      "pawmot"
+     ],
+     0.035127853830502605
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.26629585876507994,
+   "new_member_brier": 0.1960089190727413,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "02493b5a7c6f0943",
+    "logit_adjustment": 0.4686,
+    "mega": "floetteeternal",
+    "selection_worst": 0.2699,
+    "uncovered": [],
+    "minimum_incoming": {
+     "archaludon": 0.547,
+     "hippowdon": 0.056,
+     "meowscarada": 0.252,
+     "pawmot": 0.325,
+     "primarina": 0.366,
+     "salamence": 0.474
+    }
+   }
+  },
+  {
+   "record": "20261018-041756-s3f8ejgdfhwq4go199jw3fiqasn3mn2pw.json",
+   "earlier_games": 206,
+   "compatible_lineups": 1,
+   "preview": [
+    "lucario",
+    "baxcalibur",
+    "gholdengo",
+    "ninetalesalola",
+    "cinderace",
+    "basculegion"
+   ],
+   "old_event_log_loss": 5.038401085932851,
+   "new_event_log_loss": 5.318119851315195,
+   "old_lead": "ninetalesalola",
+   "new_lead": "ninetalesalola",
+   "actual_lead": [
+    "gholdengo"
+   ],
+   "top_lineups": [
+    [
+     [
+      "ninetalesalola",
+      "baxcalibur",
+      "basculegion"
+     ],
+     0.06868797627028476
+    ],
+    [
+     [
+      "ninetalesalola",
+      "lucario",
+      "baxcalibur"
+     ],
+     0.04587179529770797
+    ],
+    [
+     [
+      "baxcalibur",
+      "lucario",
+      "basculegion"
+     ],
+     0.04268577026691511
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.2669230635032839,
+   "new_member_brier": 0.29313607868243735,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "9fabd3cc958ff3be",
+    "logit_adjustment": 0.5212,
+    "mega": "floetteeternal",
+    "selection_worst": 0.161,
+    "uncovered": [],
+    "minimum_incoming": {
+     "basculegion": 0.561,
+     "baxcalibur": 0.193,
+     "cinderace": 0.171,
+     "gholdengo": 0.86,
+     "lucario": 0.371,
+     "ninetalesalola": 0.128
+    }
+   }
+  },
+  {
+   "record": "20261018-042024-2700141006.json",
+   "earlier_games": 207,
+   "compatible_lineups": 1,
+   "preview": [
+    "meowscarada",
+    "salamence",
+    "garchomp",
+    "gholdengo",
+    "primarina",
+    "golisopod"
+   ],
+   "old_event_log_loss": 3.511883534072888,
+   "new_event_log_loss": 2.7653973117815767,
+   "old_lead": "garchomp",
+   "new_lead": "primarina",
+   "actual_lead": [
+    "salamence"
+   ],
+   "top_lineups": [
+    [
+     [
+      "primarina",
+      "salamence",
+      "garchomp"
+     ],
+     0.08096981363060708
+    ],
+    [
+     [
+      "garchomp",
+      "salamence",
+      "primarina"
+     ],
+     0.07373171542885257
+    ],
+    [
+     [
+      "salamence",
+      "garchomp",
+      "primarina"
+     ],
+     0.06295108317172625
+    ]
+   ],
+   "old_lead_correct": false,
+   "new_lead_correct": false,
+   "old_member_brier": 0.1764533346725794,
+   "new_member_brier": 0.11277050942834843,
+   "old_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "new_choice_coverage": {
+    "version": "preview-coverage-v2",
+    "profile": "99ba7f8ff8691b92",
+    "logit_adjustment": 0.4848,
+    "mega": "floetteeternal",
+    "selection_worst": 0.25,
+    "uncovered": [],
+    "minimum_incoming": {
+     "garchomp": 0.3,
+     "gholdengo": 0.646,
+     "golisopod": 0.304,
+     "meowscarada": 0.266,
+     "primarina": 0.308,
+     "salamence": 0.458
+    }
+   }
+  }
+ ],
+ "changed_own_choices": 0,
+ "scope": "Descriptive forward prediction on inspected ladder histories. Each forecast fits only earlier games of the same visible own six. Partial appearances are censored. This does not measure the effect of changing our lineup or human-game win rate.",
+ "record_sha256": {
+  "20261018-042024-2700141006.json": "8bfe2e2d1cc3aafc4b1a0cf2d066defbeecedfc9c90c44e811faf80624829d5d",
+  "20261018-041756-s3f8ejgdfhwq4go199jw3fiqasn3mn2pw.json": "87f035ab540f1ad394f951caf5d27971af51c2624fcb5b9e0e5bd164a26e1635",
+  "20261018-041412-2700138466.json": "82d4f80bee62eb8982d0b3707f30d49b932e6c0a0ffaa32b2838f896bc8fda69",
+  "20261018-041239-2700137871.json": "d24c6e0e33b04dd42b6be8f9e0f104696ed1e7677587244207a206d301ed6c7b",
+  "20261018-041016-2700136564.json": "00c353c24e4a1af3f766809646ad2c7def13ec7cb6d10023609560b09ff7ef95",
+  "20261018-040806-uf7ke4tfa89y8pf73ogq8hfwwns7cbdpw.json": "73ec7d78492920fb409a1e62a4c0baf65671a4b8068b7fefeb5553d021ec8fdb",
+  "20261018-040700-2700135413.json": "d18b9edd5f038398c7ba224ed1b2dff035fa4da947e37320ffa2dd7e07ddfc2a",
+  "20261018-040521-2700134728.json": "b57154a72550c860f4d9c6c6d4805f181387cf310fc6f26e7a216e4730488bf5",
+  "20261018-040249-2700133323.json": "33a081e72fffbaef98920cb7723257dfa8f039ca213a2bb76c5aa22f049a94ee",
+  "20261018-040018-2700132619.json": "31a7994b82a56bc7c4b3b3b577d09eb84641d0a6f9c9c540c7ef8e52b2397ed1",
+  "20261018-035831-2700131460.json": "3caf20774b473b4e1c90d9ad2887b2ba64f96ac4f1ab449bdde4b1201b4c3ad1",
+  "20261018-035541-2700130480.json": "467a735e9c65144d0e5a301134bedb73047650c38152bcd8b6b8da541ee0609a",
+  "20261018-035254-2700129642.json": "866cafc9b4b0b810866e58ef2f6b574631045fb39b5f4e172c3d43e852779955",
+  "20261018-035124-2700128922.json": "fb5c17b9d66234b7e18b63508cbeaec96f5a99595812cd1235df70ca04ff9f73",
+  "20261018-034938-2700128252.json": "cc83541f64ae258a42cd37e2348ff003d36173ce0a23563ddf52dac2c4ef9b53",
+  "20261018-034803-c10l9c47vk5ixuad1hriyambtog704tpw.json": "9f626913a1ad662911421c8c8bdd67ca002a171a3eff54453ac7d1f8c5eeac36",
+  "20261018-034318-2700125232.json": "787c3301fbf2a6df9af544a86832b4c196760b280a3e2ca9007c6ed2c7e820a7",
+  "20261018-034053-2700123999.json": "a5f0bf624a9a117eae593f822caf6f97556192b58b352ae4dd6746f047fd4e82",
+  "20261018-033753-2700122537.json": "5f614895d0b839e024ccfade62de38ce5e0687a22a40a701a58e026ae5804197",
+  "20261018-033352-2700120849.json": "2c54028e276c220ced2f360eb559d183dc8dc866deeb5603ed1faacb309ed593",
+  "20261018-032932-2700119973.json": "46b1d3bfc6d4387e152f4df389c574e5c28ed715950b950bd5477f0160e57595",
+  "20261018-032812-2700119502.json": "22933aebda786ebddbd31f2b8a9761c8f5230813caddbab1c2feeb06de98f4cb",
+  "20261018-032426-ju2s0micsyc7dx7ixihbxch7qudhw8fpw.json": "e58dca1b74908a8b3f8e3f0bedb9dc210a0aa07542188a497ea9b8b21b244f46",
+  "20261018-032236-2700116855.json": "8cdce2a2695396e5b7ae1ad06ef36e2e2994406c47f7595916e659f538a109ef",
+  "20261018-032046-2700115004.json": "f1732e56daa56920149c7ae0f2ed88dde146758c5e6933e1d0a522f14b8fdc64",
+  "20261018-031532-2700113819.json": "770154ae813514601c7568c1f9d3fcdf137dafc1fc1b0ffbfb31d236e2d38051",
+  "20261018-031319-2700112824.json": "30814e51e71cd7c7beeb655c87fc7080cf10fbecc4c02b42d6d14e6698f85f1f",
+  "20261018-030823-2700110528.json": "f06b8a445613343e8a13a5031bb7ccd32b9f48050f181d95ee3583760bc088bc",
+  "20261018-030513-2700109638.json": "2b4fbc3e3ec93fe9bf16d568c18dfeb7ace7e9b21830052a3c7695cb9687f983",
+  "20261018-030303-2700108954.json": "a2c2306ff4ad47100c7d8ab3a42e8c4896668b4eb8de7d39dcd5e3840281ef26",
+  "20261018-030130-2700107992.json": "7044ac84806515e127d30691c12fc5ca782b32b81d2d9773e8ab5d8cd62bd766",
+  "20261018-025904-2700107028.json": "bc10a0fbe502bd623f61b6b73b83440496d0ca6f79cc25606f3d47e93a9ca798",
+  "20261018-025645-2700105840.json": "39a0f7f0c1fbeb52dc39d348ef226fbb276d7e34e9dbd0220f638f6405ebd178",
+  "20261018-025349-2700104423.json": "c7e25fe877c21344d4eef112c36742f23b7f93d67e6c78c83e93b3840dc99ba0",
+  "20261018-024926-2700101810.json": "2a3959667e2b54902ddc9031660e868697dfa575ff8fb451b6b118b40bb875ab",
+  "20261018-024413-2700101152.json": "57c55adf29b49c7c618db86deab3fb0e495c47902db37020c52b204eea566306",
+  "20261018-024153-2700099362.json": "3f03a873fe4a14e3eafde4ae697a32a1cfcd183b42e6d4d56bf7732563ee0dc2",
+  "20261018-023749-2700097880.json": "0ebbc8fc956a299489a22e4e3a007a855dbd7ced0253e66f0742df305d1f95b6",
+  "20261018-023523-2700096203.json": "80ef5633d233e2e445b31c520ed5a4edb04f59f342076dc5c022bc096ab8f364",
+  "20261018-023119-2700095195.json": "a1bf3d00197bae6bc7dc41c2a2c49c92d2f2832a58bd66eac4a7bceeef200347",
+  "20261018-022941-0q0tolu2w9q57bjayw3h9g359av6wawpw.json": "ebe3d5241a2f32cb97f14d3f0a5768765b850e851210311cc2c56e2f9ec66669",
+  "20261018-022725-2700093423.json": "50f77ad46993030a8473fa2630d2aeb28469378e7562b367f81c544af75b6975",
+  "20261018-022556-2700092705.json": "9cfbe15afc415eb652830f1b0b5da6da2a3857256fdf2556dd8a3b1c81fb706d",
+  "20261018-022411-2700091571.json": "acd3cc08c0a6e6b8875d7245465d271cedff27dc2983d9d22f36b5fd168dc624",
+  "20261018-022158-ovv489lcas5ooqia69v4mie00bbiqbppw.json": "b6972ebca17136f488b87205e96fe05958077824cd1b1617257fb7f9d4708d84",
+  "20261018-021838-2700088985.json": "481bd07f6f0249c51f94d9cd96b1074c5e9db0f3c03288dc82065cc1a23c396e",
+  "20261018-021624-2700087604.json": "1fdfdf28fe3d1b9cbc7e87317401b53173e3bfede02f61db95ca9f7c641b1c3d",
+  "20261018-021333-2700086464.json": "f33f5364cd429d2f50db9cdb92c821a425954e4dfe5c4871593289794a6d8c79",
+  "20261018-021112-2700085386.json": "1e6e99dfe432661f4911c6e403995acf1c986157b4d590edf9e662d7f5b5ab8a",
+  "20261018-020849-gswhf273a9yd3qnwyn5nn8mbcof6hyypw.json": "b6a0677407f3ba6920c1973bda78aff024f7e5303f1daa84e304a1134e8cf3cb",
+  "20261018-020620-2700083346.json": "b1c0bb490f9f319d21755193e560f2fdfbe74ebd2fd36903157fd0435bc65ac7",
+  "20261018-020438-2700082125.json": "cfefbddd9d13cac68ba689f357d3a64352f06d0d942aca85cdcaed9b7b14c330",
+  "20261018-020202-2700081521.json": "e862e76096f3d4092c13a8d8bd7089560cdd8292c7a9e0b05db421e8891aef3d",
+  "20261018-020045-2700080224.json": "130a825cb4fd2a19fd992025109d1b3e33a2637b071f25fa202cba34ca8122e8",
+  "20261018-015722-xqkdwaqq6mgp29wjawo9hye1ormwguwpw.json": "4663d4efbc9beb22a2ce5f217d73c438a461218887b1a8cfb8e232ca7ccd9e4f",
+  "20261018-015441-2700077836.json": "e3cde2a6c1f9b083643a90370b557713b0fa11c3ea08478a50d3aca1b10c91ed",
+  "20261018-015255-2700075753.json": "16c2d84d458f0c9c7be82bfcbe6ee7623c1307be408b48f1d38d8f4e7691f2de",
+  "20261018-014836-2700075160.json": "ebb3b56d7ba60a5a0d72e927ff2b9d63deffe5e527bd9ea519e7e58c56b93341",
+  "20261018-014711-2700074258.json": "7c69524e78d1ba02d9b504d21eb751230350d64a8b2a4070b868270e80ccaeaa",
+  "20261018-014448-2700072487.json": "90a7c4fd146c7c27501a05d1f5475d72455cfe61f5779c408f4e0292e80aac90",
+  "20261018-014134-2700071915.json": "64f43797d938eff9fd5a2bb2adda1e60f92c3b2d55e45a6c988e28391ed31c1f",
+  "20261018-014023-2700069763.json": "0b1e76aa0f77cd84326babea49f84878e2277827dac813b656c23a1d17218692",
+  "20261018-013524-2700068224.json": "797a67bdf9754425a184971db3189ab9cf1414a9a82b9f7a904f61070c554355",
+  "20261018-013247-2700065786.json": "eec7bef7aa3cff99970fb81ec78a622b2285e3234d2535bb0aeecd76fac29ced",
+  "20261018-012742-2700064825.json": "bfeb3a753524b26dd070f426efaff3023c35feda9e82019e36d7575a398c81d5",
+  "20261018-012545-2700062873.json": "032a1f6b3dfcf36df9d11ca2d948a6ebae93ede94293dd2c8247059b53f10c00",
+  "20261018-012132-2700061570.json": "cb93670bc033e38410fa1075ac9e6769dcf8167ba84e3b29f069fc056299fc19",
+  "20261018-011901-2700060589.json": "bcb9349d9133b69e51cced7396dc355ad758b2bd451dc4e8c8314e7b24ea8b65",
+  "20261018-011703-2700059094.json": "a1a2c5f136fdc75ab9bffa8331109ac1858a5ba6d18f6bdf061bea80bf59a5cc",
+  "20261018-011351-2700057682.json": "51e9a53064600ecddb1704d53142b0f7f74cc61212b8ca340a3bdbdfa4179ea5",
+  "20261018-010831-2700055281.json": "10bb6d748f942a2da131811dfc0b745d575fe7fe712afac879480ee45e9e083a",
+  "20261018-010557-2700054141.json": "228e9036b819c364ef9fe3cf969f62476838f97657c6236df1e0b9998df8885d",
+  "20261018-010345-2700053266.json": "10e51e0520bc88fab62301f79a7229ee4a83ff6a673ac9fb2a3dfc0f1e55b8ae",
+  "20261018-010147-hja54k3jlhmoj3e09lan6dmmwa7ks2apw.json": "329c34623688b5e2d7b95d46a1e37dbc0ba59397780c316ccdcbe228dea73794",
+  "20261018-005641-2700050058.json": "4b3e6d9fdee2e5ebff8b343b564e4938b1641106d404431a68960b321d8259a7",
+  "20261018-005445-2700049373.json": "6bf58801495ca3a26043fda16c2d335c1dd11d04cd9757a36154a8849b8ffe33",
+  "20261018-005320-2700047730.json": "2174183e6abb8b54e959a078316d8c4e0f03b7e6254c798bc19fb578919a8d7a",
+  "20261018-004959-2700047194.json": "4b925e048aff1e08c968d9da1f0b909f1ee812afc2181b1985dd270b5345dbac",
+  "20261018-004853-2700046153.json": "9f3aed93815a109ae0dff44705dd0fcf124377ff4f477dae53570558cbf25432",
+  "20261018-004643-2700045044.json": "3fb10b322fc1dac513fc38fa29668a89995c6f8ff3cf5dec354d70afb3cb3c15",
+  "20261018-004404-xpuussj00lgi9fxyvnmch8qmsmoado1pw.json": "b1b3b527ad977a537bc44ae4cb8fa2944ce283736cf222f5bf2acc6cdc8677a5",
+  "20261018-004224-2700043382.json": "7d64931eb5723df4fb8c05464978ca270069beaa2ece955ce8c2b1b82f3b58d6",
+  "20261018-004044-punv0fagcyid3o41vek7yt3cp0rvv8ipw.json": "1ef43e79717cea3b124b736249b053f0c774c8437f17dc76f87bdf09060ba403",
+  "20261018-003720-cuapdjhwxlt92wwkd9nrkf74i0awadypw.json": "49e9d069c816ab7ab472fa44e7ee715412c379045ea1f5e0d588b611a944b635",
+  "20261018-003523-2700039691.json": "95b97385f4f7f861a570ad865919da1909fd81247e0bb9160cea854c029425ad",
+  "20261018-003254-2700038722.json": "c08576339977d310a44591dc97922da48d04cd0ec4b7970cf2620b4b3ffee1c1",
+  "20261018-003026-2700037256.json": "cf1bace60227cdb16aea158e81c79b079ffabf94fbf12bef42cd925baef96452",
+  "20261018-002705-2700036177.json": "146d287d8816546e1288ce3b34d42e4d0ccf9d9ffbdaf55ab1057eaf1d646808",
+  "20261018-002521-2700035269.json": "4c2800528200096747cad647a20f36c04bad2fc549dd1a6f59530e954eaa282d",
+  "20261018-002326-2700034214.json": "0e46cbb401c1dabe3aec8c3854bed4e91214e4716a0909332e645f5c63aaad75",
+  "20261018-002016-2700033729.json": "7853f50a4b4f2a98231ed08c4c8df85d325d32fc555eee79bb2f166af7d53119",
+  "20261018-001950-fepnibwf957ev47mmennl86v0a60wu9pw.json": "1f31120f5c41ab98fed671f66b58ff8681a27d88b7877844347053baf820bac5",
+  "20261018-001736-2700031042.json": "e64d59bcd548cacb877eb25b2de1226794559b0bec85951c3222f73f69ad8b32",
+  "20261018-001403-2700030180.json": "6172b2b7baad4d699c0a36e9140c6a47161a05ed2070eb6fe4c2b05491254e5a",
+  "20261018-001226-m0cvsc98tdvbdjvk7v1xc250o0feqs1pw.json": "48274783a4de802618a42be3506fb44cdf8dd8cd3e5909fee8e848bfd8b29ecd",
+  "20261018-000947-2700028395.json": "e58661da124d0a5c3f3e8d122fb6d2a4af5ca202d7b77dab894548f3d3c22d45",
+  "20261018-000824-lihqlkq41ppfw3y48hrpx6cy9qnl6j5pw.json": "4339290fde3e93601fbbd27c454bb0b570cd8979a14ecdcde9f93ae41aa91a47",
+  "20261018-000423-2700025366.json": "c12ea03de8b63976b0535ef876aa049b3815c3706e1d76e69e1bc7adac588338",
+  "20261018-000153-2700023858.json": "30b0a864ad328bc78292975cba32af9f163bc30c82177ad5855788d46d2ef6ae",
+  "20261017-235836-2700023305.json": "6c42b7877f299b4cb58571c3d9272d5c5841047a03774659bd2b26e1ba5ec404",
+  "20261017-235724-2700022535.json": "765e43f662a68275b2d55b18e62ad4141583109f4a87d7e9ebb6a038e04a8c4e",
+  "20261017-235531-2700021378.json": "e64b09834ea1d1e689b3107a2f49ebf65fa7ee5b571c7bb3c1299507ff4ab87d",
+  "20261017-235252-2700020204.json": "c1c5a0b4d8e6981446dae6a1d25e9deee8fee24e0919668d33bac8d4c0f8f1a0",
+  "20261017-235036-2700019603.json": "a4c6eb8121a37902d0de46fffd550892a32ae3d20c19bfa22ae83dfd12ac24df",
+  "20261017-234918-2700018902.json": "9ce2825eb2b361a0fd8b3f01b01ed3471f5d108e529ef851d144a718d2fdeae7",
+  "20261017-234644-2700017797.json": "a3cc15eece9356bc8fe8098164b6f6eca90ef3b143ab8f56e2d94452aaf96a60",
+  "20261017-234404-2700016303.json": "b5c3ca2b87a2387085191d33caf0eda8cc1ecb2d358d3296b30e72675053fdee",
+  "20261017-234138-2700013657.json": "e0b41574d255726135d18cafd9675a7cbd156c3fef79da5b9765459c4125de38",
+  "20261017-233539-2700012891.json": "142666761ab8763bb55ae6cd1299cf64986ff10d7b9f7eba91cae0bb1c2948c3",
+  "20261017-233425-2700011620.json": "4d7b9a1d89eaa05d5b95735ef91eddf71cbbe2b484dddbd1069b7031cfe8bdfd",
+  "20261017-233122-qwd92p03cegfrhxs6ltwmx7q9fd9j9spw.json": "6f4050a35cca3e75cfb22647abed3a03b8df2f2dc6ecd29dae0b90c2a620ea63",
+  "20261017-232553-2700008364.json": "57d25fcd795bcdd82a1a4d08ab79258507db4f4df0e18cd9fc054f92fa395bdd",
+  "20261017-232426-2700007410.json": "843b2cedaeb63e844681d5cc90281f6cc1b2282cee5f6978d2f0ce1c6f628df9",
+  "20261017-232227-2700006631.json": "7628e3644523591dab1db8a963bd5efd9ec128d93d59175219293ddd7ae2884d",
+  "20261017-232046-2700005736.json": "d2be4b55768d999509a568775617310e8f60f0ee058e24a1af7450d82e4284fc",
+  "20261017-231531-2700003119.json": "8b97bce7c4b8f6606cd182fc226d9593147a7d67bbb4ef41f0221b9c19149fdd",
+  "20261017-231248-2700002011.json": "2e467e3f7230c6a90d5c9e665d69106f5ef6e0c4845d510dc8aaea7c2c58e632",
+  "20261017-231014-tfa9d006gg4vueb9laprmjhwyem93eapw.json": "47929ee9d1a683c0d5627e34fd8ca296defc3fb7f410110036aa8fa40c33a693",
+  "20261017-230628-2699998295.json": "b46a2ebd33eb504ebd6ea5cf118c9f774f7c4165705b332deca6ef12c983add8",
+  "20261017-230212-2699997458.json": "9b6aa1a592acf3dcf45fdc199f95f68e845903e170ee3a1573d7497e0b9cfb9b",
+  "20261017-230014-2699996377.json": "785a2a5c5f06580db1e88eef6dabd5a5041c8c2a7aa24922cc431f8243c0de24",
+  "20261017-225751-2699995772.json": "83d5d00759603926793c848aa1777d31189624d5ff777803d99e2087215e5ba4",
+  "20261017-225615-2699995186.json": "a2be891a1b0cc71ec2595711a38ad84b1625debf639ab984788bb5f22603bb04",
+  "20261017-225447-kh7u0uyyt3irx4by6im2gb4nccnfu20pw.json": "762339f1fdec22e4bf19efd67379700baa2afb8cacbcc1939821d01743b414ad",
+  "20261017-225159-2699992868.json": "f5583fefcb9a3e94bbd97b271de57a7f12ccc918d5927c90993cdfa65fcd6fc4",
+  "20261017-224852-2bnbr3fdeagpa40g00ft56udehtstvbpw.json": "80f4465dff9aaa9f84955e3c7c0955a574ba89c0377e769444a85af5af0903ee",
+  "20261017-224611-2699991532.json": "3f78320e39a0687a1bf1e175bffb47d3b48b94a477c7bb82ec823905a9d1d70e",
+  "20261017-224526-2699990799.json": "e027ae069d58c21d788a5be92080adf08ecfd509bedc455c0a813c56f5421ba3",
+  "20261017-224330-2699990080.json": "d2021523425b470eb99f7db8d0370feeeeebafe50d0f396051011cab23006435",
+  "20261017-224108-2699989074.json": "8b5025362f28cdfe3f5db6366e56f2b17b595ec8e7007cd04748dca14c13b467",
+  "20261017-223903-cydshtakg0hdbikj3o2fnl5k6k7jrvqpw.json": "7c91a652c17829bd8a1e0d93f5533e4c562c9bdb929a165b30afcca0fa68b573",
+  "20261017-223049-2699985153.json": "130fd47b8a1d8d2cdf224f1e609fb764ab2fd3164e4bd4199c07fbf908ee869a",
+  "20261017-222854-2699984227.json": "7f07b50ee37a96a19ebc16adbbbe75d1b893c0ebc1c30191b79a97fad8e5168e",
+  "20261017-222618-2699983694.json": "6a5ed70254f4fe2d002b4d59f9b69883035ef56e2a437a58b86eb603e385e2aa",
+  "20261017-222437-2699983099.json": "c1b746db3d81324996e97edd1c12c591f3c7ccf52a3d51f152b63e5a81be8f41",
+  "20261017-222310-gw6wf5os1pi8ro5xlul2kulsteftfpxpw.json": "126f845b0f6d39681ac698df8b0f69291485e141e962c452949a9dc6b150afa3",
+  "20261017-222226-2699982330.json": "6c856ef06aacb1b73e97a95399df7c6941ddb2e340fb231210a66f9250dede0e",
+  "20261017-222105-2699981330.json": "e5fd4682df3aab59a0b20b44f3c8a5899bb986d8a8b4eaf09f5a5af1dbf08081",
+  "20261017-221807-2699980898.json": "36da1506cadb1be8e2f47bcafe941aad6d51188b89a289aeb51937e2e831a2a8",
+  "20261017-221653-2699979915.json": "c43acafd4bea42308cf31c0d313bffa9b65d17c57064ab2837951b06d97d0d7c",
+  "20261017-221308-2699979155.json": "33c79c9b9da95679fd08087fc3dc4186aae3aee5f6d46bbedca376f422b0c14b",
+  "20261017-221156-2699978030.json": "e0bda3bdbb352625df3291123ba799b9d1019eeece8f1fd4258e3eeb0a5aefc8",
+  "20261017-220843-xrhx4u7ukmkuc2cmrud03r41jxuprtnpw.json": "d6eb3ae1d9d82b14a70903e8691e8d4ef16967db887fec803e41893453130ed1",
+  "20261017-220726-2699976029.json": "45a45186e489999918cfa5fbef6d5cc63ce555656b1be1818237d5760ccf88d0",
+  "20261017-220251-2699974977.json": "e43d51f2ca6214def9c47f00644ecb5bc8e3394118939ceecf4046bf300d6808",
+  "20261017-215945-qych5pvmyi31q2oreoshgrku7rqyfsgpw.json": "b5bce3e7928a89eaa01d365e480281d7e098035efe6e5ac63bde1d30cccde9f1",
+  "20261017-215650-2699973131.json": "5722b17ff812e7d8920eb6858a3ce74f0d6b11b2b61e0234e0d4caed5962ba30",
+  "20261017-215407-2699972402.json": "ff68083ea5e3c78120be13d7e95e52b4e775790b0a38d9b7a875df7dcfc174ff",
+  "20261017-215159-2699971795.json": "b5122124f9bccfbb562c5c26abf344ff5b83f1321daeeafeb95ff1a919b3691b",
+  "20261017-215027-vo3wnwmx2kei8dhg9wms3n0aooehd9opw.json": "1f0178fa7d90e4d9b9f41d52a2bafdaadbdf447c594ae2efc4292b881f1453b0",
+  "20261017-214749-2699970484.json": "ede55804ca0a4559588f63180fc62682e135c740861c0b23960c4b5eb5085398",
+  "20261017-214624-2699969835.json": "89daad85a823807ba4087779db1904c4ff22e82e881fe6a7d322d5a3d27140da",
+  "20261017-214424-2699969206.json": "2ddd22211ade4ae4b58acf70fb4c0e71bb7f15956e4389f764f8262beaa5e2b9",
+  "20261017-214217-2699968356.json": "67145c06c850fcd674406bd37beb550a2a5b090616dae29f58b401368ee54484",
+  "20261017-213926-2699967911.json": "f6eef4f424410cb2d631586442cb67c19041acf3c6fd37421db752b506534fad",
+  "20261017-213719-2699966442.json": "34fb33fb59d3fd15acae98bea3c964c93240d62dd95f7d64b32b8eab3b019120",
+  "20261017-213319-xe1o4ydv4fq78h9kpu1pswt3srey7yepw.json": "b9cc30a73459f8b0a60c4b70b3d26a444f463f474ffc971f1471117c176275a8",
+  "20261017-213106-8x35qfgg2m92crac5dv6h321lkwmxofpw.json": "2bf3bd14ba566b14483a55313684e4a217e7086f588182efebe2edc39e3623c1",
+  "20261017-212733-2699963410.json": "33169f19e7eddd6b2b3cc662bbc89eba55f8b3208ee21dd4084268dd29875d40",
+  "20261017-212320-2699963040.json": "19b1b30d14f8d34a7a4b1bbad962b23a6a61be6ac394b1334ea4b695033a26db",
+  "20261017-212209-7aqbhwa61e3i4cwwhksmvqvgowh3u11pw.json": "98fc80d37006195d476e3144a51595058c1e092605414ccf5d139309b41774e1",
+  "20261017-211957-2699961568.json": "4065d74e5b5d37d50557e96333e6231d1aff68f4d4109ee1e8ab330736f5bfd2",
+  "20261017-211724-2699961025.json": "44484b5914f9bd9c8a6ca98c573eb0fd8d6eaf3cc784d667221a8c0dc5d73b34",
+  "20261017-211537-2699960427.json": "3392de3b77e959b2ed8b36ef2ca803f0f1048b69d66abf41ea4b66f55c27dabc",
+  "20261017-211324-2699960063.json": "4afc6f6b2899766debcfe0e23da0431a5a9752c2ad9289a7d439b4318af5e359",
+  "20261017-211223-yk4a0d58afiecikkliclik7i2c31e49pw.json": "251cbc86d5410aa0c2b4496d31f1b5aa68d667a301ee7e972982664b373ccf6f",
+  "20261017-211043-2699959162.json": "478dc32c1eed7873a7ec89d4f3ac6c1c780d410e4ce147175ddf9f53f93f5ab8",
+  "20261017-210919-2699958562.json": "d779258d34e580a60dd49ac763c4a747154dc2384f2c3f26416c2e302d29a761",
+  "20261017-210722-2699957297.json": "a67e77228ddef648747ca24e2fad782877a3ca06bbfe55e136044e7e3ef8e230",
+  "20261017-210305-2699956537.json": "53be49959114ca43e6c7054a73e4611a5233339664daeb9de9b8d3e785ab8d1b",
+  "20261017-210027-2699955628.json": "9fe37b84f1104b9f16997eca442e94700b1ae199e331617b5a20ed06bd2fe997",
+  "20261017-205655-2vikdsd16vuc7ux72jam75j1rh1righpw.json": "8e194e994db71c6160b58934bf419df126dd727a538a5c1ed964c26d947c4983",
+  "20261017-205436-2699953007.json": "78efc523fe4d12b730b81d7e68f970eb56d1187294aced43f15c23405419d14c",
+  "20261017-204748-2699952663.json": "5331afd59eb6fffcbf774c95d53c37efe2ec47fd8ab277b9220bf8639ede3c27",
+  "20261017-204631-2699951896.json": "c64a5095128ec5fca72e54c6bf10ff281536b05a3b4d56988061470b0124ecce",
+  "20261017-204342-2699951040.json": "f394eba39f5109571a118d31b6be25122fff19bc0e1be135c669ad45747d36ab",
+  "20261017-142404-2699856370.json": "35863528d801aa1580375754997e2d099aaa4d8ca2bc690f2c6639c2e984870d",
+  "20261017-142214-2699855595.json": "907c51391bcb05ac9c41f98d98124c4a82aa5f0aea6fd05732afe7fb7663c8f5",
+  "20261017-141916-2699855205.json": "50d1f3bde62f3632616afd530796da75612a7c87c0ab9789c38ecf987a68b26b",
+  "20261017-141750-2699854667.json": "b7798c723739d870299260139343162ac5c88df4690233942833633a02b1f9db",
+  "20261017-141531-2699853996.json": "fea461422e6cc7c20cf34b4dc1e47cb0e9a4ee26e1fd583c2d22fb30a3ac6ab1",
+  "20261017-141253-2699853336.json": "259088766fe1feb6faad4044ab863ba0961147d84eebae1ad6b785dd5d4b31ac",
+  "20261017-123909-2699824823.json": "50328dc6ca55463f66af2c76866ac80fa4bc81306ad61ce5c90cb0055a1903e3",
+  "20261017-123556-2699823974.json": "d3db803e898c69a6396cf90c73a7b86823d211bbd7858239120a258ac877be58",
+  "20261017-123302-2699822845.json": "bb97e44eeb60a1a3dce6d034080d4a7062440518c04e5054817c36da9873f04c",
+  "20261017-123009-2699821959.json": "059b327f200b7d06d4db428f555302ccb2d8229e3d1a691af8c699016911337d",
+  "20261017-122725-2699821373.json": "2cfb1b092e8cabb4879c96860664bd066cd3b70b3f1617164e89573f2e6c5645",
+  "20261017-122538-2699820844.json": "cf6cd9088f752a413e14aa63013469681c14c9bb45941e5aa91fd2462c3bf510",
+  "20261017-122359-2699820066.json": "e8746f0771c6d02347fdee7a77c42efd54f57cb88a971c8131160e4dc3c4a315",
+  "20261017-122145-2699819284.json": "c88fa474cc30379003ff17c5bd4f6ede159e37996827f4d49a473eb717c400df",
+  "20261017-121915-2699818751.json": "1b46bd18f60d945f221a8f24dfe66b91e51ea121edea83ea5e12200257977823",
+  "20261017-121740-rcvmymcvg39ko4ti4fx4cunk4o32p4upw.json": "b25e675709299d4a61e09699491c986de1d8a34bffa1427d671453441ef31903",
+  "20261017-121615-2699817596.json": "7ed2513ad1ef8624d59fe4ad87aad2be207e66fc72b267c6465605a8ba2a976b",
+  "20261017-121419-2699816952.json": "45d7ab3c3119b917af3f02c568df1b4adfbbb3132165e091ba15551c02e7dd9c",
+  "20261017-121208-2699816169.json": "e7544b25d2533576869acc089689766722f35114fac4ccb4b8c5ef16bb2cb179",
+  "20261017-121011-2699815738.json": "5f6737bdbac109fee13aa8298623bf7c1067cf463dacb35583111cfa41fe406d",
+  "20261017-100259-2699770404.json": "eb7c8eae53250d14c7183c99b36612e6abeea67b7c578604d068d6b9e8cc64fe",
+  "20261017-100024-2699769664.json": "4f98dbf1176733b1f20e8a67a61ec5482ab4283f9409c9f667f4e3765bdb119b",
+  "20261017-095855-2699768883.json": "08d6fd3e717d3ec963b6bf423d9d63c081713540a8ddcb513bfc762c8ff15840",
+  "20261017-095636-2699767850.json": "fc93e18d85b310996fca82c815b68542864868f9f9d4e22cc5e391ba5cb9892d",
+  "20261017-095357-2699766354.json": "27749355f765db735f9410982ab9d3358369d49dd45be01a8c83582a22c2fb71",
+  "20261017-013848-2699542963.json": "897433003a72ed4d7c96f7478fd63e0e916adcad299643fee894095a2ae6c22c",
+  "20261017-013533-2699541555.json": "df63a891cb2eeee521dfa830d6d5952ecc90086515eea62e6deb4a26bb5a86f3",
+  "20261017-013328-2699540752.json": "e88d6423a3139b10f374fba24d98e49f560475f3f41c48cc477aa633dda243e0",
+  "20261017-012944-2699538726.json": "5b90c94d2327e87fa69507f1b3d14abd68ddba4a66e0272778cd9e99fe45527d",
+  "20261017-012809-arhlogi39glmrxocmxk96vvahkidh3upw.json": "138aea16fc211278af25565c09bab1282f12eb8c2b686955b95c6e538741640d",
+  "20261017-012654-2699531923.json": "5fb32973979caa312b928c1115095d43d5903c133c8cbcf9410f0d2772da5466",
+  "20261017-011314-vo9k1e66cgjgy4x2hfwsrjc9duhuaufpw.json": "a236f9ce27d15a8da96fb6c54e460bc3697cb0051ff7883e40e24e5395a6c838"
+ },
+ "source_sha256": {
+  "selection.py": "70222576b831a883c4cc15e56802cbce304e30d0c902bda95c501f51db1727f9",
+  "opponent_selection.py": "aae1cc64e29eec768705bff04e897eca21e5401f5fe7c2ba437490729cea0811",
+  "preview_matchups.py": "00da3fe9165d312d473562e538a6ca08bcb02b11bf4110ac4ec025255b9b5d5a"
+ },
+ "prior_sha": "d28e50734dec8d1c"
+}

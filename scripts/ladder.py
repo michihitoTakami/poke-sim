@@ -226,7 +226,9 @@ class AdvisorPlayer(TrackedPlayer):
                   f'{self.advisor.engine.value_model.version["dataset_id"][:12]}', flush=True)
         opp = [m.species for m in battle.teampreview_opponent_team]
         roster = [s["species"] for s in self.sets]
-        picks = self.picks.predict(opp)
+        picks = self.picks.predict(opp, roster=roster, records=OUT)
+        if self.advisor.engine is not None:
+            self.advisor.engine.set_opponent_picks(battle.battle_tag, picks)
         # Lineup evidence is this roster's rated ladder history (OUT), also when records go elsewhere (--out,
         # local games); unrated local games never count.
         if self.lineup_method == "ladder":
@@ -246,6 +248,8 @@ class AdvisorPlayer(TrackedPlayer):
             ranking = self.matchups.rank(roster, picks)
             lineup = ranking[0][0] if ranking else [s["species"] for s in self.sets[:3]]
             self.selection[battle.battle_tag] = {"method": "matchup", "win_prob": ranking[0][1] if ranking else None}
+        self.selection[battle.battle_tag]['opponent_selection'] = picks.context
+        self.selection[battle.battle_tag]['opponent_lineups'] = picks.lineups[:5]
         self.lineups[battle.battle_tag] = lineup
         order = [next(i for i, s in enumerate(self.sets) if to_id(s["species"]) == to_id(x)) for x in lineup]
         order += [i for i in range(len(self.sets)) if i not in order]
