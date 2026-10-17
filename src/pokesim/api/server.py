@@ -34,8 +34,9 @@ from fastapi.responses import FileResponse
 from pokesim.config import RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor, Suggestion
 from pokesim.live.events import EventTranslator
+from pokesim.live.preview_matchups import PreviewCoverage
 from pokesim.live.screen import ScreenTracker, Vocab
-from pokesim.live.selection import MatchupModel, PickModel
+from pokesim.live.selection import LadderLineupModel, MatchupModel, PickModel
 from pokesim.live.session import BattleSession
 from pokesim.rl.myteam import to_id
 from pokesim.runtime.bundle import describe
@@ -63,6 +64,7 @@ class Live:
         self.advisor = Advisor(self.sets, policy=policy, lookahead=lookahead, planner=planner, source="switch",
                                value_run=value_run)
         self.picks_model, self.matchups = PickModel(), MatchupModel()
+        self.preview_coverage = PreviewCoverage(self.sets, self.advisor.engine) if self.advisor.engine else None
         self.matchup_warning = self.matchups.check(policy)
         if self.matchup_warning:
             print("lineup table:", self.matchup_warning, flush=True)
@@ -162,13 +164,20 @@ class Live:
         self.reset()
         self.recognized = recognized
         picks = self.picks_model.predict(species)
-        ranking = self.matchups.rank(self.roster, picks)
+        model = LadderLineupModel.from_records(ROOT / 'data/raw/ladder', self.roster)
+        coverage = None
+        if self.preview_coverage:
+            try:
+                coverage = await asyncio.to_thread(self.preview_coverage.profile, picks)
+            except Exception as e:  # noqa: BLE001 - a useful historical ranking remains available
+                print('preview coverage unavailable:', repr(e)[:200], flush=True)
+        ranking = model.rank(self.roster, picks, coverage, self.matchups)
         self.preview = {"species": species, "names": [self.name(s) for s in species],
                         "brought": [round(float(p), 3) for p in picks.brought],
                         "lead": [round(float(p), 3) for p in picks.lead],
-                        "lineups": [{"lineup": names, "names": [self.name(n) for n in names], "win": round(p, 3)}
-                                    for names, p in ranking[:10]],
-                        "lineup_note": self.matchup_warning}
+                        "lineups": [{"lineup": names, "names": [self.name(n) for n in names],
+                                     "win": None, "score": round(p, 3)} for names, p, _ in ranking[:10]],
+                        "lineup_note": "実戦の選出成績と3体の相性による比較値です。勝率ではありません。"}
         self.session = BattleSession(self.sets)
         self.session.preview(species)
         self.translator = EventTranslator(self.session)

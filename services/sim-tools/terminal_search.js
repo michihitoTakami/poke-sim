@@ -109,6 +109,7 @@ class Search {
       this.policyVersion += '+nets:' + Object.entries(this.policyNets).map(([k, v]) => `${k}=${v.slice(0, 8)}`).join(',');
     }
     this.active = null; this.unfinishedAtDeadline = 0;
+    this.rootProgress = req.rootProgress !== false;
     this.states = req.samples.map(sample => {
       const b = deps.setUp(sample, req.format, 1);
       const st = {snapshot: JSON.stringify(deps.State.serializeBattle(b)), entry: b.pokesimEntryLog || [],
@@ -127,7 +128,8 @@ class Search {
     }
     this.actionFilter = pruneRoot(this.states, deps);
     for (const st of this.states) {
-      st.cells = st.p1.map(() => st.p2.map(() => ({prior: null, n: 0, sum: 0, sumSq: 0, speed: 0, ends: 0, failed: 0})));
+      st.cells = st.p1.map(() => st.p2.map(() => ({prior: null, n: 0, sum: 0, sumSq: 0, speed: 0, ends: 0, failed: 0,
+        progressSum: 0, progressN: 0, priorProgress: null})));
     }
     this.jobs = [];
     for (let i = 0; i < this.states[0].p1.length; i++) for (let w = 0; w < this.states.length; w++) {
@@ -218,9 +220,11 @@ class Search {
       // reference/material anchor instead of being replaced by the first deep rollout's binary result.
       cell.prior = v;
       cell.priorSpeed = item.ended && p === 1 ? 1 / (1 + item.turns) : 0;
+      cell.priorProgress = item.progress ?? null;
       return;
     }
     cell.n++; cell.sum += v; cell.sumSq += v * v;
+    if (Number.isFinite(item.progress)) { cell.progressSum += item.progress; cell.progressN++; }
     if (item.ended) { cell.ends++; cell.speed += p === 1 ? 1 / (1 + item.turns) : 0; }
     for (const x of item.trace) { x.node.n++; x.node.sum += x.sign * v; x.action.n++; x.action.sum += x.sign * v; }
   }
@@ -241,6 +245,13 @@ class Search {
     b.resetRNG([0, 2, 4, 6].map(x => bytes.readUInt16LE(x)));
     const obs = this.observer(b, st); let at = b.log.length, root = true, decisions = 0, tree = !initial;
     const start = b.turn;
+    // Only the first complete turn's public material change breaks near ties. Deep rollout wins can make
+    // another setup look faster than removing the threat now. Boosts have no independent progress bonus.
+    const material = () => {
+      const total = side => side.pokemon.reduce((v, m) => v + (m.hp > 0 ? .7 : 0) + .35 * m.hp / m.maxhp, 0);
+      return total(b.p1) - total(b.p2);
+    };
+    const initialMaterial = material(); let progress = null;
     const names = this.rolloutPolicies, serial = this.serial;
     const random = xorshift(bytes.readUInt32LE(8));
     let rolloutTurns = 0;
@@ -255,6 +266,7 @@ class Search {
     const advance = (a, c) => {
       this.deps.observedStep(b, a, c, this.deps.step, rollout, root ? [] : ['p1', 'p2']);
       root = false; obs.append(b.log.slice(at), true); at = b.log.length;
+      if (progress === null && (b.ended || b.requestState === 'move')) progress = material() - initialMaterial;
     };
     try {
       if (!b.ended) advance(st.p1[i][0], st.p2[j][0]);
@@ -273,7 +285,7 @@ class Search {
         advance(a, c);
         if (!initial && !b.ended && b.requestState === 'move') yield;
       }
-      const item = {cell, trace, initial, ended: b.ended, turns: b.turn - start};
+      const item = {cell, trace, initial, ended: b.ended, turns: b.turn - start, progress};
       this.maxRolloutTurns = Math.max(this.maxRolloutTurns, item.turns);
       if (b.ended) {
         this.backup(item, b.winner === 'p1' ? 1 : b.winner === 'p2' ? 0 : .5); this.terminal++;
@@ -361,14 +373,20 @@ class Search {
       unfinished_at_deadline: this.unfinishedAtDeadline, predicted_columns: this.columns !== null,
       chance_paths: this.chancePaths, immediate_wins: this.certified, policy_nets: this.policyNets,
       puct: this.nets.p1 || this.nets.p2 ? this.puct : null,
+      tactical_tiebreak: this.rootProgress ? 'first-turn-material-v1' : null,
       certificate_scope: 'all discrete chance paths and legal replies in sampled worlds only'};
     return {session: this.id, pending, summary, results: this.states.map(st => ({
       p1: st.p1.map(x => x[1]), p2: st.p2.map(x => x[1]), p2Prior: st.p2Prior || null,
       payoff: st.cells.map((row, i) => row.map(c => this.certified.includes(st.p1[i][1]) ? 1 : this.value(c))),
       winSpeed: st.cells.map(row => row.map(c => this.speed(c))),
+      ...(this.rootProgress ? {rootProgress: st.cells.map(row => row.map(c => c.progressN ?
+        ((c.priorProgress ?? 0) * this.priorVisits + c.progressSum) / (this.priorVisits + c.progressN) :
+        c.priorProgress))} : {}),
       visits: st.cells.map(row => row.map(c => c.n)), invalid: st.cells.map(row => row.map(c => c.failed)),
       stats: st.cells.map(row => row.map(c => ({n: c.n, sum: c.sum, sumSq: c.sumSq, prior: c.prior, speed: c.speed,
-        priorSpeed: c.priorSpeed || 0, ends: c.ends, failed: c.failed}))),
+        priorSpeed: c.priorSpeed || 0, ends: c.ends, failed: c.failed,
+        ...(c.priorProgress !== null || c.progressN ?
+          {progressSum: c.progressSum, progressN: c.progressN, priorProgress: c.priorProgress} : {})}))),
       // A sampling-error indicator, not a confidence interval: rollouts share a policy and hidden-set particle.
       uncertainty: st.cells.map(row => row.map(c => {
         if (c.prior === null) return null;

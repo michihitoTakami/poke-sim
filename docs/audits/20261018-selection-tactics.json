@@ -1,0 +1,2213 @@
+{
+ "schema_version": 1,
+ "baseline": "5f7b33c",
+ "snapshot_until": "20261018-004404",
+ "battles": 131,
+ "actual_results": {
+  "loss": 70,
+  "win": 61
+ },
+ "source_records": {
+  "20261017-011314-vo9k1e66cgjgy4x2hfwsrjc9duhuaufpw.json": "a236f9ce27d15a8da96fb6c54e460bc3697cb0051ff7883e40e24e5395a6c838",
+  "20261017-012654-2699531923.json": "5fb32973979caa312b928c1115095d43d5903c133c8cbcf9410f0d2772da5466",
+  "20261017-012809-arhlogi39glmrxocmxk96vvahkidh3upw.json": "138aea16fc211278af25565c09bab1282f12eb8c2b686955b95c6e538741640d",
+  "20261017-012944-2699538726.json": "5b90c94d2327e87fa69507f1b3d14abd68ddba4a66e0272778cd9e99fe45527d",
+  "20261017-013157-oix1cjx3khssf2ebddaeh5er2u7btqqpw.json": "6581b037b0053dd180ff733743286de73e6d88c458ea7912fc28e8c3074941ed",
+  "20261017-013328-2699540752.json": "e88d6423a3139b10f374fba24d98e49f560475f3f41c48cc477aa633dda243e0",
+  "20261017-013533-2699541555.json": "df63a891cb2eeee521dfa830d6d5952ecc90086515eea62e6deb4a26bb5a86f3",
+  "20261017-013848-2699542963.json": "897433003a72ed4d7c96f7478fd63e0e916adcad299643fee894095a2ae6c22c",
+  "20261017-095357-2699766354.json": "27749355f765db735f9410982ab9d3358369d49dd45be01a8c83582a22c2fb71",
+  "20261017-095636-2699767850.json": "fc93e18d85b310996fca82c815b68542864868f9f9d4e22cc5e391ba5cb9892d",
+  "20261017-095855-2699768883.json": "08d6fd3e717d3ec963b6bf423d9d63c081713540a8ddcb513bfc762c8ff15840",
+  "20261017-100024-2699769664.json": "4f98dbf1176733b1f20e8a67a61ec5482ab4283f9409c9f667f4e3765bdb119b",
+  "20261017-100259-2699770404.json": "eb7c8eae53250d14c7183c99b36612e6abeea67b7c578604d068d6b9e8cc64fe",
+  "20261017-121011-2699815738.json": "5f6737bdbac109fee13aa8298623bf7c1067cf463dacb35583111cfa41fe406d",
+  "20261017-121208-2699816169.json": "e7544b25d2533576869acc089689766722f35114fac4ccb4b8c5ef16bb2cb179",
+  "20261017-121419-2699816952.json": "45d7ab3c3119b917af3f02c568df1b4adfbbb3132165e091ba15551c02e7dd9c",
+  "20261017-121615-2699817596.json": "7ed2513ad1ef8624d59fe4ad87aad2be207e66fc72b267c6465605a8ba2a976b",
+  "20261017-121740-rcvmymcvg39ko4ti4fx4cunk4o32p4upw.json": "b25e675709299d4a61e09699491c986de1d8a34bffa1427d671453441ef31903",
+  "20261017-121915-2699818751.json": "1b46bd18f60d945f221a8f24dfe66b91e51ea121edea83ea5e12200257977823",
+  "20261017-122145-2699819284.json": "c88fa474cc30379003ff17c5bd4f6ede159e37996827f4d49a473eb717c400df",
+  "20261017-122359-2699820066.json": "e8746f0771c6d02347fdee7a77c42efd54f57cb88a971c8131160e4dc3c4a315",
+  "20261017-122538-2699820844.json": "cf6cd9088f752a413e14aa63013469681c14c9bb45941e5aa91fd2462c3bf510",
+  "20261017-122725-2699821373.json": "2cfb1b092e8cabb4879c96860664bd066cd3b70b3f1617164e89573f2e6c5645",
+  "20261017-123009-2699821959.json": "059b327f200b7d06d4db428f555302ccb2d8229e3d1a691af8c699016911337d",
+  "20261017-123302-2699822845.json": "bb97e44eeb60a1a3dce6d034080d4a7062440518c04e5054817c36da9873f04c",
+  "20261017-123556-2699823974.json": "d3db803e898c69a6396cf90c73a7b86823d211bbd7858239120a258ac877be58",
+  "20261017-123909-2699824823.json": "50328dc6ca55463f66af2c76866ac80fa4bc81306ad61ce5c90cb0055a1903e3",
+  "20261017-141253-2699853336.json": "259088766fe1feb6faad4044ab863ba0961147d84eebae1ad6b785dd5d4b31ac",
+  "20261017-141531-2699853996.json": "fea461422e6cc7c20cf34b4dc1e47cb0e9a4ee26e1fd583c2d22fb30a3ac6ab1",
+  "20261017-141750-2699854667.json": "b7798c723739d870299260139343162ac5c88df4690233942833633a02b1f9db",
+  "20261017-141916-2699855205.json": "50d1f3bde62f3632616afd530796da75612a7c87c0ab9789c38ecf987a68b26b",
+  "20261017-142214-2699855595.json": "907c51391bcb05ac9c41f98d98124c4a82aa5f0aea6fd05732afe7fb7663c8f5",
+  "20261017-142404-2699856370.json": "35863528d801aa1580375754997e2d099aaa4d8ca2bc690f2c6639c2e984870d",
+  "20261017-204342-2699951040.json": "f394eba39f5109571a118d31b6be25122fff19bc0e1be135c669ad45747d36ab",
+  "20261017-204631-2699951896.json": "c64a5095128ec5fca72e54c6bf10ff281536b05a3b4d56988061470b0124ecce",
+  "20261017-204748-2699952663.json": "5331afd59eb6fffcbf774c95d53c37efe2ec47fd8ab277b9220bf8639ede3c27",
+  "20261017-205436-2699953007.json": "78efc523fe4d12b730b81d7e68f970eb56d1187294aced43f15c23405419d14c",
+  "20261017-205655-2vikdsd16vuc7ux72jam75j1rh1righpw.json": "8e194e994db71c6160b58934bf419df126dd727a538a5c1ed964c26d947c4983",
+  "20261017-210027-2699955628.json": "9fe37b84f1104b9f16997eca442e94700b1ae199e331617b5a20ed06bd2fe997",
+  "20261017-210305-2699956537.json": "53be49959114ca43e6c7054a73e4611a5233339664daeb9de9b8d3e785ab8d1b",
+  "20261017-210722-2699957297.json": "a67e77228ddef648747ca24e2fad782877a3ca06bbfe55e136044e7e3ef8e230",
+  "20261017-210919-2699958562.json": "d779258d34e580a60dd49ac763c4a747154dc2384f2c3f26416c2e302d29a761",
+  "20261017-211043-2699959162.json": "478dc32c1eed7873a7ec89d4f3ac6c1c780d410e4ce147175ddf9f53f93f5ab8",
+  "20261017-211223-yk4a0d58afiecikkliclik7i2c31e49pw.json": "251cbc86d5410aa0c2b4496d31f1b5aa68d667a301ee7e972982664b373ccf6f",
+  "20261017-211324-2699960063.json": "4afc6f6b2899766debcfe0e23da0431a5a9752c2ad9289a7d439b4318af5e359",
+  "20261017-211537-2699960427.json": "3392de3b77e959b2ed8b36ef2ca803f0f1048b69d66abf41ea4b66f55c27dabc",
+  "20261017-211724-2699961025.json": "44484b5914f9bd9c8a6ca98c573eb0fd8d6eaf3cc784d667221a8c0dc5d73b34",
+  "20261017-211957-2699961568.json": "4065d74e5b5d37d50557e96333e6231d1aff68f4d4109ee1e8ab330736f5bfd2",
+  "20261017-212209-7aqbhwa61e3i4cwwhksmvqvgowh3u11pw.json": "98fc80d37006195d476e3144a51595058c1e092605414ccf5d139309b41774e1",
+  "20261017-212320-2699963040.json": "19b1b30d14f8d34a7a4b1bbad962b23a6a61be6ac394b1334ea4b695033a26db",
+  "20261017-212733-2699963410.json": "33169f19e7eddd6b2b3cc662bbc89eba55f8b3208ee21dd4084268dd29875d40",
+  "20261017-213106-8x35qfgg2m92crac5dv6h321lkwmxofpw.json": "2bf3bd14ba566b14483a55313684e4a217e7086f588182efebe2edc39e3623c1",
+  "20261017-213319-xe1o4ydv4fq78h9kpu1pswt3srey7yepw.json": "b9cc30a73459f8b0a60c4b70b3d26a444f463f474ffc971f1471117c176275a8",
+  "20261017-213719-2699966442.json": "34fb33fb59d3fd15acae98bea3c964c93240d62dd95f7d64b32b8eab3b019120",
+  "20261017-213926-2699967911.json": "f6eef4f424410cb2d631586442cb67c19041acf3c6fd37421db752b506534fad",
+  "20261017-214217-2699968356.json": "67145c06c850fcd674406bd37beb550a2a5b090616dae29f58b401368ee54484",
+  "20261017-214424-2699969206.json": "2ddd22211ade4ae4b58acf70fb4c0e71bb7f15956e4389f764f8262beaa5e2b9",
+  "20261017-214624-2699969835.json": "89daad85a823807ba4087779db1904c4ff22e82e881fe6a7d322d5a3d27140da",
+  "20261017-214749-2699970484.json": "ede55804ca0a4559588f63180fc62682e135c740861c0b23960c4b5eb5085398",
+  "20261017-215027-vo3wnwmx2kei8dhg9wms3n0aooehd9opw.json": "1f0178fa7d90e4d9b9f41d52a2bafdaadbdf447c594ae2efc4292b881f1453b0",
+  "20261017-215159-2699971795.json": "b5122124f9bccfbb562c5c26abf344ff5b83f1321daeeafeb95ff1a919b3691b",
+  "20261017-215407-2699972402.json": "ff68083ea5e3c78120be13d7e95e52b4e775790b0a38d9b7a875df7dcfc174ff",
+  "20261017-215650-2699973131.json": "5722b17ff812e7d8920eb6858a3ce74f0d6b11b2b61e0234e0d4caed5962ba30",
+  "20261017-215945-qych5pvmyi31q2oreoshgrku7rqyfsgpw.json": "b5bce3e7928a89eaa01d365e480281d7e098035efe6e5ac63bde1d30cccde9f1",
+  "20261017-220251-2699974977.json": "e43d51f2ca6214def9c47f00644ecb5bc8e3394118939ceecf4046bf300d6808",
+  "20261017-220726-2699976029.json": "45a45186e489999918cfa5fbef6d5cc63ce555656b1be1818237d5760ccf88d0",
+  "20261017-220843-xrhx4u7ukmkuc2cmrud03r41jxuprtnpw.json": "d6eb3ae1d9d82b14a70903e8691e8d4ef16967db887fec803e41893453130ed1",
+  "20261017-221156-2699978030.json": "e0bda3bdbb352625df3291123ba799b9d1019eeece8f1fd4258e3eeb0a5aefc8",
+  "20261017-221308-2699979155.json": "33c79c9b9da95679fd08087fc3dc4186aae3aee5f6d46bbedca376f422b0c14b",
+  "20261017-221653-2699979915.json": "c43acafd4bea42308cf31c0d313bffa9b65d17c57064ab2837951b06d97d0d7c",
+  "20261017-221807-2699980898.json": "36da1506cadb1be8e2f47bcafe941aad6d51188b89a289aeb51937e2e831a2a8",
+  "20261017-222105-2699981330.json": "e5fd4682df3aab59a0b20b44f3c8a5899bb986d8a8b4eaf09f5a5af1dbf08081",
+  "20261017-222226-2699982330.json": "6c856ef06aacb1b73e97a95399df7c6941ddb2e340fb231210a66f9250dede0e",
+  "20261017-222310-gw6wf5os1pi8ro5xlul2kulsteftfpxpw.json": "126f845b0f6d39681ac698df8b0f69291485e141e962c452949a9dc6b150afa3",
+  "20261017-222437-2699983099.json": "c1b746db3d81324996e97edd1c12c591f3c7ccf52a3d51f152b63e5a81be8f41",
+  "20261017-222618-2699983694.json": "6a5ed70254f4fe2d002b4d59f9b69883035ef56e2a437a58b86eb603e385e2aa",
+  "20261017-222854-2699984227.json": "7f07b50ee37a96a19ebc16adbbbe75d1b893c0ebc1c30191b79a97fad8e5168e",
+  "20261017-223049-2699985153.json": "130fd47b8a1d8d2cdf224f1e609fb764ab2fd3164e4bd4199c07fbf908ee869a",
+  "20261017-223903-cydshtakg0hdbikj3o2fnl5k6k7jrvqpw.json": "7c91a652c17829bd8a1e0d93f5533e4c562c9bdb929a165b30afcca0fa68b573",
+  "20261017-224108-2699989074.json": "8b5025362f28cdfe3f5db6366e56f2b17b595ec8e7007cd04748dca14c13b467",
+  "20261017-224330-2699990080.json": "d2021523425b470eb99f7db8d0370feeeeebafe50d0f396051011cab23006435",
+  "20261017-224526-2699990799.json": "e027ae069d58c21d788a5be92080adf08ecfd509bedc455c0a813c56f5421ba3",
+  "20261017-224611-2699991532.json": "3f78320e39a0687a1bf1e175bffb47d3b48b94a477c7bb82ec823905a9d1d70e",
+  "20261017-224852-2bnbr3fdeagpa40g00ft56udehtstvbpw.json": "80f4465dff9aaa9f84955e3c7c0955a574ba89c0377e769444a85af5af0903ee",
+  "20261017-225159-2699992868.json": "f5583fefcb9a3e94bbd97b271de57a7f12ccc918d5927c90993cdfa65fcd6fc4",
+  "20261017-225447-kh7u0uyyt3irx4by6im2gb4nccnfu20pw.json": "762339f1fdec22e4bf19efd67379700baa2afb8cacbcc1939821d01743b414ad",
+  "20261017-225615-2699995186.json": "a2be891a1b0cc71ec2595711a38ad84b1625debf639ab984788bb5f22603bb04",
+  "20261017-225751-2699995772.json": "83d5d00759603926793c848aa1777d31189624d5ff777803d99e2087215e5ba4",
+  "20261017-230014-2699996377.json": "785a2a5c5f06580db1e88eef6dabd5a5041c8c2a7aa24922cc431f8243c0de24",
+  "20261017-230212-2699997458.json": "9b6aa1a592acf3dcf45fdc199f95f68e845903e170ee3a1573d7497e0b9cfb9b",
+  "20261017-230628-2699998295.json": "b46a2ebd33eb504ebd6ea5cf118c9f774f7c4165705b332deca6ef12c983add8",
+  "20261017-231014-tfa9d006gg4vueb9laprmjhwyem93eapw.json": "47929ee9d1a683c0d5627e34fd8ca296defc3fb7f410110036aa8fa40c33a693",
+  "20261017-231248-2700002011.json": "2e467e3f7230c6a90d5c9e665d69106f5ef6e0c4845d510dc8aaea7c2c58e632",
+  "20261017-231531-2700003119.json": "8b97bce7c4b8f6606cd182fc226d9593147a7d67bbb4ef41f0221b9c19149fdd",
+  "20261017-231829-l1wimk3lw38qaqtaaqlvlu3grv058r9pw.json": "c8c77ca61acfa566b9519896fca95c00eea2f1f4bb25b3bb62f8c546103bc56e",
+  "20261017-232046-2700005736.json": "d2be4b55768d999509a568775617310e8f60f0ee058e24a1af7450d82e4284fc",
+  "20261017-232227-2700006631.json": "7628e3644523591dab1db8a963bd5efd9ec128d93d59175219293ddd7ae2884d",
+  "20261017-232426-2700007410.json": "843b2cedaeb63e844681d5cc90281f6cc1b2282cee5f6978d2f0ce1c6f628df9",
+  "20261017-232553-2700008364.json": "57d25fcd795bcdd82a1a4d08ab79258507db4f4df0e18cd9fc054f92fa395bdd",
+  "20261017-232735-2700009124.json": "0fa333c287d5fc9d6b646589d9785e0fbee3119dbdc51f9de3483e8a9fc8c114",
+  "20261017-233122-qwd92p03cegfrhxs6ltwmx7q9fd9j9spw.json": "6f4050a35cca3e75cfb22647abed3a03b8df2f2dc6ecd29dae0b90c2a620ea63",
+  "20261017-233425-2700011620.json": "4d7b9a1d89eaa05d5b95735ef91eddf71cbbe2b484dddbd1069b7031cfe8bdfd",
+  "20261017-233539-2700012891.json": "142666761ab8763bb55ae6cd1299cf64986ff10d7b9f7eba91cae0bb1c2948c3",
+  "20261017-234138-2700013657.json": "e0b41574d255726135d18cafd9675a7cbd156c3fef79da5b9765459c4125de38",
+  "20261017-234404-2700016303.json": "b5c3ca2b87a2387085191d33caf0eda8cc1ecb2d358d3296b30e72675053fdee",
+  "20261017-234644-2700017797.json": "a3cc15eece9356bc8fe8098164b6f6eca90ef3b143ab8f56e2d94452aaf96a60",
+  "20261017-234918-2700018902.json": "9ce2825eb2b361a0fd8b3f01b01ed3471f5d108e529ef851d144a718d2fdeae7",
+  "20261017-235036-2700019603.json": "a4c6eb8121a37902d0de46fffd550892a32ae3d20c19bfa22ae83dfd12ac24df",
+  "20261017-235252-2700020204.json": "c1c5a0b4d8e6981446dae6a1d25e9deee8fee24e0919668d33bac8d4c0f8f1a0",
+  "20261017-235531-2700021378.json": "e64b09834ea1d1e689b3107a2f49ebf65fa7ee5b571c7bb3c1299507ff4ab87d",
+  "20261017-235724-2700022535.json": "765e43f662a68275b2d55b18e62ad4141583109f4a87d7e9ebb6a038e04a8c4e",
+  "20261017-235836-2700023305.json": "6c42b7877f299b4cb58571c3d9272d5c5841047a03774659bd2b26e1ba5ec404",
+  "20261018-000153-2700023858.json": "30b0a864ad328bc78292975cba32af9f163bc30c82177ad5855788d46d2ef6ae",
+  "20261018-000423-2700025366.json": "c12ea03de8b63976b0535ef876aa049b3815c3706e1d76e69e1bc7adac588338",
+  "20261018-000824-lihqlkq41ppfw3y48hrpx6cy9qnl6j5pw.json": "4339290fde3e93601fbbd27c454bb0b570cd8979a14ecdcde9f93ae41aa91a47",
+  "20261018-000947-2700028395.json": "e58661da124d0a5c3f3e8d122fb6d2a4af5ca202d7b77dab894548f3d3c22d45",
+  "20261018-001226-m0cvsc98tdvbdjvk7v1xc250o0feqs1pw.json": "48274783a4de802618a42be3506fb44cdf8dd8cd3e5909fee8e848bfd8b29ecd",
+  "20261018-001403-2700030180.json": "6172b2b7baad4d699c0a36e9140c6a47161a05ed2070eb6fe4c2b05491254e5a",
+  "20261018-001736-2700031042.json": "e64d59bcd548cacb877eb25b2de1226794559b0bec85951c3222f73f69ad8b32",
+  "20261018-001950-fepnibwf957ev47mmennl86v0a60wu9pw.json": "1f31120f5c41ab98fed671f66b58ff8681a27d88b7877844347053baf820bac5",
+  "20261018-002016-2700033729.json": "7853f50a4b4f2a98231ed08c4c8df85d325d32fc555eee79bb2f166af7d53119",
+  "20261018-002326-2700034214.json": "0e46cbb401c1dabe3aec8c3854bed4e91214e4716a0909332e645f5c63aaad75",
+  "20261018-002521-2700035269.json": "4c2800528200096747cad647a20f36c04bad2fc549dd1a6f59530e954eaa282d",
+  "20261018-002705-2700036177.json": "146d287d8816546e1288ce3b34d42e4d0ccf9d9ffbdaf55ab1057eaf1d646808",
+  "20261018-003026-2700037256.json": "cf1bace60227cdb16aea158e81c79b079ffabf94fbf12bef42cd925baef96452",
+  "20261018-003254-2700038722.json": "c08576339977d310a44591dc97922da48d04cd0ec4b7970cf2620b4b3ffee1c1",
+  "20261018-003523-2700039691.json": "95b97385f4f7f861a570ad865919da1909fd81247e0bb9160cea854c029425ad",
+  "20261018-003720-cuapdjhwxlt92wwkd9nrkf74i0awadypw.json": "49e9d069c816ab7ab472fa44e7ee715412c379045ea1f5e0d588b611a944b635",
+  "20261018-004044-punv0fagcyid3o41vek7yt3cp0rvv8ipw.json": "1ef43e79717cea3b124b736249b053f0c774c8437f17dc76f87bdf09060ba403",
+  "20261018-004224-2700043382.json": "7d64931eb5723df4fb8c05464978ca270069beaa2ece955ce8c2b1b82f3b58d6",
+  "20261018-004404-xpuussj00lgi9fxyvnmch8qmsmoado1pw.json": "b1b3b527ad977a537bc44ae4cb8fa2944ce283736cf222f5bf2acc6cdc8677a5"
+ },
+ "source_code": {
+  "scripts/ladder.py": "2960bcb0272d4b198272423d07d648e5be0ee5953fb303cb7503faa73a57cb42",
+  "scripts/eval_selection_tactics.py": "eb992630f0562610060bc35aa33403cacded7cd9000b1444925c72d212cd203f",
+  "services/sim-tools/preview_matchups.js": "bfac240c49d55e60c8e41a23367abe111d4342d6ea0ed43a3c7af06bbcd3e6c1",
+  "services/sim-tools/lookahead.js": "d5a5884e07e3ce051e7097b35643ec5567aac605b005d139abf70e83c9cec153",
+  "services/sim-tools/terminal_search.js": "67d130ab8eda4d751d25ae329c8f12a445f210797dbcd1b06245770233118d9c",
+  "src/pokesim/api/server.py": "61655accdb01f9e0f3976270baa6ade6941071a8c1f7450e5d8401e4416b2801",
+  "src/pokesim/live/advisor.py": "0e1dc1d444df5d4e44071ad00b6a2e56c850674575a2ed700507bee7346bf9a9",
+  "src/pokesim/live/selection.py": "0740334cdd12795928aef803cba24aabccc5504985b8aee2f3852313f373aee0",
+  "src/pokesim/live/preview_matchups.py": "796537d8c1984ce564694d83640f4a38dc15d95069e978a07148a61d94ea7ad9",
+  "src/pokesim/search/terminal.py": "33086685ee86ccc8f6f075d8372e409e411a9cf5b9315edd18ef612101fb79c4",
+  "src/pokesim/search/planner.py": "ea3e3bee2a6a405d8f7a6378ef518394b3e4868ce0dd855348782f97a4c68c03",
+  "web/control.html": "9ed5a610102252e9fae53a04fbfa21777bfb83a89b0c2d9bf7b31a33e52daa0d"
+ },
+ "scope": "Development diagnostics using observed prefixes and hypothetical opponent sets. No online human win-rate claim. Chosen actions can vary with wall-clock search scheduling.",
+ "preview": {
+  "records_used": 130,
+  "forward_comparisons": 40,
+  "changed": 6,
+  "changed_trios": 3,
+  "comparisons": [
+   {
+    "record": "20261017-231014-tfa9d006gg4vueb9laprmjhwyem93eapw.json",
+    "preview": [
+     "dragapult",
+     "golisopod",
+     "floetteeternal",
+     "rotomwash",
+     "salazzle",
+     "umbreon"
+    ],
+    "result": true,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "fd8a14e7a3e42c4a",
+     "logit_adjustment": 0.5461,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "dragapult": 0.375,
+      "floetteeternal": 0.531,
+      "golisopod": 0.305,
+      "rotomwash": 0.21,
+      "salazzle": 0.209,
+      "umbreon": 0.035
+     }
+    },
+    "before_p_actual": 0.4659949076653602,
+    "after_p_actual": 0.46170836462407017
+   },
+   {
+    "record": "20261017-231248-2700002011.json",
+    "preview": [
+     "blaziken",
+     "hippowdon",
+     "umbreon",
+     "garchomp",
+     "mimikyu",
+     "raichu"
+    ],
+    "result": false,
+    "before": [
+     "Skeledirge",
+     "Salamence",
+     "Umbreon"
+    ],
+    "after": [
+     "Skeledirge",
+     "Salamence",
+     "Umbreon"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "65ea2d849720f969",
+     "logit_adjustment": 0.3933,
+     "mega": "salamence",
+     "uncovered": [],
+     "minimum_incoming": {
+      "blaziken": 0.274,
+      "garchomp": 0.4,
+      "hippowdon": 0.0,
+      "mimikyu": 0.398,
+      "raichu": 0.303,
+      "umbreon": 0.045
+     }
+    },
+    "before_p_actual": 0.6718338472162246,
+    "after_p_actual": 0.6854490525743524
+   },
+   {
+    "record": "20261017-231531-2700003119.json",
+    "preview": [
+     "golisopod",
+     "hippowdon",
+     "gyarados",
+     "volcarona",
+     "hatterene",
+     "basculegion"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "ab0d0fb9a350bf25",
+     "logit_adjustment": 0.3845,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "basculegion": 0.694,
+      "golisopod": 0.212,
+      "gyarados": 0.198,
+      "hatterene": 0.219,
+      "hippowdon": 0.028,
+      "volcarona": 0.313
+     }
+    },
+    "before_p_actual": 0.5933207901999615,
+    "after_p_actual": 0.5984901680196032
+   },
+   {
+    "record": "20261017-231829-l1wimk3lw38qaqtaaqlvlu3grv058r9pw.json",
+    "preview": [
+     "dragapult",
+     "golisopod",
+     "floetteeternal",
+     "rotomwash",
+     "salazzle",
+     "umbreon"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "fd8a14e7a3e42c4a",
+     "logit_adjustment": 0.5461,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "dragapult": 0.375,
+      "floetteeternal": 0.531,
+      "golisopod": 0.305,
+      "rotomwash": 0.21,
+      "salazzle": 0.209,
+      "umbreon": 0.035
+     }
+    },
+    "before_p_actual": 0.46162445517048467,
+    "after_p_actual": 0.45189382640531056
+   },
+   {
+    "record": "20261017-232046-2700005736.json",
+    "preview": [
+     "meganium",
+     "spiritomb",
+     "mimikyu",
+     "starmie",
+     "ninetalesalola",
+     "overqwil"
+    ],
+    "result": true,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "6a9d2982c9e68b85",
+     "logit_adjustment": 0.9063,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "meganium": 0.342,
+      "mimikyu": 0.295,
+      "ninetalesalola": 0.181,
+      "overqwil": 0.179,
+      "spiritomb": 0.079,
+      "starmie": 0.383
+     }
+    },
+    "before_p_actual": 0.5209312703630072,
+    "after_p_actual": 0.5198862651765931
+   },
+   {
+    "record": "20261017-232227-2700006631.json",
+    "preview": [
+     "golisopod",
+     "primarina",
+     "salamence",
+     "gholdengo",
+     "dragapult",
+     "archaludon"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "8b6ee919f1ba2c8b",
+     "logit_adjustment": 0.4608,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "archaludon": 0.285,
+      "dragapult": 0.198,
+      "gholdengo": 0.648,
+      "golisopod": 0.333,
+      "primarina": 0.413,
+      "salamence": 0.486
+     }
+    },
+    "before_p_actual": 0.5022326626618637,
+    "after_p_actual": 0.45500529879687207
+   },
+   {
+    "record": "20261017-232426-2700007410.json",
+    "preview": [
+     "basculegion",
+     "archaludon",
+     "charizard",
+     "greninja",
+     "mimikyu",
+     "sylveon"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "afab851964bbe137",
+     "logit_adjustment": 0.2343,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "archaludon": 0.55,
+      "basculegion": 0.615,
+      "charizard": 0.359,
+      "greninja": 0.403,
+      "mimikyu": 0.398,
+      "sylveon": 0.3
+     }
+    },
+    "before_p_actual": 0.478888856664869,
+    "after_p_actual": 0.4518932378265976
+   },
+   {
+    "record": "20261017-232553-2700008364.json",
+    "preview": [
+     "persianalola",
+     "charizard",
+     "hatterene",
+     "slowkinggalar",
+     "aegislash",
+     "swampert"
+    ],
+    "result": true,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "0596941c9d32515b",
+     "logit_adjustment": 0.2494,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "aegislash": 0.6,
+      "charizard": 0.381,
+      "hatterene": 0.219,
+      "persianalola": 0.069,
+      "slowkinggalar": 0.23,
+      "swampert": 0.362
+     }
+    },
+    "before_p_actual": 0.5536446230452554,
+    "after_p_actual": 0.5484684606816745
+   },
+   {
+    "record": "20261017-232735-2700009124.json",
+    "preview": [
+     "golisopod",
+     "garchomp",
+     "rotomheat",
+     "gengar",
+     "mimikyu",
+     "primarina"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "6228545866a5cb30",
+     "logit_adjustment": 0.4661,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "garchomp": 0.231,
+      "gengar": 0.47,
+      "golisopod": 0.197,
+      "mimikyu": 0.415,
+      "primarina": 0.4,
+      "rotomheat": 0.21
+     }
+    },
+    "before_p_actual": 0.5901994537299807,
+    "after_p_actual": 0.5804751524664329
+   },
+   {
+    "record": "20261017-233122-qwd92p03cegfrhxs6ltwmx7q9fd9j9spw.json",
+    "preview": [
+     "gholdengo",
+     "lopunny",
+     "charizard",
+     "indeedee",
+     "skeledirge",
+     "azumarill"
+    ],
+    "result": true,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Salamence",
+     "Gholdengo",
+     "Umbreon"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "56768f2870bc0752",
+     "logit_adjustment": 0.6576,
+     "mega": "salamence",
+     "uncovered": [],
+     "minimum_incoming": {
+      "azumarill": 0.452,
+      "charizard": 0.408,
+      "gholdengo": 0.261,
+      "indeedee": 0.1,
+      "lopunny": 0.487,
+      "skeledirge": 0.22
+     }
+    },
+    "before_p_actual": 0.5478452765820839,
+    "after_p_actual": 0.5088561151105454
+   },
+   {
+    "record": "20261017-233425-2700011620.json",
+    "preview": [
+     "meganium",
+     "spiritomb",
+     "mimikyu",
+     "starmie",
+     "ninetalesalola",
+     "overqwil"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "6a9d2982c9e68b85",
+     "logit_adjustment": 0.9063,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "meganium": 0.342,
+      "mimikyu": 0.295,
+      "ninetalesalola": 0.181,
+      "overqwil": 0.179,
+      "spiritomb": 0.079,
+      "starmie": 0.383
+     }
+    },
+    "before_p_actual": 0.5080938203126218,
+    "after_p_actual": 0.5100846487374741
+   },
+   {
+    "record": "20261017-233539-2700012891.json",
+    "preview": [
+     "persianalola",
+     "charizard",
+     "hatterene",
+     "slowkinggalar",
+     "aegislash",
+     "swampert"
+    ],
+    "result": true,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "0596941c9d32515b",
+     "logit_adjustment": 0.2494,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "aegislash": 0.6,
+      "charizard": 0.381,
+      "hatterene": 0.219,
+      "persianalola": 0.069,
+      "slowkinggalar": 0.23,
+      "swampert": 0.362
+     }
+    },
+    "before_p_actual": 0.6382937102772676,
+    "after_p_actual": 0.6584233588591737
+   },
+   {
+    "record": "20261017-234138-2700013657.json",
+    "preview": [
+     "charizard",
+     "toxapex",
+     "kingambit",
+     "basculegion",
+     "garchomp",
+     "gengar"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "5687e7e5bc1fc9f1",
+     "logit_adjustment": 0.205,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "basculegion": 0.601,
+      "charizard": 0.361,
+      "garchomp": 0.2,
+      "gengar": 0.492,
+      "kingambit": 0.619,
+      "toxapex": 0.032
+     }
+    },
+    "before_p_actual": 0.6190161014376372,
+    "after_p_actual": 0.6256929970660895
+   },
+   {
+    "record": "20261017-234404-2700016303.json",
+    "preview": [
+     "meganium",
+     "spiritomb",
+     "mimikyu",
+     "starmie",
+     "ninetalesalola",
+     "overqwil"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "6a9d2982c9e68b85",
+     "logit_adjustment": 0.9063,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "meganium": 0.342,
+      "mimikyu": 0.295,
+      "ninetalesalola": 0.181,
+      "overqwil": 0.179,
+      "spiritomb": 0.079,
+      "starmie": 0.383
+     }
+    },
+    "before_p_actual": 0.5807257634687036,
+    "after_p_actual": 0.561843035964164
+   },
+   {
+    "record": "20261017-234644-2700017797.json",
+    "preview": [
+     "archaludon",
+     "basculegion",
+     "gengar",
+     "umbreon",
+     "garchomp",
+     "corviknight"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "f6bb9f6dc6637881",
+     "logit_adjustment": 0.4321,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "archaludon": 0.424,
+      "basculegion": 0.547,
+      "corviknight": 0.146,
+      "garchomp": 0.172,
+      "gengar": 0.475,
+      "umbreon": 0.104
+     }
+    },
+    "before_p_actual": 0.42942876942581,
+    "after_p_actual": 0.395069418520042
+   },
+   {
+    "record": "20261017-234918-2700018902.json",
+    "preview": [
+     "cinderace",
+     "whimsicott",
+     "polteageistantique",
+     "floetteeternal",
+     "gyarados",
+     "aegislash"
+    ],
+    "result": true,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "12994dc48f7304c7",
+     "logit_adjustment": 0.4147,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "aegislash": 0.624,
+      "cinderace": 0.218,
+      "floetteeternal": 0.308,
+      "gyarados": 0.372,
+      "polteageistantique": 0.042,
+      "whimsicott": 0.111
+     }
+    },
+    "before_p_actual": 0.553093957239004,
+    "after_p_actual": 0.5561146500481278
+   },
+   {
+    "record": "20261017-235036-2700019603.json",
+    "preview": [
+     "bellibolt",
+     "samurott",
+     "dragonite",
+     "slurpuff",
+     "ariados",
+     "indeedee"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "18db1fb11948a7b9",
+     "logit_adjustment": 0.6151,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "ariados": 0.186,
+      "bellibolt": 0.135,
+      "dragonite": 0.301,
+      "indeedee": 0.276,
+      "samurott": 0.172,
+      "slurpuff": 0.217
+     }
+    },
+    "before_p_actual": 0.5355766151716913,
+    "after_p_actual": 0.49782862498117597
+   },
+   {
+    "record": "20261017-235252-2700020204.json",
+    "preview": [
+     "hippowdon",
+     "glimmora",
+     "corviknight",
+     "primarina",
+     "indeedee",
+     "golisopod"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "aa15d642703fd240",
+     "logit_adjustment": 0.5277,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "corviknight": 0.146,
+      "glimmora": 0.252,
+      "golisopod": 0.245,
+      "hippowdon": 0.056,
+      "indeedee": 0.269,
+      "primarina": 0.393
+     }
+    },
+    "before_p_actual": 0.5685714186647763,
+    "after_p_actual": 0.5820324958840788
+   },
+   {
+    "record": "20261017-235531-2700021378.json",
+    "preview": [
+     "chandelure",
+     "kangaskhan",
+     "conkeldurr",
+     "venusaur",
+     "swampert",
+     "noivern"
+    ],
+    "result": true,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "577041759b130b5d",
+     "logit_adjustment": 0.3522,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "chandelure": 0.462,
+      "conkeldurr": 0.386,
+      "kangaskhan": 0.287,
+      "noivern": 0.243,
+      "swampert": 0.578,
+      "venusaur": 0.057
+     }
+    },
+    "before_p_actual": 0.5293669492854892,
+    "after_p_actual": 0.5307252141997104
+   },
+   {
+    "record": "20261017-235724-2700022535.json",
+    "preview": [
+     "rillaboom",
+     "basculegion",
+     "arcaninehisui",
+     "salamence",
+     "ninetalesalola",
+     "blaziken"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "a9f49d57ecf9a904",
+     "logit_adjustment": 0.3164,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "arcaninehisui": 0.541,
+      "basculegion": 0.69,
+      "blaziken": 0.131,
+      "ninetalesalola": 0.15,
+      "rillaboom": 0.348,
+      "salamence": 0.495
+     }
+    },
+    "before_p_actual": 0.4638304015808834,
+    "after_p_actual": 0.418092511739121
+   },
+   {
+    "record": "20261017-235836-2700023305.json",
+    "preview": [
+     "gholdengo",
+     "garchomp",
+     "golisopod",
+     "primarina",
+     "mamoswine",
+     "cinderace"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "ab66560f9a6d92f3",
+     "logit_adjustment": 0.5285,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "cinderace": 0.234,
+      "garchomp": 0.105,
+      "gholdengo": 0.425,
+      "golisopod": 0.265,
+      "mamoswine": 0.222,
+      "primarina": 0.4
+     }
+    },
+    "before_p_actual": 0.4979123224709629,
+    "after_p_actual": 0.48227809867120996
+   },
+   {
+    "record": "20261018-000153-2700023858.json",
+    "preview": [
+     "raichu",
+     "alakazam",
+     "umbreon",
+     "corviknight",
+     "garchomp",
+     "mimikyu"
+    ],
+    "result": true,
+    "before": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "after": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "7d952f2712bd8116",
+     "logit_adjustment": 0.5553,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "alakazam": 0.39,
+      "corviknight": 0.067,
+      "garchomp": 0.355,
+      "mimikyu": 0.369,
+      "raichu": 0.281,
+      "umbreon": 0.069
+     }
+    },
+    "before_p_actual": 0.509499225588943,
+    "after_p_actual": 0.5061078083237462
+   },
+   {
+    "record": "20261018-000423-2700025366.json",
+    "preview": [
+     "bellibolt",
+     "grimmsnarl",
+     "emboar",
+     "cinderace",
+     "golisopod",
+     "gardevoir"
+    ],
+    "result": true,
+    "before": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "after": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "ae8621cad23d5236",
+     "logit_adjustment": 0.5072,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "bellibolt": 0.142,
+      "cinderace": 0.177,
+      "emboar": 0.326,
+      "gardevoir": 0.509,
+      "golisopod": 0.24,
+      "grimmsnarl": 0.092
+     }
+    },
+    "before_p_actual": 0.4807651547957265,
+    "after_p_actual": 0.4621171759372306
+   },
+   {
+    "record": "20261018-000824-lihqlkq41ppfw3y48hrpx6cy9qnl6j5pw.json",
+    "preview": [
+     "hippowdon",
+     "salamence",
+     "gholdengo",
+     "arboliva",
+     "espathra",
+     "clefable"
+    ],
+    "result": true,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "cdc5b8732315315a",
+     "logit_adjustment": 0.4709,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "arboliva": 0.251,
+      "clefable": 0.188,
+      "espathra": 0.124,
+      "gholdengo": 0.813,
+      "hippowdon": 0.028,
+      "salamence": 0.479
+     }
+    },
+    "before_p_actual": 0.5671993888789874,
+    "after_p_actual": 0.568405730111633
+   },
+   {
+    "record": "20261018-000947-2700028395.json",
+    "preview": [
+     "salamence",
+     "gyarados",
+     "mimikyu",
+     "meowscarada",
+     "mamoswine",
+     "lucario"
+    ],
+    "result": true,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "27c8c4cf898ac502",
+     "logit_adjustment": 0.5951,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "gyarados": 0.382,
+      "lucario": 0.467,
+      "mamoswine": 0.256,
+      "meowscarada": 0.235,
+      "mimikyu": 0.346,
+      "salamence": 0.47
+     }
+    },
+    "before_p_actual": 0.5704675419348484,
+    "after_p_actual": 0.5816457936211704
+   },
+   {
+    "record": "20261018-001226-m0cvsc98tdvbdjvk7v1xc250o0feqs1pw.json",
+    "preview": [
+     "infernape",
+     "snorlax",
+     "slurpuff",
+     "absol",
+     "lucario",
+     "gyarados"
+    ],
+    "result": true,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "962d5435c0324767",
+     "logit_adjustment": 0.5835,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "absol": 0.255,
+      "gyarados": 0.231,
+      "infernape": 0.188,
+      "lucario": 0.401,
+      "slurpuff": 0.175,
+      "snorlax": 0.217
+     }
+    },
+    "before_p_actual": 0.6284658299296119,
+    "after_p_actual": 0.6451555246454254
+   },
+   {
+    "record": "20261018-001403-2700030180.json",
+    "preview": [
+     "salamence",
+     "metagross",
+     "mamoswine",
+     "hydreigon",
+     "primarina",
+     "gholdengo"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "6b7f1d38dd463e18",
+     "logit_adjustment": 0.4971,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "gholdengo": 0.466,
+      "hydreigon": 0.169,
+      "mamoswine": 0.229,
+      "metagross": 0.367,
+      "primarina": 0.408,
+      "salamence": 0.383
+     }
+    },
+    "before_p_actual": 0.5309808863397925,
+    "after_p_actual": 0.506373747855866
+   },
+   {
+    "record": "20261018-001736-2700031042.json",
+    "preview": [
+     "bellibolt",
+     "grimmsnarl",
+     "emboar",
+     "cinderace",
+     "golisopod",
+     "gardevoir"
+    ],
+    "result": true,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "ae8621cad23d5236",
+     "logit_adjustment": 0.549,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "bellibolt": 0.142,
+      "cinderace": 0.177,
+      "emboar": 0.326,
+      "gardevoir": 0.509,
+      "golisopod": 0.24,
+      "grimmsnarl": 0.092
+     }
+    },
+    "before_p_actual": 0.4914797351546138,
+    "after_p_actual": 0.4903686137609907
+   },
+   {
+    "record": "20261018-001950-fepnibwf957ev47mmennl86v0a60wu9pw.json",
+    "preview": [
+     "sirfetchd",
+     "starmie",
+     "cinderace",
+     "kleavor",
+     "meowscarada",
+     "bellibolt"
+    ],
+    "result": true,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "3050fb431544610c",
+     "logit_adjustment": 0.6415,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "bellibolt": 0.197,
+      "cinderace": 0.171,
+      "kleavor": 0.287,
+      "meowscarada": 0.165,
+      "sirfetchd": 0.396,
+      "starmie": 0.24
+     }
+    },
+    "before_p_actual": 0.5788073890232112,
+    "after_p_actual": 0.5873134035955773
+   },
+   {
+    "record": "20261018-002016-2700033729.json",
+    "preview": [
+     "absol",
+     "gholdengo",
+     "rillaboom",
+     "grimmsnarl",
+     "corviknight",
+     "dragalge"
+    ],
+    "result": true,
+    "before": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "bd79c38a58d5d541",
+     "logit_adjustment": 0.5499,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "absol": 0.484,
+      "corviknight": 0.146,
+      "dragalge": 0.348,
+      "gholdengo": 0.612,
+      "grimmsnarl": 0.177,
+      "rillaboom": 0.274
+     }
+    },
+    "before_p_actual": 0.5369616190424791,
+    "after_p_actual": 0.5400301017498947
+   },
+   {
+    "record": "20261018-002326-2700034214.json",
+    "preview": [
+     "pawmot",
+     "venusaur",
+     "dragapult",
+     "rillaboom",
+     "arcaninehisui",
+     "samurotthisui"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Salamence",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "588ce831c651ccd6",
+     "logit_adjustment": 0.9773,
+     "mega": "salamence",
+     "uncovered": [],
+     "minimum_incoming": {
+      "arcaninehisui": 0.387,
+      "dragapult": 0.533,
+      "pawmot": 0.412,
+      "rillaboom": 0.149,
+      "samurotthisui": 0.173,
+      "venusaur": 0.114
+     }
+    },
+    "before_p_actual": 0.580536844904745,
+    "after_p_actual": 0.5848133618651302
+   },
+   {
+    "record": "20261018-002521-2700035269.json",
+    "preview": [
+     "kleavor",
+     "golisopod",
+     "sylveon",
+     "ninetalesalola",
+     "ceruledge",
+     "charizard"
+    ],
+    "result": true,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "a02458a90331658e",
+     "logit_adjustment": 0.4416,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "ceruledge": 0.358,
+      "charizard": 0.31,
+      "golisopod": 0.372,
+      "kleavor": 0.31,
+      "ninetalesalola": 0.226,
+      "sylveon": 0.257
+     }
+    },
+    "before_p_actual": 0.5312918510342022,
+    "after_p_actual": 0.5141894754202302
+   },
+   {
+    "record": "20261018-002705-2700036177.json",
+    "preview": [
+     "archaludon",
+     "zoroarkhisui",
+     "starmie",
+     "sneasler",
+     "cinderace",
+     "hatterene"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "5da5823cbdab4f97",
+     "logit_adjustment": 0.479,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "archaludon": 0.477,
+      "cinderace": 0.161,
+      "hatterene": 0.382,
+      "sneasler": 0.0,
+      "starmie": 0.618,
+      "zoroarkhisui": 0.384
+     }
+    },
+    "before_p_actual": 0.5480335745189836,
+    "after_p_actual": 0.5054380478765945
+   },
+   {
+    "record": "20261018-003026-2700037256.json",
+    "preview": [
+     "golisopod",
+     "toxapex",
+     "cinderace",
+     "espathra",
+     "medicham",
+     "floetteeternal"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "23c00558991f13f6",
+     "logit_adjustment": 0.5962,
+     "mega": null,
+     "uncovered": [],
+     "minimum_incoming": {
+      "cinderace": 0.224,
+      "espathra": 0.189,
+      "floetteeternal": 0.202,
+      "golisopod": 0.322,
+      "medicham": 0.257,
+      "toxapex": 0.074
+     }
+    },
+    "before_p_actual": 0.5330294469947586,
+    "after_p_actual": 0.5339648363715334
+   },
+   {
+    "record": "20261018-003254-2700038722.json",
+    "preview": [
+     "grimmsnarl",
+     "dragalge",
+     "gholdengo",
+     "umbreon",
+     "banette",
+     "pawmot"
+    ],
+    "result": true,
+    "before": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "after": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "3765f7bcfa044d85",
+     "logit_adjustment": 0.4788,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "banette": 0.607,
+      "dragalge": 0.243,
+      "gholdengo": 0.646,
+      "grimmsnarl": 0.13,
+      "pawmot": 0.283,
+      "umbreon": 0.104
+     }
+    },
+    "before_p_actual": 0.5445644893683478,
+    "after_p_actual": 0.522657711839441
+   },
+   {
+    "record": "20261018-003523-2700039691.json",
+    "preview": [
+     "golisopod",
+     "primarina",
+     "indeedee",
+     "hippowdon",
+     "corviknight",
+     "glimmora"
+    ],
+    "result": false,
+    "before": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "aa15d642703fd240",
+     "logit_adjustment": 0.5277,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "corviknight": 0.146,
+      "glimmora": 0.252,
+      "golisopod": 0.245,
+      "hippowdon": 0.056,
+      "indeedee": 0.269,
+      "primarina": 0.393
+     }
+    },
+    "before_p_actual": 0.5344983830680051,
+    "after_p_actual": 0.5225791533062631
+   },
+   {
+    "record": "20261018-003720-cuapdjhwxlt92wwkd9nrkf74i0awadypw.json",
+    "preview": [
+     "gholdengo",
+     "indeedee",
+     "blaziken",
+     "serperior",
+     "metagross",
+     "azumarill"
+    ],
+    "result": false,
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "dae3a204ea7ffebd",
+     "logit_adjustment": 0.5172,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "azumarill": 0.255,
+      "blaziken": 0.24,
+      "gholdengo": 0.675,
+      "indeedee": 0.12,
+      "metagross": 0.359,
+      "serperior": 0.23
+     }
+    },
+    "before_p_actual": 0.4949501610101434,
+    "after_p_actual": 0.4533470222097906
+   },
+   {
+    "record": "20261018-004044-punv0fagcyid3o41vek7yt3cp0rvv8ipw.json",
+    "preview": [
+     "hippowdon",
+     "salamence",
+     "gholdengo",
+     "arboliva",
+     "espathra",
+     "clefable"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "cdc5b8732315315a",
+     "logit_adjustment": 0.4709,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "arboliva": 0.251,
+      "clefable": 0.188,
+      "espathra": 0.124,
+      "gholdengo": 0.813,
+      "hippowdon": 0.028,
+      "salamence": 0.479
+     }
+    },
+    "before_p_actual": 0.6198490273159581,
+    "after_p_actual": 0.6267548550862633
+   },
+   {
+    "record": "20261018-004224-2700043382.json",
+    "preview": [
+     "lucario",
+     "baxcalibur",
+     "basculegion",
+     "rillaboom",
+     "delphox",
+     "rotomwash"
+    ],
+    "result": false,
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "e6de2741d8f1cb98",
+     "logit_adjustment": 0.2993,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "basculegion": 0.707,
+      "baxcalibur": 0.351,
+      "delphox": 0.35,
+      "lucario": 0.522,
+      "rillaboom": 0.245,
+      "rotomwash": 0.243
+     }
+    },
+    "before_p_actual": 0.5839516636760338,
+    "after_p_actual": 0.5756552780808021
+   },
+   {
+    "record": "20261018-004404-xpuussj00lgi9fxyvnmch8qmsmoado1pw.json",
+    "preview": [
+     "golisopod",
+     "primarina",
+     "sneasler",
+     "indeedee",
+     "garchomp",
+     "blastoise"
+    ],
+    "result": false,
+    "before": [
+     "Scolipede",
+     "Gholdengo",
+     "Salamence"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "coverage": {
+     "version": "preview-coverage-v1",
+     "profile": "eb57d6a5e7825d75",
+     "logit_adjustment": 0.6429,
+     "mega": "floetteeternal",
+     "uncovered": [],
+     "minimum_incoming": {
+      "blastoise": 0.255,
+      "garchomp": 0.169,
+      "golisopod": 0.233,
+      "indeedee": 0.257,
+      "primarina": 0.395,
+      "sneasler": 0.134
+     }
+    },
+    "before_p_actual": 0.42281186938415566,
+    "after_p_actual": 0.3618863399304568
+   }
+  ],
+  "simulations": [
+   {
+    "record": "20261017-233122-qwd92p03cegfrhxs6ltwmx7q9fd9j9spw.json",
+    "before": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "after": [
+     "Salamence",
+     "Gholdengo",
+     "Umbreon"
+    ],
+    "outcomes": {
+     "before": {
+      "win": 8,
+      "loss": 10,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": -0.1111111111111111,
+      "perSample": [
+       -0.3333333333333333,
+       -1,
+       1
+      ]
+     },
+     "after": {
+      "win": 18,
+      "loss": 0,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": 1,
+      "perSample": [
+       1,
+       1,
+       1
+      ]
+     }
+    }
+   },
+   {
+    "record": "20261017-235531-2700021378.json",
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "outcomes": {
+     "before": {
+      "win": 18,
+      "loss": 0,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": 1,
+      "perSample": [
+       1,
+       1,
+       1
+      ]
+     },
+     "after": {
+      "win": 18,
+      "loss": 0,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": 1,
+      "perSample": [
+       1,
+       1,
+       1
+      ]
+     }
+    }
+   },
+   {
+    "record": "20261018-002016-2700033729.json",
+    "before": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "outcomes": {
+     "before": {
+      "win": 14,
+      "loss": 4,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": 0.5555555555555556,
+      "perSample": [
+       1,
+       -0.3333333333333333,
+       1
+      ]
+     },
+     "after": {
+      "win": 14,
+      "loss": 4,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": 0.5555555555555556,
+      "perSample": [
+       0.3333333333333333,
+       1,
+       0.3333333333333333
+      ]
+     }
+    }
+   },
+   {
+    "record": "20261018-002326-2700034214.json",
+    "before": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "after": [
+     "Salamence",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "outcomes": {
+     "before": {
+      "win": 7,
+      "loss": 11,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": -0.2222222222222222,
+      "perSample": [
+       -1,
+       -0.3333333333333333,
+       0.6666666666666666
+      ]
+     },
+     "after": {
+      "win": 4,
+      "loss": 14,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": -0.5555555555555556,
+      "perSample": [
+       -0.3333333333333333,
+       -0.3333333333333333,
+       -1
+      ]
+     }
+    }
+   },
+   {
+    "record": "20261018-003523-2700039691.json",
+    "before": [
+     "Skeledirge",
+     "Gholdengo",
+     "Floette-Eternal"
+    ],
+    "after": [
+     "Gholdengo",
+     "Floette-Eternal",
+     "Skeledirge"
+    ],
+    "outcomes": {
+     "before": {
+      "win": 4,
+      "loss": 14,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": -0.5555555555555556,
+      "perSample": [
+       -1,
+       0.3333333333333333,
+       -1
+      ]
+     },
+     "after": {
+      "win": 15,
+      "loss": 3,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": 0.6666666666666666,
+      "perSample": [
+       0,
+       1,
+       1
+      ]
+     }
+    }
+   },
+   {
+    "record": "20261018-004404-xpuussj00lgi9fxyvnmch8qmsmoado1pw.json",
+    "before": [
+     "Scolipede",
+     "Gholdengo",
+     "Salamence"
+    ],
+    "after": [
+     "Floette-Eternal",
+     "Gholdengo",
+     "Skeledirge"
+    ],
+    "outcomes": {
+     "before": {
+      "win": 6,
+      "loss": 12,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": -0.3333333333333333,
+      "perSample": [
+       -1,
+       0.3333333333333333,
+       -0.3333333333333333
+      ]
+     },
+     "after": {
+      "win": 12,
+      "loss": 6,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0,
+      "score": 0.3333333333333333,
+      "perSample": [
+       1,
+       1,
+       -1
+      ]
+     }
+    }
+   }
+  ],
+  "simulation_totals": {
+   "before": {
+    "win": 57,
+    "loss": 51,
+    "draw": 0,
+    "unfinished": 0,
+    "failed": 0
+   },
+   "after": {
+    "win": 81,
+    "loss": 27,
+    "draw": 0,
+    "unfinished": 0,
+    "failed": 0
+   }
+  },
+  "simulation_scope": "Changed previews only: 3 hypothetical foe lineups x 3 seeds x expert/expert and expert/disrupt, max100 turns. Controllers see sampled full information. Different actions may consume random streams differently."
+ },
+ "moves": {
+  "positions": [
+   {
+    "record": "20261017-225159-2699992868.json",
+    "turn": 1,
+    "played": "move:nastyplot",
+    "before": "move:nastyplot",
+    "after": "move:shadowball",
+    "gap": 0.02131746298985343,
+    "seconds": 3.833754004968796,
+    "trials": 357,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-225159-T1.json"
+   },
+   {
+    "record": "20261017-233425-2700011620.json",
+    "turn": 2,
+    "played": "move:nastyplot",
+    "before": "move:shadowball",
+    "after": "move:shadowball",
+    "gap": 0.0,
+    "seconds": 3.81783584295772,
+    "trials": 599,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-233425-T2.json"
+   },
+   {
+    "record": "20261017-222437-2699983099.json",
+    "turn": 5,
+    "played": "move:calmmind:mega",
+    "before": "move:calmmind",
+    "after": "move:moonblast:mega",
+    "gap": 0.034358236406478504,
+    "seconds": 3.8149350300082006,
+    "trials": 973,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-222437-T5.json"
+   },
+   {
+    "record": "20261018-004044-punv0fagcyid3o41vek7yt3cp0rvv8ipw.json",
+    "turn": 6,
+    "played": "move:calmmind",
+    "before": "move:moonblast",
+    "after": "move:moonblast",
+    "gap": 0.0,
+    "seconds": 3.831023136037402,
+    "trials": 817,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261018-004044-T6.json"
+   },
+   {
+    "record": "20261017-234138-2700013657.json",
+    "turn": 5,
+    "played": "move:calmmind",
+    "before": "move:calmmind",
+    "after": "move:moonblast",
+    "gap": 0.0035098052621452547,
+    "seconds": 3.8064012760296464,
+    "trials": 596,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-234138-T5.json"
+   },
+   {
+    "record": "20261018-003026-2700037256.json",
+    "turn": 9,
+    "played": "move:nastyplot",
+    "before": "move:nastyplot",
+    "after": "move:recover",
+    "gap": 0.07859888245955063,
+    "seconds": 3.84415700804675,
+    "trials": 799,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261018-003026-T9.json"
+   },
+   {
+    "record": "20261017-225447-kh7u0uyyt3irx4by6im2gb4nccnfu20pw.json",
+    "turn": 6,
+    "played": "move:calmmind",
+    "before": "move:moonblast:mega",
+    "after": "move:moonblast:mega",
+    "gap": 0.06102693498484746,
+    "seconds": 3.8104382150340825,
+    "trials": 1013,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-225447-T6.json"
+   },
+   {
+    "record": "20261017-221653-2699979915.json",
+    "turn": 1,
+    "played": "move:nastyplot",
+    "before": "move:nastyplot",
+    "after": "move:shadowball",
+    "gap": 0.0,
+    "seconds": 3.8289489630260505,
+    "trials": 562,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-221653-T1.json"
+   }
+  ],
+  "changed": 5,
+  "branch_comparisons": [
+   {
+    "record": "20261017-225159-2699992868.json",
+    "turn": 1,
+    "played": "move:nastyplot",
+    "before": "move:nastyplot",
+    "after": "move:shadowball",
+    "gap": 0.02131746298985343,
+    "seconds": 3.833754004968796,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-225159-T1.json",
+    "evaluation": "sampled_full_information_continuations; 3 hypotheses x 4 seeds x 2 continuations, max100 turns",
+    "outcomes": {
+     "move:nastyplot": {
+      "win": 24
+     },
+     "move:shadowball": {
+      "win": 24
+     }
+    }
+   },
+   {
+    "record": "20261017-222437-2699983099.json",
+    "turn": 5,
+    "played": "move:calmmind:mega",
+    "before": "move:calmmind",
+    "after": "move:moonblast:mega",
+    "gap": 0.034358236406478504,
+    "seconds": 3.8149350300082006,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-222437-T5.json",
+    "evaluation": "sampled_full_information_continuations; 3 hypotheses x 4 seeds x 2 continuations, max100 turns",
+    "outcomes": {
+     "move:calmmind": {
+      "loss": 8,
+      "win": 16
+     },
+     "move:moonblast:mega": {
+      "win": 23,
+      "loss": 1
+     }
+    }
+   },
+   {
+    "record": "20261017-234138-2700013657.json",
+    "turn": 5,
+    "played": "move:calmmind",
+    "before": "move:calmmind",
+    "after": "move:moonblast",
+    "gap": 0.0035098052621452547,
+    "seconds": 3.8064012760296464,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-234138-T5.json",
+    "evaluation": "sampled_full_information_continuations; 3 hypotheses x 4 seeds x 2 continuations, max100 turns",
+    "outcomes": {
+     "move:calmmind": {
+      "win": 16,
+      "loss": 8
+     },
+     "move:moonblast": {
+      "win": 19,
+      "loss": 5
+     }
+    }
+   },
+   {
+    "record": "20261018-003026-2700037256.json",
+    "turn": 9,
+    "played": "move:nastyplot",
+    "before": "move:nastyplot",
+    "after": "move:recover",
+    "gap": 0.07859888245955063,
+    "seconds": 3.84415700804675,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261018-003026-T9.json",
+    "evaluation": "sampled_full_information_continuations; 3 hypotheses x 4 seeds x 2 continuations, max100 turns",
+    "outcomes": {
+     "move:nastyplot": {
+      "win": 12,
+      "loss": 12
+     },
+     "move:recover": {
+      "win": 14,
+      "loss": 10
+     }
+    }
+   },
+   {
+    "record": "20261017-221653-2699979915.json",
+    "turn": 1,
+    "played": "move:nastyplot",
+    "before": "move:nastyplot",
+    "after": "move:shadowball",
+    "gap": 0.0,
+    "seconds": 3.8289489630260505,
+    "failed": 0,
+    "fixture": "data/processed/selection-tactical-20261018/20261017-221653-T1.json",
+    "evaluation": "sampled_full_information_continuations; 3 hypotheses x 4 seeds x 2 continuations, max100 turns",
+    "outcomes": {
+     "move:nastyplot": {
+      "win": 14,
+      "loss": 10
+     },
+     "move:shadowball": {
+      "win": 16,
+      "loss": 8
+     }
+    }
+   }
+  ],
+  "simulation_totals": {
+   "before": {
+    "win": 82,
+    "loss": 38
+   },
+   "after": {
+    "win": 96,
+    "loss": 24
+   }
+  },
+  "simulation_scope": "Changed choices only: first 3 hidden-set hypotheses x 4 seeds x expert/tactical and expert/disrupt, max100 turns. Same world and chance seed per compared action; controllers see sampled full information."
+ }
+}

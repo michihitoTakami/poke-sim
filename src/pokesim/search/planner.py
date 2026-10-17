@@ -159,7 +159,11 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
         if tree:
             # Secondary progress across legal replies, rather than the fitted opponent mix: a prediction
             # concentrated on Protect must not erase the immediate finishing opportunities of an attack.
-            speed_terms.append(matrix(res['winSpeed'], idx, cols, np.zeros_like(payoff)).mean(axis=1))
+            speed = matrix(res['winSpeed'], idx, cols, np.zeros_like(payoff)).mean(axis=1)
+            if 'rootProgress' in res:
+                progress = matrix(res['rootProgress'], idx, cols, np.zeros_like(payoff)).mean(axis=1)
+                speed = progress + .01 * speed
+            speed_terms.append(speed)
             if 'uncertainty' in res:
                 error_terms.append(matrix(res['uncertainty'], idx, cols, np.zeros_like(payoff)).max(axis=1))
         extras.append({name: matrix(m, idx, cols, payoff) for name, m in res.get("byContinuation", {}).items()}

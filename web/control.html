@@ -155,10 +155,10 @@ function render(s) {
     const p = s.preview;
     $('picks').innerHTML = '<table><tr><th>相手</th><th>選出率</th><th>先発率</th></tr>' +
       p.names.map((n, i) => `<tr><td>${n}</td><td>${pct(p.brought[i])}</td><td>${pct(p.lead[i])}</td></tr>`).join('') + '</table>';
-    $('lineups').innerHTML = p.lineups.length ? '<table><tr><th>先発</th><th>残り</th><th>推定勝率</th></tr>' +
-      p.lineups.map((l, i) => `<tr class="pick${sameLineup(l.lineup, s.lineup) ? ' chosen' : ''}" data-i="${i}"><td>${l.names[0]}</td><td>${l.names.slice(1).join('・')}</td><td>${pct(l.win)}</td></tr>`).join('') + '</table>'
+    $('lineups').innerHTML = p.lineups.length ? '<table><tr><th>先発</th><th>残り</th><th>相性評価</th></tr>' +
+      p.lineups.map((l, i) => `<tr class="pick${sameLineup(l.lineup, s.lineup) ? ' chosen' : ''}" data-i="${i}"><td>${l.names[0]}</td><td>${l.names.slice(1).join('・')}</td><td>${l.score != null ? l.score.toFixed(3) : pct(l.win)}</td></tr>`).join('') + '</table>'
       : '選出ごとの勝率モデルがまだありません（scripts/sim_matchups.py）。手動で選んでください。';
-    if (p.lineup_note && p.lineups.length) $('lineups').innerHTML += `<div class="muted">※ 推定勝率は参考値: ${p.lineup_note}</div>`;
+    if (p.lineup_note && p.lineups.length) $('lineups').innerHTML += `<div class="muted">${p.lineup_note}</div>`;
     document.querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => selectLineup(p.lineups[+tr.dataset.i].lineup));
   }
   const b = s.battle;

@@ -53,13 +53,13 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
     results = []
     for w, world in enumerate(first['results']):
         merged = {k: v for k, v in world.items()
-                  if k not in ('payoff', 'winSpeed', 'visits', 'invalid', 'stats', 'uncertainty')}
+                  if k not in ('payoff', 'winSpeed', 'visits', 'invalid', 'stats', 'uncertainty', 'rootProgress')}
         priors = [r['results'][w].get('p2Prior') for r in replies if r['results'][w].get('p2Prior')]
         if priors:
             merged['p2Prior'] = np.mean(priors, axis=0).tolist()
-        payoff, speed, visits, invalid, stats, uncertainty = [], [], [], [], [], []
+        payoff, speed, visits, invalid, stats, uncertainty, progress = [], [], [], [], [], [], []
         for i, label in enumerate(world['p1']):
-            row_p, row_s, row_v, row_i, row_st, row_u = [], [], [], [], [], []
+            row_p, row_s, row_v, row_i, row_st, row_u, row_progress = [], [], [], [], [], [], []
             for j in range(len(world['p2'])):
                 cells = [r['results'][w]['stats'][i][j] for r in replies]
                 n = sum(c['n'] for c in cells)
@@ -69,6 +69,13 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
                 priors = [c['prior'] for c in cells if c['prior'] is not None]
                 prior = float(np.mean(priors)) if priors else None
                 prior_speed = float(np.mean([c['priorSpeed'] for c in cells if c['prior'] is not None] or [0.]))
+                progress_n = sum(c.get('progressN', 0) for c in cells)
+                progress_sum = sum(c.get('progressSum', 0.) for c in cells)
+                progress_priors = [c['priorProgress'] for c in cells if c.get('priorProgress') is not None]
+                progress_prior = float(np.mean(progress_priors)) if progress_priors else None
+                progress_weight = prior_visits if progress_prior is not None else 0.
+                row_progress.append(((progress_weight * (progress_prior or 0.) + progress_sum) /
+                                     (progress_weight + progress_n)) if progress_weight + progress_n else None)
                 n0 = prior_visits if prior is not None else 0.
                 if label in certified:
                     value = 1.
@@ -83,6 +90,9 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
                 row_i.append(sum(c['failed'] for c in cells))
                 row_st.append({'n': n, 'sum': total, 'sumSq': total_sq, 'prior': prior, 'speed': total_speed,
                                'priorSpeed': prior_speed, 'ends': sum(c['ends'] for c in cells),
+                               **({'progressSum': progress_sum, 'progressN': progress_n,
+                                   'priorProgress': progress_prior}
+                                  if progress_prior is not None or progress_n else {}),
                                'failed': row_i[-1]})
                 if prior is None or n0 + n == 0:
                     row_u.append(None)
@@ -97,8 +107,11 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
             invalid.append(row_i)
             stats.append(row_st)
             uncertainty.append(row_u)
+            progress.append(row_progress)
         merged.update(payoff=payoff, winSpeed=speed, visits=visits, invalid=invalid, stats=stats,
                       uncertainty=uncertainty, terminal_search=summary)
+        if all('rootProgress' in r['results'][w] for r in replies):
+            merged['rootProgress'] = progress
         results.append(merged)
     return {'session': first['session'], 'pending': [], 'summary': summary, 'results': results}
 

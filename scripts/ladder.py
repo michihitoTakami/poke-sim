@@ -38,6 +38,7 @@ from sb3_contrib import MaskablePPO
 
 from pokesim.config import FORMAT, PROCESSED_DIR, RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor
+from pokesim.live.preview_matchups import PreviewCoverage
 from pokesim.live.selection import LadderLineupModel, MatchupModel, PickModel
 from pokesim.rl.bc import CounterPickHeuristic
 from pokesim.rl.myteam import FixedTeam, TeamFeatures, counter_preview, to_id
@@ -84,6 +85,7 @@ class AdvisorPlayer(TrackedPlayer):
     def __init__(self, sets: list[dict], policies: list[str], out: Path = OUT, combine: dict | None = None,
                  planner: dict | None = None, sample: bool = False, seed: int | None = None,
                  opponent_policy: str = "default", belief: bool = True, value_run=None, lineup: str = "ladder",
+                 preview_coverage: bool = True,
                  **kwargs):
         """lineup: "matchup" ranks lineups by the simulated table shrunk towards recent ladder results;
         "ladder" draws them from the posterior of this roster's own rated results (LadderLineupModel)."""
@@ -97,6 +99,8 @@ class AdvisorPlayer(TrackedPlayer):
                                source="showdown", sample=sample, opponent_policy=opponent_policy,
                                belief=belief, value_run=value_run)
         self.planner, self.sample = self.advisor.planner, sample
+        self.preview_coverage = PreviewCoverage(sets, self.advisor.engine) \
+            if preview_coverage and self.advisor.engine else None
         self.seed = seed if seed is not None else random.SystemRandom().randrange(2 ** 31)
         self.rng = random.Random(self.seed)
         roster = [s["species"] for s in sets]
@@ -227,7 +231,15 @@ class AdvisorPlayer(TrackedPlayer):
         # local games); unrated local games never count.
         if self.lineup_method == "ladder":
             model = LadderLineupModel.from_records(OUT, roster)
-            lineup, info = model.choose(roster, self.rng, self.matchups, picks)
+            coverage, coverage_error = None, None
+            if self.preview_coverage:
+                try:
+                    coverage = self.preview_coverage.profile(picks)
+                except Exception as e:  # noqa: BLE001 - retain a valid historical selection if static estimates fail
+                    coverage_error = repr(e)[:200]
+            lineup, info = model.choose(roster, self.rng, self.matchups, picks, coverage=coverage)
+            if coverage_error:
+                info['coverage_error'] = coverage_error
             self.selection[battle.battle_tag] = info
         else:
             self.matchups.observe_ladder(OUT, roster)
@@ -387,7 +399,7 @@ async def run(args) -> None:
         planner["near"] = args.near
     play = {"combine": combine, "planner": planner, "sample": args.sample, "seed": args.seed,
             "opponent_policy": args.opponent_policy, "belief": args.belief, "value_run": args.value_run,
-            "lineup": args.lineup}
+            "lineup": args.lineup, "preview_coverage": args.preview_coverage}
     if args.local:
         tag = uuid.uuid4().hex[:6]
         me = AdvisorPlayer(sets, args.policy, out=Path(args.out), **play, battle_format=FORMAT,
@@ -467,6 +479,8 @@ def main() -> None:
     ap.add_argument("--lineup", choices=["matchup", "ladder"], default="ladder",
                     help="team preview: the simulated matchup table shrunk to ladder results, or the posterior of "
                          "this roster's own ladder results with Thompson sampling (pokesim.live.selection)")
+    ap.add_argument('--preview-coverage', action=argparse.BooleanOptionalAction, default=True,
+                    help='rank whole-trio matchup coverage at preview (disable for an offline A/B)')
     ap.add_argument("--rho-setup", type=float, default=None,
                     help="worst-case share for set-up moves in the planner's ranking (default: the planner's rho)")
     ap.add_argument("--near", type=float, default=None,
