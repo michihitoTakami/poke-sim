@@ -58,7 +58,10 @@ function createCodec(dir) {
           mon.statusState.time = s.sleepRemaining;
         }
         if (i === 0) {
-          if (s.lastMove) mon.lastMove = battle.dex.moves.get(s.lastMove);
+          // An ActiveMove, as the simulator itself records: the search snapshots worlds with State.serializeBattle,
+          // which turns a plain dex Move into a '[DataMove:id]' string that the restore leaves as is, and any
+          // later Encore / Disable / cantusetwice check on that lastMove throws or misreads.
+          if (s.lastMove) mon.lastMove = battle.dex.getActiveMove(s.lastMove);
           mon.clearBoosts();
           Object.assign(mon.boosts, s.boosts || {});
           for (const v of s.volatiles || []) mon.addVolatile(v);
@@ -68,14 +71,14 @@ function createCodec(dir) {
           }
           if (s.encore && mon.hasMove(s.encore)) {  // Encore locks the last move used
             const last = mon.lastMove;
-            mon.lastMove = battle.dex.moves.get(s.encore);
+            mon.lastMove = battle.dex.getActiveMove(s.encore);
             mon.addVolatile('encore');
             if (s.lastMove) mon.lastMove = last;
             if (s.encoreTurns !== undefined && mon.volatiles.encore) mon.volatiles.encore.duration = s.encoreTurns;
           }
           if (s.disabledMove && mon.hasMove(s.disabledMove)) {
             const last = mon.lastMove;
-            mon.lastMove = battle.dex.moves.get(s.disabledMove);
+            mon.lastMove = battle.dex.getActiveMove(s.disabledMove);
             mon.addVolatile('disable');
             mon.lastMove = last;
             if (s.disableTurns !== undefined && mon.volatiles.disable) mon.volatiles.disable.duration = s.disableTurns;

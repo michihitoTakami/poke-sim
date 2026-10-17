@@ -143,3 +143,25 @@ def test_champions_active_request_pp_overrides_standard_generation_pp():
     result = worker("console.log(JSON.stringify(setUp(sample,format,1).p1.activeRequest.active[0].moves));",
                     {"p1": side, "p2": {"team": [CHOMP], "mons": [{}]}})
     assert result[0]["pp"] == 12
+
+
+def test_restored_snapshot_keeps_the_last_move_usable_by_encore():
+    """The search snapshots every world with State.serializeBattle and restores it per trial. A reconstructed
+    lastMove must survive that round trip as a move object: a plain dex Move came back as the string
+    '[DataMove:id]', and Encore's onStart threw on it, so every root cell with Encore failed to bootstrap."""
+    sample = {"p1": {"team": [CHOMP], "mons": [{"lastMove": "swordsdance"}]},
+              "p2": {"team": [GENGAR], "mons": [{}]}, "field": {}}
+    result = worker("""
+const path=require('path');
+const {State}=require(path.resolve(process.argv[2],'dist/sim/state'));
+const b=setUp(sample,format,1);
+const restored=State.deserializeBattle(JSON.parse(JSON.stringify(State.serializeBattle(b))));
+const last=restored.p1.active[0].lastMove;
+let error=null;
+try { step(restored,'move 1','move 3'); } catch(e) { error=String(e); }
+console.log(JSON.stringify({type:typeof last,id:last&&last.id,flags:!!(last&&last.flags),error,
+  encored:!!restored.p1.active[0].volatiles.encore}));
+""", sample)
+    assert result["type"] == "object" and result["id"] == "swordsdance" and result["flags"]
+    assert result["error"] is None
+    assert result["encored"]
