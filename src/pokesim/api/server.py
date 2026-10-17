@@ -65,6 +65,9 @@ class Live:
                                value_run=value_run)
         self.picks_model, self.matchups = PickModel(), MatchupModel()
         self.preview_coverage = PreviewCoverage(self.sets, self.advisor.engine) if self.advisor.engine else None
+        from pokesim.live.lineup_search import LineupSearch
+
+        self.lineup_search = LineupSearch(self.sets, self.advisor.engine) if self.advisor.engine else None
         self.matchup_warning = self.matchups.check(policy)
         if self.matchup_warning:
             print("lineup table:", self.matchup_warning, flush=True)
@@ -83,6 +86,8 @@ class Live:
         self.lineup: list[str] | None = None
         self.suggestion: Suggestion | None = None
         self.history: list[dict] = []
+        self.execution_sources: list[dict] = []
+        self.confirmed_lineup = None
         self.recognized: list[dict] | None = None
         self.started = time.time()
         self.tracker: ScreenTracker | None = None
@@ -172,7 +177,16 @@ class Live:
             except Exception as e:  # noqa: BLE001 - a useful historical ranking remains available
                 print('preview coverage unavailable:', repr(e)[:200], flush=True)
         ranking = model.rank(self.roster, picks, coverage, self.matchups)
-        self.preview = {"species": species, "names": [self.name(s) for s in species],
+        continuation = None
+        if self.lineup_search:
+            try:
+                ranking, continuation = await asyncio.to_thread(self.lineup_search.rerank, ranking, picks)
+            except Exception as e:  # noqa: BLE001 - the static ranking remains usable
+                continuation = {'error': repr(e)[:200]}
+        continuation_ok = continuation and not continuation.get('fallback') and not continuation.get('error')
+        note = ("相手の選出・型の仮説に対する3対3の継続対戦で上位候補を比較します。" if continuation_ok else
+                "静的な相性と実戦履歴で選出候補を比較します。") + "表示値は実戦勝率ではありません。"
+        self.preview = {"continuation": continuation, "species": species, "names": [self.name(s) for s in species],
                         "brought": [round(float(p), 3) for p in picks.brought],
                         "lead": [round(float(p), 3) for p in picks.lead],
                         "opponent_selection": picks.context,
@@ -180,7 +194,7 @@ class Live:
                                               "probability": float(p)} for names, p in picks.lineups[:5]],
                         "lineups": [{"lineup": names, "names": [self.name(n) for n in names],
                                      "win": None, "score": round(p, 3)} for names, p, _ in ranking[:10]],
-                        "lineup_note": "実戦の選出成績と3体の相性による比較値です。勝率ではありません。"}
+                        "lineup_note": note}
         self.session = BattleSession(self.sets)
         self.session.preview(species)
         if self.advisor.engine is not None:
@@ -191,11 +205,13 @@ class Live:
         await self.broadcast()
         return self.preview
 
-    def set_lineup(self, lineup: list[str]) -> None:
+    def set_lineup(self, lineup: list[str], confirmed: bool = False) -> None:
         ids = [to_id(s) for s in lineup]
         order = [next(i for i, s in enumerate(self.sets) if to_id(s["species"]) == sid) for sid in ids]
         self.session.select(order)
         self.lineup = [self.sets[i]["species"] for i in order]
+        if confirmed:
+            self.confirmed_lineup = list(self.lineup)
 
     def ensure_member(self, species: str) -> None:
         """Our Pokémon switched in: register the lineup if nobody did (best suggested lineup with this lead), or
@@ -207,6 +223,7 @@ class Live:
                               if to_id(entry["lineup"][0]) == to_id(species)), None)
             self.set_lineup(suggested or [species] + [s for s in self.roster if to_id(s) != to_id(species)][:2])
         elif to_id(species) not in map(to_id, self.lineup):
+            self.confirmed_lineup = None
             lineup = list(self.lineup)
             unseen = [i for i, s in enumerate(lineup) if to_id(s) not in map(to_id, self.seen_me)]
             lineup[unseen[-1] if unseen else -1] = species
@@ -334,6 +351,7 @@ class Live:
             return
         self.suggestion = suggestion
         self.history.append({"turn": battle.turn, "force_switch": force_switch,
+                             "suggested": suggestion.actions[0][0] if suggestion.actions else None,
                              "actions": suggestion.actions[:5], "opponent": suggestion.opponent[:5],
                              "win": suggestion.win_raw, "win_cal": suggestion.win_prob,
                              "evaluations": suggestion.evaluations,
@@ -417,7 +435,7 @@ def create_app(live: Live, obs: dict | None = None) -> FastAPI:
     async def select(body: dict):
         if live.session is None:
             raise HTTPException(400, "send the team preview first")
-        live.set_lineup(body["lineup"])
+        live.set_lineup(body["lineup"], confirmed=True)
         await live.broadcast()
         return live.state()
 
@@ -455,6 +473,14 @@ def create_app(live: Live, obs: dict | None = None) -> FastAPI:
         await live.broadcast()
         return {"saved": str(path)}
 
+    @app.post('/api/execution-source')
+    async def execution_source(body: dict):
+        if (body.get('source') not in {'manual', 'ai', 'unknown'} or not isinstance(body.get('turn'), int) or
+                not isinstance(body.get('action'), str)):
+            raise HTTPException(400, 'turn, action and source (manual/ai/unknown) are required')
+        live.execution_sources.append({k: body[k] for k in ('turn', 'action', 'source')})
+        return {'recorded': True}
+
     @app.websocket("/ws")
     async def ws(socket: WebSocket):
         await socket.accept()
@@ -477,6 +503,13 @@ def save_record(live: Live, result: str | None) -> Path:
               "lineup": live.lineup, "log": live.session.log, "advice": live.history,
               "versions": describe(live.policy, live.matchups.meta, planner=live.advisor.planner,
                                    calibration_context=live.advisor.calibration_context)}
+    from pokesim.live.provenance import actual_lineup, execution_rows
+
+    record['suggested_lineup'] = next((r['lineup'] for r in (live.preview or {}).get('lineups', [])), None)
+    record['execution_sources'] = live.execution_sources
+    record['actual_lineup'] = ({'species': live.confirmed_lineup, 'complete': True, 'source': 'manual',
+                               'evidence': 'user_confirmed'} if live.confirmed_lineup else actual_lineup(record))
+    record['executions'] = execution_rows(record)
     path = LOG_DIR / f"{stamp}.json"
     path.write_text(json.dumps(record, ensure_ascii=False, indent=1))
     try:

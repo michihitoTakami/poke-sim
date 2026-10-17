@@ -175,3 +175,13 @@ POLICIES=none PLANNER=on EXTRA="--value-run runs/value-replays-v1 --opponent-pol
   setsid nohup ./scripts/collect.sh > /dev/null 2>&1 < /dev/null &
 ```
 `--policy none` では探索が指し、探索に失敗した判断はランダムな合法手（記録に残る）になる。
+
+## PR #37 の残提案の実装後
+
+選出は静的相性の上位候補を、相手の選出・型4仮説と3種類の公開情報方策で3対3対戦させて比較する。
+対戦中の通常設定は `rootProgress=false`、許容幅0.03固定。上位2手への集中探索と複数ターン計画は比較用に指定できる。
+学習候補は較正条件を満たすまで通常ロードしない。手順と検証は[実装監査](audits/20261018-proposals37.md)を参照。
+
+ラダーは提案・送信・実行を分け、自分側requestから実際の選出を保存する。
+操作主体の既定はunknown。人が介入できない収集であると確認している場合に限り、`EXTRA`へ
+`--control-mode autonomous_ai` を追加する。提案と一致したという理由だけではAI単独の実行と集計しない。

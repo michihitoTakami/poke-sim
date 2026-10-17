@@ -2,6 +2,8 @@
 const {createHash} = require('crypto');
 const {PublicObservation, legalChoices} = require('./public_observation');
 const {choosePublic, observedStep, VERSION} = require('./public_policy');
+const {loadPolicyNet} = require('./policy_net');
+const {PlanPolicy, VERSION: PLAN_VERSION} = require('./public_plans');
 
 function evaluateBranches(req, {setUp, choices, step, policy, State, extractChannelMessages}) {
   const cfg = req.branches;
@@ -9,6 +11,8 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
   if (!['sampled_full_information_continuations', 'public_observation'].includes(scope)) {
     throw new Error('unknown branch information scope');
   }
+  const net = cfg.policyNets?.ours ? loadPolicyNet(cfg.policyNets.ours) : null;
+  if (net && cfg.continuationNetSha && cfg.continuationNetSha !== net.sha) throw Error('continuation policy changed');
   const isPublic = scope === 'public_observation';
   const seeds = cfg.seeds, names = cfg.continuations, maxTurns = cfg.maxTurns;
   if (!Array.isArray(seeds) || !seeds.length || seeds.some(s => !Number.isSafeInteger(s) || s < 0) ||
@@ -20,7 +24,7 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
   const policies = names.map(name => {
     if (typeof name !== 'string' || name.split('/').length !== 2) throw new Error('expected p1/p2 policy pair');
     if (isPublic) {
-      for (const p of name.split('/')) if (!['greedy', 'tactical', 'expert', 'disrupt'].includes(p)) {
+      for (const p of name.split('/')) if (!['greedy', 'tactical', 'expert', 'disrupt', 'planned'].includes(p)) {
         throw new Error(`unknown public policy ${p}`);
       }
       return name.split('/');
@@ -61,17 +65,28 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
               observer.bindActive(side.id, side.active[0]?.name);
               observer.bindActive(side.id, side.active[0]?.illusion?.name);
             }
+            const plans = {p1: new PlanPolicy(), p2: new PlanPolicy()};
             let logPosition = battle.log.length, decisionStep = 0;
             const decide = (side, policyName, fixedAction = null) => {
               if (side.activeRequest?.wait || !side.activeRequest) return 'pass';
               const view = observer.view(side);
               const options = legalChoices(view);
-              const selection = fixedAction === null ? choosePublic(view, policyName, battle.dex) :
+              const recommend = () => {
+                if (net && side.id === 'p1') {
+                  const weights = net.prior(view, battle.dex, options);
+                  return options[weights.indexOf(Math.max(...weights))];
+                }
+                return policyName === 'planned' ? plans[side.id].choose(view, battle.dex) :
+                  choosePublic(view, policyName, battle.dex);
+              };
+              const selection = fixedAction === null ? recommend() :
                 options.find(([, label]) => label === fixedAction);
               if (!selection) throw new Error(`root action unavailable in public request: ${fixedAction}`);
               row.trajectory.push({step: decisionStep, side: side.id, phase: view.phase,
                 observation: view, legal: options.map(([, label]) => label), action: selection[1],
-                behavior: policyName, rootIntervention: decisionStep === 0, target: null});
+                policyRecommendation: fixedAction !== null ? (policyName === 'planned' ?
+                  new PlanPolicy().choose(view, battle.dex) : choosePublic(view, policyName, battle.dex))[1] : selection[1],
+                behavior: policyName, plan: plans[side.id].plan, rootIntervention: decisionStep === 0, target: null});
               return selection[0];
             };
             const advance = (a, b) => {
@@ -116,7 +131,9 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
       });
     }
   });
-  return {actions, trials, ...(isPublic ? {informationScope: scope, policyVersion: VERSION} : {})};
+  return {actions, trials, ...(isPublic ? {informationScope: scope,
+    policyVersion: (names.some(n => n.includes('planned')) ? PLAN_VERSION : VERSION) + (net ? '+net:' + net.sha : ''),
+    continuationNet: net?.sha || null} : {})};
 }
 
 module.exports = {evaluateBranches};

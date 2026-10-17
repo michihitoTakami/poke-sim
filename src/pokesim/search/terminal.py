@@ -108,6 +108,10 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
             stats.append(row_st)
             uncertainty.append(row_u)
             progress.append(row_progress)
+        if all('actionOrder' in r['results'][w] for r in replies):
+            merged['actionOrder'] = [[{
+                name: sum(r['results'][w]['actionOrder'][i][j][name] for r in replies)
+                for name in ('first', 'trials')} for j in range(len(world['p2']))] for i in range(len(world['p1']))]
         merged.update(payoff=payoff, winSpeed=speed, visits=visits, invalid=invalid, stats=stats,
                       uncertainty=uncertainty, terminal_search=summary)
         if all('rootProgress' in r['results'][w] for r in replies):
@@ -129,6 +133,8 @@ def search(engine, request, *, started=None, max_budget=9., predictor=None):
     budget = float(request.pop('decisionMs', 8500)) / 1000
     if not .1 <= budget <= max_budget:
         raise ValueError(f'decisionMs must be between 100 and {int(max_budget * 1000)}')
+    focus_top_two = bool(request.pop('focusTopTwo', False))
+    focus = None
     count = int(request.pop('workers', 1) or 1)
     if not 1 <= count <= 16:
         raise ValueError('workers must be between 1 and 16')
@@ -191,15 +197,21 @@ def search(engine, request, *, started=None, max_budget=9., predictor=None):
                 # Cheap allocation only; the final decision still uses the common-world robust matrix solver.
                 matrices = [np.asarray(r['payoff'], dtype=float) for r in merged['results']]
                 if all(np.isfinite(m).all() for m in matrices):
-                    scores = np.mean([.7 * m.mean(axis=1) + .3 * m.min(axis=1) for m in matrices], axis=0)
+                    predictions = column_weights(merged['results'], predictor) if predictor else None
+                    scores = np.mean([.7 * (m @ np.asarray(predictions[i]) if predictions else m.mean(axis=1)) +
+                                      .3 * m.min(axis=1) for i, m in enumerate(matrices)], axis=0)
                     weights = np.exp((scores - scores.max()) / .15)
                     mix = (weights / weights.sum()).tolist()
+                    covered = all(np.asarray(r['visits']).min() >= summary.get('minimum_reply_trials', 2)
+                                  for r in merged['results'])
+                    if focus_top_two and covered and remaining < budget * .45 and len(scores) > 2:
+                        focus = np.argsort(-scores, kind='stable')[:2].tolist()
                 if predictor is not None and not sent_columns:
                     columns, sent_columns = column_weights(merged['results'], predictor), True
             slice_ms = min(500, max(1, int((remaining - .7) * 1000)))
             requests = {k: {'terminalSearch': {'op': 'advance', 'session': reply['session'],
                                                'feedback': feedback[k], 'mix': mix, 'columns': columns,
-                                               'sliceMs': slice_ms}} for k, reply in replies.items()}
+                                               'sliceMs': slice_ms, 'focus': focus}} for k, reply in replies.items()}
             columns = None  # sent once; the workers keep it
         finals = exchange({k: {'terminalSearch': {'op': 'finish', 'session': reply['session'],
                                                   'feedback': feedback[k]}} for k, reply in replies.items()})

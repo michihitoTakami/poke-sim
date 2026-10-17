@@ -50,14 +50,12 @@ def to_id(text: str) -> str:
 
 
 def mega_evolved(mon) -> bool:
-    """poke-env keeps the species id on a Mega forme change (|detailschange|) and only swaps stats, types and ability:
-    a Mega shows as stats that differ from its own species entry."""
-    if "mega" in mon.species:
-        return True
-    from poke_env.data import GenData
+    """An observed Mega forme; copied stats (Transform) and other battle formes are not Mega Evolution."""
+    if getattr(mon._moves, '_transform_moves', None) is not None:
+        return False
+    entry = GenData.from_gen(9).pokedex.get(current_forme(mon), {})
+    return (entry.get('forme') or '').startswith('Mega')
 
-    entry = GenData.from_gen(9).pokedex.get(mon.species)
-    return bool(entry) and bool(mon.base_stats) and dict(entry["baseStats"]) != dict(mon.base_stats)
 
 
 @dataclass
@@ -230,10 +228,13 @@ def mon_state(mon: Pokemon, active: bool, own: bool = False) -> dict:
         if stone:
             out["item"] = stone
     entry = GenData.from_gen(9).pokedex.get(current_forme(mon), {})
-    if entry.get("battleOnly") or (entry.get("forme") or "").startswith("Mega"):
+    if (getattr(mon._moves, '_transform_moves', None) is None and
+            (entry.get("battleOnly") or (entry.get("forme") or "").startswith("Mega"))):
         out["forme"] = entry["name"]
     if mon.status and not mon.fainted:
         out["status"] = mon.status.name.lower()
+    if active and getattr(mon._moves, '_transform_moves', None) is not None:
+        out['pp'] = {mid: move.current_pp for mid, move in mon.moves.items()}
     if active:
         out["boosts"] = {k: v for k, v in mon.boosts.items() if k in BOOSTS and v}
         out["volatiles"] = [VOLATILE_IDS[e.name] for e in mon.effects if e.name in VOLATILE_IDS]
@@ -385,6 +386,8 @@ class Lookahead:
             states[0]["pp"] = {m["id"]: m["pp"] for m in request[0].get("moves", []) if "pp" in m}
         if hasattr(battle, "state_tracker"):
             states[0].update(battle.state_tracker.locks(battle.player_role, active.name))
+            if 'transform' in states[0]:
+                states[0]['transform'] = dict(states[0]['transform'], sourceSide='p2')
         out = {"team": [own_sets[self.sampler.base_id(m.species)] for m in mons],
                 "mons": states,
                 "totalFainted": fainted_count(battle, battle.player_role, mons),
@@ -427,6 +430,8 @@ class Lookahead:
             mons.append(mon_state(m, i == 0))
             if i == 0 and hasattr(battle, "state_tracker"):
                 mons[-1].update(battle.state_tracker.locks(battle.opponent_role, m.name))
+                if 'transform' in mons[-1]:
+                    mons[-1]['transform'] = dict(mons[-1]['transform'], sourceSide='p1')
         for sid in unseen[:3 - len(team)]:
             team.append(self.sampler.sample(sid))
             mons.append({"hp": 1.0})

@@ -31,11 +31,11 @@ def test_rain_electro_shot_is_an_action_despite_suppressed_animation():
     assert turn_actions(log, 0) == {'p1': 'move:calmmind', 'p2': 'move:electroshot'}
 
 
-def test_roster_mismatch_is_quarantined_before_observation_reconstruction():
+def test_incomplete_record_without_a_team_or_preview_is_not_reconstructed():
     rec = {'result': 'loss', 'lineup': ['Gholdengo', 'Floette-Eternal', 'Skeledirge'],
            'log': ['|switch|p1a: Scolipede|Scolipede, L50|165/165']}
     engine = SimpleNamespace(sampler=SimpleNamespace(base_id=lambda sid: sid))
-    assert rows_of('bad-roster', rec, [], engine, {}, 'train') == ([], {'lineup_mismatch': 1})
+    assert rows_of('bad-roster', rec, [], engine, {}, 'train') == ([], {'missing_team_or_preview': 1})
 
 
 def test_fainted_before_acting_remains_a_value_example_without_an_imitation_target(monkeypatch):

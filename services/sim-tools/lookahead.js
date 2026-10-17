@@ -44,7 +44,7 @@ const WIN_DECAY = 0.05;  // per turn: a quicker win scores higher
 // going stays within +-TERMINAL_OPEN, below any win and above any loss
 const TERMINAL_TIEBREAK = 0.005, TERMINAL_FLOOR = 0.95, TERMINAL_OPEN = 0.9;
 
-const {setUp} = require(path.resolve(__dirname, 'state_codec.js')).createCodec(dir);
+const {setUp, startBattle} = require(path.resolve(__dirname, 'state_codec.js')).createCodec(dir);
 
 // Legal choices for one side as [choice, label]; labels name the move or the switch target.
 function choices(battle, side) {
@@ -720,7 +720,8 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = req.previewMatchups ? require('./preview_matchups').previewMatchups(req,
+    reply = req.lineupMatches ? require('./lineup_matches').lineupMatches(req,
+      {startBattle, step, extractChannelMessages}) : req.previewMatchups ? require('./preview_matchups').previewMatchups(req,
       {setUp, expectedDamage: (b, source, target, move) => expectedDamage(b, source, target, move, true)}) :
       req.observe ? require('./observe').observe(req, {setUp, extractChannelMessages}) :
       req.terminalSearch ? require('./terminal_search').terminalSearch(req,

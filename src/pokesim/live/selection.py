@@ -306,7 +306,17 @@ def ladder_rows(root: Path, roster: list[str]) -> list[dict]:
             continue  # A concurrent writer or damaged record must not prevent team preview.
         if not isinstance(rec, dict):
             continue
+        from pokesim.live.provenance import actual_lineup, base
+
+        recovered = actual_lineup(rec)
         source = rec.get('source')
+        if recovered['complete']:
+            by_id = {base(s): s for s in roster}
+            names = [by_id.get(base(s), s) for s in recovered['species']]
+            # Private requests reorder the current active first. The original lead comes from the first reveal.
+            first = next((line.split('|')[3] for line in rec.get('log', []) if line.startswith('|switch|p1a:')), None)
+            lead = next((s for s in names if first and base(s) == base(first)), names[0])
+            rec = dict(rec, lineup=[lead] + [s for s in names if s != lead])
         if (rec.get('result') not in ('win', 'loss') or '|rated|' not in rec.get('log', []) or
                 sorted(map(to_id, rec.get('team', []))) != sorted(map(to_id, roster)) or
                 not rec.get('lineup') or len(rec['lineup']) != 3 or not source or source in seen or

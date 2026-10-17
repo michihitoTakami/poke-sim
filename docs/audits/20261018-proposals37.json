@@ -1,0 +1,3336 @@
+{
+  "scope": "development diagnostics only; sampled sets and mixed historical control; no human win-rate claim",
+  "implementation_python_sha": "f5e5a0f3f81015bd15520982c5ebab8f2128723cc64f31c07c24c8a0faf598b9",
+  "implementation_worker_sha": "49504d7eb38ccddb5d7d793a44d5bb327479b29cecaeca118f7a38a6440ba2ef",
+  "defaults": {
+    "state_codec": "observed-state-v3",
+    "rootProgress": false,
+    "tie_margin": 0.03,
+    "focusTopTwo": false,
+    "ours_rollout": "expert",
+    "preview": {
+      "shortlist": 4,
+      "worlds": 4,
+      "opponent_policies": 3
+    }
+  },
+  "history": {
+    "records": 246,
+    "complete_lineups": 196,
+    "actor:unknown": 2610,
+    "recovered_different_from_suggestion": 4,
+    "partial_lineups": 50
+  },
+  "generation": {
+    "reference": {
+      "train": {
+        "positions": 16,
+        "outcomes": {
+          "win": 564,
+          "loss": 648
+        },
+        "manifest_sha": "6f837446cf960ed02fd048bae9dec990209041f1bf4dd9054edccc33c5fbbd23"
+      },
+      "development": {
+        "positions": 16,
+        "outcomes": {
+          "win": 536,
+          "loss": 640
+        },
+        "manifest_sha": "6bee752b41dd347c07eca833f6f60449a8bf2960d042717999b8f0186d729a69"
+      }
+    },
+    "fixed_learned_policy": {
+      "train": {
+        "positions": 16,
+        "outcomes": {
+          "loss": 662,
+          "win": 550
+        },
+        "manifest_sha": "982355045a1bfc6aa19d145b23feeba4b699976f398cb57336a19c33ac9a710f"
+      },
+      "development": {
+        "positions": 16,
+        "outcomes": {
+          "win": 535,
+          "loss": 641
+        },
+        "manifest_sha": "d65d789599d4b9e74054c3ec85bdf8125c8122814cae9d578b57d08325789907"
+      }
+    }
+  },
+  "source_split": {
+    "assignments": {
+      "showdown battle-gen9championsbssregmc-2699853996": "train",
+      "showdown battle-gen9championsbssregmc-2699821373": "train",
+      "showdown battle-gen9championsbssregmc-2699996377": "train",
+      "showdown battle-gen9championsbssregmc-2700084150-gswhf273a9yd3qnwyn5nn8mbcof6hyypw": "development",
+      "showdown battle-gen9championsbssregmc-2700072487": "development",
+      "showdown battle-gen9championsbssregmc-2699991532": "train",
+      "showdown battle-gen9championsbssregmc-2699768883": "train",
+      "showdown battle-gen9championsbssregmc-2699986014-cydshtakg0hdbikj3o2fnl5k6k7jrvqpw": "train",
+      "showdown battle-gen9championsbssregmc-2699974015-qych5pvmyi31q2oreoshgrku7rqyfsgpw": "train",
+      "showdown battle-gen9championsbssregmc-2700041766-punv0fagcyid3o41vek7yt3cp0rvv8ipw": "train",
+      "showdown battle-gen9championsbssregmc-2699995772": "train",
+      "showdown battle-gen9championsbssregmc-2700049373": "train",
+      "showdown battle-gen9championsbssregmc-2700011620": "train",
+      "showdown battle-gen9championsbssregmc-2699962404-7aqbhwa61e3i4cwwhksmvqvgowh3u11pw": "train",
+      "showdown battle-gen9championsbssregmc-2699766354": "train",
+      "showdown battle-gen9championsbssregmc-2700046153": "train",
+      "showdown battle-gen9championsbssregmc-2699961568": "train",
+      "showdown battle-gen9championsbssregmc-2699855595": "train",
+      "showdown battle-gen9championsbssregmc-2700083346": "development",
+      "showdown battle-gen9championsbssregmc-2700068224": "development",
+      "showdown battle-gen9championsbssregmc-2700075160": "development",
+      "showdown battle-gen9championsbssregmc-2700075753": "development",
+      "showdown battle-gen9championsbssregmc-2700081521": "development",
+      "showdown battle-gen9championsbssregmc-2700077836": "development",
+      "showdown battle-gen9championsbssregmc-2700065786": "development",
+      "showdown battle-gen9championsbssregmc-2700078674-xqkdwaqq6mgp29wjawo9hye1ormwguwpw": "development",
+      "showdown battle-gen9championsbssregmc-2700082125": "development",
+      "showdown battle-gen9championsbssregmc-2700087604": "development",
+      "showdown battle-gen9championsbssregmc-2700069763": "development",
+      "showdown battle-gen9championsbssregmc-2700060589": "development",
+      "showdown battle-gen9championsbssregmc-2700074258": "development",
+      "showdown battle-gen9championsbssregmc-2700088985": "development"
+    },
+    "records": {
+      "20261017-141531-2699853996.json": [
+        "showdown battle-gen9championsbssregmc-2699853996",
+        "fea461422e6cc7c20cf34b4dc1e47cb0e9a4ee26e1fd583c2d22fb30a3ac6ab1"
+      ],
+      "20261017-122725-2699821373.json": [
+        "showdown battle-gen9championsbssregmc-2699821373",
+        "2cfb1b092e8cabb4879c96860664bd066cd3b70b3f1617164e89573f2e6c5645"
+      ],
+      "20261017-230014-2699996377.json": [
+        "showdown battle-gen9championsbssregmc-2699996377",
+        "785a2a5c5f06580db1e88eef6dabd5a5041c8c2a7aa24922cc431f8243c0de24"
+      ],
+      "20261018-020849-gswhf273a9yd3qnwyn5nn8mbcof6hyypw.json": [
+        "showdown battle-gen9championsbssregmc-2700084150-gswhf273a9yd3qnwyn5nn8mbcof6hyypw",
+        "b6a0677407f3ba6920c1973bda78aff024f7e5303f1daa84e304a1134e8cf3cb"
+      ],
+      "20261018-014448-2700072487.json": [
+        "showdown battle-gen9championsbssregmc-2700072487",
+        "90a7c4fd146c7c27501a05d1f5475d72455cfe61f5779c408f4e0292e80aac90"
+      ],
+      "20261017-224611-2699991532.json": [
+        "showdown battle-gen9championsbssregmc-2699991532",
+        "3f78320e39a0687a1bf1e175bffb47d3b48b94a477c7bb82ec823905a9d1d70e"
+      ],
+      "20261017-095855-2699768883.json": [
+        "showdown battle-gen9championsbssregmc-2699768883",
+        "08d6fd3e717d3ec963b6bf423d9d63c081713540a8ddcb513bfc762c8ff15840"
+      ],
+      "20261017-223903-cydshtakg0hdbikj3o2fnl5k6k7jrvqpw.json": [
+        "showdown battle-gen9championsbssregmc-2699986014-cydshtakg0hdbikj3o2fnl5k6k7jrvqpw",
+        "7c91a652c17829bd8a1e0d93f5533e4c562c9bdb929a165b30afcca0fa68b573"
+      ],
+      "20261017-215945-qych5pvmyi31q2oreoshgrku7rqyfsgpw.json": [
+        "showdown battle-gen9championsbssregmc-2699974015-qych5pvmyi31q2oreoshgrku7rqyfsgpw",
+        "b5bce3e7928a89eaa01d365e480281d7e098035efe6e5ac63bde1d30cccde9f1"
+      ],
+      "20261018-004044-punv0fagcyid3o41vek7yt3cp0rvv8ipw.json": [
+        "showdown battle-gen9championsbssregmc-2700041766-punv0fagcyid3o41vek7yt3cp0rvv8ipw",
+        "1ef43e79717cea3b124b736249b053f0c774c8437f17dc76f87bdf09060ba403"
+      ],
+      "20261017-225751-2699995772.json": [
+        "showdown battle-gen9championsbssregmc-2699995772",
+        "83d5d00759603926793c848aa1777d31189624d5ff777803d99e2087215e5ba4"
+      ],
+      "20261018-005445-2700049373.json": [
+        "showdown battle-gen9championsbssregmc-2700049373",
+        "6bf58801495ca3a26043fda16c2d335c1dd11d04cd9757a36154a8849b8ffe33"
+      ],
+      "20261017-233425-2700011620.json": [
+        "showdown battle-gen9championsbssregmc-2700011620",
+        "4d7b9a1d89eaa05d5b95735ef91eddf71cbbe2b484dddbd1069b7031cfe8bdfd"
+      ],
+      "20261017-212209-7aqbhwa61e3i4cwwhksmvqvgowh3u11pw.json": [
+        "showdown battle-gen9championsbssregmc-2699962404-7aqbhwa61e3i4cwwhksmvqvgowh3u11pw",
+        "98fc80d37006195d476e3144a51595058c1e092605414ccf5d139309b41774e1"
+      ],
+      "20261017-095357-2699766354.json": [
+        "showdown battle-gen9championsbssregmc-2699766354",
+        "27749355f765db735f9410982ab9d3358369d49dd45be01a8c83582a22c2fb71"
+      ],
+      "20261018-004853-2700046153.json": [
+        "showdown battle-gen9championsbssregmc-2700046153",
+        "9f3aed93815a109ae0dff44705dd0fcf124377ff4f477dae53570558cbf25432"
+      ],
+      "20261017-211957-2699961568.json": [
+        "showdown battle-gen9championsbssregmc-2699961568",
+        "4065d74e5b5d37d50557e96333e6231d1aff68f4d4109ee1e8ab330736f5bfd2"
+      ],
+      "20261017-142214-2699855595.json": [
+        "showdown battle-gen9championsbssregmc-2699855595",
+        "907c51391bcb05ac9c41f98d98124c4a82aa5f0aea6fd05732afe7fb7663c8f5"
+      ],
+      "20261018-020620-2700083346.json": [
+        "showdown battle-gen9championsbssregmc-2700083346",
+        "b1c0bb490f9f319d21755193e560f2fdfbe74ebd2fd36903157fd0435bc65ac7"
+      ],
+      "20261018-013524-2700068224.json": [
+        "showdown battle-gen9championsbssregmc-2700068224",
+        "797a67bdf9754425a184971db3189ab9cf1414a9a82b9f7a904f61070c554355"
+      ],
+      "20261018-014836-2700075160.json": [
+        "showdown battle-gen9championsbssregmc-2700075160",
+        "ebb3b56d7ba60a5a0d72e927ff2b9d63deffe5e527bd9ea519e7e58c56b93341"
+      ],
+      "20261018-015255-2700075753.json": [
+        "showdown battle-gen9championsbssregmc-2700075753",
+        "16c2d84d458f0c9c7be82bfcbe6ee7623c1307be408b48f1d38d8f4e7691f2de"
+      ],
+      "20261018-020202-2700081521.json": [
+        "showdown battle-gen9championsbssregmc-2700081521",
+        "e862e76096f3d4092c13a8d8bd7089560cdd8292c7a9e0b05db421e8891aef3d"
+      ],
+      "20261018-015441-2700077836.json": [
+        "showdown battle-gen9championsbssregmc-2700077836",
+        "e3cde2a6c1f9b083643a90370b557713b0fa11c3ea08478a50d3aca1b10c91ed"
+      ],
+      "20261018-013247-2700065786.json": [
+        "showdown battle-gen9championsbssregmc-2700065786",
+        "eec7bef7aa3cff99970fb81ec78a622b2285e3234d2535bb0aeecd76fac29ced"
+      ],
+      "20261018-015722-xqkdwaqq6mgp29wjawo9hye1ormwguwpw.json": [
+        "showdown battle-gen9championsbssregmc-2700078674-xqkdwaqq6mgp29wjawo9hye1ormwguwpw",
+        "4663d4efbc9beb22a2ce5f217d73c438a461218887b1a8cfb8e232ca7ccd9e4f"
+      ],
+      "20261018-020438-2700082125.json": [
+        "showdown battle-gen9championsbssregmc-2700082125",
+        "cfefbddd9d13cac68ba689f357d3a64352f06d0d942aca85cdcaed9b7b14c330"
+      ],
+      "20261018-021624-2700087604.json": [
+        "showdown battle-gen9championsbssregmc-2700087604",
+        "1fdfdf28fe3d1b9cbc7e87317401b53173e3bfede02f61db95ca9f7c641b1c3d"
+      ],
+      "20261018-014023-2700069763.json": [
+        "showdown battle-gen9championsbssregmc-2700069763",
+        "0b1e76aa0f77cd84326babea49f84878e2277827dac813b656c23a1d17218692"
+      ],
+      "20261018-011901-2700060589.json": [
+        "showdown battle-gen9championsbssregmc-2700060589",
+        "bcb9349d9133b69e51cced7396dc355ad758b2bd451dc4e8c8314e7b24ea8b65"
+      ],
+      "20261018-014711-2700074258.json": [
+        "showdown battle-gen9championsbssregmc-2700074258",
+        "7c69524e78d1ba02d9b504d21eb751230350d64a8b2a4070b868270e80ccaeaa"
+      ],
+      "20261018-021838-2700088985.json": [
+        "showdown battle-gen9championsbssregmc-2700088985",
+        "481bd07f6f0249c51f94d9cd96b1074c5e9db0f3c03288dc82065cc1a23c396e"
+      ]
+    },
+    "inspected_development": [
+      "20261018-011703-2700059094.json",
+      "20261018-011901-2700060589.json",
+      "20261018-012132-2700061570.json",
+      "20261018-012545-2700062873.json",
+      "20261018-012742-2700064825.json",
+      "20261018-013247-2700065786.json",
+      "20261018-013524-2700068224.json",
+      "20261018-014023-2700069763.json",
+      "20261018-014134-2700071915.json",
+      "20261018-014448-2700072487.json",
+      "20261018-014711-2700074258.json",
+      "20261018-014836-2700075160.json",
+      "20261018-015255-2700075753.json",
+      "20261018-015441-2700077836.json",
+      "20261018-015722-xqkdwaqq6mgp29wjawo9hye1ormwguwpw.json",
+      "20261018-020045-2700080224.json",
+      "20261018-020202-2700081521.json",
+      "20261018-020438-2700082125.json",
+      "20261018-020620-2700083346.json",
+      "20261018-020849-gswhf273a9yd3qnwyn5nn8mbcof6hyypw.json",
+      "20261018-021112-2700085386.json",
+      "20261018-021333-2700086464.json",
+      "20261018-021624-2700087604.json",
+      "20261018-021838-2700088985.json"
+    ],
+    "no_unseen_test": true
+  },
+  "models": {
+    "rank": {
+      "rank": {
+        "epoch": 3,
+        "development": {
+          "regret": 0.078125,
+          "positions": 16,
+          "battles": 16
+        }
+      },
+      "value": {
+        "selection": {
+          "best_epoch": 1,
+          "best_dev_log_loss": 0.44868411662094404
+        },
+        "development_brier_before": 0.17510314285755157,
+        "development_brier_after": 0.16283440589904785
+      },
+      "counts": {
+        "counterfactual-root+planned-continuation": 13387,
+        "unknown-root+planned-continuation": 1732
+      },
+      "gate": {
+        "passed": false,
+        "reason": "no untouched calibration cohort; development fit is not adoption evidence"
+      },
+      "policy": {
+        "path": "ours.json",
+        "sha": "db7acdc07d3b5d30"
+      },
+      "stages": {
+        "branch": {
+          "checkpoint": "value.pt",
+          "sha": "cf9809d6d97e182d"
+        }
+      },
+      "report_sha": "5d51f2dbb7af2ff567cc37f1b0c8c18268aad23262610bb9ab8023eeccb7435e",
+      "reference": {
+        "own": "planned",
+        "opponent_pool": [
+          "planned/tactical",
+          "planned/disrupt",
+          "planned/expert"
+        ],
+        "version": "public-plans-v1"
+      }
+    },
+    "on_policy": {
+      "rank": {
+        "epoch": 0,
+        "development": {
+          "regret": 0.17708333333333334,
+          "positions": 16,
+          "battles": 16
+        }
+      },
+      "value": {
+        "selection": {
+          "best_epoch": 1,
+          "best_dev_log_loss": 0.5165374452810836
+        },
+        "development_brier_before": 0.19026502966880798,
+        "development_brier_after": 0.1657867431640625
+      },
+      "counts": {
+        "counterfactual-root+learned-policy-continuation": 15990,
+        "unknown-root+learned-policy-continuation": 2385
+      },
+      "gate": {
+        "passed": false,
+        "reason": "no untouched calibration cohort; development fit is not adoption evidence"
+      },
+      "policy": {
+        "path": "ours.json",
+        "sha": "db7acdc07d3b5d30"
+      },
+      "stages": {
+        "branch": {
+          "checkpoint": "value.pt",
+          "sha": "341d7d0a97be5210"
+        }
+      },
+      "report_sha": "12271c1a664dbc6fc498b04a2710df8c2443fefa4a2e6d0b86cfba1aeac475e0",
+      "reference": {
+        "own": "planned",
+        "opponent_pool": [
+          "planned/tactical",
+          "planned/disrupt",
+          "planned/expert"
+        ],
+        "version": "public-plans-v1+net:db7acdc07d3b5d30ea6f0ac8afd6bcde58cef5cb285a4b3752dee5c15abecd71",
+        "policy_sha": "db7acdc07d3b5d30ea6f0ac8afd6bcde58cef5cb285a4b3752dee5c15abecd71"
+      }
+    }
+  },
+  "ablation": [
+    {
+      "record": "20261018-021112-2700085386.json",
+      "sha": "1e6e99dfe432661f4911c6e403995acf1c986157b4d590edf9e662d7f5b5ab8a",
+      "turn": 4,
+      "worker_code_sha": "49504d7eb38ccddb5d7d793a44d5bb327479b29cecaeca118f7a38a6440ba2ef",
+      "python_code_sha": "dc5ae31cb36b301c6a0c241756d47c298bea623e6f0f5105380cc78c2f033ba2",
+      "prior_sha": "a599610bd0dc8c4870fd3404e89a9a822ef3e22d18194168e6b53ba788d0cad7",
+      "variants": {
+        "wide-hp": {
+          "chosen": "move:moonblast",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonblast",
+            "expected": -0.04155347852414922,
+            "worst": -0.0814615798870296,
+            "utility": -0.05352590893301333,
+            "sampling_error": 0.27322879291459146,
+            "trials": 22,
+            "acts_first": 0.6451921246878238,
+            "acts_first_range": [
+              0.29038432342503856,
+              0.9999999259506092
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 152,
+          "focused_actions": null
+        },
+        "wide-no-hp": {
+          "chosen": "move:moonblast",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonblast",
+            "expected": 0.10294406680969065,
+            "worst": 0.06382966701848664,
+            "utility": 0.09120974687232944,
+            "sampling_error": 0.259090797158752,
+            "trials": 55,
+            "acts_first": 0.500002126337731,
+            "acts_first_range": [
+              4.32672485271068e-06,
+              0.9999999259506093
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 213,
+          "focused_actions": null
+        },
+        "strict": {
+          "chosen": "move:moonblast",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonblast",
+            "expected": 0.18513049078516497,
+            "worst": 0.17615127261075544,
+            "utility": 0.1824367253328421,
+            "sampling_error": 0.259090797158752,
+            "trials": 56,
+            "acts_first": 0.07580969966717163,
+            "acts_first_range": [
+              7.200581527427338e-06,
+              0.15161219875281584
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 226,
+          "focused_actions": null
+        },
+        "narrow": {
+          "chosen": "move:moonblast",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonblast",
+            "expected": 0.08875509906382201,
+            "worst": 0.05341449839644785,
+            "utility": 0.07815291886360975,
+            "sampling_error": 0.259090797158752,
+            "trials": 48,
+            "acts_first": 0.9999999110184431,
+            "acts_first_range": [
+              0.999999896086277,
+              0.9999999259506092
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 202,
+          "focused_actions": null
+        },
+        "focused": {
+          "chosen": "move:moonblast",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonblast",
+            "expected": 0.10254357312363041,
+            "worst": 0.06382966701848664,
+            "utility": 0.09092940129208726,
+            "sampling_error": 0.259090797158752,
+            "trials": 51,
+            "acts_first": 0.5000025220244958,
+            "acts_first_range": [
+              5.11809838233917e-06,
+              0.9999999259506092
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 209,
+          "focused_actions": null
+        },
+        "focused-plans": {
+          "chosen": "move:moonblast",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonblast",
+            "expected": 0.0314795408669764,
+            "worst": -0.02437892658050237,
+            "utility": 0.01472200063273277,
+            "sampling_error": 0.2684412093857302,
+            "trials": 37,
+            "acts_first": 0.9999997729491741,
+            "acts_first_range": [
+              0.9999996199477389,
+              0.9999999259506092
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 206,
+          "focused_actions": null
+        }
+      }
+    },
+    {
+      "record": "20261018-020620-2700083346.json",
+      "sha": "b1c0bb490f9f319d21755193e560f2fdfbe74ebd2fd36903157fd0435bc65ac7",
+      "turn": 5,
+      "worker_code_sha": "49504d7eb38ccddb5d7d793a44d5bb327479b29cecaeca118f7a38a6440ba2ef",
+      "python_code_sha": "dc5ae31cb36b301c6a0c241756d47c298bea623e6f0f5105380cc78c2f033ba2",
+      "prior_sha": "a599610bd0dc8c4870fd3404e89a9a822ef3e22d18194168e6b53ba788d0cad7",
+      "variants": {
+        "wide-hp": {
+          "chosen": "move:snarl",
+          "terminal": {
+            "win": 3,
+            "loss": 9,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.25,
+            "target_bounds": [
+              0.25,
+              0.25
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 1,
+                "loss": 3,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.25,
+                "target_bounds": [
+                  0.25,
+                  0.25
+                ]
+              },
+              "planned/expert": {
+                "win": 1,
+                "loss": 3,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.25,
+                "target_bounds": [
+                  0.25,
+                  0.25
+                ]
+              },
+              "planned/tactical": {
+                "win": 1,
+                "loss": 3,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.25,
+                "target_bounds": [
+                  0.25,
+                  0.25
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:snarl",
+            "expected": -0.4399649731948584,
+            "worst": -0.5655700660485432,
+            "utility": -0.4776465010509638,
+            "sampling_error": 0.24296623605928852,
+            "trials": 37,
+            "acts_first": 0.0,
+            "acts_first_range": [
+              0.0,
+              0.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 216,
+          "focused_actions": null
+        },
+        "wide-no-hp": {
+          "chosen": "move:moonlight",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonlight",
+            "expected": -0.4376284722833089,
+            "worst": -0.5583094062643734,
+            "utility": -0.47383275247762824,
+            "sampling_error": 0.2818702633028458,
+            "trials": 54,
+            "acts_first": 0.0,
+            "acts_first_range": [
+              0.0,
+              0.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 248,
+          "focused_actions": null
+        },
+        "strict": {
+          "chosen": "move:calmmind",
+          "terminal": {
+            "win": 6,
+            "loss": 6,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.5,
+            "target_bounds": [
+              0.5,
+              0.5
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/expert": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/tactical": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:calmmind",
+            "expected": -0.42627956889306207,
+            "worst": -0.5522107330255284,
+            "utility": -0.464058918132802,
+            "sampling_error": 0.2790628626101105,
+            "trials": 92,
+            "acts_first": 0.0,
+            "acts_first_range": [
+              0.0,
+              0.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 232,
+          "focused_actions": null
+        },
+        "narrow": {
+          "chosen": "move:calmmind",
+          "terminal": {
+            "win": 6,
+            "loss": 6,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.5,
+            "target_bounds": [
+              0.5,
+              0.5
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/expert": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/tactical": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:calmmind",
+            "expected": -0.3891632238718404,
+            "worst": -0.5522107330255284,
+            "utility": -0.4380774766179467,
+            "sampling_error": 0.2536344369320268,
+            "trials": 89,
+            "acts_first": 0.0,
+            "acts_first_range": [
+              0.0,
+              0.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 253,
+          "focused_actions": null
+        },
+        "focused": {
+          "chosen": "move:calmmind",
+          "terminal": {
+            "win": 6,
+            "loss": 6,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.5,
+            "target_bounds": [
+              0.5,
+              0.5
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/expert": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/tactical": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:calmmind",
+            "expected": -0.37937303989006255,
+            "worst": -0.48284579559703444,
+            "utility": -0.4104148666021541,
+            "sampling_error": 0.28465227535488524,
+            "trials": 90,
+            "acts_first": 0.0,
+            "acts_first_range": [
+              0.0,
+              0.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 247,
+          "focused_actions": [
+            2,
+            0
+          ]
+        },
+        "focused-plans": {
+          "chosen": "move:snarl",
+          "terminal": {
+            "win": 3,
+            "loss": 9,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.25,
+            "target_bounds": [
+              0.25,
+              0.25
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 1,
+                "loss": 3,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.25,
+                "target_bounds": [
+                  0.25,
+                  0.25
+                ]
+              },
+              "planned/expert": {
+                "win": 1,
+                "loss": 3,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.25,
+                "target_bounds": [
+                  0.25,
+                  0.25
+                ]
+              },
+              "planned/tactical": {
+                "win": 1,
+                "loss": 3,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.25,
+                "target_bounds": [
+                  0.25,
+                  0.25
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:snarl",
+            "expected": -0.2783044455049292,
+            "worst": -0.3272560995644594,
+            "utility": -0.29298994172278825,
+            "sampling_error": 0.22923650847003668,
+            "trials": 76,
+            "acts_first": 0.0,
+            "acts_first_range": [
+              0.0,
+              0.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 231,
+          "focused_actions": [
+            0,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "record": "20261018-020849-gswhf273a9yd3qnwyn5nn8mbcof6hyypw.json",
+      "sha": "b6a0677407f3ba6920c1973bda78aff024f7e5303f1daa84e304a1134e8cf3cb",
+      "turn": 7,
+      "worker_code_sha": "49504d7eb38ccddb5d7d793a44d5bb327479b29cecaeca118f7a38a6440ba2ef",
+      "python_code_sha": "dc5ae31cb36b301c6a0c241756d47c298bea623e6f0f5105380cc78c2f033ba2",
+      "prior_sha": "a599610bd0dc8c4870fd3404e89a9a822ef3e22d18194168e6b53ba788d0cad7",
+      "variants": {
+        "wide-hp": {
+          "chosen": "move:protect",
+          "terminal": {
+            "win": 12,
+            "loss": 0,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 1.0,
+            "target_bounds": [
+              1.0,
+              1.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/expert": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:protect",
+            "expected": 0.49882389209166567,
+            "worst": 0.36585030849489353,
+            "utility": 0.45893181701263397,
+            "sampling_error": 0.17506513014955288,
+            "trials": 176,
+            "acts_first": 0.7652621183946058,
+            "acts_first_range": [
+              0.5564651862017389,
+              0.9740590505874727
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 313,
+          "focused_actions": null
+        },
+        "wide-no-hp": {
+          "chosen": "move:protect",
+          "terminal": {
+            "win": 12,
+            "loss": 0,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 1.0,
+            "target_bounds": [
+              1.0,
+              1.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/expert": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:protect",
+            "expected": 0.42233526086333184,
+            "worst": 0.22081670323811933,
+            "utility": 0.3618796935757681,
+            "sampling_error": 0.17460927895505451,
+            "trials": 187,
+            "acts_first": 0.3461090068119872,
+            "acts_first_range": [
+              0.2805440632323632,
+              0.41167395039161125
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 339,
+          "focused_actions": null
+        },
+        "strict": {
+          "chosen": "move:protect",
+          "terminal": {
+            "win": 12,
+            "loss": 0,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 1.0,
+            "target_bounds": [
+              1.0,
+              1.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/expert": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:protect",
+            "expected": 0.4303673174986997,
+            "worst": 0.30976595098066245,
+            "utility": 0.39418690754328856,
+            "sampling_error": 0.16512497448005353,
+            "trials": 207,
+            "acts_first": 0.7225553267522425,
+            "acts_first_range": [
+              0.4451107940935375,
+              0.9999998594109476
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 369,
+          "focused_actions": null
+        },
+        "narrow": {
+          "chosen": "move:protect",
+          "terminal": {
+            "win": 12,
+            "loss": 0,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 1.0,
+            "target_bounds": [
+              1.0,
+              1.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/expert": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:protect",
+            "expected": 0.44565637287240056,
+            "worst": 0.4075863933923821,
+            "utility": 0.43423537902839504,
+            "sampling_error": 0.16420403036456346,
+            "trials": 208,
+            "acts_first": 0.567281834131486,
+            "acts_first_range": [
+              0.1728302477048337,
+              0.9617334205581383
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 379,
+          "focused_actions": null
+        },
+        "focused": {
+          "chosen": "move:protect",
+          "terminal": {
+            "win": 12,
+            "loss": 0,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 1.0,
+            "target_bounds": [
+              1.0,
+              1.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/expert": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:protect",
+            "expected": 0.402281982285293,
+            "worst": 0.25662000887573894,
+            "utility": 0.3585833902624268,
+            "sampling_error": 0.1658596903613183,
+            "trials": 200,
+            "acts_first": 0.4383208026703519,
+            "acts_first_range": [
+              0.30012436107432844,
+              0.5765172442663753
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 378,
+          "focused_actions": [
+            1,
+            2
+          ]
+        },
+        "focused-plans": {
+          "chosen": "move:protect",
+          "terminal": {
+            "win": 12,
+            "loss": 0,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 1.0,
+            "target_bounds": [
+              1.0,
+              1.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/expert": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:protect",
+            "expected": 0.40943443213366804,
+            "worst": 0.2993629167935483,
+            "utility": 0.3764129775316321,
+            "sampling_error": 0.1761650180583807,
+            "trials": 191,
+            "acts_first": 0.3224189627981939,
+            "acts_first_range": [
+              0.26141876658189095,
+              0.3834191590144968
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 364,
+          "focused_actions": [
+            1,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "record": "20261018-021333-2700086464.json",
+      "sha": "f33f5364cd429d2f50db9cdb92c821a425954e4dfe5c4871593289794a6d8c79",
+      "turn": 2,
+      "worker_code_sha": "49504d7eb38ccddb5d7d793a44d5bb327479b29cecaeca118f7a38a6440ba2ef",
+      "python_code_sha": "dc5ae31cb36b301c6a0c241756d47c298bea623e6f0f5105380cc78c2f033ba2",
+      "prior_sha": "a599610bd0dc8c4870fd3404e89a9a822ef3e22d18194168e6b53ba788d0cad7",
+      "variants": {
+        "wide-hp": {
+          "chosen": "move:moonblast",
+          "terminal": {
+            "win": 6,
+            "loss": 6,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.5,
+            "target_bounds": [
+              0.5,
+              0.5
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/expert": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/tactical": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonblast",
+            "expected": -0.05030907456034492,
+            "worst": -0.47011322090693547,
+            "utility": -0.1762503184643221,
+            "sampling_error": 0.3093521690915211,
+            "trials": 39,
+            "acts_first": 0.005315822768163626,
+            "acts_first_range": [
+              0.0,
+              0.010631645536327252
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 216,
+          "focused_actions": null
+        },
+        "wide-no-hp": {
+          "chosen": "move:calmmind",
+          "terminal": {
+            "win": 6,
+            "loss": 6,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.5,
+            "target_bounds": [
+              0.5,
+              0.5
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/expert": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              },
+              "planned/tactical": {
+                "win": 2,
+                "loss": 2,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.5,
+                "target_bounds": [
+                  0.5,
+                  0.5
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:calmmind",
+            "expected": -0.07016787279170741,
+            "worst": -0.4866286042380978,
+            "utility": -0.19510609222562453,
+            "sampling_error": 0.29274455152611334,
+            "trials": 42,
+            "acts_first": 0.0617494926102262,
+            "acts_first_range": [
+              0.0,
+              0.1234989852204524
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 228,
+          "focused_actions": null
+        },
+        "strict": {
+          "chosen": "switch:umbreon",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "switch:umbreon",
+            "expected": -0.13218211256887097,
+            "worst": -0.29582017396838334,
+            "utility": -0.18127353098872467,
+            "sampling_error": 0.261382487032718,
+            "trials": 34,
+            "acts_first": 0.8813929304928991,
+            "acts_first_range": [
+              0.7627862787423622,
+              0.999999582243436
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 201,
+          "focused_actions": null
+        },
+        "narrow": {
+          "chosen": "switch:umbreon",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "switch:umbreon",
+            "expected": -0.02215513826559158,
+            "worst": -0.17820220132240822,
+            "utility": -0.06896925718263656,
+            "sampling_error": 0.261382487032718,
+            "trials": 57,
+            "acts_first": 0.582947835129088,
+            "acts_first_range": [
+              0.16590795362328276,
+              0.9999877166348933
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 215,
+          "focused_actions": null
+        },
+        "focused": {
+          "chosen": "switch:umbreon",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "switch:umbreon",
+            "expected": -0.018577074817262035,
+            "worst": -0.21645779836055418,
+            "utility": -0.07794129188024967,
+            "sampling_error": 0.261382487032718,
+            "trials": 35,
+            "acts_first": 0.7081115258913563,
+            "acts_first_range": [
+              0.4162677013779863,
+              0.9999553504047263
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 213,
+          "focused_actions": null
+        },
+        "focused-plans": {
+          "chosen": "switch:umbreon",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "switch:umbreon",
+            "expected": -0.1514321874841339,
+            "worst": -0.32317028390344904,
+            "utility": -0.20295361640992843,
+            "sampling_error": 0.24388474658340403,
+            "trials": 63,
+            "acts_first": 0.9999931833216784,
+            "acts_first_range": [
+              0.9999926087367407,
+              0.999993757906616
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 224,
+          "focused_actions": null
+        }
+      }
+    },
+    {
+      "record": "20261018-021333-2700086464.json",
+      "sha": "f33f5364cd429d2f50db9cdb92c821a425954e4dfe5c4871593289794a6d8c79",
+      "turn": 5,
+      "worker_code_sha": "49504d7eb38ccddb5d7d793a44d5bb327479b29cecaeca118f7a38a6440ba2ef",
+      "python_code_sha": "dc5ae31cb36b301c6a0c241756d47c298bea623e6f0f5105380cc78c2f033ba2",
+      "prior_sha": "a599610bd0dc8c4870fd3404e89a9a822ef3e22d18194168e6b53ba788d0cad7",
+      "variants": {
+        "wide-hp": {
+          "chosen": "move:moonlight",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:moonlight",
+            "expected": -0.5770053056445148,
+            "worst": -0.5821214345121581,
+            "utility": -0.5785401443048077,
+            "sampling_error": 0.21054383379403596,
+            "trials": 37,
+            "acts_first": 0.9999999555703656,
+            "acts_first_range": [
+              0.9999999555703655,
+              0.9999999555703656
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 253,
+          "focused_actions": null
+        },
+        "wide-no-hp": {
+          "chosen": "switch:skeledirge",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "switch:skeledirge",
+            "expected": -0.5800947338866821,
+            "worst": -0.5933323628304408,
+            "utility": -0.5840660225698097,
+            "sampling_error": 0.24972593025916506,
+            "trials": 32,
+            "acts_first": 1.0,
+            "acts_first_range": [
+              1.0,
+              1.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 250,
+          "focused_actions": null
+        },
+        "strict": {
+          "chosen": "move:batonpass",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:batonpass",
+            "expected": -0.5350313505446186,
+            "worst": -0.5397415393103911,
+            "utility": -0.5364444071743504,
+            "sampling_error": 0.217771333755579,
+            "trials": 29,
+            "acts_first": 0.9999999555703655,
+            "acts_first_range": [
+              0.9999999555703655,
+              0.9999999555703655
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 253,
+          "focused_actions": null
+        },
+        "narrow": {
+          "chosen": "switch:skeledirge",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "switch:skeledirge",
+            "expected": -0.5121607854126038,
+            "worst": -0.560804602665719,
+            "utility": -0.5267539305885383,
+            "sampling_error": 0.2407880972089344,
+            "trials": 34,
+            "acts_first": 1.0,
+            "acts_first_range": [
+              1.0,
+              1.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 253,
+          "focused_actions": null
+        },
+        "focused": {
+          "chosen": "switch:skeledirge",
+          "terminal": {
+            "win": 0,
+            "loss": 12,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.0,
+            "target_bounds": [
+              0.0,
+              0.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "switch:skeledirge",
+            "expected": -0.5118119170484788,
+            "worst": -0.560804602665719,
+            "utility": -0.5265097227336508,
+            "sampling_error": 0.2407880972089344,
+            "trials": 34,
+            "acts_first": 1.0,
+            "acts_first_range": [
+              0.9999999999999999,
+              1.0
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 255,
+          "focused_actions": null
+        },
+        "focused-plans": {
+          "chosen": "move:calmmind",
+          "terminal": {
+            "win": 4,
+            "loss": 8,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.3333333333333333,
+            "target_bounds": [
+              0.3333333333333333,
+              0.3333333333333333
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/expert": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 0,
+                "loss": 4,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.0,
+                "target_bounds": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:calmmind",
+            "expected": -0.5387345004029844,
+            "worst": -0.5731820220799415,
+            "utility": -0.5490687569060715,
+            "sampling_error": 0.20899063075140556,
+            "trials": 108,
+            "acts_first": 0.9999999555703655,
+            "acts_first_range": [
+              0.9999999555703654,
+              0.9999999555703656
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 254,
+          "focused_actions": [
+            2,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "record": "20261018-012545-2700062873.json",
+      "sha": "032a1f6b3dfcf36df9d11ca2d948a6ebae93ede94293dd2c8247059b53f10c00",
+      "turn": 8,
+      "worker_code_sha": "49504d7eb38ccddb5d7d793a44d5bb327479b29cecaeca118f7a38a6440ba2ef",
+      "python_code_sha": "dc5ae31cb36b301c6a0c241756d47c298bea623e6f0f5105380cc78c2f033ba2",
+      "prior_sha": "a599610bd0dc8c4870fd3404e89a9a822ef3e22d18194168e6b53ba788d0cad7",
+      "variants": {
+        "wide-hp": {
+          "chosen": "move:slackoff",
+          "terminal": {
+            "win": 12,
+            "loss": 0,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 1.0,
+            "target_bounds": [
+              1.0,
+              1.0
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/expert": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "planned/tactical": {
+                "win": 4,
+                "loss": 0,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 1.0,
+                "target_bounds": [
+                  1.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:slackoff",
+            "expected": 0.8713946036927962,
+            "worst": 0.8391301583359785,
+            "utility": 0.8617152700857509,
+            "sampling_error": 0.14127148283281832,
+            "trials": 60,
+            "acts_first": 0.531339972747191,
+            "acts_first_range": [
+              0.19078715057816747,
+              0.8718927949162145
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 435,
+          "focused_actions": null
+        },
+        "wide-no-hp": {
+          "chosen": "move:willowisp",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:willowisp",
+            "expected": 0.90580394965492,
+            "worst": 0.9041005291005291,
+            "utility": 0.9052929234886027,
+            "sampling_error": 0.07190469022878379,
+            "trials": 189,
+            "acts_first": 0.5632658877992361,
+            "acts_first_range": [
+              0.44009442215432404,
+              0.6864373534441482
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 453,
+          "focused_actions": null
+        },
+        "strict": {
+          "chosen": "move:willowisp",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:willowisp",
+            "expected": 0.9411420702284693,
+            "worst": 0.941137566137566,
+            "utility": 0.9411407190011982,
+            "sampling_error": 0.059272305675258714,
+            "trials": 189,
+            "acts_first": 0.6971591621582225,
+            "acts_first_range": [
+              0.39693762641088914,
+              0.997380697905556
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 462,
+          "focused_actions": null
+        },
+        "narrow": {
+          "chosen": "move:willowisp",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:willowisp",
+            "expected": 0.9411420702284693,
+            "worst": 0.941137566137566,
+            "utility": 0.9411407190011982,
+            "sampling_error": 0.059272305675258714,
+            "trials": 189,
+            "acts_first": 0.6971591621582225,
+            "acts_first_range": [
+              0.39693762641088914,
+              0.997380697905556
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 462,
+          "focused_actions": null
+        },
+        "focused": {
+          "chosen": "move:willowisp",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:willowisp",
+            "expected": 0.8987314633414406,
+            "worst": 0.8964615384615384,
+            "utility": 0.8980504858774698,
+            "sampling_error": 0.07737292390356025,
+            "trials": 175,
+            "acts_first": 0.3610780475277534,
+            "acts_first_range": [
+              0.35850128640212436,
+              0.3636548086533824
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 433,
+          "focused_actions": [
+            1,
+            3
+          ]
+        },
+        "focused-plans": {
+          "chosen": "move:willowisp",
+          "terminal": {
+            "win": 9,
+            "loss": 3,
+            "draw": 0,
+            "unfinished": 0,
+            "failed": 0,
+            "trials": 12,
+            "terminal": 12,
+            "terminal_mean": 0.75,
+            "target_bounds": [
+              0.75,
+              0.75
+            ],
+            "by_continuation": {
+              "planned/disrupt": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/expert": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              },
+              "planned/tactical": {
+                "win": 3,
+                "loss": 1,
+                "draw": 0,
+                "unfinished": 0,
+                "failed": 0,
+                "trials": 4,
+                "terminal": 4,
+                "terminal_mean": 0.75,
+                "target_bounds": [
+                  0.75,
+                  0.75
+                ]
+              }
+            }
+          },
+          "selected_evidence": {
+            "label": "move:willowisp",
+            "expected": 0.9014755699086354,
+            "worst": 0.9004273504273503,
+            "utility": 0.9011611040642498,
+            "sampling_error": 0.07453895079770756,
+            "trials": 181,
+            "acts_first": 0.4939245791503918,
+            "acts_first_range": [
+              0.30778201802318667,
+              0.6800671402775968
+            ],
+            "order_scope": "sampled-sets-and-predicted-replies; priority-and-ties-in-engine"
+          },
+          "simulations": 441,
+          "focused_actions": [
+            1,
+            3
+          ]
+        }
+      }
+    }
+  ],
+  "local_integration": {
+    "result": "win",
+    "decisions": 8,
+    "random": 0,
+    "errors": 0,
+    "selection": {
+      "version": "preview-continuations-v1",
+      "profile": "159f0dce6d536f7a",
+      "policy": "public-plans-v1",
+      "score_kind": "sampled-public-continuation-utility",
+      "calibrated_win_probability": false,
+      "candidates": [
+        {
+          "lineup": [
+            "Gholdengo",
+            "Floette-Eternal",
+            "Skeledirge"
+          ],
+          "trials": 12,
+          "terminal": 12,
+          "failed": 0,
+          "target_bounds": [
+            1.0,
+            1.0
+          ],
+          "utility": 1.0
+        },
+        {
+          "lineup": [
+            "Floette-Eternal",
+            "Gholdengo",
+            "Skeledirge"
+          ],
+          "trials": 12,
+          "terminal": 12,
+          "failed": 0,
+          "target_bounds": [
+            0.25,
+            0.25
+          ],
+          "utility": 0.175
+        },
+        {
+          "lineup": [
+            "Gholdengo",
+            "Scolipede",
+            "Floette-Eternal"
+          ],
+          "trials": 12,
+          "terminal": 12,
+          "failed": 0,
+          "target_bounds": [
+            0.4166666666666667,
+            0.4166666666666667
+          ],
+          "utility": 0.2916666666666667
+        },
+        {
+          "lineup": [
+            "Gholdengo",
+            "Salamence",
+            "Floette-Eternal"
+          ],
+          "trials": 12,
+          "terminal": 12,
+          "failed": 0,
+          "target_bounds": [
+            0.5833333333333334,
+            0.5833333333333334
+          ],
+          "utility": 0.4083333333333333
+        }
+      ],
+      "worlds": 4,
+      "opponent_hypotheses": [
+        [
+          "Sylveon",
+          "Ceruledge",
+          "Tyranitar"
+        ],
+        [
+          "Bellibolt",
+          "Salamence",
+          "Tyranitar"
+        ],
+        [
+          "Salamence",
+          "Bellibolt",
+          "Sylveon"
+        ],
+        [
+          "Ceruledge",
+          "Sylveon",
+          "Corviknight"
+        ]
+      ],
+      "unknown_outcomes": "bounds-only; never training loss labels"
+    }
+  },
+  "quality_stop_replay": {
+    "case": "2700182186 T21",
+    "original_sha": "e470ca44ce44a21167412cbbeb088c35e44e323e0d7710ad6c2b8ea3244cafae",
+    "actions": [
+      [
+        "move:synthesis",
+        1.0
+      ],
+      [
+        "move:moonblast",
+        0.0
+      ],
+      [
+        "move:substitute",
+        0.0
+      ],
+      [
+        "move:calmmind",
+        0.0
+      ]
+    ],
+    "failed": 0,
+    "fallback": null
+  },
+  "validation": {
+    "pytest": {
+      "passed": 479
+    },
+    "ruff": "passed",
+    "node_syntax": "passed",
+    "diff_check": "passed"
+  }
+}

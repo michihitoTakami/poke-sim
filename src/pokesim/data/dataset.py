@@ -23,6 +23,7 @@ def observation_code() -> dict:
         "sim/effectiveness.py",
         "sim/formes.py",
         "live/session.py",
+        "live/provenance.py",
         "state/codec.py",
         "state/tracker.py",
     ]

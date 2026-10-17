@@ -1,9 +1,15 @@
 // Simulator reconstruction boundary. Explicit fields carry known/sample state; unknown counters stay sampled.
 const path = require('path');
-const VERSION = 'observed-state-v2';
+const VERSION = 'observed-state-v3';
 
 function createCodec(dir) {
-  const { Battle, Teams } = require(path.resolve(dir, 'dist/sim'));
+  const { Battle, Teams, Pokemon } = require(path.resolve(dir, 'dist/sim'));
+  function startBattle(sample, format, seed) {
+    const battle = new Battle({formatid: format, seed: [seed, seed + 1, seed + 2, seed + 3]});
+    for (const id of ['p1', 'p2']) battle.setPlayer(id, {name: id, team: Teams.pack(sample[id].team)});
+    battle.choose('p1', 'team 123'); battle.choose('p2', 'team 123');
+    return battle;
+  }
   function setUp(sample, format, seed) {
     const battle = new Battle({ formatid: format, seed: [seed, seed + 1, seed + 2, seed + 3] });
     // Current items override the team sheet before entry events. Restoring them afterwards resurrects
@@ -26,6 +32,22 @@ function createCodec(dir) {
       side.totalFainted = totalFainted;
       side.pokemon.forEach((mon, i) => {
         const s = spec.mons[i] || {};
+        if (s.transform) {
+          const copy = s.transform, source = sample[copy.sourceSide];
+          const original = battle.dex.species.get(copy.sourceSpecies);
+          const sourceId = battle.toID ? battle.toID(original.battleOnly || original.name) :
+            String(original.battleOnly || original.name).toLowerCase().replace(/[^a-z0-9]/g, '');
+          const template = source?.team.find(t => battle.dex.species.get(t.species).id === sourceId) ||
+            (Object.keys(copy.stats || {}).length === 5 ? {level: 50, moves: copy.moves, ability: copy.ability} : null);
+          if (!template) throw Error('Transform source missing from sampled selected team');
+          const moves = [...new Set([...(copy.moves || []), ...template.moves.map(m => String(m).toLowerCase().replace(/[^a-z0-9]/g, ''))])].slice(0, 4);
+          if (mon.transformed) mon.clearVolatile();
+          const target = new Pokemon({...template, species: copy.species, moves,
+            ability: copy.ability || template.ability}, side);
+          if (!mon.transformInto(target)) throw Error('Observed Transform could not be restored');
+          Object.assign(mon.storedStats, copy.stats || {});
+          mon.canMegaEvo = null;
+        }
         if (s.forme) {
           // An observed forme is a fact, independent of the sampled original item (notably X/Y/Z).
           const forme = battle.dex.species.get(s.forme);
@@ -40,7 +62,11 @@ function createCodec(dir) {
         if (spec.megaUsed) mon.canMegaEvo = null;
         // This ability's entry multiplier depends on previous faints. Setup entry ran before the roster was
         // restored; future real entries still run the simulator's onStart normally.
-        if (mon.isActive && mon.ability === 'supremeoverlord') mon.abilityState.fallen = Math.min(totalFainted, 5);
+        if (mon.isActive && mon.ability === 'supremeoverlord') {
+          const fallen = s.fallen ?? Math.min(totalFainted, 5);
+          if (!Number.isInteger(fallen) || fallen < 0 || fallen > 5) throw new Error('Invalid public fallen count');
+          mon.abilityState.fallen = fallen;
+        }
         if (s.hp !== undefined && s.hp <= 0) {
           mon.hp = 0; mon.fainted = true; mon.status = 'fnt'; side.pokemonLeft--;
           return;
@@ -187,6 +213,6 @@ function createCodec(dir) {
     return battle;
   }
 
-  return {setUp};
+  return {setUp, startBattle};
 }
 module.exports = {createCodec, VERSION};

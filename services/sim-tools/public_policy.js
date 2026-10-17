@@ -17,7 +17,7 @@ function choosePublic(view, name, dex, baton = false) {
   const foe = view.public.mons[foeSide][view.public.active[foeSide]];
   if (!foe) return opts[0];
   const spec = m => dex.species.get(m.details ? m.details.split(',')[0] : m.species);
-  const publicMon = m => Object.values(view.public.mons[side]).find(p => spec(p).baseSpecies === spec(m).baseSpecies);
+  const publicMon = m => m.active ? view.public.mons[side][view.public.active[side]] : Object.values(view.public.mons[side]).find(p => spec(p).baseSpecies === spec(m).baseSpecies);
   const boosts = m => baton && m !== foe && !m.active ? {} : (m === foe ? foe : publicMon(m))?.boosts || {};
   const stat = (m, s, projected) => {
     const base = spec(m).baseStats[s];
@@ -53,8 +53,14 @@ function choosePublic(view, name, dex, baton = false) {
     if (Array.isArray(move.multihit)) power *= 3; else power *= move.multihit || 1;
     if (baton && target.ability === 'unaware') sourceBoosts = {};
     if (baton && source.ability === 'unaware') targetBoosts = {};
+    const focus = baton && source === foe && (foe.volatiles.includes('focusenergy') || move.willCrit);
+    if (focus) {
+      sourceBoosts = Object.fromEntries(Object.entries(sourceBoosts || boosts(source)).map(([s, n]) => [s, Math.max(0, n)]));
+      targetBoosts = Object.fromEntries(Object.entries(targetBoosts || boosts(target)).map(([s, n]) => [s, Math.min(0, n)]));
+    }
     let result = ((22 * power * stat(source, physical ? 'atk' : 'spa', sourceBoosts) /
       Math.max(1, stat(target, physical ? 'def' : 'spd', targetBoosts))) / 50 + 2) * .925;
+    if (focus) result *= 1.5;
     if (spec(source).types.includes(move.type)) result *= 1.5;
     result *= 2 ** dex.getEffectiveness(move.type, types);
     if (physical && health(source.condition).status === 'brn') result *= .5;
@@ -121,7 +127,7 @@ function choosePublic(view, name, dex, baton = false) {
   const best = moves.reduce((a, b) => b.damage > a.damage ? b : a);
   if (name === 'greedy') return finish(best);
   const hit = incoming(me), currentHp = hp(me), maximum = maxhp(me);
-  if (best.damage >= hp(foe)) return finish(best);
+  if (best.damage >= hp(foe) && (!baton || faster(me) || hit < currentHp || best.move.priority > 0)) return finish(best);
   if (baton && name === 'expert' && pick('batonpass') && passTargets.length) {
     const pass = pick('batonpass'), sub = pick('substitute'), protect = pick('protect') || pick('detect');
     const gained = Object.values(knownMe.boosts).reduce((s, b) => s + Math.max(0, b), 0);
@@ -178,7 +184,8 @@ function choosePublic(view, name, dex, baton = false) {
   const encoreRisk = foe.moves.includes('encore') || foe.volatiles.includes('encore');
   if (pass && gained >= 2 && switches.some(s => bestDamage(s.mon) > 0) &&
       (hit * 2 >= currentHp || encoreRisk || (knownMe.boosts.spe || 0) >= 2)) return finish(pass);
-  if (setup && !encoreRisk && hit * 3 < currentHp && best.damage * 2 < hp(foe)) return finish(setup);
+  const criticalDefence = baton && foe.volatiles.includes('focusenergy') && setup?.move.boosts?.spd;
+  if (setup && !criticalDefence && !encoreRisk && hit * 3 < currentHp && best.damage * 2 < hp(foe)) return finish(setup);
   if (pass && gained >= 2 && switches.length) return finish(pass);
   const protect = pick('protect');
   if (pass && protect && (knownMe.boosts.spe || 0) < 2 && knownMe.lastMove !== 'protect') return finish(protect);

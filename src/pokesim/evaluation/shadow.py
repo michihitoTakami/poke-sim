@@ -249,7 +249,12 @@ def position(rec: dict, sets: list[dict], turn: int):
 
     session = BattleSession(sets)
     session.preview(rec["preview"]["species"])
-    session.select([next(i for i, s in enumerate(sets) if to_id(s["species"]) == to_id(x)) for x in rec["lineup"]])
+    from pokesim.live.provenance import base, reconstruction_lineup
+
+    lineup, info = reconstruction_lineup(rec, turn)
+    if not info['complete'] and info['evidence'] == 'partial_public_reveals':
+        raise ValueError('actual selected three unknown; terminal comparisons require a complete private lineup')
+    session.select([next(i for i, s in enumerate(sets) if base(s['species']) == base(x)) for x in lineup])
     log = rec["log"]
     start = next(i for i, line in enumerate(log) if line.startswith("|teampreview")) + 1
     end = log.index(f"|turn|{turn}")

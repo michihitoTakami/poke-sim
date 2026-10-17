@@ -106,7 +106,12 @@ class PublicObservation {
         const passedBoosts = passing ? {...previous.boosts} : {};
         const passedVolatiles = passing ? previous.volatiles.filter(v => !this.dex.conditions.get(v).noCopy) : [];
         this.pendingBaton[side] = false;
-        if (previous) { previous.boosts = {}; previous.volatiles = []; }
+        if (previous) {
+          previous.boosts = {}; previous.volatiles = [];
+          if (previous.transformOriginal) {
+            Object.assign(previous, previous.transformOriginal); delete previous.transformOriginal;
+          }
+        }
         this.names[side][name] = key;
         const old = this.state.mons[side][key] || {};
         this.entries[side] = {key, known: this.state.mons[side][key] ? clone(old) : null, moves: [], revealed: {}};
@@ -117,6 +122,15 @@ class PublicObservation {
       }
       const mon = this.state.mons[side][this.names[side][name]];
       if (!mon) continue;
+      if (kind === '-transform') {
+        const targetSide = p[3].slice(0, 2), targetName = p[3].split(': ')[1];
+        const target = this.state.mons[targetSide]?.[this.names[targetSide]?.[targetName]];
+        if (target) {
+          mon.transformOriginal = {species: mon.species, moves: mon.moves.slice(), ability: mon.ability};
+          mon.species = target.species; mon.moves = target.moves.slice(); mon.boosts = {...target.boosts};
+          mon.ability = target.ability;
+        }
+      }
       if (['detailschange', '-formechange'].includes(kind)) mon.species = p[3].split(',')[0];
       if (kind === 'faint') mon.condition = '0 fnt';
       if (['-damage', '-heal', '-sethp'].includes(kind)) mon.condition = p[3];
@@ -151,6 +165,15 @@ class PublicObservation {
   view(side) {
     const request = clone(side.activeRequest || {wait: true});
     request.side = clone(side.getRequestData());  // the acting player's private information is legitimate
+    const active = this.state.mons[side.id][this.state.active[side.id]];
+    if (active?.transformOriginal) {
+      const mon = request.side.pokemon.find(m => m.active);
+      if (mon) {
+        mon.details = active.species + ', ' + mon.details.split(',').slice(1).join(',').trim();
+        // The protocol's side.stats stay the ORIGINAL stats through Transform, not the copied hidden EVs.
+        delete mon.stats;
+      }
+    }
     return {schema: 1, side: side.id, turn: this.state.turn,
             phase: request.wait ? 'wait' : request.forceSwitch ? 'switch' : 'move',
             request, public: clone(this.state), history: this.history.slice()};
