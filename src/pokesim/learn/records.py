@@ -12,6 +12,8 @@ carry the search's root evidence as a teacher for distillation.
 
 Rows: schema_version, source, battle_id, record, started, turn, side, split, view, legal, action, outcome
 (1 win / 0 loss / .5 draw for that side), rating {p1, p2}, opponent, teacher (p1 only), sample_weight.
+An actor observation with no visible action (e.g. knocked out before moving) has action=null and remains
+usable for outcome learning. The policy dataset drops it because there is no imitation target.
 """
 import argparse
 import gzip
@@ -30,7 +32,7 @@ from pokesim.live.session import BattleSession
 from pokesim.rl.myteam import to_id
 from pokesim.search.lookahead import Lookahead, field_state, mon_state, revealed, side_conditions
 
-SCHEMA = 1
+SCHEMA = 2
 PRIORS = ROOT / 'data/processed/scoped/priors.json'
 
 
@@ -49,7 +51,7 @@ def turn_actions(log: list[str], start: int, stones: dict | None = None) -> dict
     stones (optional dict): filled with the Mega Stone each side revealed this turn."""
     out: dict[str, str | None] = {'p1': None, 'p2': None}
     megas: set[str] = set()
-    for line in log[start + 1:]:
+    for offset, line in enumerate(log[start + 1:], start + 1):
         parts = line.split('|')
         if len(parts) < 2:
             continue
@@ -65,7 +67,18 @@ def turn_actions(log: list[str], start: int, stones: dict | None = None) -> dict
                 stones[side] = to_id(parts[4])
         if kind in ('cant', 'faint') and out[side] is None:
             out[side] = ''  # no choice this turn (asleep, flinched, fainted before acting)
-        if kind in ('move', 'switch') and '[from]' not in line and not line.endswith('[still]') and out[side] is None:
+        # [still] suppresses the animation, not the action: rain's Electro Shot uses it even when it hits.
+        # Keep the existing exclusion for a visibly failed move, using its explicit failure event.
+        failed = False
+        if kind == 'move' and line.endswith('[still]'):
+            for following in log[offset + 1:]:
+                event = following.split('|')
+                if event[1:2] in (['move'], ['turn'], ['win'], ['tie']):
+                    break
+                if event[1:2] == ['-fail'] and len(event) > 2 and event[2][:2] == side:
+                    failed = True
+                    break
+        if kind in ('move', 'switch') and '[from]' not in line and not failed and out[side] is None:
             if kind == 'move':
                 out[side] = 'move:' + to_id(parts[3]) + (':mega' if side in megas else '')
             else:
@@ -133,7 +146,7 @@ def rows_from_session(battle_id: str, session: BattleSession, lines: list[str], 
     meta: fields copied into every row (source, record, started, outcome for the actor, rating, opponent).
     teacher(turn) -> dict | None: the actor's search evidence at that turn (ladder records)."""
     foe = 'p2' if role == 'p1' else 'p1'
-    rows, skipped = [], {'no_choice': 0, 'unreplayable': 0, 'illegal': 0}
+    rows, skipped = [], {'no_choice': 0, 'unreplayable': 0, 'illegal': 0, 'value_only': 0}
     turns = sum(line.startswith('|turn|') for line in lines)
     for i, line in enumerate(lines):
         if line.startswith('|error|'):
@@ -170,9 +183,11 @@ def rows_from_session(battle_id: str, session: BattleSession, lines: list[str], 
             action = actions[role if side == 'p1' else foe]
             if not action:
                 skipped['no_choice'] += 1
-                continue
+                if side != 'p1':
+                    continue
+                skipped['value_only'] += 1
             legal = [label for _, label in views[side]['legal']]
-            if action not in legal:
+            if action is not None and action not in legal:
                 skipped['illegal'] += 1
                 continue
             row = {'schema_version': SCHEMA, **meta, 'battle_id': battle_id, 'turn': turn, 'turns': turns,
@@ -190,6 +205,13 @@ def rows_of(battle_id: str, rec: dict, sets: list[dict], engine: Lookahead, own:
     log = rec['log']
     if rec.get('result') not in ('win', 'loss'):
         return [], {'no_result': 1}
+    selected = {engine.sampler.base_id(to_id(s)) for s in rec['lineup']}
+    for line in log:
+        parts = line.split('|')
+        if len(parts) > 3 and parts[1] in ('switch', 'drag') and parts[2].startswith('p1'):
+            if engine.sampler.base_id(to_id(parts[3].split(',')[0])) not in selected:
+                # Do not invent the unobserved bench or overwrite the original record using future reveals.
+                return [], {'lineup_mismatch': 1}
     session = BattleSession(sets)
     session.preview(rec['preview']['species'])
     session.select([next(i for i, s in enumerate(sets) if to_id(s['species']) == to_id(x)) for x in rec['lineup']])

@@ -21,7 +21,7 @@ import torch
 from torch import nn
 
 from pokesim.data.dataset import sidecar
-from pokesim.learn.model import PolicyNet, export_json, save_checkpoint
+from pokesim.learn.model import PolicyNet, export_json, load_checkpoint, save_checkpoint
 from pokesim.runtime.bundle import file_hash, git_commit
 
 MAX_OPPONENT_BATTLES = 12
@@ -95,7 +95,10 @@ def fit(model: PolicyNet, train: dict, dev: dict, device, epochs: int, lr: float
     state, actions, mask, target = tensors(train, device)
     w = torch.as_tensor(weights(train), device=device)
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-3)
-    best, best_epoch, best_state, bad = None, -1, None, 0
+    # A warm start must be allowed to keep epoch 0 when every update overfits.
+    best = evaluate(model, dev, device)['all']['log_lik']
+    best_epoch, bad = 0, 0
+    best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
     g = torch.Generator(device='cpu').manual_seed(seed)
     for epoch in range(epochs):
         model.train()
@@ -109,7 +112,7 @@ def fit(model: PolicyNet, train: dict, dev: dict, device, epochs: int, lr: float
             loss.backward()
             nn.utils.clip_grad_norm_(model.parameters(), 5.)
             opt.step()
-            total += float(loss) * len(idx)
+            total += float(loss.detach()) * len(idx)
         score = evaluate(model, dev, device)['all']['log_lik']
         log(f'  epoch {epoch + 1}: train loss {total / len(target):.4f} dev log-lik {score:.4f}')
         if best is None or score > best + 1e-5:
@@ -128,6 +131,7 @@ def main() -> None:
     ap.add_argument('--head', choices=['opp', 'ours'], required=True)
     ap.add_argument('--out', required=True)
     ap.add_argument('--pretrain', nargs='*', default=[])
+    ap.add_argument('--init-run', type=Path, help='fine-tune matching seed checkpoints from an existing policy run')
     ap.add_argument('--train', nargs='+', required=True)
     ap.add_argument('--dev', nargs='+', required=True)
     ap.add_argument('--seeds', type=int, nargs='+', default=[0, 1, 2])
@@ -140,6 +144,8 @@ def main() -> None:
     ap.add_argument('--patience', type=int, default=6)
     ap.add_argument('--batch', type=int, default=512)
     args = ap.parse_args()
+    if args.init_run and args.pretrain:
+        raise ValueError('choose --init-run or --pretrain')
     out = Path(args.out)
     if out.exists():
         raise ValueError('choose a new run directory')
@@ -166,6 +172,13 @@ def main() -> None:
         raise ValueError('a battle appears in both training and development data')
     device = torch.device(args.device)
     state_dim, action_dim = train['state'].shape[1], train['actions'].shape[2]
+    initial = None
+    if args.init_run:
+        initial = json.loads((args.init_run / 'report.json').read_text())
+        if (initial['head'] != args.head or
+                initial['provenance']['feature_contract'] != next(iter(contracts)) or
+                initial['provenance']['dex_sha'] != train['meta'][0]['dex_sha']):
+            raise ValueError('initial policy uses a different head or feature contract')
     report = {'schema_version': 1, 'head': args.head, 'provenance': {
         'code': git_commit(), 'feature_contract': train['meta'][0]['feature_schema_sha'],
         'feature_version': train['meta'][0]['feature_version'],
@@ -173,7 +186,10 @@ def main() -> None:
         'train': [{'path': p, 'sha': file_hash(Path(p))} for p in args.train],
         'dev': [{'path': p, 'sha': file_hash(Path(p))} for p in args.dev],
         'pretrain': [{'path': p, 'sha': file_hash(Path(p))} for p in args.pretrain],
-        'settings': vars(args), 'torch': str(torch.__version__), 'device': str(device)},
+        'settings': {**vars(args), 'init_run': str(args.init_run) if args.init_run else None},
+        'initialization': {'run': str(args.init_run), 'report_sha': file_hash(args.init_run / 'report.json'),
+                           'checkpoints': {}} if args.init_run else None,
+        'torch': str(torch.__version__), 'device': str(device)},
         'rows': {'train': int(len(train['target'])), 'dev': int(len(dev['target'])),
                  'pretrain': int(len(pretrain['target'])) if pretrain else 0},
         'battles': {'train': int(len(set(train['group']))), 'dev': int(len(set(dev['group'])))},
@@ -189,6 +205,17 @@ def main() -> None:
         torch.manual_seed(seed)
         model = PolicyNet(state_dim, action_dim, hidden=args.hidden).to(device)
         stages = {}
+        if initial:
+            item = initial['seeds'][str(seed)]
+            path = args.init_run / item['checkpoint']
+            if path.parent != args.init_run or file_hash(path) != item['sha']:
+                raise ValueError('modified initial policy checkpoint')
+            model, _ = load_checkpoint(path)
+            if model.config['state_dim'] != state_dim or model.config['action_dim'] != action_dim:
+                raise ValueError('initial policy feature dimensions differ')
+            model = model.to(device)
+            report['provenance']['initialization']['checkpoints'][str(seed)] = item['sha']
+            stages['initial'] = {'dev': evaluate(model, dev, device)}
         if pretrain is not None:
             log(' pretrain')
             stages['pretrain'], _ = fit(model, pretrain, dev, device, args.pretrain_epochs, args.pretrain_lr,

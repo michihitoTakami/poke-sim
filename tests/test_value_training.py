@@ -238,5 +238,11 @@ def test_a_real_outcome_value_run_loads_into_the_live_ensemble(tmp_path):
     with torch.no_grad():
         expected = torch.sigmoid(model(torch.as_tensor(public)[None], torch.as_tensor(private)[None])).numpy()
     assert np.allclose(p, expected[0], atol=1e-6)
+    from pokesim.learn.train_value import reference_predictions
+
+    # A real-outcome incumbent is also a valid comparison run during subsequent ladder fine-tuning.
+    comparison = reference_predictions(run, {'public': public[None], 'private': private[None],
+                                              'target': np.array([1.])})
+    assert np.allclose(comparison, expected, atol=1e-6)
     assert encode_row({'view': view, 'outcome': 1, 'turn': 14, 'side': 'p1', 'source': 'ladder',
                        'battle_id': 'b', 'rating': {'p1': 1100}})['target'] == 1

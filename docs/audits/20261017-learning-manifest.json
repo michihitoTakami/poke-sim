@@ -1,0 +1,186 @@
+{
+ "schema_version": 1,
+ "audit_snapshot": "20261017-142404",
+ "battles": 33,
+ "source_audit": "docs/audits/20261017-weakness.json",
+ "source_audit_sha256": "27fd3401222cf3e7fe371b14fc0228abf1af0622e2135a404e0f4a3fb126f25c",
+ "split_manifest": "data/curated/ladder-20261017/split.json",
+ "split_manifest_sha256": "e5e0d6a8859b40ac9779db984661d1a9cef98414db1da50c6aa1fae5c96e05c9",
+ "split": {
+  "made": "2026-10-17 14:10:45",
+  "test_from": "20261017-140000",
+  "shares": [
+   0.7,
+   0.3,
+   0
+  ],
+  "cap_per_opponent": 4,
+  "split_starts": {
+   "train": "20261017-011314",
+   "development": "20261017-121740"
+  },
+  "counts": {
+   "train": 17,
+   "development": 8,
+   "calibration": 0,
+   "test": 0,
+   "purged": 2
+  },
+  "battles": {
+   "showdown:battle-gen9championsbssregmc-2699529161-vo9k1e66cgjgy4x2hfwsrjc9duhuaufpw": "train",
+   "showdown:battle-gen9championsbssregmc-2699531923": "train",
+   "showdown:battle-gen9championsbssregmc-2699538021-arhlogi39glmrxocmxk96vvahkidh3upw": "train",
+   "showdown:battle-gen9championsbssregmc-2699538726": "train",
+   "showdown:battle-gen9championsbssregmc-2699539543-oix1cjx3khssf2ebddaeh5er2u7btqqpw": "train",
+   "showdown:battle-gen9championsbssregmc-2699540752": "train",
+   "showdown:battle-gen9championsbssregmc-2699541555": "train",
+   "showdown:battle-gen9championsbssregmc-2699542963": "train",
+   "showdown:battle-gen9championsbssregmc-2699766354": "train",
+   "showdown:battle-gen9championsbssregmc-2699767850": "train",
+   "showdown:battle-gen9championsbssregmc-2699769664": "train",
+   "showdown:battle-gen9championsbssregmc-2699768883": "train",
+   "showdown:battle-gen9championsbssregmc-2699770404": "train",
+   "showdown:battle-gen9championsbssregmc-2699815738": "train",
+   "showdown:battle-gen9championsbssregmc-2699821373": "purged",
+   "showdown:battle-gen9championsbssregmc-2699816169": "train",
+   "showdown:battle-gen9championsbssregmc-2699820844": "purged",
+   "showdown:battle-gen9championsbssregmc-2699816952": "train",
+   "showdown:battle-gen9championsbssregmc-2699817596": "train",
+   "showdown:battle-gen9championsbssregmc-2699818263-rcvmymcvg39ko4ti4fx4cunk4o32p4upw": "development",
+   "showdown:battle-gen9championsbssregmc-2699818751": "development",
+   "showdown:battle-gen9championsbssregmc-2699820066": "development",
+   "showdown:battle-gen9championsbssregmc-2699819284": "development",
+   "showdown:battle-gen9championsbssregmc-2699822845": "development",
+   "showdown:battle-gen9championsbssregmc-2699821959": "development",
+   "showdown:battle-gen9championsbssregmc-2699823974": "development",
+   "showdown:battle-gen9championsbssregmc-2699824823": "development"
+  },
+  "ledger": "data/curated/ladder-20261017/battles.jsonl",
+  "campaign": "20261017 adaptation requested by user; historical default-test records consumed for train/development; no final-test claim",
+  "previous_manifest": "data/curated/split_manifest.json"
+ },
+ "previous_default_manifest": {
+  "path": "data/curated/split_manifest.json",
+  "sha256": "91b811ab80d3f0ffe6142c72b84fdf8e04d88ded380355ffbb035af67c03e2f3",
+  "status": "preserved; its empty forward-test designation for the first 27 records is consumed for this user-requested learning campaign, not reusable as an independent final test"
+ },
+ "rows": {
+  "train": {
+   "path": "data/processed/learn/ladder-20261017/views-v2/train.jsonl.gz",
+   "sha256": "b4b7b564ecfc84222789914e6fb816d5d9a5499e092807dffc3d9e3a2ee4d40d",
+   "rows": 286,
+   "actor_value_rows": 153,
+   "actor_without_visible_action": 27,
+   "usable_battles": 16,
+   "results_by_battle": {
+    "0.0": 9,
+    "1.0": 7
+   }
+  },
+  "development": {
+   "path": "data/processed/learn/ladder-20261017/views-v2/development.jsonl.gz",
+   "sha256": "c616d7f3e7544f169c621895fd004fda87059cd9af2c1cdcdc95bce271eff1c2",
+   "rows": 134,
+   "actor_value_rows": 72,
+   "actor_without_visible_action": 15,
+   "usable_battles": 8,
+   "results_by_battle": {
+    "1.0": 4,
+    "0.0": 4
+   }
+  },
+  "test": {
+   "path": "data/processed/learn/ladder-20261017/views-v2/test.jsonl.gz",
+   "sha256": "5cadc638bff9ef0c892f6f9773bf0124d587378df79049df90f0de12d9acc8fe",
+   "rows": 96,
+   "actor_value_rows": 50,
+   "actor_without_visible_action": 13,
+   "usable_battles": 6,
+   "results_by_battle": {
+    "0.0": 3,
+    "1.0": 3
+   }
+  }
+ },
+ "models": {
+  "opp-ladder-20261017": {
+   "report": "runs/opp-ladder-20261017/report.json",
+   "report_sha256": "ffdb085f2b81d31daf89b620bd375d205a542e1a7874ef1efe60121f2b35b110",
+   "checkpoints": {
+    "opp-seed0.pt": "c100205f460400d944d9192f843bdbc9a629abe3bcdc1054ac05ec18e9620c65",
+    "opp-seed1.pt": "51c8f3bf3ec8d3ab94aa5931de4842fd0ed58e7bb08380d2104fb33863f96861",
+    "opp-seed2.pt": "4d84b78ad80432830b1523a59a9851a22663cb7fff785ae93508811d3105df64"
+   },
+   "training_settings": {
+    "head": "opp",
+    "out": "runs/opp-ladder-20261017",
+    "pretrain": [],
+    "init_run": "runs/opp-replays-v1",
+    "train": [
+     "data/processed/learn/ladder-20261017/opponent-train.npz"
+    ],
+    "dev": [
+     "data/processed/learn/ladder-20261017/opponent-development.npz"
+    ],
+    "seeds": [
+     0,
+     1,
+     2
+    ],
+    "device": "cuda",
+    "hidden": 192,
+    "pretrain_epochs": 20,
+    "epochs": 80,
+    "pretrain_lr": 0.001,
+    "lr": 0.0001,
+    "patience": 10,
+    "batch": 128
+   }
+  },
+  "value-ladder-20261017-v2": {
+   "report": "runs/value-ladder-20261017-v2/report.json",
+   "report_sha256": "9c672286286a88eb9b9e65ae8bab94a801e01b8eff5e3de32fccf108aa4bab19",
+   "checkpoints": {
+    "real-seed0.pt": "1689db43bdbe8dea125c96285e39424fee16e51ed7bbaa7ad81c760d3e52798f",
+    "real-seed1.pt": "c8024b68f6fa80583b490422ac91320804b7f59df7d466193342e08488ee61eb",
+    "real-seed2.pt": "6f8804f56b84245213f328e3cc446c47eeaeeb0f97b16f5cf1072ec2bef44be3"
+   },
+   "training_settings": {
+    "out": "runs/value-ladder-20261017-v2",
+    "pretrain": [],
+    "init_run": "runs/value-replays-v1",
+    "train": [
+     "data/processed/learn/ladder-20261017/views-v2/value-train.npz"
+    ],
+    "dev": [
+     "data/processed/learn/ladder-20261017/views-v2/value-development.npz"
+    ],
+    "reference_run": "runs/value-replays-v1",
+    "seeds": [
+     0,
+     1,
+     2
+    ],
+    "device": "cuda",
+    "hidden": 256,
+    "pretrain_epochs": 30,
+    "epochs": 80,
+    "pretrain_lr": 0.001,
+    "lr": 3e-05,
+    "patience": 10,
+    "batch": 128,
+    "bootstrap": 2000
+   }
+  }
+ },
+ "curriculum": {
+  "path": "data/processed/learn/ladder-20261017/curriculum.json",
+  "sha256": "43d0b350f4a98f46b5c0edf6688ac4e62ff0b00fb5bbf7fa463d57dbe67cfb94",
+  "scope": "train only; review pointers, no counterfactual winning-action labels"
+ },
+ "adoption": {
+  "value": false,
+  "opponent": false,
+  "reason": "Value gate C failed; held-out value Brier and opponent log likelihood worsened. Existing live model files retained."
+ }
+}

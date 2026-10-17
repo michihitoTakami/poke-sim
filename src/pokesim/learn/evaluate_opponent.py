@@ -21,6 +21,7 @@ import torch
 from pokesim.data.curate_battles import CURATED
 from pokesim.data.dataset import DatasetScope
 from pokesim.learn.model import load_checkpoint
+from pokesim.learn.records import turn_actions
 from pokesim.learn.train_policy import evaluate, load
 
 GATE = {'top1': .46, 'top3': .72}
@@ -35,18 +36,7 @@ def opponent_action(log: list[str], turn: int) -> str | None:
     start = next((i for i, ln in enumerate(log) if ln == f'|turn|{turn}'), None)
     if start is None:
         return None
-    megas = False
-    for line in log[start + 1:]:
-        parts = line.split('|')
-        if parts[1:2] == ['turn']:
-            return None
-        if parts[1:2] == ['-mega'] and parts[2].startswith('p2'):
-            megas = True
-        if line.startswith(('|move|p2', '|switch|p2')) and '[from]' not in line and not line.endswith('[still]'):
-            if parts[1] == 'move':
-                return 'move:' + parts[3].lower().replace(' ', '').replace('-', '') + (':mega' if megas else '')
-            return 'switch:' + parts[3].split(',')[0].lower().replace(' ', '').replace('-', '')
-    return None
+    return turn_actions(log, start)['p2']
 
 
 def incumbent(records: list[tuple[str, dict]]) -> dict:

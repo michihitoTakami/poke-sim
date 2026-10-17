@@ -27,7 +27,7 @@ from pokesim.data.dataset import sidecar
 from pokesim.evaluation.metrics import reliability
 from pokesim.runtime.bundle import file_hash, git_commit
 from pokesim.value.evaluate import group_means, intervals, losses
-from pokesim.value.model import ValueModel, predict
+from pokesim.value.model import ValueModel, load_checkpoint, predict
 from pokesim.value.train import hp_fit, hp_predict, set_seed
 
 
@@ -59,7 +59,8 @@ def fit(model, train, dev, *, epochs, lr, patience, batch, seed, device, log) ->
     weight = torch.as_tensor(train['weight'], device=device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-3)
     generator = torch.Generator().manual_seed(seed)
-    best, best_epoch, saved, idle = float('inf'), 0, None, 0
+    best, best_epoch, idle = dev_log_loss(model, dev, device), 0, 0
+    saved = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
     for epoch in range(1, epochs + 1):
         model.train()
         order = torch.randperm(len(target), generator=generator).to(device)
@@ -87,21 +88,17 @@ def fit(model, train, dev, *, epochs, lr, patience, batch, seed, device, log) ->
 
 
 def reference_predictions(run: Path, dev: dict) -> np.ndarray | None:
-    from pokesim.value.model import load_checkpoint
+    from pokesim.value.runtime import ValueEnsemble
 
-    report = json.loads((run / 'report.json').read_text())
-    models = []
-    for seed in report['provenance']['settings']['seeds']:
-        item = report['stages'][f'pretrained:{seed}']
-        model, _ = load_checkpoint(run / item['checkpoint'])
-        models.append(model)
-    return np.mean([predict(m, dev) for m in models], axis=0)
+    ensemble = ValueEnsemble(run)
+    return np.mean([predict(m, dev) for m in ensemble.models], axis=0)
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--out', required=True)
     ap.add_argument('--pretrain', nargs='*', default=[])
+    ap.add_argument('--init-run', type=Path, help='fine-tune matching seeds from an existing real-outcome run')
     ap.add_argument('--train', nargs='+', required=True)
     ap.add_argument('--dev', nargs='+', required=True)
     ap.add_argument('--reference-run', default=None)
@@ -116,6 +113,8 @@ def main() -> None:
     ap.add_argument('--batch', type=int, default=1024)
     ap.add_argument('--bootstrap', type=int, default=2000)
     args = ap.parse_args()
+    if args.init_run and args.pretrain:
+        raise ValueError('choose --init-run or --pretrain')
     out = Path(args.out)
     if out.exists():
         raise ValueError('choose a new run directory')
@@ -136,6 +135,14 @@ def main() -> None:
     device = torch.device(args.device)
     features = train['meta'][0]['features']
     public_dim, private_dim = len(features['public']), len(features['private'])
+    initial = None
+    if args.init_run:
+        initial = json.loads((args.init_run / 'report.json').read_text())
+        cfg = initial['provenance']
+        if (cfg.get('target') != 'real_outcome' or cfg['features'] != features or
+                cfg['feature_code_sha'] != train['meta'][0]['feature_code_sha'] or
+                cfg['dex_sha'] != train['meta'][0]['dex_sha']):
+            raise ValueError('initial value run uses a different target or feature contract')
     contract = {'schema_version': 1, 'target': 'real_outcome', 'feature_version': train['meta'][0]['feature_version'],
                 'features': features, 'feature_code_sha': train['meta'][0]['feature_code_sha'],
                 'dex_sha': train['meta'][0]['dex_sha'], 'code': git_commit(), 'torch': str(torch.__version__),
@@ -143,7 +150,10 @@ def main() -> None:
                 'train': [{'path': p, 'sha': file_hash(Path(p))} for p in args.train],
                 'dev': [{'path': p, 'sha': file_hash(Path(p))} for p in args.dev],
                 'pretrain': [{'path': p, 'sha': file_hash(Path(p))} for p in args.pretrain],
-                'settings': vars(args)}
+                'settings': {**vars(args), 'init_run': str(args.init_run) if args.init_run else None},
+                'initialization': {'run': str(args.init_run),
+                                   'report_sha': file_hash(args.init_run / 'report.json'),
+                                   'checkpoints': {}} if args.init_run else None}
     (out / 'manifest.json').write_text(json.dumps(contract, indent=1))
     started = time.perf_counter()
     models, stages = [], {}
@@ -152,6 +162,16 @@ def main() -> None:
         model = ValueModel(public_dim, private_dim, args.hidden)
         log(f'seed {seed}')
         result = {}
+        if initial:
+            item = initial['stages'][f'real:{seed}']
+            path = args.init_run / item['checkpoint']
+            if path.parent != args.init_run or file_hash(path) != item['sha']:
+                raise ValueError('modified initial value checkpoint')
+            model, saved = load_checkpoint(path)
+            if saved['features'] != features or saved.get('stage') != 'real':
+                raise ValueError('initial value checkpoint contract mismatch')
+            contract['initialization']['checkpoints'][str(seed)] = item['sha']
+            result['initial'] = {'dev_log_loss': dev_log_loss(model.to(device), dev, device)}
         if pretrain is not None:
             log(' pretrain')
             result['pretrain'] = fit(model, pretrain, dev, epochs=args.pretrain_epochs, lr=args.pretrain_lr,
@@ -192,13 +212,15 @@ def main() -> None:
         if mask.any():
             report['by_turn'][name] = {m: float(losses(p[mask], y[mask])['brier'].mean())
                                        for m, p in predictions.items()}
-    best_other = min(report['models'][k]['brier']['mean'] for k in ('hp', 'reference_v2') if k in report['models'])
+    best_name = min((k for k in ('hp', 'reference_v2') if k in report['models']),
+                    key=lambda k: report['models'][k]['brier']['mean'])
+    best_other = report['models'][best_name]['brier']['mean']
     gap = best_other - report['models']['real']['brier']['mean']
-    paired = (report['paired_differences'].get('real_minus_reference_v2') or
-              report['paired_differences']['real_minus_hp'])
+    paired = report['paired_differences'][f'real_minus_{best_name}']
     report['gate'] = {'brier_gain': float(gap), 'required': .015, 'ci90_excludes_zero': paired['brier']['ci90'][1] < 0,
                       'passed': gap >= .015 and paired['brier']['ci90'][1] < 0}
     report['seconds'] = time.perf_counter() - started
+    (out / 'manifest.json').write_text(json.dumps(contract, indent=1))
     (out / 'report.json').write_text(json.dumps(report, indent=1))
     for name, m in report['models'].items():
         log(f"  {name:14s} Brier {m['brier']['mean']:.5f} log loss {m['log_loss']['mean']:.5f}")
