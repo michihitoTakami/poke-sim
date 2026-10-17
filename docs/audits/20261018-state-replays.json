@@ -1,0 +1,1852 @@
+{
+ "before": {
+  "code_root": "/home/michihito/Working/poke-sim",
+  "cases_sha256": "872188a21b33ab6b1ff895cc337a1863e82ea1e5b3fb74def67c7ddc464f6d88",
+  "value_model": {
+   "dataset_id": "abe5a04ed7a75fbe",
+   "report_sha": "b0d4be669e82c64b83b4a35b988f17869e07929d4b753c151a746feb301e278d",
+   "checkpoints": {
+    "real-seed0.pt": "81d23e0fe2b777a1",
+    "real-seed1.pt": "f1314cd73d285545",
+    "real-seed2.pt": "39717cd7cbabda21"
+   },
+   "reference": {
+    "target": "real_outcome"
+   },
+   "run": "/home/michihito/Working/poke-sim/runs/value-replays-v1",
+   "feature_version": "observed-value-v1"
+  },
+  "opponent_model": {
+   "path": "opp-seed0.json",
+   "sha": "c7cd00e48b33b9ac",
+   "kind": "net"
+  },
+  "settings": {
+   "decision_ms": 4500,
+   "workers": 2,
+   "live_record_prior": false
+  },
+  "decisions": [
+   {
+    "record": "20261017-123302-2699822845.json",
+    "turn": 6,
+    "reason": "Gholdengo after Air Balloon was popped",
+    "record_sha256": "bb97e44eeb60a1a3dce6d034080d4a7062440518c04e5054817c36da9873f04c",
+    "request_sha256": "0f28a1f75e01c468e5183649fbae56db5f9cae5587335f407c1bbd6561b81d62",
+    "chosen": "move:flashcannon",
+    "status": {
+     "solver": "pure-robust",
+     "objective": 0.47015126311249894,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "83ae7bb704baa39e5cc2982de64efd92fd28f28d667b7dd4739a7313d801763c",
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 136,
+        "opponent": 139,
+        "ourAction": 136,
+        "opponentAction": 139
+       },
+       {
+        "ours": 136,
+        "opponent": 152,
+        "ourAction": 136,
+        "opponentAction": 152
+       },
+       {
+        "ours": 136,
+        "opponent": 139,
+        "ourAction": 136,
+        "opponentAction": 139
+       },
+       {
+        "ours": 136,
+        "opponent": 139,
+        "ourAction": 136,
+        "opponentAction": 139
+       },
+       {
+        "ours": 136,
+        "opponent": 139,
+        "ourAction": 136,
+        "opponentAction": 139
+       },
+       {
+        "ours": 136,
+        "opponent": 139,
+        "ourAction": 136,
+        "opponentAction": 139
+       }
+      ],
+      "ready": true,
+      "simulations": 572,
+      "terminal": 571,
+      "learned": 301,
+      "censored": 1,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 843,
+      "max_tree_decisions": 2,
+      "max_rollout_turns": 8,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 1,
+      "predicted_columns": true,
+      "chance_paths": 0,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       287,
+       285
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3811.038660001941,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:shadowball",
+       "expected": 0.5701541734162897,
+       "worst": 0.3958310031477091,
+       "utility": 0.5178572223357155,
+       "sampling_error": 0.25700313268228253,
+       "trials": 116
+      },
+      {
+       "label": "move:flashcannon",
+       "expected": 0.5558326733686172,
+       "worst": 0.2702279725148898,
+       "utility": 0.47015126311249894,
+       "sampling_error": 0.2508093032968149,
+       "trials": 115
+      },
+      {
+       "label": "move:recover",
+       "expected": 0.22545428499640424,
+       "worst": -0.19579815032453618,
+       "utility": 0.09907855440012212,
+       "sampling_error": 0.2722370492485689,
+       "trials": 113
+      },
+      {
+       "label": "move:nastyplot",
+       "expected": 0.09270771198178465,
+       "worst": -0.45821032116449484,
+       "utility": -0.07256769796209919,
+       "sampling_error": 0.27972181078160424,
+       "trials": 114
+      },
+      {
+       "label": "switch:skeledirge",
+       "expected": -0.5433245922029442,
+       "worst": -0.7411560061786924,
+       "utility": -0.6026740163956685,
+       "sampling_error": 0.2847920179218219,
+       "trials": 114
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    }
+   },
+   {
+    "record": "20261018-004224-2700043382.json",
+    "turn": 8,
+    "reason": "Basculegion after two allied faints",
+    "record_sha256": "7d64931eb5723df4fb8c05464978ca270069beaa2ece955ce8c2b1b82f3b58d6",
+    "request_sha256": "2fb82f0225c9a0d5d4618c9d09613870f27fa458f3be7aee5d3dff8e9b1d016b",
+    "chosen": "move:moonblast",
+    "status": {
+     "solver": "pure-robust",
+     "objective": 0.7004470011529326,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "fcaa02d5431a5e9b830ede5bae923a98aa13f338d18e638d832422e05571e9be",
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 122,
+        "opponent": 143,
+        "ourAction": 122,
+        "opponentAction": 143
+       },
+       {
+        "ours": 122,
+        "opponent": 174,
+        "ourAction": 122,
+        "opponentAction": 174
+       },
+       {
+        "ours": 122,
+        "opponent": 174,
+        "ourAction": 122,
+        "opponentAction": 174
+       },
+       {
+        "ours": 122,
+        "opponent": 195,
+        "ourAction": 122,
+        "opponentAction": 195
+       },
+       {
+        "ours": 122,
+        "opponent": 214,
+        "ourAction": 122,
+        "opponentAction": 214
+       },
+       {
+        "ours": 122,
+        "opponent": 214,
+        "ourAction": 122,
+        "opponentAction": 214
+       }
+      ],
+      "ready": true,
+      "simulations": 1640,
+      "terminal": 1652,
+      "learned": 228,
+      "censored": 0,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 1178,
+      "max_tree_decisions": 4,
+      "max_rollout_turns": 3,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 1,
+      "predicted_columns": true,
+      "chance_paths": 3,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       804,
+       836
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3806.4407540368848,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:moonblast",
+       "expected": 0.8003662111737982,
+       "worst": 0.46730217777091254,
+       "utility": 0.7004470011529326,
+       "sampling_error": 0.13238086917127043,
+       "trials": 739
+      },
+      {
+       "label": "move:substitute",
+       "expected": 0.6048126710635696,
+       "worst": 0.24697435035818807,
+       "utility": 0.4974611748519551,
+       "sampling_error": 0.24731654842849535,
+       "trials": 142
+      },
+      {
+       "label": "move:synthesis",
+       "expected": 0.6358194228006586,
+       "worst": 0.3350215921646741,
+       "utility": 0.5455800736098632,
+       "sampling_error": 0.23485895706331242,
+       "trials": 170
+      },
+      {
+       "label": "move:calmmind",
+       "expected": 0.7134484800607148,
+       "worst": 0.4318821072459373,
+       "utility": 0.6289785682162815,
+       "sampling_error": 0.18574864638508273,
+       "trials": 299
+      },
+      {
+       "label": "switch:skeledirge",
+       "expected": 0.6732079981902436,
+       "worst": 0.3235757166532964,
+       "utility": 0.5683183137291594,
+       "sampling_error": 0.2157735869982522,
+       "trials": 290
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    }
+   },
+   {
+    "record": "20261017-224526-2699990799.json",
+    "turn": 7,
+    "reason": "Observed Mega Starmie",
+    "record_sha256": "e027ae069d58c21d788a5be92080adf08ecfd509bedc455c0a813c56f5421ba3",
+    "request_sha256": "e198c08cd8521e0266583a3295876fb9d40ac2d829d7cb7367aec66aceac7ee4",
+    "chosen": "move:shadowball",
+    "status": {
+     "solver": "pure-robust",
+     "objective": -0.9505670526816798,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "fd175fd54fe8fe6f2f4cff161034ccecc7b42aaa15313578df536b3e9aca499c",
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       },
+       {
+        "ours": 88,
+        "opponent": 172,
+        "ourAction": 88,
+        "opponentAction": 172
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       }
+      ],
+      "ready": true,
+      "simulations": 1455,
+      "terminal": 1445,
+      "learned": 250,
+      "censored": 17,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 2083,
+      "max_tree_decisions": 2,
+      "max_rollout_turns": 8,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 2,
+      "predicted_columns": true,
+      "chance_paths": 0,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       729,
+       726
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3806.3569410005584,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:torchsong",
+       "expected": -0.9288585119767063,
+       "worst": -0.986674719329518,
+       "utility": -0.9462033741825497,
+       "sampling_error": 0.19788473056467026,
+       "trials": 511
+      },
+      {
+       "label": "move:willowisp",
+       "expected": -0.9231958164165572,
+       "worst": -0.9729556778052967,
+       "utility": -0.938123774833179,
+       "sampling_error": 0.1679514871951797,
+       "trials": 382
+      },
+      {
+       "label": "move:shadowball",
+       "expected": -0.9413340525793844,
+       "worst": -0.9721107195870358,
+       "utility": -0.9505670526816798,
+       "sampling_error": 0.15200708822124737,
+       "trials": 309
+      },
+      {
+       "label": "move:slackoff",
+       "expected": -0.9473000976258215,
+       "worst": -0.977232717739082,
+       "utility": -0.9562798836597995,
+       "sampling_error": 0.16388667264006218,
+       "trials": 253
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    }
+   },
+   {
+    "record": "20261018-025645-2700105840.json",
+    "turn": 8,
+    "reason": "Observed Mega Floette after Baton Pass",
+    "record_sha256": "39a0f7f0c1fbeb52dc39d348ef226fbb276d7e34e9dbd0220f638f6405ebd178",
+    "request_sha256": "4da0c6ba0e955e69089a17a16740e2e9a8db7956023eb4172104598ec23dda9e",
+    "chosen": "move:shadowball",
+    "status": {
+     "solver": "pure-robust",
+     "objective": 0.9213381883320402,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "4ba37b848ede6adf0f36af3a142e1dfc7eb86fe42e7907c57824aadccc19d7ce",
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 88,
+        "opponent": 338,
+        "ourAction": 88,
+        "opponentAction": 338
+       },
+       {
+        "ours": 88,
+        "opponent": 338,
+        "ourAction": 88,
+        "opponentAction": 338
+       },
+       {
+        "ours": 88,
+        "opponent": 338,
+        "ourAction": 88,
+        "opponentAction": 338
+       },
+       {
+        "ours": 88,
+        "opponent": 338,
+        "ourAction": 88,
+        "opponentAction": 338
+       },
+       {
+        "ours": 88,
+        "opponent": 316,
+        "ourAction": 88,
+        "opponentAction": 316
+       },
+       {
+        "ours": 88,
+        "opponent": 338,
+        "ourAction": 88,
+        "opponentAction": 338
+       }
+      ],
+      "ready": true,
+      "simulations": 1069,
+      "terminal": 1060,
+      "learned": 309,
+      "censored": 9,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 1486,
+      "max_tree_decisions": 4,
+      "max_rollout_turns": 8,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 1,
+      "predicted_columns": true,
+      "chance_paths": 0,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       530,
+       539
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3809.3604290043004,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:torchsong",
+       "expected": 0.9576477600109797,
+       "worst": 0.893786577488393,
+       "utility": 0.9384894052542037,
+       "sampling_error": 0.1010473822702485,
+       "trials": 422
+      },
+      {
+       "label": "move:willowisp",
+       "expected": 0.7361662851380759,
+       "worst": 0.4002671623415716,
+       "utility": 0.6353965482991246,
+       "sampling_error": 0.24724052720452472,
+       "trials": 121
+      },
+      {
+       "label": "move:shadowball",
+       "expected": 0.9451216863203812,
+       "worst": 0.8658433596925776,
+       "utility": 0.9213381883320402,
+       "sampling_error": 0.12523573265806356,
+       "trials": 284
+      },
+      {
+       "label": "move:slackoff",
+       "expected": 0.749686230636922,
+       "worst": 0.6594426292440615,
+       "utility": 0.7226131502190638,
+       "sampling_error": 0.17446332781137122,
+       "trials": 120
+      },
+      {
+       "label": "switch:floetteeternal",
+       "expected": -0.17570589848058918,
+       "worst": -0.4324211478569548,
+       "utility": -0.25272047329349884,
+       "sampling_error": 0.27158793247281315,
+       "trials": 122
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    }
+   },
+   {
+    "record": "20261018-035831-2700131460.json",
+    "turn": 14,
+    "reason": "Observed Mega Lucario Z",
+    "record_sha256": "3caf20774b473b4e1c90d9ad2887b2ba64f96ac4f1ab449bdde4b1201b4c3ad1",
+    "request_sha256": "550cabe26fc53d199b643a6ff418c822a57a0cf3b80c95623210b7524fccaa58",
+    "chosen": "switch:gholdengo",
+    "status": {
+     "solver": "pure-robust",
+     "objective": -0.6272832434007019,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "47debf7147a5a5458ad8cea7e9ce9e5545487fb1efdbbb8e4d297d5aae72895e",
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 122,
+        "opponent": 162,
+        "ourAction": 122,
+        "opponentAction": 162
+       },
+       {
+        "ours": 122,
+        "opponent": 223,
+        "ourAction": 122,
+        "opponentAction": 223
+       },
+       {
+        "ours": 122,
+        "opponent": 191,
+        "ourAction": 122,
+        "opponentAction": 191
+       },
+       {
+        "ours": 122,
+        "opponent": 223,
+        "ourAction": 122,
+        "opponentAction": 223
+       },
+       {
+        "ours": 122,
+        "opponent": 223,
+        "ourAction": 122,
+        "opponentAction": 223
+       },
+       {
+        "ours": 122,
+        "opponent": 201,
+        "ourAction": 122,
+        "opponentAction": 201
+       }
+      ],
+      "ready": true,
+      "simulations": 1526,
+      "terminal": 1532,
+      "learned": 234,
+      "censored": 0,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 1920,
+      "max_tree_decisions": 4,
+      "max_rollout_turns": 7,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 2,
+      "predicted_columns": true,
+      "chance_paths": 4,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       758,
+       768
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3808.1533419899642,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:moonblast",
+       "expected": -0.6192015462883689,
+       "worst": -0.8866516491177272,
+       "utility": -0.6994365771371763,
+       "sampling_error": 0.1874322960746673,
+       "trials": 465
+      },
+      {
+       "label": "move:substitute",
+       "expected": -0.5959293178715411,
+       "worst": -0.7661619772513706,
+       "utility": -0.64699911568549,
+       "sampling_error": 0.24703502083275566,
+       "trials": 195
+      },
+      {
+       "label": "move:synthesis",
+       "expected": -0.6169297737719651,
+       "worst": -0.8062241738099335,
+       "utility": -0.6737180937833556,
+       "sampling_error": 0.20379802743322592,
+       "trials": 442
+      },
+      {
+       "label": "move:calmmind",
+       "expected": -0.5901486800885315,
+       "worst": -0.7977663562411352,
+       "utility": -0.6524339829343127,
+       "sampling_error": 0.2631514355109053,
+       "trials": 215
+      },
+      {
+       "label": "switch:gholdengo",
+       "expected": -0.5665636631767577,
+       "worst": -0.7689622639232383,
+       "utility": -0.6272832434007019,
+       "sampling_error": 0.25999561158242573,
+       "trials": 209
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    }
+   },
+   {
+    "record": "20261017-211957-2699961568.json",
+    "turn": 2,
+    "reason": "Illusion replacement placeholder",
+    "record_sha256": "4065d74e5b5d37d50557e96333e6231d1aff68f4d4109ee1e8ab330736f5bfd2",
+    "request_sha256": "92d8c5e09d08bd8b1380d4727ed80a090ec6e010037296631bd1e226b8254e82",
+    "chosen": "switch:umbreon",
+    "status": {
+     "solver": "pure-robust",
+     "objective": 0.32229966215969713,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "0f2431b4d2016c5c4eb329117440b1b013f9384e19bc31f41c70acd3dd9b7ecd",
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 88,
+        "opponent": 130,
+        "ourAction": 88,
+        "opponentAction": 130
+       },
+       {
+        "ours": 88,
+        "opponent": 178,
+        "ourAction": 88,
+        "opponentAction": 178
+       },
+       {
+        "ours": 88,
+        "opponent": 162,
+        "ourAction": 88,
+        "opponentAction": 162
+       },
+       {
+        "ours": 88,
+        "opponent": 267,
+        "ourAction": 88,
+        "opponentAction": 267
+       },
+       {
+        "ours": 88,
+        "opponent": 267,
+        "ourAction": 88,
+        "opponentAction": 267
+       },
+       {
+        "ours": 88,
+        "opponent": 178,
+        "ourAction": 88,
+        "opponentAction": 178
+       }
+      ],
+      "ready": true,
+      "simulations": 657,
+      "terminal": 609,
+      "learned": 408,
+      "censored": 48,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 917,
+      "max_tree_decisions": 3,
+      "max_rollout_turns": 8,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 2,
+      "predicted_columns": true,
+      "chance_paths": 0,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       329,
+       328
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3818.4585759881884,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:torchsong",
+       "expected": 0.20037115478335213,
+       "worst": -0.04841794040911333,
+       "utility": 0.12573442622561248,
+       "sampling_error": 0.24589467181712663,
+       "trials": 107
+      },
+      {
+       "label": "move:willowisp",
+       "expected": -0.008065048921101756,
+       "worst": -0.16442899944857858,
+       "utility": -0.054974234079344805,
+       "sampling_error": 0.24897612719860931,
+       "trials": 110
+      },
+      {
+       "label": "move:shadowball",
+       "expected": 0.039555829791877196,
+       "worst": -0.19968202992186865,
+       "utility": -0.03221552812224656,
+       "sampling_error": 0.2733047843415243,
+       "trials": 109
+      },
+      {
+       "label": "move:slackoff",
+       "expected": 0.04937467741127295,
+       "worst": -0.12448629375997092,
+       "utility": -0.0027836139401002102,
+       "sampling_error": 0.261476221056013,
+       "trials": 111
+      },
+      {
+       "label": "switch:floetteeternal",
+       "expected": 0.2741314879235891,
+       "worst": 0.04664278973484373,
+       "utility": 0.20588487846696546,
+       "sampling_error": 0.2737327128957338,
+       "trials": 107
+      },
+      {
+       "label": "switch:umbreon",
+       "expected": 0.3609266727651694,
+       "worst": 0.23216997074692866,
+       "utility": 0.32229966215969713,
+       "sampling_error": 0.25896358869198083,
+       "trials": 113
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    }
+   }
+  ],
+  "scope": "Observed-prefix replay and hypothetical-set paired terminal continuations. Development diagnostics, not a human win-rate estimate."
+ },
+ "after": {
+  "code_root": "/tmp/poke-sim-state-integrity",
+  "cases_sha256": "872188a21b33ab6b1ff895cc337a1863e82ea1e5b3fb74def67c7ddc464f6d88",
+  "value_model": {
+   "dataset_id": "abe5a04ed7a75fbe",
+   "report_sha": "b0d4be669e82c64b83b4a35b988f17869e07929d4b753c151a746feb301e278d",
+   "checkpoints": {
+    "real-seed0.pt": "81d23e0fe2b777a1",
+    "real-seed1.pt": "f1314cd73d285545",
+    "real-seed2.pt": "39717cd7cbabda21"
+   },
+   "reference": {
+    "target": "real_outcome"
+   },
+   "run": "/home/michihito/Working/poke-sim/runs/value-replays-v1",
+   "feature_version": "observed-value-v1"
+  },
+  "opponent_model": {
+   "path": "opp-seed0.json",
+   "sha": "c7cd00e48b33b9ac",
+   "kind": "net"
+  },
+  "settings": {
+   "decision_ms": 4500,
+   "workers": 2,
+   "live_record_prior": false
+  },
+  "decisions": [
+   {
+    "record": "20261017-123302-2699822845.json",
+    "turn": 6,
+    "reason": "Gholdengo after Air Balloon was popped",
+    "record_sha256": "bb97e44eeb60a1a3dce6d034080d4a7062440518c04e5054817c36da9873f04c",
+    "request_sha256": "ffeda917c816a2b22e8d5fa4c5a2a853245c84bc453bb8f0a2eb456396a68e98",
+    "chosen": "move:flashcannon",
+    "status": {
+     "solver": "pure-robust",
+     "objective": 0.336234554988857,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "5dd4fd5be59556b9e008b68f971c27f3158327dd66c43bfe7ae883c5679cef49",
+      "state_codec": "observed-state-v2",
+      "opponent_selection": null,
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 136,
+        "opponent": 152,
+        "ourAction": 136,
+        "opponentAction": 152
+       },
+       {
+        "ours": 136,
+        "opponent": 152,
+        "ourAction": 136,
+        "opponentAction": 152
+       },
+       {
+        "ours": 136,
+        "opponent": 139,
+        "ourAction": 136,
+        "opponentAction": 139
+       },
+       {
+        "ours": 136,
+        "opponent": 152,
+        "ourAction": 136,
+        "opponentAction": 152
+       },
+       {
+        "ours": 136,
+        "opponent": 152,
+        "ourAction": 136,
+        "opponentAction": 152
+       },
+       {
+        "ours": 136,
+        "opponent": 139,
+        "ourAction": 136,
+        "opponentAction": 139
+       }
+      ],
+      "ready": true,
+      "simulations": 728,
+      "terminal": 725,
+      "learned": 303,
+      "censored": 3,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 1030,
+      "max_tree_decisions": 3,
+      "max_rollout_turns": 8,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 1,
+      "predicted_columns": true,
+      "chance_paths": 0,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       368,
+       360
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3776.624559017364,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:shadowball",
+       "expected": 0.29758638449961106,
+       "worst": 0.029430841185547202,
+       "utility": 0.2171397215053919,
+       "sampling_error": 0.2682105512240196,
+       "trials": 120
+      },
+      {
+       "label": "move:flashcannon",
+       "expected": 0.40224562605600583,
+       "worst": 0.18220872249884312,
+       "utility": 0.336234554988857,
+       "sampling_error": 0.20295828963012297,
+       "trials": 248
+      },
+      {
+       "label": "move:recover",
+       "expected": 0.12648421014861788,
+       "worst": -0.020558514128588917,
+       "utility": 0.08237139286545583,
+       "sampling_error": 0.26789858318860754,
+       "trials": 120
+      },
+      {
+       "label": "move:nastyplot",
+       "expected": -0.0367812596119404,
+       "worst": -0.2454028977473336,
+       "utility": -0.09936775105255835,
+       "sampling_error": 0.2701806235458683,
+       "trials": 120
+      },
+      {
+       "label": "switch:skeledirge",
+       "expected": -0.3010272095031414,
+       "worst": -0.45769962991998425,
+       "utility": -0.34802893562819426,
+       "sampling_error": 0.29576188302722733,
+       "trials": 120
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    },
+    "before": "move:flashcannon"
+   },
+   {
+    "record": "20261018-004224-2700043382.json",
+    "turn": 8,
+    "reason": "Basculegion after two allied faints",
+    "record_sha256": "7d64931eb5723df4fb8c05464978ca270069beaa2ece955ce8c2b1b82f3b58d6",
+    "request_sha256": "8ef5859fc30d3d944d076bb003f787415cdd95a4697ca7571a0ea3c2cf36c8d3",
+    "chosen": "switch:skeledirge",
+    "status": {
+     "solver": "pure-robust",
+     "objective": -0.2674184966197918,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "5169ca508067d5d436957c3ccae7a0b9d073de444b89d5d6d77fa1d9020fb4fe",
+      "state_codec": "observed-state-v2",
+      "opponent_selection": null,
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 122,
+        "opponent": 214,
+        "ourAction": 122,
+        "opponentAction": 214
+       },
+       {
+        "ours": 122,
+        "opponent": 143,
+        "ourAction": 122,
+        "opponentAction": 143
+       },
+       {
+        "ours": 122,
+        "opponent": 174,
+        "ourAction": 122,
+        "opponentAction": 174
+       },
+       {
+        "ours": 122,
+        "opponent": 195,
+        "ourAction": 122,
+        "opponentAction": 195
+       },
+       {
+        "ours": 122,
+        "opponent": 214,
+        "ourAction": 122,
+        "opponentAction": 214
+       },
+       {
+        "ours": 122,
+        "opponent": 195,
+        "ourAction": 122,
+        "opponentAction": 195
+       }
+      ],
+      "ready": true,
+      "simulations": 2441,
+      "terminal": 2455,
+      "learned": 226,
+      "censored": 0,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 958,
+      "max_tree_decisions": 4,
+      "max_rollout_turns": 4,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 1,
+      "predicted_columns": true,
+      "chance_paths": 3,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       1195,
+       1246
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3807.6453000539914,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:moonblast",
+       "expected": -0.14224949399183973,
+       "worst": -0.5891269131046393,
+       "utility": -0.27631271972567956,
+       "sampling_error": 0.20600712195948234,
+       "trials": 381
+      },
+      {
+       "label": "move:substitute",
+       "expected": -0.15159584462438253,
+       "worst": -0.6172097987608417,
+       "utility": -0.2912800308653203,
+       "sampling_error": 0.2209845624587817,
+       "trials": 310
+      },
+      {
+       "label": "move:synthesis",
+       "expected": -0.14106477394992667,
+       "worst": -0.5883118602340779,
+       "utility": -0.275238899835172,
+       "sampling_error": 0.18209526960301672,
+       "trials": 420
+      },
+      {
+       "label": "move:calmmind",
+       "expected": -0.1522009738180264,
+       "worst": -0.6360897589287086,
+       "utility": -0.2973676093512311,
+       "sampling_error": 0.2115879981389889,
+       "trials": 296
+      },
+      {
+       "label": "switch:skeledirge",
+       "expected": -0.07970160752566946,
+       "worst": -0.7054245711727438,
+       "utility": -0.2674184966197918,
+       "sampling_error": 0.1433431981388725,
+       "trials": 1034
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    },
+    "before": "move:moonblast",
+    "paired_continuations": {
+     "move:moonblast": {
+      "win": 16,
+      "loss": 8
+     },
+     "switch:skeledirge": {
+      "win": 16,
+      "loss": 8
+     }
+    }
+   },
+   {
+    "record": "20261017-224526-2699990799.json",
+    "turn": 7,
+    "reason": "Observed Mega Starmie",
+    "record_sha256": "e027ae069d58c21d788a5be92080adf08ecfd509bedc455c0a813c56f5421ba3",
+    "request_sha256": "c489680c141e825c4dce2c88e4a8b57a2db9dc09e5d93eab5165fc4a6ef18fe3",
+    "chosen": "move:shadowball",
+    "status": {
+     "solver": "pure-robust",
+     "objective": -0.9334781194629977,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "309149a1b71b1d355d0611a7275ae646c524998b99694c6a7045743d952ebc96",
+      "state_codec": "observed-state-v2",
+      "opponent_selection": null,
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 88,
+        "opponent": 172,
+        "ourAction": 88,
+        "opponentAction": 172
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       },
+       {
+        "ours": 88,
+        "opponent": 189,
+        "ourAction": 88,
+        "opponentAction": 189
+       }
+      ],
+      "ready": true,
+      "simulations": 1843,
+      "terminal": 1849,
+      "learned": 234,
+      "censored": 1,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 2646,
+      "max_tree_decisions": 3,
+      "max_rollout_turns": 8,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 1,
+      "predicted_columns": true,
+      "chance_paths": 0,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       913,
+       930
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3803.777389053721,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:torchsong",
+       "expected": -0.9315146040825231,
+       "worst": -0.991078640759775,
+       "utility": -0.9493838150856986,
+       "sampling_error": 0.2230675388227855,
+       "trials": 577
+      },
+      {
+       "label": "move:willowisp",
+       "expected": -0.9213563335688566,
+       "worst": -0.9749464617152525,
+       "utility": -0.9374333720127752,
+       "sampling_error": 0.22615524056747058,
+       "trials": 363
+      },
+      {
+       "label": "move:shadowball",
+       "expected": -0.9129823684502908,
+       "worst": -0.9813015384926478,
+       "utility": -0.9334781194629977,
+       "sampling_error": 0.17372504306276904,
+       "trials": 633
+      },
+      {
+       "label": "move:slackoff",
+       "expected": -0.9414690643933223,
+       "worst": -0.9786303908068363,
+       "utility": -0.9526174623173764,
+       "sampling_error": 0.21508361930622621,
+       "trials": 270
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    },
+    "before": "move:shadowball"
+   },
+   {
+    "record": "20261018-025645-2700105840.json",
+    "turn": 8,
+    "reason": "Observed Mega Floette after Baton Pass",
+    "record_sha256": "39a0f7f0c1fbeb52dc39d348ef226fbb276d7e34e9dbd0220f638f6405ebd178",
+    "request_sha256": "a39a19ddc2ada2f3120dc66972483fa35abbee0c25d4a9419a4e20a96e261804",
+    "chosen": "move:torchsong",
+    "status": {
+     "solver": "pure-robust",
+     "objective": 0.3168206518489354,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "cb42f39432671f1190d7330f33f691eccb4010055c33d28d552fc959e5dca260",
+      "state_codec": "observed-state-v2",
+      "opponent_selection": null,
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 88,
+        "opponent": 316,
+        "ourAction": 88,
+        "opponentAction": 316
+       },
+       {
+        "ours": 88,
+        "opponent": 316,
+        "ourAction": 88,
+        "opponentAction": 316
+       },
+       {
+        "ours": 88,
+        "opponent": 338,
+        "ourAction": 88,
+        "opponentAction": 338
+       },
+       {
+        "ours": 88,
+        "opponent": 338,
+        "ourAction": 88,
+        "opponentAction": 338
+       },
+       {
+        "ours": 88,
+        "opponent": 316,
+        "ourAction": 88,
+        "opponentAction": 316
+       },
+       {
+        "ours": 88,
+        "opponent": 316,
+        "ourAction": 88,
+        "opponentAction": 316
+       }
+      ],
+      "ready": true,
+      "simulations": 1729,
+      "terminal": 1718,
+      "learned": 311,
+      "censored": 11,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 1949,
+      "max_tree_decisions": 4,
+      "max_rollout_turns": 8,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 1,
+      "predicted_columns": true,
+      "chance_paths": 0,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       872,
+       857
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3805.5128380074166,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:torchsong",
+       "expected": 0.6387780403864446,
+       "worst": -0.434413254738586,
+       "utility": 0.3168206518489354,
+       "sampling_error": 0.15940280771594806,
+       "trials": 781
+      },
+      {
+       "label": "move:willowisp",
+       "expected": 0.27453458039651385,
+       "worst": -0.3347411345914097,
+       "utility": 0.09175186590013677,
+       "sampling_error": 0.28679328323951386,
+       "trials": 137
+      },
+      {
+       "label": "move:shadowball",
+       "expected": 0.6195909314302545,
+       "worst": -0.47754762885998014,
+       "utility": 0.29044936334318405,
+       "sampling_error": 0.16485077804155457,
+       "trials": 518
+      },
+      {
+       "label": "move:slackoff",
+       "expected": 0.4535948259404121,
+       "worst": -0.5105710641032204,
+       "utility": 0.16434505892732237,
+       "sampling_error": 0.21590241654330541,
+       "trials": 167
+      },
+      {
+       "label": "switch:floetteeternal",
+       "expected": -0.33186268367919824,
+       "worst": -0.6458599929837393,
+       "utility": -0.42606187647056054,
+       "sampling_error": 0.27503876889794027,
+       "trials": 126
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    },
+    "before": "move:shadowball",
+    "paired_continuations": {
+     "move:shadowball": {
+      "loss": 24
+     },
+     "move:torchsong": {
+      "loss": 24
+     }
+    }
+   },
+   {
+    "record": "20261018-035831-2700131460.json",
+    "turn": 14,
+    "reason": "Observed Mega Lucario Z",
+    "record_sha256": "3caf20774b473b4e1c90d9ad2887b2ba64f96ac4f1ab449bdde4b1201b4c3ad1",
+    "request_sha256": "75ef8657043fb5fd31ea106c0deda0c3a60ad57b01908c2d7e98ca43fcee193b",
+    "chosen": "switch:gholdengo",
+    "status": {
+     "solver": "pure-robust",
+     "objective": -0.7573123130503375,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "0ba8548f4ceec2824ef45afa8461c4945c9bbdc93a6d41ed0d1e0653db0e7e62",
+      "state_codec": "observed-state-v2",
+      "opponent_selection": null,
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 122,
+        "opponent": 201,
+        "ourAction": 122,
+        "opponentAction": 201
+       },
+       {
+        "ours": 122,
+        "opponent": 223,
+        "ourAction": 122,
+        "opponentAction": 223
+       },
+       {
+        "ours": 122,
+        "opponent": 201,
+        "ourAction": 122,
+        "opponentAction": 201
+       },
+       {
+        "ours": 122,
+        "opponent": 201,
+        "ourAction": 122,
+        "opponentAction": 201
+       },
+       {
+        "ours": 122,
+        "opponent": 201,
+        "ourAction": 122,
+        "opponentAction": 201
+       },
+       {
+        "ours": 122,
+        "opponent": 191,
+        "ourAction": 122,
+        "opponentAction": 191
+       }
+      ],
+      "ready": true,
+      "simulations": 2247,
+      "terminal": 2249,
+      "learned": 238,
+      "censored": 0,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 2942,
+      "max_tree_decisions": 4,
+      "max_rollout_turns": 4,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 1,
+      "predicted_columns": true,
+      "chance_paths": 4,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       1108,
+       1139
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3802.486439002678,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:moonblast",
+       "expected": -0.7564138016033767,
+       "worst": -0.8606086045527227,
+       "utility": -0.7876722424881804,
+       "sampling_error": 0.15945633490272762,
+       "trials": 482
+      },
+      {
+       "label": "move:substitute",
+       "expected": -0.7452884562451156,
+       "worst": -0.8208172283379256,
+       "utility": -0.7679470878729586,
+       "sampling_error": 0.18486602642848027,
+       "trials": 390
+      },
+      {
+       "label": "move:synthesis",
+       "expected": -0.7131472466127385,
+       "worst": -0.8472554937063556,
+       "utility": -0.7533797207408236,
+       "sampling_error": 0.18399547304656197,
+       "trials": 452
+      },
+      {
+       "label": "move:calmmind",
+       "expected": -0.755164046638905,
+       "worst": -0.8681892568662771,
+       "utility": -0.7890716097071167,
+       "sampling_error": 0.17677392905371833,
+       "trials": 480
+      },
+      {
+       "label": "switch:gholdengo",
+       "expected": -0.7237929054008632,
+       "worst": -0.8355242642324446,
+       "utility": -0.7573123130503375,
+       "sampling_error": 0.1805873779560291,
+       "trials": 443
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    },
+    "before": "switch:gholdengo"
+   },
+   {
+    "record": "20261017-211957-2699961568.json",
+    "turn": 2,
+    "reason": "Illusion replacement placeholder",
+    "record_sha256": "4065d74e5b5d37d50557e96333e6231d1aff68f4d4109ee1e8ab330736f5bfd2",
+    "request_sha256": "8adc114cc9777eca225160a5421ec58c2dc4de6855f80ed2ed53f6250b7b2512",
+    "chosen": "switch:umbreon",
+    "status": {
+     "solver": "pure-robust",
+     "objective": -0.11592426669094548,
+     "rho": 0.3,
+     "worlds": 6,
+     "failed_worlds": 0,
+     "failed_cells": 0,
+     "tie_margin": 0.1,
+     "terminal_search": {
+      "algorithm": "public-information-set-uct-v2",
+      "particle_id": "b56dc9306d96ddc23e2cd117a5311d9ff85980e5b458f0525184ae4f9f08d6fc",
+      "state_codec": "observed-state-v2",
+      "opponent_selection": null,
+      "continuation_policy": "public-baton-v1+p1:expert/p2:disrupt,tactical,expert+nets:opp=c7cd00e4",
+      "bootstrap_reference": "public-reference-v2",
+      "root_speed_samples": [
+       {
+        "ours": 88,
+        "opponent": 178,
+        "ourAction": 88,
+        "opponentAction": 178
+       },
+       {
+        "ours": 88,
+        "opponent": 178,
+        "ourAction": 88,
+        "opponentAction": 178
+       },
+       {
+        "ours": 88,
+        "opponent": 178,
+        "ourAction": 88,
+        "opponentAction": 178
+       },
+       {
+        "ours": 88,
+        "opponent": 178,
+        "ourAction": 88,
+        "opponentAction": 178
+       },
+       {
+        "ours": 88,
+        "opponent": 178,
+        "ourAction": 88,
+        "opponentAction": 178
+       },
+       {
+        "ours": 88,
+        "opponent": 178,
+        "ourAction": 88,
+        "opponentAction": 178
+       }
+      ],
+      "ready": true,
+      "simulations": 549,
+      "terminal": 193,
+      "learned": 788,
+      "censored": 356,
+      "failed": 0,
+      "errors": [],
+      "tree_nodes": 842,
+      "max_tree_decisions": 2,
+      "max_rollout_turns": 8,
+      "horizon_turns": 8,
+      "prior_weight": 4,
+      "minimum_reply_trials": 2,
+      "value_kind": "bounded-reference-material-utility-v1",
+      "calibrated_win_probability": false,
+      "action_filter": {
+       "excluded": [],
+       "all_no_effect": false,
+       "passive_wait": null,
+       "scope": "all sampled worlds and legal root replies"
+      },
+      "unfinished_at_deadline": 2,
+      "predicted_columns": true,
+      "chance_paths": 0,
+      "immediate_wins": [],
+      "policy_nets": {
+       "opp": "c7cd00e48b33b9ac441a29f8d9f772a12e30ba3ee3add410a8985a9a7dc563a9"
+      },
+      "puct": 1.5,
+      "tactical_tiebreak": "first-turn-material-v1",
+      "certificate_scope": "all discrete chance paths and legal replies in sampled worlds only",
+      "workers": 2,
+      "worker_simulations": [
+       279,
+       270
+      ],
+      "budget_ms": 4500.0,
+      "elapsed_ms": 3824.4016859680414,
+      "hidden_sets_exhaustive": false,
+      "workers_requested": 2,
+      "workers_failed": []
+     },
+     "root_evidence": [
+      {
+       "label": "move:torchsong",
+       "expected": -0.3269187086929869,
+       "worst": -0.533858826778595,
+       "utility": -0.3890007441186693,
+       "sampling_error": 0.26255295369764925,
+       "trials": 103
+      },
+      {
+       "label": "move:willowisp",
+       "expected": -0.3281970637270753,
+       "worst": -0.49813490246128544,
+       "utility": -0.3791784153473383,
+       "sampling_error": 0.28031763523939607,
+       "trials": 91
+      },
+      {
+       "label": "move:shadowball",
+       "expected": -0.4401520320161665,
+       "worst": -0.6443994656589103,
+       "utility": -0.5014262621089896,
+       "sampling_error": 0.28408266211269967,
+       "trials": 85
+      },
+      {
+       "label": "move:slackoff",
+       "expected": -0.37034118150305345,
+       "worst": -0.5301898057672405,
+       "utility": -0.41829576878230956,
+       "sampling_error": 0.2640122440770509,
+       "trials": 94
+      },
+      {
+       "label": "switch:floetteeternal",
+       "expected": -0.16470730175929188,
+       "worst": -0.3222647509341245,
+       "utility": -0.21197453651174164,
+       "sampling_error": 0.26231256307551587,
+       "trials": 104
+      },
+      {
+       "label": "switch:umbreon",
+       "expected": -0.0763885343030616,
+       "worst": -0.20817430892934122,
+       "utility": -0.11592426669094548,
+       "sampling_error": 0.2570105391287613,
+       "trials": 72
+      }
+     ],
+     "score_kind": "bounded-reference-material-utility-v1",
+     "calibrated_win_probability": false
+    },
+    "before": "switch:umbreon"
+   }
+  ],
+  "scope": "Observed-prefix replay and hypothetical-set paired terminal continuations. Development diagnostics, not a human win-rate estimate."
+ }
+}

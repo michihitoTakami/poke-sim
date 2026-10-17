@@ -22,6 +22,7 @@ from poke_env.data import GenData
 from pokesim.live.session import BattleSession
 from pokesim.rl.myteam import to_id
 from pokesim.search.lookahead import field_state, mon_state, revealed, side_conditions
+from pokesim.state.codec import fainted_count
 
 SURVIVAL = ("Focus Sash", "Sturdy", "Endure", "Disguise", "Ice Face", "Substitute", "Focus Band")
 ORDER_EFFECTS = ("Quick Claw", "Custap Berry", "Quash", "Quick Draw", "After You")
@@ -71,6 +72,7 @@ def own_sample_side(battle, own_sets: dict, base_id) -> dict:
     for k in ("ppUsed", "pp", "choiceMove"):  # damage and speed do not depend on them; avoid PP mismatches
         state.pop(k, None)
     return {"team": sets, "mons": [state, {"hp": 1.0}, {"hp": 1.0}], "megaUsed": battle.used_mega_evolve,
+            "totalFainted": fainted_count(battle, battle.player_role, battle.team.values()),
             "conditions": side_conditions(battle.side_conditions, battle.turn)}
 
 
@@ -82,6 +84,7 @@ def opponent_sample_side(battle) -> dict:
     if item is not None:
         state["item"] = item  # empty string means known to have none
     return {"team": [None, None, None], "mons": [state, {"hp": 1.0}, {"hp": 1.0}],
+            "totalFainted": fainted_count(battle, battle.opponent_role, battle.opponent_team.values()),
             "megaUsed": battle.opponent_used_mega_evolve,
             "conditions": side_conditions(battle.opponent_side_conditions, battle.turn)}
 
@@ -102,11 +105,13 @@ class Observer:
         self._stay_done = False
         self._n = 0
         self.item_epochs: dict[str, int] = {}
+        self._opponent_entry = (0, {})
+        self.quarantined: list[Observation] = []  # observations reconstructed using an Illusion's wrong identity
 
     # -- feeding ---------------------------------------------------------------------------------------------------
     def feed(self, log: list[str]) -> list[Observation]:
         """Consume log[self.seen:]; returns the observations completed by these lines."""
-        new_start = len(self.observations)
+        before = {o.id for o in self.observations}
         lines = log[self.seen:]
         self.seen = len(log)
         for line in lines:
@@ -115,7 +120,7 @@ class Observer:
                     self._start(log)
                 continue
             self._line(line)
-        return self.observations[new_start:]
+        return [o for o in self.observations if o.id not in before]
 
     def _start(self, log: list[str]) -> None:
         self.session = BattleSession(self.sets, role=self.role)
@@ -138,6 +143,17 @@ class Observer:
             self._resolve_move()
         if kind == "turn":
             self._resolve_turn()
+        if kind in ('switch', 'drag') and len(parts) > 2 and parts[2].startswith(self.opp):
+            self._opponent_entry = len(self.observations), dict(self.item_epochs)
+        elif kind == 'replace' and len(parts) > 2 and parts[2].startswith(self.opp):
+            # Those damage/order snapshots used the imitated species and possibly its previous held item.
+            # Do not constrain either real species with them. Public moves/items transfer in TrackedBattle;
+            # fresh observations after the reveal are safe for posterior updates.
+            start, epochs = self._opponent_entry
+            self.quarantined.extend(self.observations[start:])
+            del self.observations[start:]
+            self.item_epochs = dict(epochs)
+            self._pending = self._turn = None
         if kind in ("switch", "drag", "replace") and len(parts) > 2 and parts[2].startswith(self.opp):
             self._stay, self._stay_done = set(), False
         if kind == "move" and "[from]" not in line and len(parts) > 3:

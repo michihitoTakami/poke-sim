@@ -5,6 +5,7 @@ const {PublicObservation, legalChoices} = require('./public_observation');
 const {pruneRoot} = require('./action_filter');
 const {choosePublic, chooseBatonPublic, observedStep, VERSION, BATON_VERSION} = require('./public_policy');
 const {loadPolicyNet} = require('./policy_net');
+const {VERSION: STATE_VERSION} = require('./state_codec');
 
 // A small deterministic random source per trial (xorshift32), separate from the engine's PRNG so loading a
 // policy net does not change the chance events of a trial that does not consult it.
@@ -57,6 +58,7 @@ function immediateWin(snapshot, a, c, deps, deadline, limit = 4096) {
 class Search {
   constructor(req, deps) {
     this.deps = deps; this.history = req.observationLog; this.nodes = new Map(); this.pending = new Map();
+    this.opponentSelection = req.opponentSelection || null;
     this.policy = req.batonPolicy === false ? choosePublic : chooseBatonPublic;
     this.policyVersion = req.batonPolicy === false ? VERSION : BATON_VERSION;
     // stream: an independent random stream over the same worlds (offline oracles merge several; live uses none).
@@ -361,6 +363,8 @@ class Search {
     const ready = this.states.every(st => st.cells.every(row => row.every(c => c.prior !== null))) ||
       this.certified.length > 0;
     const summary = {algorithm: 'public-information-set-uct-v2', particle_id: this.id,
+      state_codec: STATE_VERSION,
+      opponent_selection: this.opponentSelection,
       continuation_policy: this.policyVersion, bootstrap_reference: VERSION,
       root_speed_samples: this.states.map(s => s.speed),
       ready, simulations: this.simulations,

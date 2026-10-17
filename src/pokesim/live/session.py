@@ -151,7 +151,7 @@ class BattleSession:
             active = bool(mon is not None and mon.active and not team_preview)
             if active:
                 active_info = info
-            item = info["item"] if mon is None or mon.item in (None, "unknown_item") else mon.item
+            item = info["item"] if mon is None or mon.item == "unknown_item" else (mon.item or "")
             # A receiver can already be Mega evolved. Reusing the original team-file details here reverts
             # its observed forme when poke-env refreshes the next request.
             details = mon._last_details if mon is not None and mon._last_details else info['details']

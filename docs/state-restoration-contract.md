@@ -4,6 +4,13 @@
 `state/codec.py` exports known counters. `state/tracker.py` retains public Disable and Encore move identities
 for reconstructed sessions and clears them on switching or the corresponding end event.
 
+`observed-state-v2` additionally restores current held items (including the known empty slot), cumulative
+faints and exact observed Mega formes. These facts override the original team sheet and sampled unknowns.
+`tryMega` is a hypothetical preview request; `mega` is an observed fact and must be restorable.
+Illusion reveals transfer current-stint public evidence to the real member and restore the imitated member's
+prior history. Belief observations built under the wrong identity are quarantined. See the
+[2026-10-18 audit](audits/20261018-state-and-opponent-selection.md) for coverage and limits.
+
 Our selected roster comes from the current request's `side.pokemon`, including fainted and trapped members.
 `battle.team` may retain all six preview members; an empty `available_switches` must never refill the simulated
 bench from it. Missing, preview-only or inconsistent selected-roster requests fail the search rather than guess.

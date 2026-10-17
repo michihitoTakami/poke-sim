@@ -163,7 +163,7 @@ class Live:
         recognized = self.recognized
         self.reset()
         self.recognized = recognized
-        picks = self.picks_model.predict(species)
+        picks = await asyncio.to_thread(self.picks_model.predict, species, self.roster, ROOT / 'data/raw/ladder')
         model = LadderLineupModel.from_records(ROOT / 'data/raw/ladder', self.roster)
         coverage = None
         if self.preview_coverage:
@@ -175,11 +175,16 @@ class Live:
         self.preview = {"species": species, "names": [self.name(s) for s in species],
                         "brought": [round(float(p), 3) for p in picks.brought],
                         "lead": [round(float(p), 3) for p in picks.lead],
+                        "opponent_selection": picks.context,
+                        "opponent_lineups": [{"lineup": names, "names": [self.name(n) for n in names],
+                                              "probability": float(p)} for names, p in picks.lineups[:5]],
                         "lineups": [{"lineup": names, "names": [self.name(n) for n in names],
                                      "win": None, "score": round(p, 3)} for names, p, _ in ranking[:10]],
                         "lineup_note": "実戦の選出成績と3体の相性による比較値です。勝率ではありません。"}
         self.session = BattleSession(self.sets)
         self.session.preview(species)
+        if self.advisor.engine is not None:
+            self.advisor.engine.set_opponent_picks(self.session.battle.battle_tag, picks)
         self.translator = EventTranslator(self.session)
         self.tracker = ScreenTracker(Vocab.build(self.sets, species, self.ja),
                                      maxhp={i["species"]: i["maxhp"] for i in self.session.info})

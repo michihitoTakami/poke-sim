@@ -155,6 +155,8 @@ function render(s) {
     const p = s.preview;
     $('picks').innerHTML = '<table><tr><th>相手</th><th>選出率</th><th>先発率</th></tr>' +
       p.names.map((n, i) => `<tr><td>${n}</td><td>${pct(p.brought[i])}</td><td>${pct(p.lead[i])}</td></tr>`).join('') + '</table>';
+    if (p.opponent_lineups?.length) $('picks').innerHTML += '<div class="muted">相手の選出候補（先頭が先発・予測）</div>' +
+      p.opponent_lineups.map(l => `<div>${l.names.join('・')} ${pct(l.probability)}</div>`).join('');
     $('lineups').innerHTML = p.lineups.length ? '<table><tr><th>先発</th><th>残り</th><th>相性評価</th></tr>' +
       p.lineups.map((l, i) => `<tr class="pick${sameLineup(l.lineup, s.lineup) ? ' chosen' : ''}" data-i="${i}"><td>${l.names[0]}</td><td>${l.names.slice(1).join('・')}</td><td>${l.score != null ? l.score.toFixed(3) : pct(l.win)}</td></tr>`).join('') + '</table>'
       : '選出ごとの勝率モデルがまだありません（scripts/sim_matchups.py）。手動で選んでください。';

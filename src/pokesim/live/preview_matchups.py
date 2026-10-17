@@ -12,7 +12,7 @@ import numpy as np
 
 from pokesim.rl.myteam import to_id
 
-VERSION = 'preview-coverage-v1'
+VERSION = 'preview-coverage-v2'
 
 
 class PreviewCoverage:
@@ -77,10 +77,19 @@ class CoverageProfile:
             # A passive passer alone cannot answer a threat merely by resisting its first hit.
             duel = np.where(outgoing > .05, duel, np.minimum(duel, -.75))
             cover = duel.max(axis=0)
-            score = .6 * float(cover @ brought) + .4 * float(cover.min()) + .25 * float(duel[0] @ lead)
-            scores.append((score, mega, cover, incoming))
-        score, mega, cover, incoming = max(scores, key=lambda x: x[0])
+            worst = float(cover.min())
+            # Opponents bring three together. Use their joint selection's weakest matchup, while retaining
+            # a 30% guard for an unexpected selection. Without joint predictions retain the old all-six guard.
+            if getattr(picks, 'lineups', None):
+                index = {s: j for j, s in enumerate(self.species)}
+                expected_worst = sum(p * float(min(cover[index[to_id(s)]] for s in names))
+                                     for names, p in picks.lineups)
+                worst = .7 * expected_worst + .3 * worst
+            score = .6 * float(cover @ brought) + .4 * worst + .25 * float(duel[0] @ lead)
+            scores.append((score, mega, cover, incoming, worst))
+        score, mega, cover, incoming, worst = max(scores, key=lambda x: x[0])
         return score, {'version': VERSION, 'profile': self.signature, 'logit_adjustment': round(score, 4),
                        'mega': self.roster[mega] if mega is not None else None,
+                       'selection_worst': round(worst, 4),
                        'uncovered': [s for s, value in zip(self.species, cover) if value < -.25],
                        'minimum_incoming': {s: round(float(v), 3) for s, v in zip(self.species, incoming.min(axis=0))}}

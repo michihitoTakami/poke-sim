@@ -7,7 +7,7 @@ function previewMatchups(req, deps) {
         const estimates = [];
         for (const set of opponent.sets) {
           for (const weather of req.previewMatchups.weather || ['']) {
-            const side = (team, evolved) => ({team: [team], mons: [{hp: 1, mega: evolved}]});
+            const side = (team, evolved) => ({team: [team], mons: [{hp: 1, tryMega: evolved}]});
             const b = deps.setUp({p1: side(req.previewMatchups.ours[i], mega), p2: side(set, true),
               field: weather ? {weather, weatherTurns: 5} : {}}, req.format, 1);
             try {
