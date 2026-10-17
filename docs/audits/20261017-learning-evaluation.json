@@ -1,0 +1,213 @@
+{
+ "schema_version": 1,
+ "settings": {
+  "data": "data/processed/learn/ladder-20261017",
+  "value_data": "data/processed/learn/ladder-20261017/views-v2",
+  "value_before": "runs/value-replays-v1",
+  "value_after": "runs/value-ladder-20261017-v2",
+  "opp_before": "runs/opp-replays-v1",
+  "opp_after": "runs/opp-ladder-20261017",
+  "out": "docs/audits/20261017-learning-evaluation.json"
+ },
+ "report_shas": {
+  "runs/value-replays-v1": "b0d4be669e82c64b",
+  "runs/value-ladder-20261017-v2": "9c672286286a88eb",
+  "runs/opp-replays-v1": "cfeedf78479fd208",
+  "runs/opp-ladder-20261017": "ffdb085f2b81d31d"
+ },
+ "note": "Development chooses epochs. Test is descriptive held-out validation, six battles; all histories were inspected for the weakness audit. No claim of online win-rate gain.",
+ "results": {
+  "development": {
+   "policy": {
+    "before": {
+     "seeds": {
+      "0": {
+       "rows": 62,
+       "battles": 8,
+       "log_lik": -1.389908262575386,
+       "top1": 0.5087482333183289,
+       "top3": 0.8026695847511292
+      },
+      "1": {
+       "rows": 62,
+       "battles": 8,
+       "log_lik": -1.3929647618102057,
+       "top1": 0.49089109897613525,
+       "top3": 0.8517767190933228
+      },
+      "2": {
+       "rows": 62,
+       "battles": 8,
+       "log_lik": -1.3692242987481849,
+       "top1": 0.46563854813575745,
+       "top3": 0.8361517190933228
+      }
+     },
+     "mean": {
+      "top1": 0.48842596014340717,
+      "top3": 0.8301993409792582,
+      "log_lik": -1.3840324410445923
+     }
+    },
+    "after": {
+     "seeds": {
+      "0": {
+       "rows": 62,
+       "battles": 8,
+       "log_lik": -1.3872302322059824,
+       "top1": 0.5087482333183289,
+       "top3": 0.8205267190933228
+      },
+      "1": {
+       "rows": 62,
+       "battles": 8,
+       "log_lik": -1.3910524470871874,
+       "top1": 0.49089109897613525,
+       "top3": 0.8517767190933228
+      },
+      "2": {
+       "rows": 62,
+       "battles": 8,
+       "log_lik": -1.3627232563698137,
+       "top1": 0.49089109897613525,
+       "top3": 0.8517767190933228
+      }
+     },
+     "mean": {
+      "top1": 0.49684347709019977,
+      "top3": 0.8413600524266561,
+      "log_lik": -1.3803353118876611
+     }
+    }
+   },
+   "value": {
+    "before": {
+     "brier": 0.19980248544805657,
+     "log_loss": 0.5665200842582161
+    },
+    "after": {
+     "brier": 0.1875275053995099,
+     "log_loss": 0.5389836372035894
+    },
+    "after_minus_before": {
+     "brier": {
+      "mean": -0.012274980048546658,
+      "ci90": [
+       -0.025838785658217286,
+       0.0004251242571294018
+      ]
+     },
+     "log_loss": {
+      "mean": -0.027536447054626656,
+      "ci90": [
+       -0.059310040587683945,
+       0.0029601288237241508
+      ]
+     }
+    },
+    "battles": 8,
+    "rows": 72
+   }
+  },
+  "test": {
+   "policy": {
+    "before": {
+     "seeds": {
+      "0": {
+       "rows": 46,
+       "battles": 6,
+       "log_lik": -1.5770442813063879,
+       "top1": 0.4265873432159424,
+       "top3": 0.8055555820465088
+      },
+      "1": {
+       "rows": 46,
+       "battles": 6,
+       "log_lik": -1.5053374333926026,
+       "top1": 0.4265873432159424,
+       "top3": 0.845238208770752
+      },
+      "2": {
+       "rows": 46,
+       "battles": 6,
+       "log_lik": -1.4317455066700857,
+       "top1": 0.48214292526245117,
+       "top3": 0.8690476417541504
+      }
+     },
+     "mean": {
+      "top1": 0.4451058705647786,
+      "top3": 0.8399471441904703,
+      "log_lik": -1.504709073789692
+     }
+    },
+    "after": {
+     "seeds": {
+      "0": {
+       "rows": 46,
+       "battles": 6,
+       "log_lik": -1.6138111305801512,
+       "top1": 0.46626991033554077,
+       "top3": 0.8055555820465088
+      },
+      "1": {
+       "rows": 46,
+       "battles": 6,
+       "log_lik": -1.507242513496735,
+       "top1": 0.4543651342391968,
+       "top3": 0.845238208770752
+      },
+      "2": {
+       "rows": 46,
+       "battles": 6,
+       "log_lik": -1.4709431810857492,
+       "top1": 0.4543651342391968,
+       "top3": 0.8690476417541504
+      }
+     },
+     "mean": {
+      "top1": 0.4583333929379781,
+      "top3": 0.8399471441904703,
+      "log_lik": -1.530665608387545
+     }
+    }
+   },
+   "value": {
+    "before": {
+     "brier": 0.2098596907949848,
+     "log_loss": 0.6118847993854
+    },
+    "after": {
+     "brier": 0.2180810225644676,
+     "log_loss": 0.6298427013532236
+    },
+    "after_minus_before": {
+     "brier": {
+      "mean": 0.008221331769482832,
+      "ci90": [
+       -0.003618674875887138,
+       0.02090387222537483
+      ]
+     },
+     "log_loss": {
+      "mean": 0.01795790196782372,
+      "ci90": [
+       -0.009114656612704528,
+       0.04786079267110391
+      ]
+     }
+    },
+    "battles": 6,
+    "rows": 50
+   }
+  }
+ },
+ "data_shas": {
+  "data/processed/learn/ladder-20261017/opponent-train.npz": "ec165ed10ac059a5",
+  "data/processed/learn/ladder-20261017/views-v2/value-train.npz": "c4f3c799b5a4e847",
+  "data/processed/learn/ladder-20261017/opponent-development.npz": "aab11054ce50f9db",
+  "data/processed/learn/ladder-20261017/views-v2/value-development.npz": "4c55498a9d79abee",
+  "data/processed/learn/ladder-20261017/opponent-test.npz": "41a4718928ab65df",
+  "data/processed/learn/ladder-20261017/views-v2/value-test.npz": "421a0acbbaccb327"
+ }
+}

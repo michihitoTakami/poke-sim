@@ -1,0 +1,4000 @@
+{
+ "schema_version": 1,
+ "scope": "saved Showdown ladder records",
+ "interpretation": "Conditional battle outcomes and observed events, not causal move ratings. Direct KOs exclude residual damage. Small samples and repeated opponents remain.",
+ "summary": {
+  "battles": 33,
+  "known_results": 33,
+  "results": {
+   "loss": 19,
+   "win": 14
+  },
+  "by_preview": [
+   {
+    "name": "Salamence",
+    "battles": 7,
+    "wins": 0,
+    "losses": 7,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Archaludon",
+    "battles": 10,
+    "wins": 3,
+    "losses": 7,
+    "win_rate": 0.3
+   },
+   {
+    "name": "Primarina",
+    "battles": 10,
+    "wins": 4,
+    "losses": 6,
+    "win_rate": 0.4
+   },
+   {
+    "name": "Golisopod",
+    "battles": 11,
+    "wins": 5,
+    "losses": 6,
+    "win_rate": 0.45454545454545453
+   },
+   {
+    "name": "Basculegion",
+    "battles": 4,
+    "wins": 0,
+    "losses": 4,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Dragonite",
+    "battles": 5,
+    "wins": 1,
+    "losses": 4,
+    "win_rate": 0.2
+   },
+   {
+    "name": "Pelipper",
+    "battles": 3,
+    "wins": 0,
+    "losses": 3,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Absol",
+    "battles": 4,
+    "wins": 1,
+    "losses": 3,
+    "win_rate": 0.25
+   },
+   {
+    "name": "Mimikyu",
+    "battles": 5,
+    "wins": 2,
+    "losses": 3,
+    "win_rate": 0.4
+   },
+   {
+    "name": "Glimmora",
+    "battles": 6,
+    "wins": 3,
+    "losses": 3,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Rillaboom",
+    "battles": 6,
+    "wins": 3,
+    "losses": 3,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Garchomp",
+    "battles": 10,
+    "wins": 7,
+    "losses": 3,
+    "win_rate": 0.7
+   },
+   {
+    "name": "Gholdengo",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Hatterene",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Pawmot",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Charizard",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Cinderace",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Clefable",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Sneasler",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Hippowdon",
+    "battles": 4,
+    "wins": 2,
+    "losses": 2,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Swampert",
+    "battles": 4,
+    "wins": 2,
+    "losses": 2,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Meowscarada",
+    "battles": 5,
+    "wins": 3,
+    "losses": 2,
+    "win_rate": 0.6
+   },
+   {
+    "name": "Baxcalibur",
+    "battles": 6,
+    "wins": 4,
+    "losses": 2,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Aggron",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Ampharos",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Basculegion-F",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Blaziken",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Dragalge",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Forretress",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Gengar",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Gourgeist",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Hydreigon",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Lopunny",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Manectric",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Maushold",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Noivern",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Pikachu",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Pincurchin",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Politoed",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Raichu",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Raichu-Alola",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Salazzle",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Scovillain",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Staraptor",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Starmie",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Vanilluxe",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Vivillon",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Aegislash",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Arcanine-Hisui",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Beedrill",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Dragapult",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Indeedee",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Metagross",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Ninetales-Alola",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Rotom-Mow",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Samurott-Hisui",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Slowking-Galar",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Umbreon",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Corviknight",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Kingambit",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Lucario",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Skeledirge",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Toxapex",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Audino",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Barbaracle",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Ditto",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Espathra",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Garganacl",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Goodra-Hisui",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Greninja",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Gyarados",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Klefki",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Rotom-Heat",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Skarmory",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Snorlax",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Venusaur",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Altaria",
+    "battles": 2,
+    "wins": 2,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Delphox",
+    "battles": 2,
+    "wins": 2,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Scizor",
+    "battles": 2,
+    "wins": 2,
+    "losses": 0,
+    "win_rate": 1.0
+   }
+  ],
+  "by_seen": [
+   {
+    "name": "Archaludon",
+    "battles": 8,
+    "wins": 2,
+    "losses": 6,
+    "win_rate": 0.25
+   },
+   {
+    "name": "Primarina",
+    "battles": 6,
+    "wins": 2,
+    "losses": 4,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Salamence",
+    "battles": 3,
+    "wins": 0,
+    "losses": 3,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Pelipper",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Charizard",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Cinderace",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Garchomp",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Baxcalibur",
+    "battles": 4,
+    "wins": 2,
+    "losses": 2,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Golisopod",
+    "battles": 5,
+    "wins": 3,
+    "losses": 2,
+    "win_rate": 0.6
+   },
+   {
+    "name": "Absol",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Aegislash",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Basculegion-F",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Clefable",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Dragalge",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Dragapult",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Hydreigon",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Manectric",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Maushold",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Ninetales-Alola",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Noivern",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Pikachu",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Pincurchin",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Politoed",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Raichu",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Samurott-Hisui",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Arcanine-Hisui",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Beedrill",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Glimmora",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Hippowdon",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Metagross",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Mimikyu",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Swampert",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Barbaracle",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Garganacl",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Goodra-Hisui",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Greninja",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Gyarados",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Klefki",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Lucario",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Meowscarada",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Rotom-Heat",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Scizor",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Skarmory",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Skeledirge",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Slowking-Galar",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Toxapex",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Umbreon",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Venusaur",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Altaria",
+    "battles": 2,
+    "wins": 2,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Kingambit",
+    "battles": 2,
+    "wins": 2,
+    "losses": 0,
+    "win_rate": 1.0
+   }
+  ],
+  "by_move": [
+   {
+    "name": "Draco Meteor",
+    "battles": 4,
+    "wins": 0,
+    "losses": 4,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Surf",
+    "battles": 4,
+    "wins": 0,
+    "losses": 4,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Earthquake",
+    "battles": 7,
+    "wins": 3,
+    "losses": 4,
+    "win_rate": 0.42857142857142855
+   },
+   {
+    "name": "Dragon Dance",
+    "battles": 5,
+    "wins": 2,
+    "losses": 3,
+    "win_rate": 0.4
+   },
+   {
+    "name": "Stealth Rock",
+    "battles": 7,
+    "wins": 4,
+    "losses": 3,
+    "win_rate": 0.5714285714285714
+   },
+   {
+    "name": "Calm Mind",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Double-Edge",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Electro Shot",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Fire Blast",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Glaive Rush",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Iron Head",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Moonblast",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Shadow Ball",
+    "battles": 2,
+    "wins": 0,
+    "losses": 2,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Dragon Claw",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Shadow Sneak",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Sparkling Aria",
+    "battles": 3,
+    "wins": 1,
+    "losses": 2,
+    "win_rate": 0.3333333333333333
+   },
+   {
+    "name": "Sucker Punch",
+    "battles": 6,
+    "wins": 4,
+    "losses": 2,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Air Slash",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Aurora Veil",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Ceaseless Edge",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Cosmic Power",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Dragon Tail",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Gunk Shot",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Ice Punch",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Icicle Crash",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "King's Shield",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Memento",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Moonlight",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Mud Shot",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Play Rough",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Poltergeist",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Population Bomb",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Psychic Fangs",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Psychic Noise",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Rising Voltage",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Rock Tomb",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Shadow Claw",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Snarl",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Stored Power",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Struggle",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Swords Dance",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Tailwind",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Thunder Punch",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Tidy Up",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Wave Crash",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Weather Ball",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Whirlwind",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Zap Cannon",
+    "battles": 1,
+    "wins": 0,
+    "losses": 1,
+    "win_rate": 0.0
+   },
+   {
+    "name": "Aqua Jet",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Bullet Punch",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Curse",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Encore",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Flash Cannon",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Flip Turn",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Head Smash",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Ice Shard",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Light Screen",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Poison Jab",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Power Gem",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Pyro Ball",
+    "battles": 2,
+    "wins": 1,
+    "losses": 1,
+    "win_rate": 0.5
+   },
+   {
+    "name": "Flare Blitz",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Roar",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "U-turn",
+    "battles": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 0.6666666666666666
+   },
+   {
+    "name": "Brave Bird",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Chilly Reception",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Crunch",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Dark Pulse",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Earth Power",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Giga Drain",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Hex",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Ice Beam",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Overheat",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Protect",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Recover",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Roost",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Salt Cure",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Sludge Wave",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Spikes",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Thunder Fang",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Torch Song",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Toxic",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Triple Axel",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Volt Switch",
+    "battles": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Cotton Guard",
+    "battles": 2,
+    "wins": 2,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Drill Run",
+    "battles": 2,
+    "wins": 2,
+    "losses": 0,
+    "win_rate": 1.0
+   },
+   {
+    "name": "Will-O-Wisp",
+    "battles": 2,
+    "wins": 2,
+    "losses": 0,
+    "win_rate": 1.0
+   }
+  ],
+  "direct_ko_moves": {
+   "Earthquake": 6,
+   "Electro Shot": 4,
+   "Shadow Sneak": 3,
+   "Weather Ball": 2,
+   "Wave Crash": 2,
+   "Draco Meteor": 2,
+   "Glaive Rush": 2,
+   "Sparkling Aria": 2,
+   "Double-Edge": 2,
+   "Rising Voltage": 2,
+   "Surf": 2,
+   "Flare Blitz": 2,
+   "Shadow Ball": 2,
+   "Head Smash": 2,
+   "Play Rough": 2,
+   "Shadow Claw": 2,
+   "Zap Cannon": 2,
+   "Population Bomb": 1,
+   "Ceaseless Edge": 1,
+   "Struggle": 1,
+   "Ice Punch": 1,
+   "Pyro Ball": 1,
+   "Rock Tomb": 1,
+   "Mud Shot": 1,
+   "Ice Shard": 1,
+   "Aqua Jet": 1,
+   "Psychic Noise": 1,
+   "U-turn": 1,
+   "Iron Head": 1,
+   "Sucker Punch": 1,
+   "Bullet Punch": 1,
+   "Psychic Fangs": 1,
+   "Sludge Wave": 1,
+   "Poison Jab": 1,
+   "Moonblast": 1,
+   "Gunk Shot": 1,
+   "Triple Axel": 1,
+   "Crunch": 1,
+   "Brave Bird": 1
+  },
+  "marker_battles": {
+   "curse": {
+    "loss": 1
+   },
+   "encore": {
+    "loss": 1
+   },
+   "last_scolipede": {
+    "loss": 4
+   },
+   "opponent_setup_during_passive_move": {
+    "loss": 5,
+    "win": 1
+   },
+   "phazed": {
+    "loss": 1,
+    "win": 2
+   },
+   "rain_electro_shot": {
+    "loss": 2
+   }
+  },
+  "lineup_mismatches": [
+   "showdown battle-gen9championsbssregmc-2699531923"
+  ],
+  "random_fallbacks": 9
+ },
+ "battles": [
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699529161-vo9k1e66cgjgy4x2hfwsrjc9duhuaufpw",
+   "started": "20261017-011314",
+   "result": "loss",
+   "opponent": "yhbbhy",
+   "code": {
+    "commit": "da5a1e8192d4",
+    "dirty": false
+   },
+   "turns": 11,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Basculegion",
+    "Charizard",
+    "Maushold",
+    "Mimikyu",
+    "Salamence",
+    "Sneasler"
+   ],
+   "opponent_seen": [
+    "Charizard",
+    "Maushold"
+   ],
+   "opponent_moves": [
+    "Air Slash",
+    "Population Bomb",
+    "Tidy Up",
+    "Weather Ball"
+   ],
+   "own_faints": [
+    {
+     "turn": 1,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Weather Ball",
+     "attacker": "Charizard",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 4,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Weather Ball",
+     "attacker": "Charizard",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    },
+    {
+     "turn": 11,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Population Bomb",
+     "attacker": "Maushold",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 9,
+     "our_move": "Calm Mind",
+     "opponent_move": "Tidy Up"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 10,
+     "our_move": "Substitute",
+     "opponent_move": "Tidy Up"
+    }
+   ],
+   "random_fallbacks": 4,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-011314-vo9k1e66cgjgy4x2hfwsrjc9duhuaufpw.json",
+   "sha256": "a236f9ce27d15a8da96fb6c54e460bc3697cb0051ff7883e40e24e5395a6c838"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699531923",
+   "started": "20261017-012654",
+   "result": "loss",
+   "opponent": "ob.gjl",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 63,
+   "lineup": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Scolipede",
+    "Umbreon"
+   ],
+   "lineup_mismatch": true,
+   "opponent_preview": [
+    "Clefable",
+    "Corviknight",
+    "Dragalge",
+    "Garchomp",
+    "Samurott-Hisui",
+    "Scovillain"
+   ],
+   "opponent_seen": [
+    "Clefable",
+    "Dragalge",
+    "Samurott-Hisui"
+   ],
+   "opponent_moves": [
+    "Ceaseless Edge",
+    "Cosmic Power",
+    "Draco Meteor",
+    "Flip Turn",
+    "Moonblast",
+    "Moonlight",
+    "Stored Power",
+    "Struggle"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Ceaseless Edge",
+     "attacker": "Samurott-Hisui",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 61,
+     "victim": "Scolipede",
+     "source": "direct_move",
+     "move": "Struggle",
+     "attacker": "Clefable",
+     "protocol": "|-damage|p1a: Scolipede|0 fnt"
+    }
+   ],
+   "failed_moves": [
+    {
+     "side": "p1",
+     "species": "Umbreon",
+     "move": "Moonlight",
+     "turn": 52
+    },
+    {
+     "side": "p1",
+     "species": "Umbreon",
+     "move": "Moonlight",
+     "turn": 54
+    },
+    {
+     "side": "p1",
+     "species": "Umbreon",
+     "move": "Moonlight",
+     "turn": 56
+    },
+    {
+     "side": "p1",
+     "species": "Umbreon",
+     "move": "Baton Pass",
+     "turn": 62
+    }
+   ],
+   "markers": [
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 5,
+     "our_move": "Substitute",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 6,
+     "our_move": "Iron Defense",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 7,
+     "our_move": "Iron Defense",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 8,
+     "our_move": "Baton Pass",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 9,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 21,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 25,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 32,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 33,
+     "our_move": "Baton Pass",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 35,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 36,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 38,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 39,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 40,
+     "our_move": "Calm Mind",
+     "opponent_move": "Cosmic Power"
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-012654-2699531923.json",
+   "sha256": "5fb32973979caa312b928c1115095d43d5903c133c8cbcf9410f0d2772da5466"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699538021-arhlogi39glmrxocmxk96vvahkidh3upw",
+   "started": "20261017-012809",
+   "result": "win",
+   "opponent": "pelor 4242",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 6,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Cinderace",
+    "Garchomp",
+    "Golisopod",
+    "Goodra-Hisui",
+    "Rillaboom",
+    "Sneasler"
+   ],
+   "opponent_seen": [
+    "Cinderace",
+    "Goodra-Hisui"
+   ],
+   "opponent_moves": [
+    "Pyro Ball",
+    "Sucker Punch"
+   ],
+   "own_faints": [],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-012809-arhlogi39glmrxocmxk96vvahkidh3upw.json",
+   "sha256": "138aea16fc211278af25565c09bab1282f12eb8c2b686955b95c6e538741640d"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699538726",
+   "started": "20261017-012944",
+   "result": "win",
+   "opponent": "DreamPrince",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 6,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Altaria",
+    "Corviknight",
+    "Meowscarada",
+    "Skeledirge",
+    "Snorlax",
+    "Toxapex"
+   ],
+   "opponent_seen": [
+    "Altaria",
+    "Skeledirge"
+   ],
+   "opponent_moves": [
+    "Cotton Guard",
+    "Torch Song",
+    "Will-O-Wisp"
+   ],
+   "own_faints": [],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-012944-2699538726.json",
+   "sha256": "5b90c94d2327e87fa69507f1b3d14abd68ddba4a66e0272778cd9e99fe45527d"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699539543-oix1cjx3khssf2ebddaeh5er2u7btqqpw",
+   "started": "20261017-013157",
+   "result": "win",
+   "opponent": "kyagawa",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 9,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Baxcalibur",
+    "Dragonite",
+    "Garchomp",
+    "Lucario",
+    "Primarina",
+    "Rotom-Heat"
+   ],
+   "opponent_seen": [
+    "Lucario",
+    "Primarina",
+    "Rotom-Heat"
+   ],
+   "opponent_moves": [
+    "Encore",
+    "Overheat",
+    "Volt Switch",
+    "Will-O-Wisp"
+   ],
+   "own_faints": [],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-013157-oix1cjx3khssf2ebddaeh5er2u7btqqpw.json",
+   "sha256": "6581b037b0053dd180ff733743286de73e6d88c458ea7912fc28e8c3074941ed"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699540752",
+   "started": "20261017-013328",
+   "result": "win",
+   "opponent": "pcapk",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 10,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Barbaracle",
+    "Clefable",
+    "Gyarados",
+    "Hippowdon",
+    "Kingambit",
+    "Scizor"
+   ],
+   "opponent_seen": [
+    "Barbaracle",
+    "Gyarados",
+    "Kingambit"
+   ],
+   "opponent_moves": [
+    "Dragon Dance",
+    "Earthquake"
+   ],
+   "own_faints": [],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 1,
+     "our_move": "Iron Defense",
+     "opponent_move": "Dragon Dance"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 2,
+     "our_move": "Baton Pass",
+     "opponent_move": "Dragon Dance"
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-013328-2699540752.json",
+   "sha256": "e88d6423a3139b10f374fba24d98e49f560475f3f41c48cc477aa633dda243e0"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699541555",
+   "started": "20261017-013533",
+   "result": "loss",
+   "opponent": "penelopito03",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 9,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Archaludon",
+    "Dragonite",
+    "Meowscarada",
+    "Mimikyu",
+    "Politoed",
+    "Swampert"
+   ],
+   "opponent_seen": [
+    "Archaludon",
+    "Politoed",
+    "Swampert"
+   ],
+   "opponent_moves": [
+    "Ice Punch",
+    "Surf",
+    "Wave Crash"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Salamence",
+     "source": "direct_move",
+     "move": "Ice Punch",
+     "attacker": "Swampert",
+     "protocol": "|-damage|p1a: Salamence|0 fnt"
+    },
+    {
+     "turn": 5,
+     "victim": "Scolipede",
+     "source": "direct_move",
+     "move": "Wave Crash",
+     "attacker": "Swampert",
+     "protocol": "|-damage|p1a: Scolipede|0 fnt"
+    },
+    {
+     "turn": 9,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Wave Crash",
+     "attacker": "Swampert",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    }
+   ],
+   "failed_moves": [
+    {
+     "side": "p1",
+     "species": "Scolipede",
+     "move": "Protect",
+     "turn": 5
+    }
+   ],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-013533-2699541555.json",
+   "sha256": "df63a891cb2eeee521dfa830d6d5952ecc90086515eea62e6deb4a26bb5a86f3"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699542963",
+   "started": "20261017-013848",
+   "result": "win",
+   "opponent": "Swaguilar",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 14,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Delphox",
+    "Garchomp",
+    "Garganacl",
+    "Golisopod",
+    "Primarina",
+    "Rillaboom"
+   ],
+   "opponent_seen": [
+    "Garganacl",
+    "Golisopod",
+    "Primarina"
+   ],
+   "opponent_moves": [
+    "Aqua Jet",
+    "Protect",
+    "Recover",
+    "Salt Cure",
+    "Sparkling Aria",
+    "Stealth Rock"
+   ],
+   "own_faints": [
+    {
+     "turn": 5,
+     "victim": "Gholdengo",
+     "source": "residual_or_unknown",
+     "move": null,
+     "attacker": null,
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt|[from] Salt Cure"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 1,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-013848-2699542963.json",
+   "sha256": "897433003a72ed4d7c96f7478fd63e0e916adcad299643fee894095a2ae6c22c"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699766354",
+   "started": "20261017-095357",
+   "result": "loss",
+   "opponent": "dngl_kz",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 18,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Aegislash",
+    "Glimmora",
+    "Hippowdon",
+    "Salamence",
+    "Salazzle",
+    "Toxapex"
+   ],
+   "opponent_seen": [
+    "Aegislash",
+    "Hippowdon",
+    "Salamence"
+   ],
+   "opponent_moves": [
+    "Earthquake",
+    "Fire Blast",
+    "King's Shield",
+    "Poltergeist",
+    "Shadow Sneak",
+    "Stealth Rock",
+    "Whirlwind"
+   ],
+   "own_faints": [
+    {
+     "turn": 4,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Shadow Sneak",
+     "attacker": "Aegislash",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 7,
+     "victim": "Salamence",
+     "source": "direct_move",
+     "move": "Shadow Sneak",
+     "attacker": "Aegislash",
+     "protocol": "|-damage|p1a: Salamence|0 fnt"
+    },
+    {
+     "turn": 18,
+     "victim": "Scolipede",
+     "source": "direct_move",
+     "move": "Earthquake",
+     "attacker": "Hippowdon",
+     "protocol": "|-damage|p1a: Scolipede|0 fnt"
+    }
+   ],
+   "failed_moves": [
+    {
+     "side": "p1",
+     "species": "Scolipede",
+     "move": "Protect",
+     "turn": 14
+    },
+    {
+     "side": "p1",
+     "species": "Scolipede",
+     "move": "Protect",
+     "turn": 17
+    }
+   ],
+   "markers": [
+    {
+     "kind": "last_scolipede",
+     "turn": 7
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-095357-2699766354.json",
+   "sha256": "27749355f765db735f9410982ab9d3358369d49dd45be01a8c83582a22c2fb71"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699767850",
+   "started": "20261017-095636",
+   "result": "loss",
+   "opponent": "scpfoundation-lo",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 17,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Archaludon",
+    "Cinderace",
+    "Garchomp",
+    "Golisopod",
+    "Pelipper",
+    "Swampert"
+   ],
+   "opponent_seen": [
+    "Archaludon",
+    "Cinderace",
+    "Garchomp"
+   ],
+   "opponent_moves": [
+    "Draco Meteor",
+    "Dragon Tail",
+    "Pyro Ball",
+    "Rock Tomb"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Scolipede",
+     "source": "direct_move",
+     "move": "Draco Meteor",
+     "attacker": "Archaludon",
+     "protocol": "|-damage|p1a: Scolipede|0 fnt"
+    },
+    {
+     "turn": 5,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Pyro Ball",
+     "attacker": "Cinderace",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 17,
+     "victim": "Salamence",
+     "source": "direct_move",
+     "move": "Rock Tomb",
+     "attacker": "Garchomp",
+     "protocol": "|-damage|p1a: Salamence|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-095636-2699767850.json",
+   "sha256": "fc93e18d85b310996fca82c815b68542864868f9f9d4e22cc5e391ba5cb9892d"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699768883",
+   "started": "20261017-095855",
+   "result": "loss",
+   "opponent": "Megapikachu0592",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 10,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Baxcalibur",
+    "Dragonite",
+    "Forretress",
+    "Glimmora",
+    "Rillaboom",
+    "Starmie"
+   ],
+   "opponent_seen": [
+    "Baxcalibur",
+    "Glimmora"
+   ],
+   "opponent_moves": [
+    "Dragon Dance",
+    "Glaive Rush",
+    "Ice Shard",
+    "Icicle Crash",
+    "Memento",
+    "Mud Shot",
+    "Power Gem"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Mud Shot",
+     "attacker": "Glimmora",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 9,
+     "victim": "Scolipede",
+     "source": "direct_move",
+     "move": "Ice Shard",
+     "attacker": "Baxcalibur",
+     "protocol": "|-damage|p1a: Scolipede|0 fnt"
+    },
+    {
+     "turn": 10,
+     "victim": "Salamence",
+     "source": "direct_move",
+     "move": "Glaive Rush",
+     "attacker": "Baxcalibur",
+     "protocol": "|-damage|p1a: Salamence|0 fnt"
+    }
+   ],
+   "failed_moves": [
+    {
+     "side": "p1",
+     "species": "Salamence",
+     "move": "Double-Edge",
+     "turn": 4
+    }
+   ],
+   "markers": [
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 6,
+     "our_move": "Iron Defense",
+     "opponent_move": "Dragon Dance"
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-095855-2699768883.json",
+   "sha256": "08d6fd3e717d3ec963b6bf423d9d63c081713540a8ddcb513bfc762c8ff15840"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699769664",
+   "started": "20261017-100024",
+   "result": "loss",
+   "opponent": "scpfoundation-lo",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 7,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Lucario",
+    "Primarina",
+    "Rotom-Mow",
+    "Salamence",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "opponent_seen": [
+    "Primarina",
+    "Salamence"
+   ],
+   "opponent_moves": [
+    "Calm Mind",
+    "Double-Edge",
+    "Dragon Dance",
+    "Sparkling Aria"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Sparkling Aria",
+     "attacker": "Primarina",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Salamence",
+     "source": "direct_move",
+     "move": "Double-Edge",
+     "attacker": "Salamence",
+     "protocol": "|-damage|p1a: Salamence|0 fnt"
+    },
+    {
+     "turn": 7,
+     "victim": "Scolipede",
+     "source": "direct_move",
+     "move": "Double-Edge",
+     "attacker": "Salamence",
+     "protocol": "|-damage|p1a: Scolipede|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "last_scolipede",
+     "turn": 6
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 1,
+     "our_move": "Baton Pass",
+     "opponent_move": "Calm Mind"
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 5,
+     "our_move": "Dragon Dance",
+     "opponent_move": "Dragon Dance"
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-100024-2699769664.json",
+   "sha256": "4f98dbf1176733b1f20e8a67a61ec5482ab4283f9409c9f667f4e3765bdb119b"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699770404",
+   "started": "20261017-100259",
+   "result": "loss",
+   "opponent": "Kj233316",
+   "code": {
+    "commit": "c3032c3a2ebf",
+    "dirty": false
+   },
+   "turns": 7,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Ampharos",
+    "Manectric",
+    "Pawmot",
+    "Pikachu",
+    "Pincurchin",
+    "Raichu-Alola"
+   ],
+   "opponent_seen": [
+    "Manectric",
+    "Pikachu",
+    "Pincurchin"
+   ],
+   "opponent_moves": [
+    "Rising Voltage",
+    "Snarl",
+    "Surf"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Rising Voltage",
+     "attacker": "Manectric",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 5,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Rising Voltage",
+     "attacker": "Manectric",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 7,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Surf",
+     "attacker": "Pikachu",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 1,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-100259-2699770404.json",
+   "sha256": "eb7c8eae53250d14c7183c99b36612e6abeea67b7c578604d068d6b9e8cc64fe"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699815738",
+   "started": "20261017-121011",
+   "result": "win",
+   "opponent": "puyilang",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 5,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Gholdengo"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Altaria",
+    "Lucario",
+    "Rotom-Mow",
+    "Scizor",
+    "Skeledirge",
+    "Swampert"
+   ],
+   "opponent_seen": [
+    "Altaria",
+    "Scizor",
+    "Swampert"
+   ],
+   "opponent_moves": [
+    "Bullet Punch",
+    "Cotton Guard",
+    "Stealth Rock"
+   ],
+   "own_faints": [],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-121011-2699815738.json",
+   "sha256": "5f6737bdbac109fee13aa8298623bf7c1067cf463dacb35583111cfa41fe406d"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699816169",
+   "started": "20261017-121208",
+   "result": "win",
+   "opponent": "abusuoliute",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 9,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Arcanine-Hisui",
+    "Baxcalibur",
+    "Golisopod",
+    "Ninetales-Alola",
+    "Rillaboom",
+    "Slowking-Galar"
+   ],
+   "opponent_seen": [
+    "Arcanine-Hisui",
+    "Golisopod",
+    "Slowking-Galar"
+   ],
+   "opponent_moves": [
+    "Chilly Reception",
+    "Flare Blitz",
+    "Head Smash",
+    "Sucker Punch"
+   ],
+   "own_faints": [
+    {
+     "turn": 1,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Flare Blitz",
+     "attacker": "Arcanine-Hisui",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-121208-2699816169.json",
+   "sha256": "e7544b25d2533576869acc089689766722f35114fac4ccb4b8c5ef16bb2cb179"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699816952",
+   "started": "20261017-121419",
+   "result": "loss",
+   "opponent": "hjkjhkjkhkhj",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 7,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Archaludon",
+    "Dragapult",
+    "Gholdengo",
+    "Golisopod",
+    "Primarina",
+    "Salamence"
+   ],
+   "opponent_seen": [
+    "Dragapult",
+    "Primarina"
+   ],
+   "opponent_moves": [
+    "Calm Mind",
+    "Curse",
+    "Light Screen",
+    "Shadow Ball",
+    "Surf"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Shadow Ball",
+     "attacker": "Dragapult",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Floette-Eternal",
+     "source": "residual_or_unknown",
+     "move": null,
+     "attacker": null,
+     "protocol": "|-damage|p1a: Floette|0 fnt|[from] Curse"
+    },
+    {
+     "turn": 7,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Surf",
+     "attacker": "Primarina",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "curse",
+     "turn": 4,
+     "victim": "Floette-Eternal"
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-121419-2699816952.json",
+   "sha256": "45d7ab3c3119b917af3f02c568df1b4adfbbb3132165e091ba15551c02e7dd9c"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699817596",
+   "started": "20261017-121615",
+   "result": "loss",
+   "opponent": "Anavis",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 8,
+   "lineup": [
+    "Scolipede",
+    "Gholdengo",
+    "Salamence"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Charizard",
+    "Clefable",
+    "Kingambit",
+    "Primarina",
+    "Rillaboom",
+    "Vivillon"
+   ],
+   "opponent_seen": [
+    "Charizard",
+    "Primarina"
+   ],
+   "opponent_moves": [
+    "Aqua Jet",
+    "Dragon Claw",
+    "Dragon Dance",
+    "Flare Blitz",
+    "Psychic Noise",
+    "Thunder Punch"
+   ],
+   "own_faints": [
+    {
+     "turn": 4,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Flare Blitz",
+     "attacker": "Charizard",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Salamence",
+     "source": "direct_move",
+     "move": "Aqua Jet",
+     "attacker": "Primarina",
+     "protocol": "|-damage|p1a: Salamence|0 fnt"
+    },
+    {
+     "turn": 8,
+     "victim": "Scolipede",
+     "source": "direct_move",
+     "move": "Psychic Noise",
+     "attacker": "Primarina",
+     "protocol": "|-damage|p1a: Scolipede|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "last_scolipede",
+     "turn": 6
+    },
+    {
+     "kind": "opponent_setup_during_passive_move",
+     "turn": 1,
+     "our_move": "Substitute",
+     "opponent_move": "Dragon Dance"
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-121615-2699817596.json",
+   "sha256": "7ed2513ad1ef8624d59fe4ad87aad2be207e66fc72b267c6465605a8ba2a976b"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699818263-rcvmymcvg39ko4ti4fx4cunk4o32p4upw",
+   "started": "20261017-121740",
+   "result": "win",
+   "opponent": "Kuro_woods093",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 6,
+   "lineup": [
+    "Skeledirge",
+    "Floette-Eternal",
+    "Umbreon"
+   ],
+   "observed_own": [
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Archaludon",
+    "Espathra",
+    "Garchomp",
+    "Metagross",
+    "Mimikyu",
+    "Umbreon"
+   ],
+   "opponent_seen": [
+    "Metagross",
+    "Mimikyu",
+    "Umbreon"
+   ],
+   "opponent_moves": [
+    "Dark Pulse",
+    "Shadow Sneak"
+   ],
+   "own_faints": [],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-121740-rcvmymcvg39ko4ti4fx4cunk4o32p4upw.json",
+   "sha256": "b25e675709299d4a61e09699491c986de1d8a34bffa1427d671453441ef31903"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699818751",
+   "started": "20261017-121915",
+   "result": "loss",
+   "opponent": "tuanquewang",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 8,
+   "lineup": [
+    "Skeledirge",
+    "Floette-Eternal",
+    "Umbreon"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Archaludon",
+    "Basculegion",
+    "Dragonite",
+    "Golisopod",
+    "Hatterene",
+    "Pelipper"
+   ],
+   "opponent_seen": [
+    "Archaludon",
+    "Golisopod",
+    "Pelipper"
+   ],
+   "opponent_moves": [
+    "Electro Shot",
+    "Surf"
+   ],
+   "own_faints": [
+    {
+     "turn": 6,
+     "victim": "Umbreon",
+     "source": "direct_move",
+     "move": "Electro Shot",
+     "attacker": "Archaludon",
+     "protocol": "|-damage|p1a: Umbreon|0 fnt"
+    },
+    {
+     "turn": 7,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Electro Shot",
+     "attacker": "Archaludon",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 8,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Electro Shot",
+     "attacker": "Archaludon",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 4
+    },
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 5
+    },
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 6
+    },
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 7
+    },
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 8
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-121915-2699818751.json",
+   "sha256": "1b46bd18f60d945f221a8f24dfe66b91e51ea121edea83ea5e12200257977823"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699819284",
+   "started": "20261017-122145",
+   "result": "win",
+   "opponent": "hgjdmfm",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 8,
+   "lineup": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Absol",
+    "Archaludon",
+    "Baxcalibur",
+    "Beedrill",
+    "Glimmora",
+    "Indeedee"
+   ],
+   "opponent_seen": [
+    "Archaludon",
+    "Baxcalibur",
+    "Beedrill"
+   ],
+   "opponent_moves": [
+    "Drill Run",
+    "Earthquake",
+    "Ice Shard",
+    "Poison Jab",
+    "Stealth Rock",
+    "U-turn"
+   ],
+   "own_faints": [
+    {
+     "turn": 4,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "U-turn",
+     "attacker": "Beedrill",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Earthquake",
+     "attacker": "Baxcalibur",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-122145-2699819284.json",
+   "sha256": "c88fa474cc30379003ff17c5bd4f6ede159e37996827f4d49a473eb717c400df"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699820066",
+   "started": "20261017-122359",
+   "result": "loss",
+   "opponent": "tuanquewang",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 10,
+   "lineup": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Archaludon",
+    "Basculegion",
+    "Dragonite",
+    "Golisopod",
+    "Hatterene",
+    "Pelipper"
+   ],
+   "opponent_seen": [
+    "Archaludon",
+    "Golisopod",
+    "Pelipper"
+   ],
+   "opponent_moves": [
+    "Electro Shot",
+    "Iron Head",
+    "Sucker Punch"
+   ],
+   "own_faints": [
+    {
+     "turn": 2,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Iron Head",
+     "attacker": "Golisopod",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 8,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Electro Shot",
+     "attacker": "Archaludon",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    },
+    {
+     "turn": 10,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Sucker Punch",
+     "attacker": "Golisopod",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 4
+    },
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 5
+    },
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 6
+    },
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 7
+    },
+    {
+     "kind": "rain_electro_shot",
+     "side": "p2",
+     "species": "Archaludon",
+     "move": "Electro Shot",
+     "turn": 8
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-122359-2699820066.json",
+   "sha256": "e8746f0771c6d02347fdee7a77c42efd54f57cb88a971c8131160e4dc3c4a315"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699820844",
+   "started": "20261017-122538",
+   "result": "loss",
+   "opponent": "abusuoliute",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 6,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Arcanine-Hisui",
+    "Basculegion-F",
+    "Golisopod",
+    "Rillaboom",
+    "Salamence",
+    "Slowking-Galar"
+   ],
+   "opponent_seen": [
+    "Arcanine-Hisui",
+    "Basculegion-F"
+   ],
+   "opponent_moves": [
+    "Head Smash",
+    "Shadow Ball"
+   ],
+   "own_faints": [
+    {
+     "turn": 1,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Shadow Ball",
+     "attacker": "Basculegion-F",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 4,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Head Smash",
+     "attacker": "Arcanine-Hisui",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Head Smash",
+     "attacker": "Arcanine-Hisui",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-122538-2699820844.json",
+   "sha256": "cf6cd9088f752a413e14aa63013469681c14c9bb45941e5aa91fd2462c3bf510"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699821373",
+   "started": "20261017-122725",
+   "result": "loss",
+   "opponent": "puyilang",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 7,
+   "lineup": [
+    "Salamence",
+    "Scolipede",
+    "Gholdengo"
+   ],
+   "observed_own": [
+    "Gholdengo",
+    "Salamence",
+    "Scolipede"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Basculegion",
+    "Hydreigon",
+    "Lopunny",
+    "Metagross",
+    "Primarina",
+    "Vanilluxe"
+   ],
+   "opponent_seen": [
+    "Hydreigon",
+    "Metagross"
+   ],
+   "opponent_moves": [
+    "Bullet Punch",
+    "Draco Meteor",
+    "Fire Blast",
+    "Psychic Fangs"
+   ],
+   "own_faints": [
+    {
+     "turn": 1,
+     "victim": "Salamence",
+     "source": "direct_move",
+     "move": "Draco Meteor",
+     "attacker": "Hydreigon",
+     "protocol": "|-damage|p1a: Salamence|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Bullet Punch",
+     "attacker": "Metagross",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 7,
+     "victim": "Scolipede",
+     "source": "direct_move",
+     "move": "Psychic Fangs",
+     "attacker": "Metagross",
+     "protocol": "|-damage|p1a: Scolipede|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "last_scolipede",
+     "turn": 6
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-122725-2699821373.json",
+   "sha256": "2cfb1b092e8cabb4879c96860664bd066cd3b70b3f1617164e89573f2e6c5645"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699821959",
+   "started": "20261017-123009",
+   "result": "win",
+   "opponent": "xuzihan88",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 9,
+   "lineup": [
+    "Skeledirge",
+    "Gholdengo",
+    "Floette-Eternal"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Charizard",
+    "Corviknight",
+    "Greninja",
+    "Meowscarada",
+    "Mimikyu",
+    "Toxapex"
+   ],
+   "opponent_seen": [
+    "Charizard",
+    "Greninja",
+    "Toxapex"
+   ],
+   "opponent_moves": [
+    "Dragon Claw",
+    "Flare Blitz",
+    "Hex",
+    "Ice Beam",
+    "Sludge Wave",
+    "Toxic",
+    "U-turn"
+   ],
+   "own_faints": [
+    {
+     "turn": 5,
+     "victim": "Skeledirge",
+     "source": "residual_or_unknown",
+     "move": null,
+     "attacker": null,
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt|[from] psn"
+    },
+    {
+     "turn": 7,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Sludge Wave",
+     "attacker": "Greninja",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-123009-2699821959.json",
+   "sha256": "059b327f200b7d06d4db428f555302ccb2d8229e3d1a691af8c699016911337d"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699822845",
+   "started": "20261017-123302",
+   "result": "loss",
+   "opponent": "hgjdmfm",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 9,
+   "lineup": [
+    "Skeledirge",
+    "Gholdengo",
+    "Floette-Eternal"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Absol",
+    "Archaludon",
+    "Baxcalibur",
+    "Beedrill",
+    "Glimmora",
+    "Indeedee"
+   ],
+   "opponent_seen": [
+    "Archaludon",
+    "Baxcalibur",
+    "Beedrill"
+   ],
+   "opponent_moves": [
+    "Earthquake",
+    "Glaive Rush",
+    "Poison Jab",
+    "Roar",
+    "Stealth Rock",
+    "U-turn"
+   ],
+   "own_faints": [
+    {
+     "turn": 4,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Poison Jab",
+     "attacker": "Beedrill",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Earthquake",
+     "attacker": "Baxcalibur",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 9,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Glaive Rush",
+     "attacker": "Baxcalibur",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "phazed",
+     "turn": 2
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-123302-2699822845.json",
+   "sha256": "bb97e44eeb60a1a3dce6d034080d4a7062440518c04e5054817c36da9873f04c"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699823974",
+   "started": "20261017-123556",
+   "result": "win",
+   "opponent": "buddyplays20",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 10,
+   "lineup": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Garchomp",
+    "Glimmora",
+    "Hippowdon",
+    "Klefki",
+    "Samurott-Hisui",
+    "Venusaur"
+   ],
+   "opponent_seen": [
+    "Hippowdon",
+    "Klefki",
+    "Venusaur"
+   ],
+   "opponent_moves": [
+    "Flash Cannon",
+    "Giga Drain",
+    "Light Screen",
+    "Roar",
+    "Spikes"
+   ],
+   "own_faints": [],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "phazed",
+     "turn": 3
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-123556-2699823974.json",
+   "sha256": "d3db803e898c69a6396cf90c73a7b86823d211bbd7858239120a258ac877be58"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699824823",
+   "started": "20261017-123909",
+   "result": "loss",
+   "opponent": "zsx123456",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": false
+   },
+   "turns": 12,
+   "lineup": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Blaziken",
+    "Gholdengo",
+    "Meowscarada",
+    "Ninetales-Alola",
+    "Primarina",
+    "Salamence"
+   ],
+   "opponent_seen": [
+    "Ninetales-Alola",
+    "Primarina",
+    "Salamence"
+   ],
+   "opponent_moves": [
+    "Aurora Veil",
+    "Double-Edge",
+    "Earthquake",
+    "Encore",
+    "Moonblast",
+    "Sparkling Aria"
+   ],
+   "own_faints": [
+    {
+     "turn": 5,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Sparkling Aria",
+     "attacker": "Primarina",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    },
+    {
+     "turn": 10,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Earthquake",
+     "attacker": "Salamence",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 12,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Moonblast",
+     "attacker": "Primarina",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "encore",
+     "turn": 7,
+     "victim": "Floette-Eternal"
+    }
+   ],
+   "random_fallbacks": 2,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-123909-2699824823.json",
+   "sha256": "50328dc6ca55463f66af2c76866ac80fa4bc81306ad61ce5c90cb0055a1903e3"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699853336",
+   "started": "20261017-141253",
+   "result": "loss",
+   "opponent": "Emanuel450",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": true
+   },
+   "turns": 8,
+   "lineup": [
+    "Skeledirge",
+    "Floette-Eternal",
+    "Umbreon"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Skeledirge",
+    "Umbreon"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Absol",
+    "Gengar",
+    "Gourgeist",
+    "Mimikyu",
+    "Noivern",
+    "Staraptor"
+   ],
+   "opponent_seen": [
+    "Mimikyu",
+    "Noivern"
+   ],
+   "opponent_moves": [
+    "Draco Meteor",
+    "Play Rough",
+    "Shadow Sneak",
+    "Swords Dance",
+    "Tailwind"
+   ],
+   "own_faints": [
+    {
+     "turn": 5,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Shadow Sneak",
+     "attacker": "Mimikyu",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Play Rough",
+     "attacker": "Mimikyu",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 8,
+     "victim": "Umbreon",
+     "source": "direct_move",
+     "move": "Play Rough",
+     "attacker": "Mimikyu",
+     "protocol": "|-damage|p1a: Umbreon|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-141253-2699853336.json",
+   "sha256": "259088766fe1feb6faad4044ab863ba0961147d84eebae1ad6b785dd5d4b31ac"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699853996",
+   "started": "20261017-141531",
+   "result": "loss",
+   "opponent": "maozaiy",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": true
+   },
+   "turns": 7,
+   "lineup": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Absol",
+    "Archaludon",
+    "Cinderace",
+    "Hippowdon",
+    "Primarina",
+    "Salamence"
+   ],
+   "opponent_seen": [
+    "Absol",
+    "Archaludon",
+    "Cinderace"
+   ],
+   "opponent_moves": [
+    "Flash Cannon",
+    "Gunk Shot",
+    "Shadow Claw",
+    "Sucker Punch"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Gunk Shot",
+     "attacker": "Cinderace",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Shadow Claw",
+     "attacker": "Absol",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    },
+    {
+     "turn": 7,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Shadow Claw",
+     "attacker": "Absol",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-141531-2699853996.json",
+   "sha256": "fea461422e6cc7c20cf34b4dc1e47cb0e9a4ee26e1fd583c2d22fb30a3ac6ab1"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699854667",
+   "started": "20261017-141750",
+   "result": "win",
+   "opponent": "Benjamin2025",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": true
+   },
+   "turns": 7,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Archaludon",
+    "Delphox",
+    "Garchomp",
+    "Golisopod",
+    "Meowscarada",
+    "Primarina"
+   ],
+   "opponent_seen": [
+    "Archaludon",
+    "Golisopod",
+    "Meowscarada"
+   ],
+   "opponent_moves": [
+    "Roar",
+    "Stealth Rock",
+    "Sucker Punch",
+    "Triple Axel"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Triple Axel",
+     "attacker": "Meowscarada",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [
+    {
+     "kind": "phazed",
+     "turn": 5
+    }
+   ],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-141750-2699854667.json",
+   "sha256": "b7798c723739d870299260139343162ac5c88df4690233942833633a02b1f9db"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699855205",
+   "started": "20261017-141916",
+   "result": "win",
+   "opponent": "aijunan121107",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": true
+   },
+   "turns": 6,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Ditto",
+    "Garchomp",
+    "Glimmora",
+    "Golisopod",
+    "Kingambit",
+    "Primarina"
+   ],
+   "opponent_seen": [
+    "Garchomp",
+    "Glimmora",
+    "Kingambit"
+   ],
+   "opponent_moves": [
+    "Earth Power",
+    "Earthquake",
+    "Power Gem",
+    "Sucker Punch"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Earthquake",
+     "attacker": "Garchomp",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-141916-2699855205.json",
+   "sha256": "50d1f3bde62f3632616afd530796da75612a7c87c0ab9789c38ecf987a68b26b"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699855595",
+   "started": "20261017-142214",
+   "result": "win",
+   "opponent": "popolawiwi",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": true
+   },
+   "turns": 16,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Aegislash",
+    "Audino",
+    "Baxcalibur",
+    "Dragapult",
+    "Skarmory",
+    "Swampert"
+   ],
+   "opponent_seen": [
+    "Baxcalibur",
+    "Skarmory",
+    "Swampert"
+   ],
+   "opponent_moves": [
+    "Brave Bird",
+    "Crunch",
+    "Curse",
+    "Dragon Dance",
+    "Drill Run",
+    "Flip Turn",
+    "Roost",
+    "Thunder Fang"
+   ],
+   "own_faints": [
+    {
+     "turn": 2,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Crunch",
+     "attacker": "Baxcalibur",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 15,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Brave Bird",
+     "attacker": "Skarmory",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 0,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-142214-2699855595.json",
+   "sha256": "907c51391bcb05ac9c41f98d98124c4a82aa5f0aea6fd05732afe7fb7663c8f5"
+  },
+  {
+   "battle_id": "showdown battle-gen9championsbssregmc-2699856370",
+   "started": "20261017-142404",
+   "result": "loss",
+   "opponent": "cihuy1945",
+   "code": {
+    "commit": "dc19df2a7e09",
+    "dirty": true
+   },
+   "turns": 6,
+   "lineup": [
+    "Gholdengo",
+    "Floette-Eternal",
+    "Skeledirge"
+   ],
+   "observed_own": [
+    "Floette-Eternal",
+    "Gholdengo",
+    "Skeledirge"
+   ],
+   "lineup_mismatch": false,
+   "opponent_preview": [
+    "Aggron",
+    "Garchomp",
+    "Golisopod",
+    "Pawmot",
+    "Raichu",
+    "Sneasler"
+   ],
+   "opponent_seen": [
+    "Garchomp",
+    "Raichu"
+   ],
+   "opponent_moves": [
+    "Dragon Claw",
+    "Earthquake",
+    "Iron Head",
+    "Stealth Rock",
+    "Zap Cannon"
+   ],
+   "own_faints": [
+    {
+     "turn": 3,
+     "victim": "Gholdengo",
+     "source": "direct_move",
+     "move": "Earthquake",
+     "attacker": "Garchomp",
+     "protocol": "|-damage|p1a: Gholdengo|0 fnt"
+    },
+    {
+     "turn": 5,
+     "victim": "Floette-Eternal",
+     "source": "direct_move",
+     "move": "Zap Cannon",
+     "attacker": "Raichu",
+     "protocol": "|-damage|p1a: Floette|0 fnt"
+    },
+    {
+     "turn": 6,
+     "victim": "Skeledirge",
+     "source": "direct_move",
+     "move": "Zap Cannon",
+     "attacker": "Raichu",
+     "protocol": "|-damage|p1a: Skeledirge|0 fnt"
+    }
+   ],
+   "failed_moves": [],
+   "markers": [],
+   "random_fallbacks": 1,
+   "record": "/home/michihito/Working/poke-sim/data/raw/ladder/20261017-142404-2699856370.json",
+   "sha256": "35863528d801aa1580375754997e2d099aaa4d8ca2bc690f2c6639c2e984870d"
+  }
+ ]
+}
