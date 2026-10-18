@@ -144,6 +144,7 @@ console.log(JSON.stringify({attempts,retries,fixedRejected}));
 
 def test_showdown_p2_history_is_normalized_to_the_models_own_p1_perspective():
     engine = Lookahead.__new__(Lookahead)
+    engine.sampler = SimpleNamespace(catalog=None)
     engine.own_side = lambda *args: {'team': 'ours'}
     engine.opponent_side = lambda *args: {'team': 'theirs'}
     engine.n_samples, engine.seeds, engine.rollout = 1, 1, 0

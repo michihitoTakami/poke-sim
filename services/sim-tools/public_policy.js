@@ -4,7 +4,7 @@ const {estimateDamage, megaSource} = require('./public_damage');
 const VERSION = 'public-reference-v2';
 // Keep the training reference frozen. The live tree uses the revised policy explicitly;
 // its V_ref remains a v2 bootstrap estimate, not a value trained for this new continuation.
-const BATON_VERSION = 'public-baton-v2';
+const BATON_VERSION = 'public-baton-v3';
 const stage = s => s >= 0 ? (2 + s) / 2 : 2 / (2 - s);
 
 function choosePublic(view, name, dex, baton = false, mechanics = baton) {
@@ -263,5 +263,11 @@ function observedStep(battle, ours, theirs, step, rechoose, allowed = ['p1', 'p2
   throw new Error('observed request retries exhausted');
 }
 
-const chooseBatonPublic = (view, name, dex) => choosePublic(view, name, dex, name === 'expert', true);
+const chooseBatonPublic = (view, name, dex) => {
+  if (name === 'expert') {
+    const strategy = require('./relay_strategy').relayStrategy(view, dex);
+    if (strategy) return strategy.choice;
+  }
+  return choosePublic(view, name, dex, name === 'expert', true);
+};
 module.exports = {choosePublic, chooseBatonPublic, observedStep, VERSION, BATON_VERSION};

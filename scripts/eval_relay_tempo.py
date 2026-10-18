@@ -56,6 +56,8 @@ def main():
     ap.add_argument('--cases', type=Path, required=True)
     ap.add_argument('--priors', type=Path, required=True)
     ap.add_argument('--value-run', type=Path, default=ROOT / 'runs/value-replays-v1')
+    ap.add_argument('--opponent-policy', type=Path, default=ROOT / 'runs/opp-replays-v1/opp-seed0.json')
+    ap.add_argument('--catalog', type=Path)
     ap.add_argument('--baseline-ref', default='365306c')
     ap.add_argument('--worlds', type=int, default=4)
     ap.add_argument('--budget-ms', type=int, default=4500)
@@ -74,6 +76,11 @@ def main():
     value = ValueEnsemble(args.value_run)
     engines = {name: Lookahead(sampler(load_bundle(args.priors)), samples=args.worlds, value_model=value)
                for name in ('before', 'after')}
+    if args.catalog:
+        from pokesim.belief.team_catalog import TeamCatalog
+
+        for engine in engines.values():
+            engine.sampler.catalog = TeamCatalog.load(engine.sampler.base_id, path=args.catalog)
     engines['before'].worker.kill()
     engines['before'].worker = ReplayWorker(baseline / 'services/sim-tools/lookahead.js')
     beliefs = Beliefs(json.loads((ROOT / 'data/my_teams/baton.json').read_text()), engines['after'].sampler)
@@ -81,7 +88,8 @@ def main():
     own = {engines['after'].sampler.base_id(to_id(s['species'])): s for s in sets}
     report = {'scope': 'development diagnostics; observed prefixes and hypothetical sets; mixed control sources',
               'baseline_ref': args.baseline_ref, 'settings': {k: str(v) for k, v in vars(args).items()},
-              'priors_sha': file_sha(args.priors), 'value': value.version,
+              'priors_sha': file_sha(args.priors),
+              'catalog_sha': file_sha(args.catalog) if args.catalog else None, 'value': value.version,
               'worker_sha': {name: tree_sha(directory, {'.js'}) for name, directory in
                              [('before', baseline / 'services/sim-tools'), ('after', ROOT / 'services/sim-tools')]},
               'cases': []}
@@ -94,7 +102,7 @@ def main():
             settings = copy.deepcopy(rec['versions']['planner']['search'])
             settings.pop('value_model', None)
             settings.update(workers=1, decisionMs=args.budget_ms)
-            settings['policyNets'] = {'opp': str(ROOT / 'runs/opp-replays-v1/opp-seed0.json')}
+            settings['policyNets'] = {'opp': str(args.opponent_policy.resolve())}
             request = engines['after'].query(battle, own, search=settings, belief=belief,
                 log=session.log, value=True, capture=True)
             atomic_json(args.out / f'{case["stamp"]}-T{case["turn"]}.request.json', request)

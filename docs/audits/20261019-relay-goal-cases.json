@@ -1,0 +1,10 @@
+[
+ {"stamp":"20261019-041312","turn":3,"actions":["move:protect","move:substitute","move:batonpass"]},
+ {"stamp":"20261019-041312","turn":7,"actions":["move:calmmind","move:moonlight"]},
+ {"stamp":"20261019-052527","turn":7,"actions":["move:protect","move:batonpass","move:irondefense"]},
+ {"stamp":"20261019-052527","turn":12,"actions":["move:calmmind","move:batonpass"]},
+ {"stamp":"20261019-042606","turn":5},
+ {"stamp":"20261019-051309","turn":4},
+ {"stamp":"20261019-064651","turn":8},
+ {"stamp":"20261018-074955","turn":7}
+]

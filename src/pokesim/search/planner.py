@@ -197,7 +197,10 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
                 chosen = index
             sol.status['relay_plan'] = {'suggested': root_plan, 'followed': bool(followed),
                                         'gap': float(objective.max() - objective[index]),
-                                        'scope': 'dedicated-passer; common-public-plan; existing-tie-margin'}
+                                        'scope': 'common-public-relay-goal; existing-tie-margin'}
+            strategy = results[0].get('rootStrategy')
+            if strategy and all(r.get('rootStrategy') == strategy for r in results):
+                sol.status['relay_plan']['strategy'] = strategy
         review = results[0].get('terminal_review')
         if review is not None and near is None and all(r.get('terminal_review') == review for r in results):
             from pokesim.search.review import preferred
