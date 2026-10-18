@@ -126,11 +126,17 @@ class Search {
         st.p2Prior = this.nets.p2.prior(obs.view(b.p2), b.dex, st.p2);
       }
       const view = this.observer(b, st).view(b.p1), mon = view.request.side.pokemon.find(m => m.active);
-      // Only a dedicated Speed Boost passer supplies a root plan. The recommendation sees the
-      // same public opponent and our own request in every particle, never the sampled hidden set.
-      if (req.batonPolicy !== false && view.phase === 'move' && mon?.ability === 'speedboost' &&
-          mon.moves.includes('batonpass') && mon.moves.every(m => b.dex.moves.get(m).category === 'Status'))
-        st.rootPlan = chooseBatonPublic(view, 'expert', b.dex)[1];
+      // Goals use the same public prefix in every particle. They may break an existing utility tie;
+      // they never replace the win certificate, full-game review or immediate-sacrifice guard.
+      if (req.batonPolicy !== false && view.phase === 'move') {
+        const strategy = require('./relay_strategy').relayStrategy(view, b.dex);
+        if (strategy) {
+          st.rootPlan = strategy.choice[1];
+          st.rootStrategy = {version: strategy.version, goal: strategy.goal, evidence: strategy.evidence};
+        } else if (mon?.ability === 'speedboost' && mon.moves.includes('batonpass') &&
+            mon.moves.every(m => b.dex.moves.get(m).category === 'Status'))
+          st.rootPlan = chooseBatonPublic(view, 'expert', b.dex)[1];
+      }
       b.destroy(); return st;
     });
     if (!this.states.length || this.states.some(s => JSON.stringify(s.p1) !== JSON.stringify(this.states[0].p1))) {
@@ -408,6 +414,7 @@ class Search {
     return {session: this.id, pending, summary, results: this.states.map(st => ({
       p1: st.p1.map(x => x[1]), p2: st.p2.map(x => x[1]), p2Prior: st.p2Prior || null,
       ...(st.rootPlan ? {rootPlan: st.rootPlan} : {}),
+      ...(st.rootStrategy ? {rootStrategy: st.rootStrategy} : {}),
       payoff: st.cells.map((row, i) => row.map(c => this.certified.includes(st.p1[i][1]) ? 1 : this.value(c))),
       actionOrder: st.cells.map(row => row.map(c => ({first: c.orderFirst, trials: c.orderN}))),
       winSpeed: st.cells.map(row => row.map(c => this.speed(c))),

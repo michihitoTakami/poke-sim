@@ -56,6 +56,8 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
                   if k not in ('payoff', 'winSpeed', 'visits', 'invalid', 'stats', 'uncertainty', 'rootProgress')}
         if any(r['results'][w].get('rootPlan') != world.get('rootPlan') for r in replies):
             merged.pop('rootPlan', None)
+        if any(r['results'][w].get('rootStrategy') != world.get('rootStrategy') for r in replies):
+            merged.pop('rootStrategy', None)
         priors = [r['results'][w].get('p2Prior') for r in replies if r['results'][w].get('p2Prior')]
         if priors:
             merged['p2Prior'] = np.mean(priors, axis=0).tolist()

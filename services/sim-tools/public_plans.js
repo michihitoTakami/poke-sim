@@ -2,7 +2,7 @@
 const {health, id, legalChoices} = require('./public_observation');
 const {chooseBatonPublic} = require('./public_policy');
 const {estimateDamage} = require('./public_damage');
-const VERSION = 'public-plans-v2';
+const VERSION = 'public-plans-v3';
 const stage = n => n >= 0 ? (2 + n) / 2 : 2 / (2 - n);
 
 function assess(view, dex) {
@@ -69,6 +69,15 @@ class PlanPolicy {
     if (this.plan && this.plan.signature !== a.signature) end('new-public-information');
     if (this.plan?.kind === 'relay' && !move('batonpass')) end('baton-unavailable');
     if (this.plan && view.turn - this.plan.start > 4) end('deadline');
+    const strategy = require('./relay_strategy').relayStrategy(view, dex);
+    if (strategy) {
+      if (this.plan?.kind !== strategy.goal) {
+        this.plan = {kind: strategy.goal, signature: a.signature, start: view.turn};
+        this.events.push({turn: view.turn, plan: strategy.goal, event: 'start'});
+      }
+      return strategy.choice;
+    }
+    if (this.plan && !['relay', 'protected-setup'].includes(this.plan.kind)) end('goal-reconsidered');
     const disrupted = foe.moves.some(m => ['roar', 'whirlwind', 'haze', 'encore', 'taunt'].includes(m));
     if (this.plan?.kind === 'protected-setup' && (!sheltered || mine.volatiles.includes('yawn') || critical || disrupted))
       end('protection-lost-or-critical-threat');

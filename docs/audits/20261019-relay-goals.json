@@ -1,0 +1,875 @@
+{
+ "scope": "development diagnostics; mixed manual/AI control; not held-out performance",
+ "baseline": "7f9556b9bb05ff7dd245ef7f60a271a776f282d1",
+ "cutoff": "20261019-064651",
+ "records": 76,
+ "wins": 41,
+ "losses": 35,
+ "opponents": 39,
+ "control_mode": "unknown",
+ "nn_weights_changed": false,
+ "policy_versions": {
+  "expert": "public-baton-v3",
+  "planned": "public-plans-v3",
+  "relay": "public-relay-goals-v1",
+  "frozen": "public-reference-v2"
+ },
+ "tests": 257,
+ "worker_sha": {
+  "before": "d87299af0cf29bdf67962a6facdf4854a022f6812c89389f6fd675639c3ab2a3",
+  "after": "fd40dc2575702ccfb9186f8e2732f6057703055f548058ec59a266b6573fe39b"
+ },
+ "artifacts": {
+  "fixed_prefix": {
+   "path": "data/processed/relay-goals-20261019-final/report.json",
+   "sha256": "357dfaf4fe86ffec1db6828d05b266d26c7df17245e813ea6336fb671bfd124f"
+  },
+  "runtime_15s": {
+   "path": "data/processed/relay-goals-20261019-live-budget/report.json",
+   "sha256": "81df13b01b224fdeb409efc4a57aa974a352926e1e3c34205120e2461dcc1d21"
+  },
+  "runtime_8_5s": {
+   "path": "data/processed/relay-goals-20261019-runtime/report.json",
+   "sha256": "618533780582f13ed9963122407ed8d4558894838db099eb66d3b3cc0c67cf38"
+  },
+  "selection": {
+   "path": "data/processed/relay-goals-20261019-selection/report.json",
+   "sha256": "974177313b22bfb6cd97fab1efc58b1ae115bc10aec0ce730bbff863c72b7b27"
+  },
+  "selection_resampled": {
+   "path": "data/processed/relay-goals-20261019-selection-reproduced-final/report.json",
+   "sha256": "30ef6f66d271b87f2d84ce63ccdd91ae6d28aa1853f8cae37609000343977db7"
+  }
+ },
+ "fixed_prefix_cases": [
+  {
+   "record": "20261019-041312-2700625337.json",
+   "sha256": "8a3dcd6fd988c2d4b1fa16d32de0f20184c0d5e3d7bf902b89cb12b71e47340b",
+   "turn": 3,
+   "tree_choices": {
+    "before": "move:protect",
+    "after": "move:batonpass"
+   },
+   "unchanged_opponent_terminal_counts": {
+    "before": {
+     "move:batonpass": {
+      "win": 0,
+      "loss": 16,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:protect": {
+      "win": 0,
+      "loss": 16,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:substitute": {
+      "win": 4,
+      "loss": 12,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    },
+    "after": {
+     "move:batonpass": {
+      "win": 12,
+      "loss": 4,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:protect": {
+      "win": 14,
+      "loss": 2,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:substitute": {
+      "win": 12,
+      "loss": 4,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    }
+   }
+  },
+  {
+   "record": "20261019-041312-2700625337.json",
+   "sha256": "8a3dcd6fd988c2d4b1fa16d32de0f20184c0d5e3d7bf902b89cb12b71e47340b",
+   "turn": 7,
+   "tree_choices": {
+    "before": "move:calmmind",
+    "after": "move:calmmind"
+   },
+   "unchanged_opponent_terminal_counts": {
+    "before": {
+     "move:calmmind": {
+      "win": 2,
+      "loss": 14,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:moonlight": {
+      "win": 2,
+      "loss": 14,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    },
+    "after": {
+     "move:calmmind": {
+      "win": 10,
+      "loss": 6,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:moonlight": {
+      "win": 8,
+      "loss": 8,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    }
+   }
+  },
+  {
+   "record": "20261019-052527-2700656912.json",
+   "sha256": "07384d5052473acbeeff8962e42f534e493e6531bdaba5e9a24fb1bd53eb8067",
+   "turn": 7,
+   "tree_choices": {
+    "before": "move:batonpass",
+    "after": "move:batonpass"
+   },
+   "unchanged_opponent_terminal_counts": {
+    "before": {
+     "move:batonpass": {
+      "win": 16,
+      "loss": 0,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:irondefense": {
+      "win": 2,
+      "loss": 14,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:protect": {
+      "win": 8,
+      "loss": 8,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    },
+    "after": {
+     "move:batonpass": {
+      "win": 16,
+      "loss": 0,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:irondefense": {
+      "win": 2,
+      "loss": 14,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:protect": {
+      "win": 8,
+      "loss": 8,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    }
+   }
+  },
+  {
+   "record": "20261019-052527-2700656912.json",
+   "sha256": "07384d5052473acbeeff8962e42f534e493e6531bdaba5e9a24fb1bd53eb8067",
+   "turn": 12,
+   "tree_choices": {
+    "before": "move:moonlight",
+    "after": "move:moonlight"
+   },
+   "unchanged_opponent_terminal_counts": {
+    "before": {
+     "move:batonpass": {
+      "win": 0,
+      "loss": 16,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:calmmind": {
+      "win": 4,
+      "loss": 12,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:moonlight": {
+      "win": 6,
+      "loss": 10,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    },
+    "after": {
+     "move:batonpass": {
+      "win": 0,
+      "loss": 16,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:calmmind": {
+      "win": 4,
+      "loss": 12,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     },
+     "move:moonlight": {
+      "win": 6,
+      "loss": 10,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    }
+   }
+  },
+  {
+   "record": "20261019-042606-2700632132.json",
+   "sha256": "54d24289ae5a4cdbb453be3d339799f45305582b4d3dc0047aff77714b41ca48",
+   "turn": 5,
+   "tree_choices": {
+    "before": "move:protect",
+    "after": "move:protect"
+   },
+   "unchanged_opponent_terminal_counts": {
+    "before": {
+     "move:protect": {
+      "win": 0,
+      "loss": 16,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    },
+    "after": {
+     "move:protect": {
+      "win": 0,
+      "loss": 16,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    }
+   }
+  },
+  {
+   "record": "20261019-051309-2700652523.json",
+   "sha256": "b5a3da72936cb85a4a43a73d4b7d97c10a03d4b1b9aaf44796c35b21a0f13e9d",
+   "turn": 4,
+   "tree_choices": {
+    "before": "move:calmmind:mega",
+    "after": "move:calmmind:mega"
+   },
+   "unchanged_opponent_terminal_counts": {
+    "before": {
+     "move:calmmind:mega": {
+      "win": 0,
+      "loss": 16,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    },
+    "after": {
+     "move:calmmind:mega": {
+      "win": 0,
+      "loss": 16,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    }
+   }
+  },
+  {
+   "record": "20261019-064651-2700691144.json",
+   "sha256": "f0023e6bc21ae8abdfebe59b35d2ab84448378b066661e6acb92ad9cd7b60e2f",
+   "turn": 8,
+   "tree_choices": {
+    "before": "move:moonblast",
+    "after": "move:moonblast"
+   },
+   "unchanged_opponent_terminal_counts": {
+    "before": {
+     "move:moonblast": {
+      "win": 12,
+      "loss": 4,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    },
+    "after": {
+     "move:moonblast": {
+      "win": 12,
+      "loss": 4,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    }
+   }
+  },
+  {
+   "record": "20261018-074955-2700223028.json",
+   "sha256": "fa127c38f2928785dcde24cb5ec4e73ce8d84157fd4676034737a16bec433f29",
+   "turn": 7,
+   "tree_choices": {
+    "before": "move:protect",
+    "after": "move:protect"
+   },
+   "unchanged_opponent_terminal_counts": {
+    "before": {
+     "move:protect": {
+      "win": 8,
+      "loss": 8,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    },
+    "after": {
+     "move:protect": {
+      "win": 8,
+      "loss": 8,
+      "draw": 0,
+      "unfinished": 0,
+      "failed": 0
+     }
+    }
+   }
+  }
+ ],
+ "runtime": [
+  {
+   "file": "20261018-074955-T7.request.json",
+   "input_sha256": "a547b1278a3fa82f7bd3af711346c8a4333060b9f2d466e3f8c1e65b687b4c75",
+   "chosen": "move:protect",
+   "seconds": 9.08458928996697,
+   "counterplay_complete": true,
+   "review_complete": true,
+   "relay_plan": {
+    "suggested": "move:protect",
+    "followed": true,
+    "gap": 0.003277134553306471,
+    "scope": "common-public-relay-goal; existing-tie-margin",
+    "strategy": {
+     "version": "public-relay-goals-v1",
+     "goal": "wait-out-sun",
+     "evidence": {
+      "sun": {
+       "min": 4,
+       "max": 4,
+       "elapsed": 1
+      }
+     }
+    }
+   }
+  },
+  {
+   "file": "20261019-041312-T3.request.json",
+   "input_sha256": "f128ff0210c3ebb3273017b6ab68a2ce3cb1ab5ea40163b9d4fd42db5880ab33",
+   "chosen": "move:batonpass",
+   "seconds": 10.314836277044378,
+   "counterplay_complete": true,
+   "review_complete": true,
+   "relay_plan": {
+    "suggested": "move:protect",
+    "followed": false,
+    "gap": 0.18063610311920697,
+    "scope": "common-public-relay-goal; existing-tie-margin",
+    "strategy": {
+     "version": "public-relay-goals-v1",
+     "goal": "wait-out-sun",
+     "evidence": {
+      "sun": {
+       "min": 3,
+       "max": 3,
+       "elapsed": 2
+      }
+     }
+    }
+   }
+  },
+  {
+   "file": "20261019-041312-T7.request.json",
+   "input_sha256": "47421a350a53d25d1377fc54d9ba35b6b806b90b9388b38c0a2035c260735cc0",
+   "chosen": "move:calmmind",
+   "seconds": 9.831510899006389,
+   "counterplay_complete": true,
+   "review_complete": true,
+   "relay_plan": {
+    "suggested": "move:calmmind",
+    "followed": true,
+    "gap": 0.0,
+    "scope": "common-public-relay-goal; existing-tie-margin",
+    "strategy": {
+     "version": "public-relay-goals-v1",
+     "goal": "prepare-special-survival",
+     "evidence": {
+      "incoming": 58.67999999999999,
+      "specialDefence": 1
+     }
+    }
+   }
+  },
+  {
+   "file": "20261019-042606-T5.request.json",
+   "input_sha256": "998d125b32c9a3570ca9811b2c988f5cae607a3ee3eb0ac9ce2b01f714ed4e81",
+   "chosen": "move:substitute",
+   "seconds": 9.225137831061147,
+   "counterplay_complete": true,
+   "review_complete": true,
+   "relay_plan": {
+    "suggested": "move:protect",
+    "followed": false,
+    "gap": 0.0448260670639502,
+    "scope": "common-public-relay-goal; existing-tie-margin"
+   }
+  },
+  {
+   "file": "20261019-051309-T4.request.json",
+   "input_sha256": "53b8b1cf231acc73e3e419475a32ae039604932de20a86c360710e71a882d723",
+   "chosen": "move:calmmind:mega",
+   "seconds": 9.328451586072333,
+   "counterplay_complete": true,
+   "review_complete": true,
+   "relay_plan": null
+  },
+  {
+   "file": "20261019-052527-T12.request.json",
+   "input_sha256": "fd9bb72f8c879a06c13834bc2e3b0c16eb2fcad820acaa84edd5aba23fac75d7",
+   "chosen": "move:moonlight",
+   "seconds": 9.853190261987038,
+   "counterplay_complete": true,
+   "review_complete": true,
+   "relay_plan": null
+  },
+  {
+   "file": "20261019-052527-T7.request.json",
+   "input_sha256": "d035c6d367f4a08c8bfb21af9683fb509b55c5f7ad72f3bd2f840722f7fdd498",
+   "chosen": "move:protect",
+   "seconds": 9.690708299982361,
+   "counterplay_complete": true,
+   "review_complete": true,
+   "relay_plan": {
+    "suggested": "move:batonpass",
+    "followed": false,
+    "gap": 0.0,
+    "scope": "common-public-relay-goal; existing-tie-margin",
+    "strategy": {
+     "version": "public-relay-goals-v1",
+     "goal": "receiver-defence-ready",
+     "evidence": {
+      "receiver": "Floette-Eternal, L50, F",
+      "defence": 2
+     }
+    },
+    "overridden_by": "root_counterplay"
+   }
+  },
+  {
+   "file": "20261019-064651-T8.request.json",
+   "input_sha256": "6baaf7c64237c88917aadbfb95f9ad780d43397d96d798c9bab6817ee224a15f",
+   "chosen": "move:calmmind",
+   "seconds": 8.573899834998883,
+   "counterplay_complete": true,
+   "review_complete": true,
+   "relay_plan": null
+  }
+ ],
+ "selection": [
+  {
+   "file": "20261019-041312-2700625337.json",
+   "sha256": "8a3dcd6fd988c2d4b1fa16d32de0f20184c0d5e3d7bf902b89cb12b71e47340b",
+   "preview": [
+    "baxcalibur",
+    "charizard",
+    "corviknight",
+    "garchomp",
+    "metagross",
+    "mimikyu"
+   ],
+   "candidates": 37,
+   "worlds": 5,
+   "policies": [
+    "counterplay",
+    "disrupt",
+    "expert"
+   ],
+   "new_seconds": 7.3845533929998055,
+   "top": {
+    "before": {
+     "lineup": [
+      "Scolipede",
+      "Gholdengo",
+      "Salamence"
+     ],
+     "utility": 0.5283333333333333,
+     "wins": 7,
+     "losses": 8,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 14,
+     "two_hop_games": 0
+    },
+    "after": {
+     "lineup": [
+      "Scolipede",
+      "Floette-Eternal",
+      "Umbreon"
+     ],
+     "utility": 0.7649999999999999,
+     "wins": 12,
+     "losses": 3,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 15,
+     "two_hop_games": 13
+    }
+   },
+   "trials_per_variant": 555
+  },
+  {
+   "file": "20261019-064651-2700691144.json",
+   "sha256": "f0023e6bc21ae8abdfebe59b35d2ab84448378b066661e6acb92ad9cd7b60e2f",
+   "preview": [
+    "feraligatr",
+    "meowscarada",
+    "skeledirge",
+    "salamence",
+    "gholdengo",
+    "clefable"
+   ],
+   "candidates": 40,
+   "worlds": 5,
+   "policies": [
+    "counterplay",
+    "disrupt",
+    "expert"
+   ],
+   "new_seconds": 7.257372069987468,
+   "top": {
+    "before": {
+     "lineup": [
+      "Floette-Eternal",
+      "Salamence",
+      "Umbreon"
+     ],
+     "utility": 0.8216666666666665,
+     "wins": 12,
+     "losses": 3,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 4,
+     "two_hop_games": 1
+    },
+    "after": {
+     "lineup": [
+      "Floette-Eternal",
+      "Salamence",
+      "Umbreon"
+     ],
+     "utility": 0.8216666666666665,
+     "wins": 12,
+     "losses": 3,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 4,
+     "two_hop_games": 1
+    }
+   },
+   "trials_per_variant": 600
+  },
+  {
+   "file": "20261019-044056-07iic9xarmt9iwlcwtt4kg9hhmmfe9cpw.json",
+   "sha256": "da0659375f9f0ef86d6aac3e3c929a2987e98e00780b80881e69c26fa6759078",
+   "preview": [
+    "slurpuff",
+    "gholdengo",
+    "rillaboom",
+    "feraligatr",
+    "venusaur",
+    "torkoal"
+   ],
+   "candidates": 38,
+   "worlds": 6,
+   "policies": [
+    "counterplay",
+    "disrupt",
+    "expert"
+   ],
+   "new_seconds": 8.707190992077813,
+   "top": {
+    "before": {
+     "lineup": [
+      "Floette-Eternal",
+      "Gholdengo",
+      "Salamence"
+     ],
+     "utility": 1.0,
+     "wins": 18,
+     "losses": 0,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 0,
+     "two_hop_games": 0
+    },
+    "after": {
+     "lineup": [
+      "Floette-Eternal",
+      "Gholdengo",
+      "Salamence"
+     ],
+     "utility": 1.0,
+     "wins": 18,
+     "losses": 0,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 0,
+     "two_hop_games": 0
+    }
+   },
+   "trials_per_variant": 684
+  }
+ ],
+ "selection_resampled": [
+  {
+   "file": "20261019-041312-2700625337.json",
+   "sha256": "8a3dcd6fd988c2d4b1fa16d32de0f20184c0d5e3d7bf902b89cb12b71e47340b",
+   "preview": [
+    "baxcalibur",
+    "charizard",
+    "corviknight",
+    "garchomp",
+    "metagross",
+    "mimikyu"
+   ],
+   "candidates": 37,
+   "worlds": 6,
+   "policies": [
+    "counterplay",
+    "disrupt",
+    "expert"
+   ],
+   "new_seconds": 8.770971931051463,
+   "top": {
+    "before": {
+     "lineup": [
+      "Umbreon",
+      "Gholdengo",
+      "Floette-Eternal"
+     ],
+     "utility": 0.7333333333333334,
+     "wins": 13,
+     "losses": 5,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 17,
+     "two_hop_games": 0
+    },
+    "after": {
+     "lineup": [
+      "Scolipede",
+      "Salamence",
+      "Skeledirge"
+     ],
+     "utility": 0.8416666666666666,
+     "wins": 14,
+     "losses": 4,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 18,
+     "two_hop_games": 4
+    }
+   },
+   "trials_per_variant": 666
+  },
+  {
+   "file": "20261019-042606-2700632132.json",
+   "sha256": "54d24289ae5a4cdbb453be3d339799f45305582b4d3dc0047aff77714b41ca48",
+   "preview": [
+    "staraptor",
+    "indeedee",
+    "rillaboom",
+    "rotomheat",
+    "baxcalibur",
+    "gengar"
+   ],
+   "candidates": 38,
+   "worlds": 6,
+   "policies": [
+    "counterplay",
+    "disrupt",
+    "expert"
+   ],
+   "new_seconds": 9.090232064016163,
+   "top": {
+    "before": {
+     "lineup": [
+      "Umbreon",
+      "Floette-Eternal",
+      "Skeledirge"
+     ],
+     "utility": 0.6749999999999999,
+     "wins": 12,
+     "losses": 6,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 18,
+     "two_hop_games": 2
+    },
+    "after": {
+     "lineup": [
+      "Umbreon",
+      "Floette-Eternal",
+      "Skeledirge"
+     ],
+     "utility": 0.6249999999999999,
+     "wins": 10,
+     "losses": 8,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 18,
+     "two_hop_games": 0
+    }
+   },
+   "trials_per_variant": 684
+  },
+  {
+   "file": "20261019-064651-2700691144.json",
+   "sha256": "f0023e6bc21ae8abdfebe59b35d2ab84448378b066661e6acb92ad9cd7b60e2f",
+   "preview": [
+    "feraligatr",
+    "meowscarada",
+    "skeledirge",
+    "salamence",
+    "gholdengo",
+    "clefable"
+   ],
+   "candidates": 40,
+   "worlds": 6,
+   "policies": [
+    "counterplay",
+    "disrupt",
+    "expert"
+   ],
+   "new_seconds": 8.40709367301315,
+   "top": {
+    "before": {
+     "lineup": [
+      "Umbreon",
+      "Gholdengo",
+      "Salamence"
+     ],
+     "utility": 0.7916666666666666,
+     "wins": 11,
+     "losses": 7,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 12,
+     "two_hop_games": 0
+    },
+    "after": {
+     "lineup": [
+      "Umbreon",
+      "Gholdengo",
+      "Salamence"
+     ],
+     "utility": 0.7916666666666666,
+     "wins": 11,
+     "losses": 7,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 12,
+     "two_hop_games": 0
+    }
+   },
+   "trials_per_variant": 720
+  },
+  {
+   "file": "20261018-074955-2700223028.json",
+   "sha256": "fa127c38f2928785dcde24cb5ec4e73ce8d84157fd4676034737a16bec433f29",
+   "preview": [
+    "baxcalibur",
+    "gholdengo",
+    "charizard",
+    "garchomp",
+    "hatterene",
+    "golisopod"
+   ],
+   "candidates": 37,
+   "worlds": 5,
+   "policies": [
+    "counterplay",
+    "disrupt",
+    "expert"
+   ],
+   "new_seconds": 6.608716037939303,
+   "top": {
+    "before": {
+     "lineup": [
+      "Salamence",
+      "Gholdengo",
+      "Skeledirge"
+     ],
+     "utility": 0.7633333333333334,
+     "wins": 13,
+     "losses": 2,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 0,
+     "two_hop_games": 0
+    },
+    "after": {
+     "lineup": [
+      "Scolipede",
+      "Floette-Eternal",
+      "Umbreon"
+     ],
+     "utility": 1.0,
+     "wins": 15,
+     "losses": 0,
+     "unfinished": 0,
+     "failed": 0,
+     "payload_games": 15,
+     "two_hop_games": 15
+    }
+   },
+   "trials_per_variant": 555
+  }
+ ]
+}
