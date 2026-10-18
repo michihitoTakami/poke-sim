@@ -122,8 +122,8 @@ def merge_replies(replies: list[dict], prior_visits: float) -> dict:
     return {'session': first['session'], 'pending': [], 'summary': summary, 'results': results}
 
 
-def search(engine, request, *, started=None, max_budget=9., predictor=None):
-    """max_budget: the live limit is 9 s (one decision); offline oracles (pokesim.evaluation.positions) raise it.
+def search(engine, request, *, started=None, max_budget=20., predictor=None):
+    """max_budget: the live limit is 20 s; offline oracles (pokesim.evaluation.positions) raise it.
     predictor: the opponent prediction the planner will use (pokesim.search.planner.predict with its models);
     once every root cell has its first trial, the worker allocates the opponent's replies by it (column_weights).
     request['workers']: Node worker processes searching the same worlds on independent random streams; their

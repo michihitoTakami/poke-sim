@@ -103,6 +103,8 @@ class SetBelief:
         return self.observer.observations
 
     def feed(self, log: list[str]) -> list[Observation]:
+        self.preview = [p[3].split(',')[0] for line in log if
+                        len(p := line.split('|')) > 3 and p[1] == 'poke' and p[2] == self.observer.opp]
         return self.observer.feed(log)
 
     def candidates(self, species: str, moves=(), item: str | None = None, ability: str | None = None) -> list[dict]:
@@ -112,6 +114,9 @@ class SetBelief:
         saved = self.sampler.rng
         self.sampler.rng = random.Random(int(hashlib.sha1(tag.encode()).hexdigest()[:8], 16))
         try:
+            if getattr(self.sampler, 'catalog', None) is not None:
+                return [self.sampler.sample(base, list(moves), item, ability,
+                                            preview=getattr(self, 'preview', None)) for _ in range(self.n)]
             return [self.sampler.sample(base, list(moves), item, ability) for _ in range(self.n)]
         finally:
             self.sampler.rng = saved

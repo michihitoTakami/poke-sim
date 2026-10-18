@@ -243,14 +243,14 @@ def predictor_of(fixture: dict):
 
 def run_search(engine, fixture: dict, budget_ms: int, stream: int, overrides: dict | None, max_budget: float,
                predicted_columns: bool = True):
-    from pokesim.search.terminal import search
+    from pokesim.search.review import search_with_review
 
     request = {k: v for k, v in fixture.items() if k not in ('source', 'meta', 'expected')}
     request.update(overrides or {})
     request['decisionMs'] = budget_ms
     if stream:
         request['stream'] = stream
-    return search(engine, request, max_budget=max_budget,
+    return search_with_review(engine, request, max_budget=max_budget,
                   predictor=predictor_of(fixture) if predicted_columns else None)
 
 
@@ -317,7 +317,7 @@ def evaluate(args) -> None:
         path = files[index]
         fixture = json.loads(path.read_text())
         start = time.perf_counter()
-        results = run_search(pool[index % args.jobs], fixture, args.budget_ms, args.stream, overrides, 9.,
+        results = run_search(pool[index % args.jobs], fixture, args.budget_ms, args.stream, overrides, 20.,
                              predicted_columns=not args.uniform_columns)
         row = objectives(results, fixture)
         row.update(id=path.stem, kind=fixture['meta']['kind'], played=fixture['meta']['chosen'],

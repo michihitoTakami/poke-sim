@@ -79,7 +79,7 @@ PLANNER=on setsid nohup ~/Working/poke-sim/scripts/collect.sh > /dev/null 2>&1 <
 検証結果と制限は[積み判断と選出の改善](audits/20261018-selection-tactics.md)を参照。
 旧来の模擬対戦表は `--lineup matchup`。`--battle-timeout` は対戦の総時間ではなく、対戦メッセージが途絶えた時間で判定します。
 勝敗価値を探索で使う場合は`EXTRA="--value-run runs/terminal-value-v2"`と`PLANNER=on`を指定します。
-この指定の現在の既定は、[1判断8.5秒の終局探索](terminal-search.md)です。
+この指定の現在の既定は、[1判断最大15秒の探索と終局確認](terminal-search.md)です。
 参照方策の版を含む検証条件と起動例は[価値探索の接続手順](value-search-runtime.md)を参照してください。
 
 状態の確認：
@@ -187,3 +187,22 @@ POLICIES=none PLANNER=on EXTRA="--value-run runs/value-replays-v1 --opponent-pol
 ラダーは提案・送信・実行を分け、自分側requestから実際の選出を保存する。
 操作主体の既定はunknown。人が介入できない収集であると確認している場合に限り、`EXTRA`へ
 `--control-mode autonomous_ai` を追加する。提案と一致したという理由だけではAI単独の実行と集計しない。
+
+## 公開構築の型推定と追加時間での終局確認
+
+通常の価値探索は1手最大15秒。通常探索の8.5秒・8ターンを維持し、余剰時間で公開情報方策の終局比較を行う。
+各仮説と相手方策で悪化せず平均が改善する候補だけ採用し、打切り・時間切れでは通常探索の手を使う。
+Showdownが通知した持ち時間が少ない場合は短縮する。
+比較用に旧設定へ戻すには `--search '{"decisionMs":8500,"maxTurns":8,"terminalReview":false}'` を指定する。
+
+`data/processed/top_teams.json` がある場合、GameWith上位構築の検証済みの型・6体を、選出と実戦中の仮説へ使う。
+更新は開発worktreeで次を実行し、保存先の内容・validator結果を確認して、対戦の合間に原子的に配置する。
+
+```sh
+uv run python -m pokesim.data.team_catalog \
+  --cache data/raw/team-catalog-20261018 --out data/processed/top_teams.json
+```
+
+実行中の自動ダウンロードはない。catalogのhashは記録・較正・選出cacheへ入り、変更は対戦間に検知する。
+再学習したNN候補は検証で採用条件を満たさなかったため、現在のNN重みは維持する。
+原本の分割、構築取得、時間延長の比較、再学習の採否は[今回の監査](audits/20261018-team-priors-refresh.md)を参照。
