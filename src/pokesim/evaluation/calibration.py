@@ -39,9 +39,14 @@ def continuation_context(sets: list[dict], planner: dict | None, combine: dict, 
     config = {"team": sets, "planner": planner, "combine": combine, "reward": reward,
               "lookahead": search, "sample": sample}
     if search:
+        from pokesim.config import ROOT
+        from pokesim.runtime.bundle import file_hash
         from pokesim.state.codec import VERSION
 
         config['state_codec'] = VERSION
+        config['search_worker'] = {p.name: file_hash(p) for p in sorted((ROOT / 'services/sim-tools').glob('*.js'))}
+        config['search_driver'] = {name: file_hash(ROOT / 'src/pokesim/search' / name)
+                                   for name in ('planner.py', 'terminal.py')}
     return hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()[:16]
 
 

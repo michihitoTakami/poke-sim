@@ -147,6 +147,16 @@ class AdvisorPlayer(TrackedPlayer):
                 if battle is not None:
                     self.diagnostic(battle, 'stale-choice-error', message=message)
                 continue
+            if kind == 'error' and len(message) > 2 and battle is not None:
+                # Error packets carry no rqid. A delayed MOVE error can arrive after the next
+                # forced-switch request has been answered. It cannot reject that SWITCH command.
+                last = next((e for e in reversed(self.advice.get(tag, [])) if e.get('sent')), {})
+                same_request = last.get('rqid') == battle.last_request.get('rqid')
+                if (same_request and last.get('sent', '').startswith('/choose switch ') and
+                        "Can't move: You need a switch response" in message[2]):
+                    self.diagnostic(battle, 'stale-choice-error', message=message,
+                                    reason='move-error-after-current-switch-command')
+                    continue
             if kind == 'request' and len(message) > 2 and message[2] and battle is not None:
                 incoming_id = json.loads(message[2]).get('rqid')
                 current_id = battle.last_request.get('rqid')

@@ -1,12 +1,13 @@
 // A versioned, deliberately simple reference policy over client observations. No sampled world or engine objects.
 const {health, id, legalChoices} = require('./public_observation');
+const {estimateDamage, megaSource} = require('./public_damage');
 const VERSION = 'public-reference-v2';
 // Keep the training reference frozen. The live tree uses the revised policy explicitly;
 // its V_ref remains a v2 bootstrap estimate, not a value trained for this new continuation.
-const BATON_VERSION = 'public-baton-v1';
+const BATON_VERSION = 'public-baton-v2';
 const stage = s => s >= 0 ? (2 + s) / 2 : 2 / (2 - s);
 
-function choosePublic(view, name, dex, baton = false) {
+function choosePublic(view, name, dex, baton = false, mechanics = baton) {
   if (!['greedy', 'tactical', 'expert', 'disrupt'].includes(name)) throw new Error(`unknown public policy ${name}`);
   const opts = legalChoices(view);
   if (!opts.length) throw new Error('public request has no legal actions');
@@ -41,6 +42,8 @@ function choosePublic(view, name, dex, baton = false) {
   const maxhp = m => m === foe ? Math.floor((2 * spec(m).baseStats.hp + 31 + 16) / 2) + 60 : health(m.condition).maxhp;
   const hp = m => m === foe ? health(m.condition).fraction * maxhp(m) : health(m.condition).hp;
   const damage = (source, target, move, sourceBoosts, targetBoosts) => {
+    if (mechanics) return estimateDamage(view, dex, source === me ? megaSource(view, dex, source) : source,
+      target === me ? megaSource(view, dex, target) : target, move, sourceBoosts, targetBoosts);
     if (!move || move.category === 'Status') return 0;
     const types = spec(target).types;
     if (!dex.getImmunity(move.type, types)) return 0;
@@ -98,9 +101,25 @@ function choosePublic(view, name, dex, baton = false) {
   const passing = baton && view.phase === 'switch' && hp(me) > 0 && knownMe.lastMove === 'batonpass';
   const switches = switchOpts.map(o => scoreSwitch(o, passing)).sort((a, b) => b.score - a.score);
   // Baton Pass can leave trapping, so its recipients are not limited to ordinary legal switches.
-  const passTargets = baton ? own.flatMap((m, i) => !m.active && hp(m) > 0 ?
+  let passTargets = baton ? own.flatMap((m, i) => !m.active && hp(m) > 0 ?
     [scoreSwitch([`switch ${i + 1}`, `switch:${id(m.details.split(',')[0])}`], true)] : []) : [];
   if (baton) {
+    // A passive receiver must still add a missing, useful boost for a living attacker.
+    // Otherwise the expert can bounce a completed payload between Scolipede and Umbreon forever.
+    passTargets = passTargets.filter(target => {
+      const relay = target.mon, payload = knownMe.boosts;
+      if (bestDamage(relay, payload) > 0) return true;
+      const endpoints = own.filter(m => m !== relay && hp(m) > 0 && bestDamage(m, payload) > 0);
+      const addSpeed = relay.ability === 'speedboost' && (payload.spe || 0) < 6 &&
+        endpoints.some(m => !faster(m, payload));
+      const addDefence = relay.moves.includes('irondefense') && (payload.def || 0) < 4 &&
+        threats.some(m => m.category === 'Physical');
+      const addSpecial = relay.moves.includes('calmmind') && (payload.spa || 0) < 2 &&
+        endpoints.some(m => m.moves.some(mid => dex.moves.get(mid).category === 'Special'));
+      return endpoints.length && (addSpeed || addDefence || addSpecial) &&
+        incoming(relay, payload) * 3 < hp(relay) &&
+        !foe.moves.some(m => ['haze', 'roar', 'whirlwind', 'encore', 'taunt'].includes(m));
+    });
     // A relay is useful only while it can safely add special boosts for a remaining special attacker.
     for (const target of passTargets) {
       const relay = target.mon;
@@ -120,7 +139,8 @@ function choosePublic(view, name, dex, baton = false) {
   const moves = opts.filter(([, l]) => l.startsWith('move:') && !l.endsWith(':mega')).map(([choice, label]) => {
     const move = dex.moves.get(label.split(':')[1]);
     return {choice, label, move, damage: damage(me, foe, move)};
-  });
+  }).filter(x => !mechanics || x.move.id !== 'substitute' ||
+    (hp(me) > Math.floor(maxhp(me) / 4) && !knownMe.volatiles.includes('substitute')));
   if (!moves.length) return opts[0];
   const finish = candidate => opts.find(([, l]) => l === candidate.label + ':mega') || [candidate.choice, candidate.label];
   const pick = move => moves.find(x => x.move.id === move);
@@ -140,7 +160,37 @@ function choosePublic(view, name, dex, baton = false) {
     const canAct = !priority && (faster(me) || worst < currentHp || sheltered);
     const stops = foe.moves.some(m => ['encore', 'taunt', 'haze', 'clearsmog', 'roar', 'whirlwind', 'yawn'].includes(m));
     const carry = gained > 0 || covered;
-    const residual = ['tox', 'psn', 'brn'].includes(health(me.condition).status) ? maximum / 8 : 0;
+    const status = health(me.condition).status;
+    let residual = status === 'brn' ? maximum / 16 : ['tox', 'psn'].includes(status) ? maximum / 8 : 0;
+    if (id(view.public.weather) === 'sandstorm' && !spec(me).types.some(t => ['Rock', 'Ground', 'Steel'].includes(t)) &&
+        !['magicguard', 'overcoat', 'sandveil', 'sandrush', 'sandforce'].includes(me.ability) && me.item !== 'safetygoggles')
+      residual += maximum / 16;
+    if (me.ability === 'magicguard') residual = 0;
+    // An unseen Garchomp can be special. Scout its first attack while obtaining the first Speed Boost,
+    // instead of committing the unprotected passer to Iron Defense from base stats alone.
+    if (protect && me.ability === 'speedboost' && !carry && !knownMe.lastMove && foe.moves.length === 0 &&
+        residual < currentHp) return finish(protect);
+    const special = Math.max(0, ...threats.filter(m => m.category === 'Special').map(m =>
+      damage(foe, me, {...m, accuracy: true}) / .925));
+    const physical = Math.max(0, ...threats.filter(m => m.category === 'Physical').map(m =>
+      damage(foe, me, {...m, accuracy: true}) / .925));
+    const speedNeeded = me.ability === 'speedboost' && (knownMe.boosts.spe || 0) < 6 &&
+      !faster(passTargets[0].mon, knownMe.boosts);
+    const unsafeEntry = faster(me) && !sheltered &&
+      incoming(passTargets[0].mon, knownMe.boosts) >= hp(passTargets[0].mon);
+    const interrupted = knownMe.volatiles.includes('yawn') ||
+      foe.moves.some(m => ['encore', 'taunt', 'haze', 'clearsmog', 'roar', 'whirlwind'].includes(m));
+    // Against special pressure a breakable shield can still buy a Speed Boost. Alternate the two
+    // protections until the RECEIVER wins the speed race, rather than spending HP on successive shields.
+    if ((speedNeeded || unsafeEntry) && special > physical && !interrupted && !priority) {
+      const lastProtect = ['protect', 'detect'].includes(knownMe.lastMove);
+      if (protect && !lastProtect && residual < currentHp) return finish(protect);
+      const priorityDamage = Math.max(0, ...threats.filter(m => m.priority > 0).map(m =>
+        damage(foe, me, {...m, accuracy: true}) / .925));
+      if (sub && !covered && canAct && currentHp - Math.floor(maximum / 4) > residual + priorityDamage &&
+          foe.ability !== 'infiltrator' && !threats.some(m => m.flags?.sound || m.flags?.bypasssub || m.multihit))
+        return finish(sub);
+    }
     if (carry && canAct && (2 * worst + residual >= currentHp || stops || knownMe.volatiles.includes('yawn')))
       return finish(pass);
     const heal = moves.find(x => x.move.heal && x.move.target === 'self');
@@ -173,7 +223,13 @@ function choosePublic(view, name, dex, baton = false) {
     if (disruption && foe.ability !== 'goodasgold' && !foe.volatiles.includes('substitute')) return finish(disruption);
   }
   const heal = moves.find(x => x.move.heal && x.move.target === 'self');
-  if (heal && currentHp < maximum / 2 && hit < maximum / 2) return finish(heal);
+  const healingHit = heal && mechanics && heal.move.id === 'roost' && faster(me) ? Math.max(0,
+    ...threats.map(m => {
+      const target = megaSource(view, dex, me);
+      const types = spec(target).types.filter(t => t !== 'Flying');
+      return damage(foe, (m.priority || 0) <= 0 ? {...target, types: types.length ? types : ['Normal']} : me, m);
+    })) : hit;
+  if (heal && currentHp < maximum / 2 && healingHit < maximum / 2) return finish(heal);
   const pass = pick('batonpass');
   const gained = Object.values(knownMe.boosts).reduce((s, b) => s + Math.max(0, b), 0);
   const sub = pick('substitute');
@@ -186,7 +242,7 @@ function choosePublic(view, name, dex, baton = false) {
       (hit * 2 >= currentHp || encoreRisk || (knownMe.boosts.spe || 0) >= 2)) return finish(pass);
   const criticalDefence = baton && foe.volatiles.includes('focusenergy') && setup?.move.boosts?.spd;
   if (setup && !criticalDefence && !encoreRisk && hit * 3 < currentHp && best.damage * 2 < hp(foe)) return finish(setup);
-  if (pass && gained >= 2 && switches.length) return finish(pass);
+  if (pass && gained >= 2 && (baton ? passTargets.length : switches.length)) return finish(pass);
   const protect = pick('protect');
   if (pass && protect && (knownMe.boosts.spe || 0) < 2 && knownMe.lastMove !== 'protect') return finish(protect);
   return finish(best);
@@ -207,5 +263,5 @@ function observedStep(battle, ours, theirs, step, rechoose, allowed = ['p1', 'p2
   throw new Error('observed request retries exhausted');
 }
 
-const chooseBatonPublic = (view, name, dex) => choosePublic(view, name, dex, name === 'expert');
+const chooseBatonPublic = (view, name, dex) => choosePublic(view, name, dex, name === 'expert', true);
 module.exports = {choosePublic, chooseBatonPublic, observedStep, VERSION, BATON_VERSION};

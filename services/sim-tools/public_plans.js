@@ -1,7 +1,8 @@
 // Multi-turn options using only an actor's request and the public protocol prefix.
 const {health, id, legalChoices} = require('./public_observation');
 const {chooseBatonPublic} = require('./public_policy');
-const VERSION = 'public-plans-v1';
+const {estimateDamage} = require('./public_damage');
+const VERSION = 'public-plans-v2';
 const stage = n => n >= 0 ? (2 + n) / 2 : 2 / (2 - n);
 
 function assess(view, dex) {
@@ -26,17 +27,7 @@ function assess(view, dex) {
     return value;
   };
   const estimate = (target, move, projected = {}) => {
-    if (move.category === 'Status') return 0;
-    const types = species(target).types;
-    if (!dex.getImmunity(move.type, types)) return 0;
-    const s = move.category === 'Physical' ? ['atk', 'def'] : ['spa', 'spd'];
-    const critical = foe.volatiles.includes('focusenergy') || move.willCrit;
-    const defence = critical ? Math.min(stats(target, s[1], projected), stats(target, s[1])) : stats(target, s[1], projected);
-    const attack = critical ? Math.max(stats(foe, s[0], foe.boosts), stats(foe, s[0])) : stats(foe, s[0], foe.boosts);
-    const hits = Array.isArray(move.multihit) ? 3 : move.multihit || 1;
-    return ((22 * (move.basePower || 80) * attack / defence) / 50 + 2) * hits *
-      (species(foe).types.includes(move.type) ? 1.5 : 1) * 2 ** dex.getEffectiveness(move.type, types) *
-      (critical ? 1.5 : 1);
+    return estimateDamage(view, dex, foe, target, {...move, accuracy: true}, undefined, projected) / .925;
   };
   const attacks = foe.moves.map(m => dex.moves.get(m)).filter(m => m.category !== 'Status');
   if (foe.moves.length < 4) for (const type of species(foe).types) attacks.push({type, basePower: 90,
@@ -101,10 +92,16 @@ class PlanPolicy {
       const payload = Object.values(mine.boosts).some(n => n > 0) || sheltered;
       const residual = ['tox', 'psn', 'brn'].includes(current.status) ? current.maxhp / 8 : 0;
       const ready = receivers.some(m => a.faster(m, mine.boosts) && a.hit(m, mine.boosts) < health(m.condition).hp);
+      const preparation = fallback();
+      // The expert controller can safely alternate Protect/Substitute for a slow receiver even when
+      // a direct hit is large. Do not replace that protected turn with a premature handoff.
+      if (['move:protect', 'move:detect', 'move:substitute'].includes(preparation[1])) return preparation;
       // Deadline includes priority and residuals. A failed speed race cannot justify losing the whole payload.
       const deadline = 2 * incoming + residual >= current.hp || a.priority + residual >= current.hp ||
         mine.volatiles.includes('yawn') || critical || foe.moves.some(m => ['haze', 'roar', 'whirlwind', 'taunt'].includes(m));
-      if (payload && canAct && (ready || deadline)) { end(ready ? 'receiver-ready' : 'handoff-deadline'); return move('batonpass'); }
+      if (payload && canAct && (ready || deadline) && preparation[1] === 'move:batonpass') {
+        end(ready ? 'receiver-ready' : 'handoff-deadline'); return move('batonpass');
+      }
       if (critical && move('calmmind')) {
         // Rebuild the choice without special-defence-only preparation; critical hits bypass those boosts.
         end('critical-plan-reconsidered');

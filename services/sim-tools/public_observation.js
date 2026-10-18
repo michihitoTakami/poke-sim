@@ -29,7 +29,8 @@ class PublicObservation {
     this.extract = extract;
     this.champions = champions;
     this.state = {turn: 0, preview: {p1: [], p2: []}, active: {p1: null, p2: null},
-                  mons: {p1: {}, p2: {}}, weather: '', terrain: '', conditions: {p1: {}, p2: {}}};
+                  mons: {p1: {}, p2: {}}, totalFainted: {p1: 0, p2: 0},
+                  weather: '', terrain: '', conditions: {p1: {}, p2: {}}};
     this.history = [];
     this.names = {p1: {}, p2: {}};
     this.pendingBaton = {p1: false, p2: false};
@@ -79,6 +80,7 @@ class PublicObservation {
       if (kind === '-fieldend' && /terrain/i.test(p[2])) this.state.terrain = '';
       const side = (p[2] || '').slice(0, 2);
       if (!this.state.mons[side]) continue;
+      if (kind === 'faint') this.state.totalFainted[side]++;
       if (kind === '-sidestart') this.state.conditions[side][p[3]] = (this.state.conditions[side][p[3]] || 0) + 1;
       if (kind === '-sideend') delete this.state.conditions[side][p[3]];
       const name = (p[2] || '').split(': ')[1];

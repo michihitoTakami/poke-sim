@@ -10,7 +10,7 @@ import numpy as np
 from pokesim.config import FORMAT
 from pokesim.rl.myteam import to_id
 
-VERSION = 'preview-continuations-v1'
+VERSION = 'preview-continuations-v2'
 
 
 class LineupSearch:
@@ -30,6 +30,18 @@ class LineupSearch:
                 trios.add(key)
             if len(pool) == self.shortlist:
                 break
+        # Static one-on-one coverage undervalues a passive passer before any payload exists.
+        # Give every passer-led trio an actual full-game comparison, including two-hop relays.
+        # Only known own moves are consulted; no speculative boost bonus enters the final score.
+        passers = {to_id(s['species']) for s in self.sets if 'batonpass' in map(to_id, s.get('moves', []))}
+        included = {tuple(map(to_id, row[0])) for row in pool}
+        relay_candidates = []
+        for row in ranking:
+            names = tuple(map(to_id, row[0]))
+            if names[0] in passers and names not in included:
+                pool.append(row)
+                included.add(names)
+                relay_candidates.append(row[0])
         if len(pool) < 2:
             return ranking, {'version': VERSION, 'skipped': 'less-than-two-candidates'}
         signature = json.dumps([self.sets, [r[0] for r in pool], picks.species, picks.lineups,
@@ -73,12 +85,14 @@ class LineupSearch:
             utility = .7 * low + .3 * min(by_world)
             info = {'lineup': row[0], 'trials': len(trials), 'terminal': len(trials) - unknown,
                     'failed': sum(t['outcome'] == 'failed' for t in trials),
-                    'target_bounds': [low, high], 'utility': utility}
+                    'target_bounds': [low, high], 'utility': utility,
+                    'relay': [t.get('relay', {}) for t in trials]}
             evidence.append(info)
             scored.append((row[0], utility, dict(row[2] or {}, continuation=info)))
         info = {'version': VERSION, 'profile': key[:16], 'policy': reply['version'],
                 'score_kind': 'sampled-public-continuation-utility', 'calibrated_win_probability': False,
                 'candidates': evidence, 'worlds': self.worlds, 'opponent_hypotheses': reply['world_lineups'],
+                'additional_relay_candidates': relay_candidates,
                 'unknown_outcomes': 'bounds-only; never training loss labels'}
         # A partial simulator failure must not silently change the selection. Keep the static ranking usable.
         if any(e['failed'] for e in evidence):

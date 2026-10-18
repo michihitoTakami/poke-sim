@@ -2,6 +2,27 @@
 const {PublicObservation} = require('./public_observation');
 const {PlanPolicy, choosePlannedPublic, VERSION} = require('./public_plans');
 const {observedStep} = require('./public_policy');
+const {health} = require('./public_observation');
+
+// Diagnostics read only the actor's public observation and own request. They do not add
+// reward: a payload matters to selection only when the real continuation can win with it.
+function relayTrace() {
+  const transfers = [];
+  let pending = null, lastActive = null;
+  return {transfers, observe(view) {
+    const me = view.public.mons.p1[view.public.active.p1];
+    if (!me) return;
+    const active = view.public.active.p1;
+    if (lastActive && active !== lastActive && pending) {
+      if (Object.values(me.boosts).some(n => n > 0) || me.volatiles.includes('substitute'))
+        transfers.push({from: lastActive, to: active, boosts: {...me.boosts},
+          substitute: me.volatiles.includes('substitute'), hp: health(me.condition).fraction});
+      pending = null;
+    }
+    if (me.lastMove === 'batonpass' && view.phase === 'switch' && health(me.condition).hp > 0) pending = active;
+    lastActive = active;
+  }};
+}
 
 function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
   const cfg = req.lineupMatches;
@@ -20,8 +41,10 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
         const obs = new PublicObservation(history, battle.dex, extractChannelMessages, true);
         const plans = {p1: new PlanPolicy(), p2: new PlanPolicy()};
         let pos = battle.log.length, requests = 0;
+        const relay = relayTrace(); row.relay = relay;
         const choose = side => {
           const view = obs.view(side);
+          if (side.id === 'p1') relay.observe(view);
           return (side.id === 'p1' ? plans.p1.choose(view, battle.dex) :
             choosePlannedPublic(view, opponent, battle.dex))[0];
         };
@@ -33,6 +56,7 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
         }
         row.outcome = !battle.ended ? 'unfinished' : battle.winner === 'p1' ? 'win' : battle.winner === 'p2' ? 'loss' : 'draw';
         row.target = {win: 1, loss: 0, draw: .5}[row.outcome] ?? null;
+        relay.observe(obs.view(battle.p1));
       } catch (e) { row.outcome = 'failed'; row.error = String(e.stack || e); }
       finally { row.turns = battle.turn; battle.destroy(); }
       trials.push(row);

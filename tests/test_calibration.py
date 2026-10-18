@@ -99,6 +99,19 @@ def test_continuation_identity_separates_sampling_and_planner_modes():
     assert baseline != continuation_context([], {"mode": "on"}, {}, "sparse", True)
 
 
+def test_changing_worker_policy_invalidates_search_calibration_only(monkeypatch):
+    from pokesim.runtime import bundle
+
+    args = ([], None, {}, "sparse")
+    with_search = continuation_context(*args, True)
+    without_search = continuation_context(*args, False)
+    original = bundle.file_hash
+    monkeypatch.setattr(bundle, 'file_hash',
+                        lambda p: 'changed-policy' if p.name == 'public_policy.js' else original(p))
+    assert continuation_context(*args, True) != with_search
+    assert continuation_context(*args, False) == without_search
+
+
 def test_ab_policy_switch_selects_or_clears_its_own_calibration():
     from types import SimpleNamespace
 
