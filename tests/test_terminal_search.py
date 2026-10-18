@@ -143,7 +143,7 @@ def test_faster_lethal_attack_is_taken_instead_of_a_fatal_heal_or_setup(move):
     alternative_win = move == 'shadowball' and chosen == 'move:flashcannon' and chosen in summary['immediate_wins']
     assert chosen == 'move:' + move or alternative_win
     assert summary['failed'] == 0
-    assert summary['continuation_policy'] == 'public-plans-v1'
+    assert summary['continuation_policy'] == 'public-plans-v2'
 
 
 def test_playing_one_move_uses_its_own_risk_instead_of_the_largest_mixed_probability():
@@ -262,13 +262,13 @@ def test_the_value_bootstrap_keeps_its_weight_against_a_single_rollout_only_when
     assert plain['stats'] == {'n': 1, 'sum': -1, 'sumSq': 0, 'prior': .6, 'speed': 0, 'priorSpeed': .2, 'ends': 1,
                               'failed': 0}
     assert plain['policies'] == {'p1': ['expert'], 'p2': ['disrupt', 'tactical']}
-    assert plain['version'] == 'public-plans-v1'
+    assert plain['version'] == 'public-plans-v2'
     blended = cell_values(4, {'p2': ['disrupt', 'tactical', 'expert']})
     assert blended['before'] == pytest.approx(.6)
     assert blended['after'] == pytest.approx((4 * .6 - 1) / 5)
     assert blended['speed'] == pytest.approx(4 * .2 / 5)
     assert blended['policies'] == {'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']}
-    assert blended['version'] == 'public-plans-v1+p1:expert/p2:disrupt,tactical,expert'
+    assert blended['version'] == 'public-plans-v2+p1:expert/p2:disrupt,tactical,expert'
     with pytest.raises(subprocess.CalledProcessError):
         cell_values(0, {'p2': ['random']})
 

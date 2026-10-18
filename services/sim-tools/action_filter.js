@@ -67,6 +67,18 @@ function reason(b, side, option, replies) {
   if (!label.startsWith('move:') || label.endsWith(':mega') || side.activeRequest?.forceSwitch) return null;
   const me = side.active[0], foe = side.foe.active[0], move = b.dex.moves.get(label.split(':')[1]);
   if (!me || !foe || me.fainted || foe.fainted) return null;
+  if (move.id === 'substitute' && me.hp <= Math.floor(me.maxhp / 4)) {
+    // Public HP proves failure unless a preceding reply can heal us. Damage-triggered berries and
+    // abilities, Pain Split/Heal Pulse and custom onHit effects make this proof inconclusive.
+    for (const [, otherLabel] of replies) {
+      if (!otherLabel.startsWith('move:')) continue;
+      const response = b.dex.moves.get(otherLabel.split(':')[1]);
+      if (canPrecede(b, me, foe, move, response, otherLabel.endsWith(':mega')) &&
+          (response.onHit || me.getItem().isBerry ||
+           ['waterabsorb', 'dryskin', 'voltabsorb', 'eartheater'].includes(me.ability))) return null;
+    }
+    return 'insufficient-hp-for-substitute';
+  }
   // These can create useful effects even when the primary move has no effect.
   // Roost's grounding effect is not applied if its heal fails at full HP (verified on the deployed engine).
   const fullRoost = move.id === 'roost' && me.hp === me.maxhp;
@@ -107,6 +119,7 @@ function reason(b, side, option, replies) {
 function pruneRoot(states, deps) {
   const reasons = states[0].p1.map(() => []);
   let residualFinish = false;
+  let suckerPunch = false;
   for (const st of states) {
     const b = deps.State.deserializeBattle(st.snapshot);
     try {
@@ -116,13 +129,14 @@ function pruneRoot(states, deps) {
         foe?.status === 'psn' ? foe.maxhp / 8 :
           foe?.status === 'tox' ? foe.maxhp * ((foe.statusState.stage || 0) + 1) / 16 : 0;
       residualFinish ||= !!foe && (residual >= foe.hp || foe.volatiles.perishsong?.duration <= 1);
+      suckerPunch ||= st.p2.some(([, label]) => label.split(':')[1] === 'suckerpunch');
     }
     finally { b.destroy(); }
   }
   const keep = reasons.map(row => !row.every(Boolean));
   // Waiting for a known residual KO can be useful, e.g. avoiding recoil/contact. Retain one passive option.
   let passiveWait = null;
-  if (residualFinish) {
+  if (residualFinish || suckerPunch) {
     const i = reasons.findIndex(row => row.every(r => r && r !== 'immune-to-every-sampled-reply'));
     if (i >= 0) { keep[i] = true; passiveWait = states[0].p1[i][1]; }
   }

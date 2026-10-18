@@ -189,6 +189,15 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
         objective = (1 - rhos) * sol.expected + rhos * sol.worst
         candidates = np.flatnonzero(objective >= objective.max() - max(1e-9, tie_margin))
         chosen = int(candidates[np.argmax(secondary[candidates])]) if secondary is not None else int(candidates[0])
+        root_plan = results[0].get('rootPlan')
+        if root_plan in labels and all(r.get('rootPlan') == root_plan for r in results):
+            index = labels.index(root_plan)
+            followed = index in candidates
+            if followed:
+                chosen = index
+            sol.status['relay_plan'] = {'suggested': root_plan, 'followed': bool(followed),
+                                        'gap': float(objective.max() - objective[index]),
+                                        'scope': 'dedicated-passer; common-public-plan; existing-tie-margin'}
         sol.prob = np.eye(len(labels))[chosen]
         sol.status.update(solver='pure-robust', objective=float(objective[chosen]))
         if near is not None and near > 0:

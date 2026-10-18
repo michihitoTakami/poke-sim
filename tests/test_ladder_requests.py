@@ -161,3 +161,15 @@ def test_active_game_fallback_still_stops_collection_and_persists_its_full_reaso
     assert failure['battle'] == battle.battle_tag
     assert failure['advice']['status']['fallback'] == 'worker failed while active'
     assert failure['rqid'] == battle.last_request['rqid']
+
+
+def test_delayed_move_error_cannot_reject_the_current_switch_order(state):
+    player, _, battle = state
+    rqid = battle.last_request['rqid']
+    player.advice[battle.battle_tag] = [{'rqid': rqid, 'sent': f'/choose switch Skeledirge|{rqid}'}]
+    packet = [['>' + battle.battle_tag], ['', 'error',
+               "[Invalid choice] Can't move: You need a switch response"]]
+    asyncio.run(player._handle_battle_message(packet))
+    player.ps_client.send_message.assert_not_called()
+    assert not player.quality_issues
+    assert diagnostics(player)[-1]['reason'] == 'move-error-after-current-switch-command'
