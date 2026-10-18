@@ -3,6 +3,7 @@ const {PublicObservation} = require('./public_observation');
 const {PlanPolicy, choosePlannedPublic, VERSION} = require('./public_plans');
 const {observedStep} = require('./public_policy');
 const {health} = require('./public_observation');
+const {chooseCounterplay, VERSION: COUNTERPLAY_VERSION} = require('./counterplay_policy');
 
 // Diagnostics read only the actor's public observation and own request. They do not add
 // reward: a payload matters to selection only when the real continuation can win with it.
@@ -46,7 +47,8 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
           const view = obs.view(side);
           if (side.id === 'p1') relay.observe(view);
           return (side.id === 'p1' ? plans.p1.choose(view, battle.dex) :
-            choosePlannedPublic(view, opponent, battle.dex))[0];
+            opponent === 'counterplay' ? chooseCounterplay(view, battle.dex) :
+              choosePlannedPublic(view, opponent, battle.dex))[0];
         };
         while (!battle.ended && battle.turn <= (cfg.maxTurns ?? 160)) {
           if (++requests > 1400) throw Error('lineup request guard exhausted');
@@ -62,6 +64,6 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
       trials.push(row);
     }
   }
-  return {version: VERSION, informationScope: 'public_observation', trials};
+  return {version: VERSION + '+' + COUNTERPLAY_VERSION, informationScope: 'public_observation', trials};
 }
 module.exports = {lineupMatches};

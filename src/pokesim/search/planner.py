@@ -204,11 +204,37 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
 
             before = labels[chosen]
             after = preferred(review, before)
+            from pokesim.search.counterplay import dominates
+
+            counterplay = results[0].get('root_counterplay', {})
+            veto = all(r.get('root_counterplay', {}) == counterplay for r in results) and \
+                dominates(counterplay, before, after)
+            if veto:
+                after = before
             if after in labels:
                 chosen = labels.index(after)
             sol.status['terminal_review'] = dict(review, incumbent=before, selected=labels[chosen])
+            if veto:
+                sol.status['terminal_review']['veto'] = 'dominated-immediate-sacrifice'
             if after != before and 'relay_plan' in sol.status:
                 sol.status['relay_plan'].update(followed=False, overridden_by='terminal_review')
+        counterplay = results[0].get('root_counterplay')
+        if counterplay is not None and near is None and all(r.get('root_counterplay') == counterplay for r in results):
+            from pokesim.search.counterplay import dominates
+            from pokesim.search.counterplay import preferred as counterplay_preferred
+
+            before = labels[chosen]
+            order = [labels[i] for i in np.argsort(-objective, kind='stable')]
+            after = counterplay_preferred(counterplay, before, order)
+            chosen = labels.index(after)
+            sol.status['root_counterplay'] = {k: v for k, v in counterplay.items() if k != 'cells'} | {
+                'incumbent': before, 'selected': after,
+                'dominating': [lab for lab in labels if dominates(counterplay, lab, before)],
+                'witnesses': [{'cell': key, 'before': cell[before], 'after': cell[after]}
+                              for key, cell in counterplay.get('cells', {}).items()
+                              if after != before and cell[before]['lost'] >= 2 / 3][:6]}
+            if after != before and 'relay_plan' in sol.status:
+                sol.status['relay_plan'].update(followed=False, overridden_by='root_counterplay')
         sol.prob = np.eye(len(labels))[chosen]
         sol.status.update(solver='pure-robust', objective=float(objective[chosen]))
         if near is not None and near > 0:

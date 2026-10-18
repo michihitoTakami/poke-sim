@@ -46,7 +46,8 @@ def continuation_context(sets: list[dict], planner: dict | None, combine: dict, 
         config['state_codec'] = VERSION
         config['search_worker'] = {p.name: file_hash(p) for p in sorted((ROOT / 'services/sim-tools').glob('*.js'))}
         config['search_driver'] = {name: file_hash(ROOT / 'src/pokesim/search' / name)
-                                   for name in ('planner.py', 'terminal.py', 'lookahead.py', 'budget.py', 'review.py')}
+                                   for name in ('planner.py', 'terminal.py', 'lookahead.py', 'budget.py', 'review.py',
+                                                'counterplay.py')}
         config['belief_driver'] = {name: file_hash(ROOT / 'src/pokesim/belief' / name)
                                   for name in ('sets.py', 'team_catalog.py')}
         config['team_catalog'] = file_hash(ROOT / 'data/processed/top_teams.json')

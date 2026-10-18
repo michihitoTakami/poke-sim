@@ -720,7 +720,9 @@ rl.on('line', line => {
   let reply;
   try {
     const req = JSON.parse(line);
-    reply = req.lineupMatches ? require('./lineup_matches').lineupMatches(req,
+    reply = req.rootTactics ? require('./root_tactics').rootTactics(req,
+      {setUp, choices, step, State, extractChannelMessages}) :
+      req.lineupMatches ? require('./lineup_matches').lineupMatches(req,
       {startBattle, step, extractChannelMessages}) : req.previewMatchups ? require('./preview_matchups').previewMatchups(req,
       {setUp, expectedDamage: (b, source, target, move) => expectedDamage(b, source, target, move, true)}) :
       req.observe ? require('./observe').observe(req, {setUp, extractChannelMessages}) :
