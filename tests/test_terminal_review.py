@@ -79,7 +79,7 @@ def test_surplus_search_keeps_the_original_tree_allowance_and_global_deadline(mo
         return {'complete': False, 'reason': 'fixture'}
     monkeypatch.setattr('pokesim.search.terminal.search', search)
     monkeypatch.setattr(module, 'review', compare)
-    request = {'decisionMs': 15000, 'terminalReview': True}
+    request = {'decisionMs': 15000, 'terminalReview': True, 'rootCounterplay': False}
     result = module.search_with_review(object(), request, started=100.)
     assert calls == [8500, 115.] and result[0]['terminal_review']['reason'] == 'fixture'
     with pytest.raises(ValueError, match='decisionMs'):

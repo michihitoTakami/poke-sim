@@ -239,10 +239,10 @@ def test_passer_led_trios_get_full_games_even_when_static_coverage_ranks_them_la
         cfg = req['lineupMatches']
         calls.append(cfg)
         return {'version': 'test', 'informationScope': 'public_observation', 'trials': [
-            {'candidate': i, 'world': w, 'target': float(trio == desired),
+            {'candidate': i, 'world': w, 'opponent': policy, 'target': float(trio == desired),
              'outcome': 'win' if trio == desired else 'loss'}
             for i, trio in enumerate([[s['species'] for s in team] for team in cfg['ours']])
-            for w in range(len(cfg['worlds']))]}
+            for w in range(len(cfg['worlds'])) for policy in cfg['policies']]}
     engine = SimpleNamespace(sampler=SimpleNamespace(rng=random.Random(0), sample=lambda s: {'species': s}),
                              _query=query)
     picks = OpponentPicks(['x', 'y', 'z'], [1., 1., 1.], [1., 0., 0.], [(['x', 'y', 'z'], 1.)])
@@ -250,7 +250,8 @@ def test_passer_led_trios_get_full_games_even_when_static_coverage_ranks_them_la
     tested = [[s['species'] for s in team] for team in calls[0]['ours']]
     assert sum(trio[0] in {'scolipede', 'umbreon'} for trio in tested) == 20
     assert len(tested) == len({tuple(t) for t in tested})
-    assert ranked[0][0] == desired and len(info['additional_relay_candidates']) == 20
+    assert ranked[0][0] == desired
+    assert len({tuple(sorted(team)) for team in tested}) == 20
     assert info['calibrated_win_probability'] is False
 
 

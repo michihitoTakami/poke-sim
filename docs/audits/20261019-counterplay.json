@@ -1,0 +1,438 @@
+{
+  "scope": "development diagnostics, not an untouched evaluation or a human-game win-rate estimate",
+  "baseline": "da3ef47aa51736dbf0677c4b919aa2af80bba328",
+  "engine": "942cda71d14b",
+  "neural_weights": "unchanged",
+  "root_cases": [
+    {
+      "file": "2700414376-T12.json",
+      "sha256": "181c7c026c2c811b5af63ef50a77acfc2fc708f0995166eb74fd7e8a6df99053",
+      "chosen": "move:calmmind",
+      "seconds": 9.21147403307259,
+      "counterplay": {
+        "version": "paired-root-counterplay-v1",
+        "complete": true,
+        "actions": [
+          "move:moonblast",
+          "move:substitute",
+          "move:synthesis",
+          "move:calmmind",
+          "switch:scolipede"
+        ],
+        "kinds": {
+          "move:moonblast": "attack",
+          "move:substitute": "status",
+          "move:synthesis": "status",
+          "move:calmmind": "status",
+          "switch:scolipede": "switch"
+        },
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "scope": "all legal root replies in sampled sets; three paired seeds; not exhaustive chance or hidden sets",
+        "seconds": 0.32912140991538763,
+        "incumbent": "move:calmmind",
+        "selected": "move:calmmind",
+        "dominating": [],
+        "witnesses": []
+      },
+      "review_complete": true,
+      "failed": 0
+    },
+    {
+      "file": "2700430261-T2.json",
+      "sha256": "4bea67acf26fa3ac11765489becb36a6467d785b8372e2ac6741e148cbd16c1a",
+      "chosen": "switch:gholdengo",
+      "seconds": 10.054085289943032,
+      "counterplay": {
+        "version": "paired-root-counterplay-v1",
+        "complete": true,
+        "actions": [
+          "move:snarl",
+          "move:batonpass",
+          "move:calmmind",
+          "move:moonlight",
+          "switch:floetteeternal",
+          "switch:gholdengo"
+        ],
+        "kinds": {
+          "move:snarl": "attack",
+          "move:batonpass": "status",
+          "move:calmmind": "status",
+          "move:moonlight": "status",
+          "switch:floetteeternal": "switch",
+          "switch:gholdengo": "switch"
+        },
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "scope": "all legal root replies in sampled sets; three paired seeds; not exhaustive chance or hidden sets",
+        "seconds": 0.5623688709456474,
+        "incumbent": "move:moonlight",
+        "selected": "switch:gholdengo",
+        "dominating": [
+          "switch:floetteeternal",
+          "switch:gholdengo"
+        ],
+        "witnesses": [
+          {
+            "cell": "0:move:hammerarm",
+            "before": {
+              "lost": 1,
+              "ko": 0,
+              "damage": 0
+            },
+            "after": {
+              "lost": 0,
+              "ko": 0,
+              "damage": 0
+            }
+          },
+          {
+            "cell": "1:move:hammerarm",
+            "before": {
+              "lost": 1,
+              "ko": 0,
+              "damage": 0
+            },
+            "after": {
+              "lost": 0,
+              "ko": 0,
+              "damage": 0
+            }
+          },
+          {
+            "cell": "2:move:hammerarm",
+            "before": {
+              "lost": 1,
+              "ko": 0,
+              "damage": 0
+            },
+            "after": {
+              "lost": 0,
+              "ko": 0,
+              "damage": 0
+            }
+          },
+          {
+            "cell": "3:move:hammerarm",
+            "before": {
+              "lost": 1,
+              "ko": 0,
+              "damage": 0
+            },
+            "after": {
+              "lost": 0,
+              "ko": 0,
+              "damage": 0
+            }
+          },
+          {
+            "cell": "4:move:hammerarm",
+            "before": {
+              "lost": 1,
+              "ko": 0,
+              "damage": 0
+            },
+            "after": {
+              "lost": 0,
+              "ko": 0,
+              "damage": 0
+            }
+          },
+          {
+            "cell": "5:move:hammerarm",
+            "before": {
+              "lost": 1,
+              "ko": 0,
+              "damage": 0
+            },
+            "after": {
+              "lost": 0,
+              "ko": 0,
+              "damage": 0
+            }
+          }
+        ]
+      },
+      "review_complete": true,
+      "failed": 0
+    },
+    {
+      "file": "2700430261-T5.json",
+      "sha256": "b3612d8bf9cec74c9d532450ae51a51fe86152323798ef4b197a04660adba828",
+      "chosen": "move:shadowball",
+      "seconds": 9.030152130988427,
+      "counterplay": {
+        "version": "paired-root-counterplay-v1",
+        "complete": true,
+        "actions": [
+          "move:shadowball",
+          "move:flashcannon",
+          "move:recover",
+          "move:nastyplot",
+          "switch:floetteeternal"
+        ],
+        "kinds": {
+          "move:shadowball": "attack",
+          "move:flashcannon": "attack",
+          "move:recover": "status",
+          "move:nastyplot": "status",
+          "switch:floetteeternal": "switch"
+        },
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "scope": "all legal root replies in sampled sets; three paired seeds; not exhaustive chance or hidden sets",
+        "seconds": 0.36511394300032407,
+        "incumbent": "move:shadowball",
+        "selected": "move:shadowball",
+        "dominating": [],
+        "witnesses": []
+      },
+      "review_complete": true,
+      "failed": 0
+    },
+    {
+      "file": "2700431852-T14.json",
+      "sha256": "868436e987d227885091402193eec259abafb8a2cbef67018a6468947881884a",
+      "chosen": "move:flashcannon",
+      "seconds": 11.714033280033618,
+      "counterplay": {
+        "version": "paired-root-counterplay-v1",
+        "complete": true,
+        "actions": [
+          "move:shadowball",
+          "move:flashcannon",
+          "move:recover",
+          "move:nastyplot",
+          "switch:scolipede",
+          "switch:umbreon"
+        ],
+        "kinds": {
+          "move:shadowball": "attack",
+          "move:flashcannon": "attack",
+          "move:recover": "status",
+          "move:nastyplot": "status",
+          "switch:scolipede": "switch",
+          "switch:umbreon": "switch"
+        },
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "scope": "all legal root replies in sampled sets; three paired seeds; not exhaustive chance or hidden sets",
+        "seconds": 0.574275317019783,
+        "incumbent": "move:flashcannon",
+        "selected": "move:flashcannon",
+        "dominating": [],
+        "witnesses": []
+      },
+      "review_complete": true,
+      "failed": 0
+    },
+    {
+      "file": "2700438104-T5.json",
+      "sha256": "257b4dd86a42f7e92b37257c231e259d9f9c390a2403aee9e8fc58a9d9480149",
+      "chosen": "move:irondefense",
+      "seconds": 10.76758303400129,
+      "counterplay": {
+        "version": "paired-root-counterplay-v1",
+        "complete": true,
+        "actions": [
+          "move:irondefense",
+          "move:protect",
+          "move:substitute",
+          "move:batonpass",
+          "switch:floetteeternal",
+          "switch:umbreon"
+        ],
+        "kinds": {
+          "move:irondefense": "status",
+          "move:protect": "status",
+          "move:substitute": "status",
+          "move:batonpass": "status",
+          "switch:floetteeternal": "switch",
+          "switch:umbreon": "switch"
+        },
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "scope": "all legal root replies in sampled sets; three paired seeds; not exhaustive chance or hidden sets",
+        "seconds": 0.5387862940551713,
+        "incumbent": "move:irondefense",
+        "selected": "move:irondefense",
+        "dominating": [],
+        "witnesses": []
+      },
+      "review_complete": true,
+      "failed": 0
+    },
+    {
+      "file": "2700438104-T9.json",
+      "sha256": "2fc76e5f6d6b538cbc7fe7a2d5237d9f842a4b45b644707ba4c4cfbd097deb40",
+      "chosen": "move:batonpass",
+      "seconds": 9.555353905074298,
+      "counterplay": {
+        "version": "paired-root-counterplay-v1",
+        "complete": true,
+        "actions": [
+          "move:protect",
+          "move:substitute",
+          "move:batonpass",
+          "switch:floetteeternal",
+          "switch:umbreon"
+        ],
+        "kinds": {
+          "move:protect": "status",
+          "move:substitute": "status",
+          "move:batonpass": "status",
+          "switch:floetteeternal": "switch",
+          "switch:umbreon": "switch"
+        },
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "scope": "all legal root replies in sampled sets; three paired seeds; not exhaustive chance or hidden sets",
+        "seconds": 0.46623694198206067,
+        "incumbent": "move:batonpass",
+        "selected": "move:batonpass",
+        "dominating": [],
+        "witnesses": []
+      },
+      "review_complete": true,
+      "failed": 0
+    }
+  ],
+  "selection_cases": [
+    {
+      "id": "2700424723",
+      "previous_lineup": [
+        "Umbreon",
+        "Gholdengo",
+        "Floette-Eternal"
+      ],
+      "chosen": [
+        "Salamence",
+        "Gholdengo",
+        "Floette-Eternal"
+      ],
+      "seconds": 11.763457486056723,
+      "candidates": 38,
+      "unique_trios": 20,
+      "worlds": 6,
+      "stress": [
+        "disruption",
+        "physical_setup"
+      ],
+      "failed": 0
+    },
+    {
+      "id": "ki0v7xcay2dql0cuxb22k12lgrf8o37pw",
+      "previous_lineup": [
+        "Umbreon",
+        "Gholdengo",
+        "Floette-Eternal"
+      ],
+      "chosen": [
+        "Floette-Eternal",
+        "Salamence",
+        "Umbreon"
+      ],
+      "seconds": 8.054145616013557,
+      "candidates": 36,
+      "unique_trios": 20,
+      "worlds": 6,
+      "stress": [
+        "disruption",
+        "physical_setup"
+      ],
+      "failed": 0
+    },
+    {
+      "id": "2700430261",
+      "previous_lineup": [
+        "Umbreon",
+        "Gholdengo",
+        "Floette-Eternal"
+      ],
+      "chosen": [
+        "Scolipede",
+        "Floette-Eternal",
+        "Umbreon"
+      ],
+      "seconds": 5.846740809967741,
+      "candidates": 35,
+      "unique_trios": 20,
+      "worlds": 5,
+      "stress": [
+        "disruption"
+      ],
+      "failed": 0
+    },
+    {
+      "id": "2700438104",
+      "previous_lineup": [
+        "Umbreon",
+        "Scolipede",
+        "Floette-Eternal"
+      ],
+      "chosen": [
+        "Floette-Eternal",
+        "Salamence",
+        "Skeledirge"
+      ],
+      "seconds": 7.377951915026642,
+      "candidates": 35,
+      "unique_trios": 20,
+      "worlds": 6,
+      "stress": [
+        "disruption",
+        "physical_setup"
+      ],
+      "failed": 0
+    }
+  ],
+  "value_model": {
+    "dataset_id": "abe5a04ed7a75fbe",
+    "report_sha": "b0d4be669e82c64b83b4a35b988f17869e07929d4b753c151a746feb301e278d",
+    "checkpoints": {
+      "real-seed0.pt": "81d23e0fe2b777a1",
+      "real-seed1.pt": "f1314cd73d285545",
+      "real-seed2.pt": "39717cd7cbabda21"
+    },
+    "reference": {
+      "target": "real_outcome"
+    },
+    "run": "/home/michihito/Working/poke-sim/runs/value-replays-v1",
+    "feature_version": "observed-value-v1"
+  },
+  "artifacts": {
+    "root-report.json": "f1af686e8efd5dd96065fdf565163e97864d25b271d40f01e1d1c18abcdb8f01",
+    "selection-report.json": "f783e95f180e22e21f773ad6a169e1f63debd41748b2c8ea61f5e7b2312997dd",
+    "2700431852-T14.json": "868436e987d227885091402193eec259abafb8a2cbef67018a6468947881884a",
+    "2700430261-T5.json": "b3612d8bf9cec74c9d532450ae51a51fe86152323798ef4b197a04660adba828",
+    "frozen-root-evaluation.json": "8e1f9800d63198b4bd295f6cb0f7a659b10ccd77a9f40e449eae3ba12d0b413e",
+    "2700430261-T2.json": "4bea67acf26fa3ac11765489becb36a6467d785b8372e2ac6741e148cbd16c1a",
+    "2700438104-T5.json": "257b4dd86a42f7e92b37257c231e259d9f9c390a2403aee9e8fc58a9d9480149",
+    "2700414376-T12.json": "181c7c026c2c811b5af63ef50a77acfc2fc708f0995166eb74fd7e8a6df99053",
+    "2700438104-T9.json": "2fc76e5f6d6b538cbc7fe7a2d5237d9f842a4b45b644707ba4c4cfbd097deb40"
+  },
+  "tests": {
+    "related_distinct_passed": 198,
+    "broad_suite": 196,
+    "additional_real_prefix_regressions": 2
+  },
+  "critical_hit_correction": "2700431852 T14 Earth Power crits. Previous hits 90/76, own HP97. Do not label the normal hit guaranteed lethal. Sampled guard deliberately preserves surviving setup."
+}

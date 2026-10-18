@@ -156,7 +156,7 @@ class Advisor:
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
                                           lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1',
                                           priorVisits=4, rootProgress=False, focusTopTwo=False,
-                                          terminalReview=True,
+                                          terminalReview=True, rootCounterplay=True,
                                           rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']},
                                           workers=int(os.environ.get('POKESIM_SEARCH_WORKERS', 4)))
             self.planner['search'].update({k: v for k, v in requested.items()

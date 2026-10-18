@@ -3,7 +3,7 @@ import itertools
 import time
 from collections import defaultdict
 
-VERSION = 'paired-terminal-review-v1'
+VERSION = 'paired-terminal-review-v2'
 
 
 def search_with_review(engine, request, *, started=None, predictor=None, max_budget=20., normal_move=True):
@@ -15,9 +15,16 @@ def search_with_review(engine, request, *, started=None, predictor=None, max_bud
         raise ValueError(f'decisionMs must be between 100 and {int(max_budget * 1000)}')
     # Long offline oracles retain their requested tree budget; surplus review is a live-budget strategy.
     enabled = request.get('terminalReview') and 8500 < total_ms <= 20000 and normal_move
-    if enabled:
-        request['decisionMs'] = 8500
+    tactical = normal_move and request.get('rootCounterplay', True) and 1500 <= total_ms <= 20000
+    if enabled or tactical:
+        request['decisionMs'] = min(8500 if enabled else total_ms, total_ms - (1000 if tactical else 0))
     matrices = search(engine, request, started=started, predictor=predictor, max_budget=max_budget)
+    if tactical and not matrices[0]['terminal_search'].get('immediate_wins'):
+        from pokesim.search.counterplay import inspect
+
+        result = inspect(engine, request, matrices[0]['p1'], started + total_ms / 1000)
+        for row in matrices:
+            row['root_counterplay'] = result
     if enabled:
         result = review(engine, request, matrices, started + total_ms / 1000)
         for row in matrices:

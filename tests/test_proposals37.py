@@ -240,8 +240,9 @@ def test_lineup_ranking_shares_foe_worlds_preserves_rng_and_returns_only_simulat
         calls.append(request)
         cfg = request['lineupMatches']
         return {'version': 'test', 'informationScope': 'public_observation', 'trials': [
-            {'candidate': i, 'world': w, 'outcome': 'win' if i == 2 else 'loss', 'target': float(i == 2)}
-            for i in range(len(cfg['ours'])) for w in range(len(cfg['worlds']))]}
+            {'candidate': i, 'world': w, 'opponent': policy,
+             'outcome': 'win' if i == 2 else 'loss', 'target': float(i == 2)}
+            for i in range(len(cfg['ours'])) for w in range(len(cfg['worlds'])) for policy in cfg['policies']]}
     engine = SimpleNamespace(sampler=sampler, _query=query)
     ours = [{'species': s} for s in ['a', 'b', 'c', 'd']]
     picks = OpponentPicks(['x', 'y', 'z'], [1., 1., 1.], [1., 0., 0.], [(['x', 'y', 'z'], 1.)])
