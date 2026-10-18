@@ -198,6 +198,17 @@ def plan(results: list[dict], opponent_model: dict | None = None, last_move: str
             sol.status['relay_plan'] = {'suggested': root_plan, 'followed': bool(followed),
                                         'gap': float(objective.max() - objective[index]),
                                         'scope': 'dedicated-passer; common-public-plan; existing-tie-margin'}
+        review = results[0].get('terminal_review')
+        if review is not None and near is None and all(r.get('terminal_review') == review for r in results):
+            from pokesim.search.review import preferred
+
+            before = labels[chosen]
+            after = preferred(review, before)
+            if after in labels:
+                chosen = labels.index(after)
+            sol.status['terminal_review'] = dict(review, incumbent=before, selected=labels[chosen])
+            if after != before and 'relay_plan' in sol.status:
+                sol.status['relay_plan'].update(followed=False, overridden_by='terminal_review')
         sol.prob = np.eye(len(labels))[chosen]
         sol.status.update(solver='pure-robust', objective=float(objective[chosen]))
         if near is not None and near > 0:

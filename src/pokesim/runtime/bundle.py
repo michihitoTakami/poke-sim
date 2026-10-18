@@ -49,6 +49,7 @@ def describe(policy: str | Path | None = None, matchup_meta: dict | None = None,
     from pokesim.state.codec import VERSION
 
     out = {"code": git_commit(), "engine": git_commit(str(SHOWDOWN_DIR)), "state_codec": VERSION}
+    out['team_catalog_sha'] = file_hash(ROOT / 'data/processed/top_teams.json')
     if policy:
         out["policy"] = {"path": Path(policy).name, "sha": file_hash(policy)}
     if matchup_meta is not None:

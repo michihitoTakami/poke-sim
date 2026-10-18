@@ -10,7 +10,7 @@ import numpy as np
 from pokesim.config import FORMAT
 from pokesim.rl.myteam import to_id
 
-VERSION = 'preview-continuations-v2'
+VERSION = 'preview-continuations-v3'
 
 
 class LineupSearch:
@@ -44,7 +44,8 @@ class LineupSearch:
                 relay_candidates.append(row[0])
         if len(pool) < 2:
             return ranking, {'version': VERSION, 'skipped': 'less-than-two-candidates'}
-        signature = json.dumps([self.sets, [r[0] for r in pool], picks.species, picks.lineups,
+        signature = json.dumps([getattr(getattr(self.engine.sampler, 'catalog', None), 'sha', None),
+                                self.sets, [r[0] for r in pool], picks.species, picks.lineups,
                                 picks.context, self.worlds, self.max_turns], sort_keys=True)
         key = hashlib.sha256(signature.encode()).hexdigest()
         if key not in self.cache:
@@ -57,7 +58,11 @@ class LineupSearch:
                 offset = sampler.rng.random()
                 selected = [names[min(len(names) - 1, int(np.searchsorted(cumulative, (i + offset) / self.worlds)))]
                             for i in range(self.worlds)]
-                worlds = [[sampler.sample(to_id(s)) for s in trio] for trio in selected]
+                worlds = []
+                for trio in selected:
+                    catalog = getattr(sampler, 'catalog', None)
+                    joint = catalog.draw(picks.species, {}, sampler.rng) if catalog is not None else {}
+                    worlds.append([joint.get(to_id(s)) or sampler.sample(to_id(s)) for s in trio])
             finally:
                 sampler.rng = saved
             by_id = {to_id(s['species']): s for s in self.sets}
@@ -94,6 +99,9 @@ class LineupSearch:
                 'candidates': evidence, 'worlds': self.worlds, 'opponent_hypotheses': reply['world_lineups'],
                 'additional_relay_candidates': relay_candidates,
                 'unknown_outcomes': 'bounds-only; never training loss labels'}
+        catalog = getattr(self.engine.sampler, 'catalog', None)
+        if catalog is not None:
+            info['team_catalog'] = catalog.info(picks.species)
         # A partial simulator failure must not silently change the selection. Keep the static ranking usable.
         if any(e['failed'] for e in evidence):
             return ranking, dict(info, fallback='failed-continuation')

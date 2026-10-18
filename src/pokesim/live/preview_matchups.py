@@ -23,14 +23,17 @@ class PreviewCoverage:
 
     def profile(self, picks):
         species = sorted(set(map(to_id, picks.species)))
-        signature = json.dumps([self.sets, species, self.samples], sort_keys=True)
+        signature = json.dumps([self.sets, species, self.samples,
+                                getattr(getattr(self.engine.sampler, 'catalog', None), 'sha', None)], sort_keys=True)
         key = hashlib.sha256(signature.encode()).hexdigest()[:16]
         if key not in self.cache:
             sampler = self.engine.sampler
             old_rng = sampler.rng
             try:
                 sampler.rng = random.Random(int(key, 16))
-                opponents = [{'species': sid, 'sets': [sampler.sample(sid) for _ in range(self.samples)]}
+                opponents = [{'species': sid, 'sets': [sampler.sample(sid, preview=species)
+                              if getattr(sampler, 'catalog', None) is not None else sampler.sample(sid)
+                              for _ in range(self.samples)]}
                              for sid in species]
             finally:
                 sampler.rng = old_rng

@@ -2,6 +2,7 @@
 const {createHash} = require('crypto');
 const {PublicObservation, legalChoices} = require('./public_observation');
 const {choosePublic, observedStep, VERSION} = require('./public_policy');
+const {chooseBatonPublic} = require('./public_policy');
 const {loadPolicyNet} = require('./policy_net');
 const {PlanPolicy, VERSION: PLAN_VERSION} = require('./public_plans');
 
@@ -77,12 +78,12 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
                   return options[weights.indexOf(Math.max(...weights))];
                 }
                 return policyName === 'planned' ? plans[side.id].choose(view, battle.dex) :
-                  choosePublic(view, policyName, battle.dex);
+                  (cfg.livePolicies ? chooseBatonPublic : choosePublic)(view, policyName, battle.dex);
               };
               const selection = fixedAction === null ? recommend() :
                 options.find(([, label]) => label === fixedAction);
               if (!selection) throw new Error(`root action unavailable in public request: ${fixedAction}`);
-              row.trajectory.push({step: decisionStep, side: side.id, phase: view.phase,
+              if (cfg.recordTrajectories !== false) row.trajectory.push({step: decisionStep, side: side.id, phase: view.phase,
                 observation: view, legal: options.map(([, label]) => label), action: selection[1],
                 policyRecommendation: fixedAction !== null ? (policyName === 'planned' ?
                   new PlanPolicy().choose(view, battle.dex) : choosePublic(view, policyName, battle.dex))[1] : selection[1],
@@ -132,7 +133,8 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
     }
   });
   return {actions, trials, ...(isPublic ? {informationScope: scope,
-    policyVersion: (names.some(n => n.includes('planned')) ? PLAN_VERSION : VERSION) + (net ? '+net:' + net.sha : ''),
+    policyVersion: (names.some(n => n.includes('planned')) ? PLAN_VERSION : VERSION) +
+      (cfg.livePolicies ? '+live' : '') + (net ? '+net:' + net.sha : ''),
     continuationNet: net?.sha || null} : {})};
 }
 

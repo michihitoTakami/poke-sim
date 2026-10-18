@@ -152,10 +152,11 @@ class Advisor:
             # disrupt / tactical foes and the same expert policy we use (symmetric rollouts).
             # workers: Node processes searching the same worlds on independent random streams
             # (POKESIM_SEARCH_WORKERS, default 4; about 400 MB each).
-            self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=8500,
+            self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=15000,
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
                                           lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1',
                                           priorVisits=4, rootProgress=False, focusTopTwo=False,
+                                          terminalReview=True,
                                           rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']},
                                           workers=int(os.environ.get('POKESIM_SEARCH_WORKERS', 4)))
             self.planner['search'].update({k: v for k, v in requested.items()
@@ -192,6 +193,10 @@ class Advisor:
             else None
         )
         self.beliefs = None
+        if self.engine and sampler is None:
+            from pokesim.belief.team_catalog import TeamCatalog
+
+            self.engine.sampler.catalog = TeamCatalog.load(self.engine.sampler.base_id)
         self.last_plan: dict | None = None  # the plan search of the last _search (see _choose_plan)
         if belief and self.engine:
             from pokesim.belief.sets import Beliefs
@@ -307,9 +312,13 @@ class Advisor:
                 cache: dict = {}
                 settings = None
                 if mode == 'on' and self.planner['search'].get('terminalSearch'):
+                    from pokesim.search.budget import decision_budget
+
                     # Inference from the observed log is part of this decision's time budget.
                     settings = dict(self.planner['search'])
-                    settings['decisionMs'] = max(100, settings.get('decisionMs', 8500) -
+                    allowance = decision_budget(settings.get('decisionMs', 8500), log)
+                    status['decision_budget_ms'] = allowance
+                    settings['decisionMs'] = max(100, allowance -
                                                  int(1000 * (time.perf_counter() - start)))
                 advice = self._search(battle, last_move, dict(cloned), planned=mode == "on", cache=cache,
                                       belief=belief, log=log, our_role=our_role, settings=settings)

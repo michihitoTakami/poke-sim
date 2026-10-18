@@ -62,8 +62,9 @@ def search_quality_issues(status: dict, elapsed: float, expected_nets: dict | No
         issues.append('simulation failed')
     if expected_nets and tree and set(expected_nets) - set(tree.get('policy_nets') or {}):
         issues.append('policy net missing')
-    if elapsed > 10:
-        issues.append('decision exceeded 10 seconds')
+    limit = max(10., min(20000, status.get('decision_budget_ms', 8500)) / 1000 + 1.5)
+    if elapsed > limit:
+        issues.append(f'decision exceeded {limit:g} seconds')
     return issues
 
 
@@ -406,7 +407,7 @@ def code_stamp(extra: list[Path] = ()) -> float:
 
 def model_files(args) -> list[Path]:
     files = [Path(p) for p in args.policy if p] + [Path(args.team), PROCESSED_DIR / "matchup_model.json",
-                                             PROCESSED_DIR / "pick_rates.json"]
+                                             PROCESSED_DIR / "pick_rates.json", PROCESSED_DIR / "top_teams.json"]
     if args.value_run:
         run = Path(args.value_run)
         files += [run / "report.json", *run.glob("*.pt")]

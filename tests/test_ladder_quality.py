@@ -17,7 +17,7 @@ def test_collector_does_not_restart_after_a_quality_failure(tmp_path):
     stub = tmp_path / 'python'
     stub.write_text('#!/bin/sh\nexit 78\n')
     stub.chmod(0o700)
-    env = dict(os.environ, COLLECT_DIR=str(tmp_path), PYTHON=str(stub))
+    env = dict(os.environ, COLLECT_DIR=str(tmp_path), PYTHON=str(stub), MIN_FREE_MB='0')
     result = subprocess.run(['bash', str(ROOT / 'scripts/collect.sh')], env=env, cwd=ROOT,
                             capture_output=True, text=True, timeout=5)
     assert result.returncode == 0

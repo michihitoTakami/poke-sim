@@ -113,8 +113,9 @@ class SetSampler:
 
     def __init__(self, seasons: list[str], seed: int = 0, observed: dict | None = None,
                  observed_weight: float = OBSERVED_WEIGHT, utility: float = UTILITY_PSEUDO,
-                 summary: dict[str, SpeciesSummary] | None = None):
+                 summary: dict[str, SpeciesSummary] | None = None, catalog=None):
         self.observed_weight, self.utility = observed_weight, utility
+        self.catalog = catalog
         self.summary: dict[str, SpeciesSummary] = {} if summary is None else summary
         if summary is None:
             articles = {x.species_id: x for x in summarize(seasons)}
@@ -176,8 +177,13 @@ class SetSampler:
         keys, weights = zip(*items)
         return self.rng.choices(keys, weights=weights)[0]
 
-    def sample(self, species_id: str, moves=(), item: str | None = None, ability: str | None = None) -> dict:
+    def sample(self, species_id: str, moves=(), item: str | None = None, ability: str | None = None,
+               *, preview=None) -> dict:
         base = self.base_id(species_id)
+        if self.catalog is not None:
+            joint = self.catalog.draw_set(base, moves, item, ability, self.rng, preview)
+            if joint is not None:
+                return joint
         sp, sm = self.species[base], self.summary.get(base)
         learnable = self.learnsets.get(base, set())
         out = [m for m in moves if m in learnable][:4]
@@ -420,10 +426,19 @@ class Lookahead:
             unseen = predicted
         else:
             self.sampler.rng.shuffle(unseen)
+        catalog = getattr(self.sampler, 'catalog', None)
+        joint = {}
+        if catalog is not None:
+            preview = [m.species for m in battle.teampreview_opponent_team]
+            known = {self.sampler.base_id(m.species): dict(zip(('moves', 'item', 'ability'), revealed(m)))
+                     for m in seen[:3]}
+            joint = catalog.draw(preview, known, self.sampler.rng, belief)
         team, mons = [], []
         for i, m in enumerate(seen[:3]):
             moves, item, ability = revealed(m)
-            if belief is not None:
+            if self.sampler.base_id(m.species) in joint:
+                team.append(joint[self.sampler.base_id(m.species)])
+            elif belief is not None:
                 team.append(belief.draw(m.species, moves, item, ability))
             else:
                 team.append(self.sampler.sample(m.species, list(moves), item, ability))
@@ -433,7 +448,7 @@ class Lookahead:
                 if 'transform' in mons[-1]:
                     mons[-1]['transform'] = dict(mons[-1]['transform'], sourceSide='p1')
         for sid in unseen[:3 - len(team)]:
-            team.append(self.sampler.sample(sid))
+            team.append(joint.get(self.sampler.base_id(sid)) or self.sampler.sample(sid))
             mons.append({"hp": 1.0})
         return {"team": team, "mons": mons, "megaUsed": battle.opponent_used_mega_evolve,
                 "totalFainted": fainted_count(battle, battle.opponent_role, seen),
@@ -479,6 +494,10 @@ class Lookahead:
         picks = getattr(self, 'opponent_picks', {}).get(getattr(battle, 'battle_tag', ''))
         if picks is not None:
             request['opponentSelection'] = picks.context
+        catalog = getattr(self.sampler, 'catalog', None)
+        if catalog is not None:
+            request['opponentSelection'] = dict(request.get('opponentSelection') or {},
+                team_catalog=catalog.info([m.species for m in battle.teampreview_opponent_team]))
         if self.win_decay is not None:
             request["winDecay"] = self.win_decay
         request.update(self.search)
@@ -495,11 +514,12 @@ class Lookahead:
                                   lambda m: 'p' + ('2' if m[1] == '1' else '1'), line) for line in history]
             request.update(valueLeaves=True, observationLog=history)
             if deep:
-                from pokesim.search.terminal import search as terminal_search
+                from pokesim.search.review import search_with_review
 
                 if capture:
                     return request
-                return terminal_search(self, request, started=started, predictor=predictor)
+                return search_with_review(self, request, started=started, predictor=predictor,
+                                          normal_move=not battle.force_switch and incoming is None)
             return self.value_model.apply(self._query(request))
         return self._query(request)["results"]
 
