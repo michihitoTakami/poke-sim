@@ -435,8 +435,11 @@ class LadderLineupModel:
         return candidates
 
     def rank(self, roster, picks, coverage=None, reference=None):
-        return [(c[0], c[3], c[6]) for c in sorted(self.candidates(roster, reference, picks, coverage),
-                                                 key=lambda c: (c[3], c[5]), reverse=True)]
+        # Keep actual ladder evidence with every candidate through the simulation reranker.
+        return [(c[0], c[3], dict(c[6] or {}, history={
+            'mean': self.mean(c[0], picks.species), **self.evidence(c[0])}))
+                for c in sorted(self.candidates(roster, reference, picks, coverage),
+                                key=lambda c: (c[3], c[5]), reverse=True)]
 
     def choose(self, roster: list[str], rng, reference: "MatchupModel | None" = None,
                picks: OpponentPicks | None = None, explore: bool = True, coverage=None) -> tuple[list[str], dict]:

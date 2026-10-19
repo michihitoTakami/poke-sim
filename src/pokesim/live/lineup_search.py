@@ -10,7 +10,7 @@ import numpy as np
 from pokesim.config import FORMAT
 from pokesim.rl.myteam import to_id
 
-VERSION = 'preview-counterplay-v4'
+VERSION = 'preview-evidence-v5'
 POLICIES = ['counterplay', 'disrupt', 'expert']
 
 
@@ -148,17 +148,30 @@ class LineupSearch:
             # Average the worst response per world, rather than the binary minimum of all games.
             worst_responses = {world: min(values) for world, values in by_world.items()}
             downside = sum(worst_responses.values()) / len(worst_responses)
-            utility = .7 * low + .3 * downside
+            simulation = .7 * low + .3 * downside
+            history = (row[2] or {}).get('history', {})
+            # Empirical posterior is already shrunk/decayed. Missing history cannot become fake evidence.
+            # Bound its influence: observational lineup results are not randomized counterfactual wins.
+            ordered = max(0., float(history.get('ordered_games', 0)))
+            trio = max(ordered, float(history.get('trio_games', 0)))
+            evidence_games = ordered + .25 * (trio - ordered)
+            history_weight = min(.35, evidence_games / (evidence_games + 40))
+            empirical = float(history.get('mean', .5))
+            if not np.isfinite(empirical) or not 0 <= empirical <= 1:
+                raise ValueError('invalid empirical lineup posterior')
+            utility = (1 - history_weight) * simulation + history_weight * empirical
             info = {'lineup': row[0], 'trials': len(trials),
                     'terminal': sum(t['target'] is not None for t in trials), 'downside': downside,
                     'worst_response_by_world': worst_responses,
                     'failed': sum(t['outcome'] == 'failed' for t in trials),
                     'target_bounds': [low, high], 'utility': utility,
+                    'simulation_utility': simulation, 'history_mean': empirical,
+                    'history_weight': history_weight, 'history_effective_games': evidence_games,
                     'relay': [t.get('relay', {}) for t in trials]}
             evidence.append(info)
             scored.append((row[0], utility, dict(row[2] or {}, continuation=info)))
         info = {'version': VERSION, 'profile': key[:16], 'policy': reply['version'],
-                'score_kind': 'sampled-public-continuation-utility', 'calibrated_win_probability': False,
+                'score_kind': 'public-continuation-with-ladder-evidence', 'calibrated_win_probability': False,
                 'candidates': evidence, 'worlds': len(reply['world_lineups']), 'nominal_worlds': self.worlds,
                 'stress_worlds': reply['stress_tags'], 'opponent_hypotheses': reply['world_lineups'],
                 'additional_relay_candidates': relay_candidates,

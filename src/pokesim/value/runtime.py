@@ -23,7 +23,7 @@ class ValueEnsemble:
             self._load_branch(run, report, cfg, allow_candidate)
             return
         if cfg.get('target') == 'real_outcome':
-            self._load_real(run, report, cfg)
+            self._load_real(run, report, cfg, allow_candidate)
             return
         data = Path(cfg['settings']['data'])
         meta = json.loads((data / 'manifest.json').read_text())
@@ -60,15 +60,17 @@ class ValueEnsemble:
         from pokesim.evaluation.branch_matches import tree_sha
         from pokesim.learn.value_dataset import DEX
         from pokesim.runtime.bundle import file_hash
+        from pokesim.value.contracts import code_hash, encoder
 
         if not allow_candidate and (not report.get('gate', {}).get('passed') or
                                     not cfg['reference'].get('policy_sha')):
             raise ValueError('branch candidate has not passed the untouched calibration gate')
-        if (cfg['feature_code_sha'] != file_hash(Path(__file__).with_name('features.py')) or
+        feature_version = cfg.get('feature_version', 'observed-value-v1')
+        if (cfg['feature_code_sha'] != code_hash(feature_version) or
                 cfg['dex_sha'] != file_hash(DEX) or
                 cfg['worker_code_sha'] != tree_sha(ROOT / 'services/sim-tools', {'.js'})):
             raise ValueError('branch features, dex or continuation code differ from training')
-        self.encoder, self.features = Encoder.load(DEX), cfg['features']
+        self.encoder, self.features = encoder(feature_version, DEX), cfg['features']
         self.models, hashes = [], {}
         torch.set_num_threads(2)
         for item in report['stages'].values():
@@ -89,16 +91,20 @@ class ValueEnsemble:
         self.version = {'dataset_id': cfg['source_split_sha'], 'report_sha': file_sha(run / 'report.json'),
                         'checkpoints': hashes, 'reference': cfg['reference'], 'run': str(run)}
 
-    def _load_real(self, run, report, cfg):
+    def _load_real(self, run, report, cfg, allow_candidate=False):
         """Runs written by pokesim.learn.train_value hash files with pokesim.runtime.bundle.file_hash."""
         from pokesim.learn.value_dataset import DEX
         from pokesim.runtime.bundle import file_hash
+        from pokesim.value.contracts import code_hash, encoder
 
-        if cfg['feature_code_sha'] != file_hash(Path(__file__).with_name('features.py')):
+        if cfg['feature_version'] != 'observed-value-v1' and not allow_candidate:
+            if not report.get('adoption', {}).get('passed'):
+                raise ValueError('structured value candidate has not passed prospective adoption evaluation')
+        if cfg['feature_code_sha'] != code_hash(cfg['feature_version']):
             raise ValueError('value features differ from training')
         if cfg['dex_sha'] != file_hash(DEX):
             raise ValueError('value dex differs from training')
-        self.encoder = Encoder.load(DEX)
+        self.encoder = encoder(cfg['feature_version'], DEX)
         self.features = cfg['features']
         self.models, hashes = [], {}
         torch.set_num_threads(2)

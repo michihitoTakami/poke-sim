@@ -3,6 +3,7 @@ import torch
 
 from pokesim.learn.model import PolicyNet
 from pokesim.learn.train_policy import fit as fit_policy
+from pokesim.learn.train_value import battle_groups, concat
 from pokesim.learn.train_value import fit as fit_value
 from pokesim.value.model import ValueModel
 
@@ -34,3 +35,18 @@ def test_value_keeps_initial_checkpoint_when_updates_do_not_help():
                        device='cpu', log=lambda _: None)
     assert result['best_epoch'] == 0
     assert all(torch.equal(initial[k], v) for k, v in model.state_dict().items())
+
+
+def test_value_statistics_keep_two_replay_perspectives_in_one_battle(tmp_path):
+    import json
+
+    from pokesim.data.dataset import sidecar
+
+    path = tmp_path / 'views.npz'
+    np.savez(path, group=np.array(['replay:a:p1', 'replay:a:p2', 'replay:b:p1']),
+             weight=np.ones(3), target=np.array([1., 0., 1.]))
+    sidecar(path).write_text(json.dumps({'features': {}}))
+    data = concat([path])
+    assert battle_groups(['replay:a:p1', 'replay:a:p2']).tolist() == ['replay:a'] * 2
+    assert data['group'].tolist() == ['replay:a', 'replay:a', 'replay:b']
+    assert data['weight'][:2].sum() == data['weight'][2]

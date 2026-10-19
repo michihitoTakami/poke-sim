@@ -5,6 +5,7 @@ const {choosePublic, observedStep, VERSION} = require('./public_policy');
 const {chooseBatonPublic} = require('./public_policy');
 const {loadPolicyNet} = require('./policy_net');
 const {PlanPolicy, VERSION: PLAN_VERSION} = require('./public_plans');
+const {chooseCounterplay} = require('./counterplay_policy');
 
 function evaluateBranches(req, {setUp, choices, step, policy, State, extractChannelMessages}) {
   const cfg = req.branches;
@@ -25,7 +26,7 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
   const policies = names.map(name => {
     if (typeof name !== 'string' || name.split('/').length !== 2) throw new Error('expected p1/p2 policy pair');
     if (isPublic) {
-      for (const p of name.split('/')) if (!['greedy', 'tactical', 'expert', 'disrupt', 'planned'].includes(p)) {
+      for (const p of name.split('/')) if (!['greedy', 'tactical', 'expert', 'disrupt', 'planned', 'counterplay'].includes(p)) {
         throw new Error(`unknown public policy ${p}`);
       }
       return name.split('/');
@@ -72,12 +73,13 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
               if (side.activeRequest?.wait || !side.activeRequest) return 'pass';
               const view = observer.view(side);
               const options = legalChoices(view);
-              const recommend = () => {
+              const recommend = (fresh = false) => {
                 if (net && side.id === 'p1') {
                   const weights = net.prior(view, battle.dex, options);
                   return options[weights.indexOf(Math.max(...weights))];
                 }
-                return policyName === 'planned' ? plans[side.id].choose(view, battle.dex) :
+                return policyName === 'counterplay' ? chooseCounterplay(view, battle.dex) :
+                  policyName === 'planned' ? (fresh ? new PlanPolicy() : plans[side.id]).choose(view, battle.dex) :
                   (cfg.livePolicies ? chooseBatonPublic : choosePublic)(view, policyName, battle.dex);
               };
               const selection = fixedAction === null ? recommend() :
@@ -85,8 +87,7 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
               if (!selection) throw new Error(`root action unavailable in public request: ${fixedAction}`);
               if (cfg.recordTrajectories !== false) row.trajectory.push({step: decisionStep, side: side.id, phase: view.phase,
                 observation: view, legal: options.map(([, label]) => label), action: selection[1],
-                policyRecommendation: fixedAction !== null ? (policyName === 'planned' ?
-                  new PlanPolicy().choose(view, battle.dex) : choosePublic(view, policyName, battle.dex))[1] : selection[1],
+                policyRecommendation: fixedAction !== null ? recommend(true)[1] : selection[1],
                 behavior: policyName, plan: plans[side.id].plan, rootIntervention: decisionStep === 0, target: null});
               return selection[0];
             };

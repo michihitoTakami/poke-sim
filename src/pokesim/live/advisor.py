@@ -30,7 +30,7 @@ from pokesim.rl.advise import action_probs
 from pokesim.rl.env import REWARDS
 from pokesim.rl.features import embed
 from pokesim.rl.myteam import TeamFeatures, to_id
-from pokesim.search.lookahead import Lookahead, SetSampler, aggregate, label_to_action, revealed
+from pokesim.search.lookahead import Lookahead, SetSampler, action_moves, aggregate, label_to_action, revealed
 from pokesim.team.roles import win_path
 
 POLICY_WEIGHT = 0.5  # share of the policy in the combined recommendation
@@ -62,7 +62,9 @@ def action_label(action: int, battle: Battle) -> str | None:
     if action < 6:
         team = list(battle.team.values())
         return f"switch:{to_id(team[action].species)}" if action < len(team) else None
-    moves = list(battle.active_pokemon.moves.keys())[:4] if battle.active_pokemon else []
+    if not 6 <= action < 14:
+        return None
+    moves = [m.id for m in action_moves(battle)]
     slot = (action - 6) % 4
     if slot >= len(moves):
         return None
@@ -154,7 +156,7 @@ class Advisor:
             # (POKESIM_SEARCH_WORKERS, default 4; about 400 MB each).
             self.planner['search'].update(plans=None, seeds=1, rollout=2, terminalSearch=True, decisionMs=15000,
                                           continuations=['expert/tactical', 'expert/disrupt'], tiebreak=0,
-                                          lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v1',
+                                          lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v2',
                                           priorVisits=4, rootProgress=False, focusTopTwo=False,
                                           terminalReview=True, rootCounterplay=True,
                                           rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']},

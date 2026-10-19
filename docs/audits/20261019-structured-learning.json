@@ -1,0 +1,308 @@
+{
+  "scope": "implementation and development diagnostics; no new NN adoption or human win-rate improvement claim",
+  "deployed": {
+    "utility": "reference-material-v2",
+    "selection": "preview-evidence-v5",
+    "value": "runs/value-replays-v1",
+    "opponent": "runs/opp-replays-v1/opp-seed0.json",
+    "own_policy": "none",
+    "decision_ms": 15000
+  },
+  "artifacts": {
+    "real_training": {
+      "path": "runs/value-sets-v2-20261019-final/report.json",
+      "sha256": "1dfe3ab7b82f1a3a3d72ffafb450a06226e419f35d92c8d688e8abaa986d2841"
+    },
+    "rank_training": {
+      "path": "runs/branches-sets-v2-20261019/report.json",
+      "sha256": "04afb9f8f8c43b2c8b40e7ba7d3fba58ceead49ed910722441026d0a78ffd4c5"
+    },
+    "fixed_policy_value": {
+      "path": "runs/branches-sets-fixed-v2-20261019-final/report.json",
+      "sha256": "8c88d2536df005e41f8bb04f9b00f2b8f813f06acabcb6f320489dd15e6e7f17"
+    },
+    "live_diagnostic": {
+      "path": "data/processed/structured-learning-20261019/pr43-value-comparison.json",
+      "sha256": "09348898cac7c9d53a81dc51cb283ac42cc997fa68a9198c6c853d84239cd90d"
+    },
+    "utility_ablation": {
+      "path": "data/processed/structured-learning-20261019/material-ablation-final.json",
+      "sha256": "a129fe0209fa8e3096584740f86c610f43e6ee3f780da6a2d7e4342cf88edb8b"
+    }
+  },
+  "encoder": {
+    "version": "observed-value-sets-v2",
+    "public_dim": 2956,
+    "private_dim": 1297,
+    "parameter_count": 200510,
+    "aliasing_probes": [
+      {
+        "case": "which_bench_recipient_is_paralyzed",
+        "equal_public_private": {
+          "legacy": [
+            true,
+            true
+          ],
+          "sets": [
+            false,
+            false
+          ]
+        }
+      },
+      {
+        "case": "which_move_has_no_pp",
+        "equal_public_private": {
+          "legacy": [
+            true,
+            true
+          ],
+          "sets": [
+            true,
+            false
+          ]
+        }
+      },
+      {
+        "case": "remaining_sun_turns",
+        "equal_public_private": {
+          "legacy": [
+            true,
+            true
+          ],
+          "sets": [
+            false,
+            true
+          ]
+        }
+      }
+    ]
+  },
+  "real_training": {
+    "development_rows": 25475,
+    "development_battles": 1650,
+    "models": {
+      "constant": {
+        "brier": 0.24999494615271672,
+        "log_loss": 0.6931370728414257
+      },
+      "hp": {
+        "brier": 0.21151604244269523,
+        "log_loss": 0.6094326594712445
+      },
+      "real": {
+        "brier": 0.19629293548327048,
+        "log_loss": 0.5717703202525701
+      },
+      "reference_v2": {
+        "brier": 0.19749453176852533,
+        "log_loss": 0.5749890858469898
+      }
+    },
+    "gate": {
+      "brier_gain": 0.0012015962852548467,
+      "required": 0.015,
+      "ci90_excludes_zero": false,
+      "passed": false
+    },
+    "checkpoints": {
+      "real:0": {
+        "checkpoint": "real-seed0.pt",
+        "sha": "32f40638251624df",
+        "finetune": {
+          "best_epoch": 5,
+          "best_dev_log_loss": 0.5818654849080923
+        }
+      },
+      "real:1": {
+        "checkpoint": "real-seed1.pt",
+        "sha": "70a4ca1bbce244de",
+        "finetune": {
+          "best_epoch": 3,
+          "best_dev_log_loss": 0.5760465990033571
+        }
+      },
+      "real:2": {
+        "checkpoint": "real-seed2.pt",
+        "sha": "772f88f1aefee0a0",
+        "finetune": {
+          "best_epoch": 5,
+          "best_dev_log_loss": 0.5754986219201416
+        }
+      }
+    }
+  },
+  "live_diagnostic": {
+    "rows": 1590,
+    "metrics": {
+      "incumbent": {
+        "brier": 0.21529580125139192,
+        "log_loss": 0.6108716207744395
+      },
+      "candidate": {
+        "brier": 0.2227786203343585,
+        "log_loss": 0.6338336994375248
+      }
+    },
+    "differences": {
+      "brier": {
+        "mean": 0.007482819082966578,
+        "ci95": [
+          -0.006393420242704343,
+          0.02073481061765405
+        ],
+        "battles": 117,
+        "opponent_groups": 72
+      },
+      "log_loss": {
+        "mean": 0.022962078663085618,
+        "ci95": [
+          -0.010204921305263718,
+          0.05425301688681254
+        ],
+        "battles": 117,
+        "opponent_groups": 72
+      }
+    }
+  },
+  "branch_training": {
+    "outcomes": {
+      "branches": {
+        "win": 703,
+        "loss": 801
+      },
+      "branches-fixed": {
+        "loss": 1007,
+        "win": 497
+      }
+    },
+    "ranking": {
+      "epoch": 6,
+      "development": {
+        "regret": 0.0,
+        "positions": 4,
+        "battles": 4
+      }
+    },
+    "fixed_policy_value": {
+      "selection": {
+        "best_epoch": 7,
+        "best_dev_log_loss": 0.4384481587296237
+      },
+      "development_brier_before": 0.23971819877624512,
+      "development_brier_after": 0.13900621235370636
+    },
+    "policy": {
+      "path": "ours.json",
+      "sha": "f80d4e0617d8f8bb"
+    },
+    "gate": {
+      "passed": false,
+      "reason": "no untouched calibration cohort; development fit is not adoption evidence"
+    }
+  },
+  "utility_ablation": {
+    "cases": 8,
+    "changed": [
+      {
+        "case": "20261019-064651-T8.request.json",
+        "source_sha": "a48ca730c3d5546f32be31c3859a63fa888c8aeff51765b0c5b519ed01506b79",
+        "variants": {
+          "reference-material-v1": {
+            "action": "move:moonblast",
+            "failures": 0
+          },
+          "reference-material-v2": {
+            "action": "move:calmmind",
+            "failures": 0
+          }
+        },
+        "terminal_comparison": {
+          "move:moonblast": {
+            "win": 25,
+            "loss": 7,
+            "draw": 0,
+            "failed": 0,
+            "unfinished": 0
+          },
+          "move:calmmind": {
+            "win": 32,
+            "loss": 0,
+            "draw": 0,
+            "failed": 0,
+            "unfinished": 0
+          }
+        }
+      }
+    ]
+  },
+  "source_sha256": {
+    "src/pokesim/value/__init__.py": "6120ddc0aa23796673d9921b5f95ee9c22e26040d0333519cb6f0e4647944b69",
+    "src/pokesim/value/features.py": "abe5a04ed7a75fbe919d6520127ff26dbbfbbd1c6e2deeda84cecc789bb15076",
+    "src/pokesim/value/train.py": "73577fe3ca4891d9443e2fdb828ea5144c985aa7fcaff9274e402e47ed991320",
+    "src/pokesim/value/contracts.py": "f7cf82ca52e60f79eb29675a6fa1f4cbac7e111637b1585a8cd4cdee278cd8af",
+    "src/pokesim/value/runtime.py": "76fc050b62a6f4fda0012645ac50e6889f10bf84b05e08a57eccee42c27c1617",
+    "src/pokesim/value/set_model.py": "f8528ad98253dab18b9b5f21a050c1af7ef2e1f6bcc867304ef2ea2d25b89ea4",
+    "src/pokesim/value/evaluate.py": "51395a6506654743d7384ff33fa6da5c86ae2187ceb7d23180e446c33d10a62e",
+    "src/pokesim/value/model.py": "770179d0af76b28a6bb0a72bae79df8d926bfc580cd576f63de6f9f726e54cef",
+    "src/pokesim/value/structured.py": "7716c1ee73f1bd676e9d5a40c5b7a46e1ebd92f48ea38ac452b10cca36168afc",
+    "src/pokesim/value/dataset.py": "6886b7283320ad896797078c63b84949166e51a2ef3891bb19ee498882221843",
+    "src/pokesim/learn/evaluate_opponent.py": "6e1e0636f65258414b86d2a7efda50521192463418d7fc1783942b1ee3eeff48",
+    "src/pokesim/learn/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/pokesim/learn/features.py": "ec0de05180ce5aeb796696a61748e894167e26bd8057dd9e443a5a957947891e",
+    "src/pokesim/learn/replays.py": "a5b0776e358d10e39f9856516f7ee10405fea64c6b45d8d5d9f76fcf6d10ab7c",
+    "src/pokesim/learn/train_value.py": "2235e7e54dc009a582c0ccf23083c57a9557ef1a9133a7746ac4cdce80269511",
+    "src/pokesim/learn/branches.py": "683dc1c785b8fc27996fdcf783e46096855dd8ec79ac5b2af29069b3c4a97e2e",
+    "src/pokesim/learn/train_policy.py": "4ee25e931d3e3c996d0e2c6f50e6e5f23e299e659eda85f7a894e424ee78f6de",
+    "src/pokesim/learn/value_dataset.py": "756a4302a7d083376ccce6cc0ab12d875db2fc12c6a87dded8103cef275c8e32",
+    "src/pokesim/learn/compare_value.py": "2708b65a64890463f51e7a307356988eaee874d2bf0629706be6102a67a08be1",
+    "src/pokesim/learn/model.py": "4174eb248ab9520b85a39b6e44ddee5301587ad6faafa0a1cab412d0f0d79ca9",
+    "src/pokesim/learn/records.py": "ede344ef4549ed210654727770e0c8cfa8c40a652e50dbebdf9c987b2b6843dd",
+    "src/pokesim/learn/dataset.py": "a146b06941ea4b78922a584faf3a01f74e90cb0e3d9e5d67cb1ec394ea2ed854",
+    "src/pokesim/search/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/pokesim/search/terminal.py": "042289a50a4bdd164f09dc43b9876551f539416ca275499edbdb35f167636e32",
+    "src/pokesim/search/player.py": "12bcb8254c7c3c2e5f6f247137360886f9e10ce57a6a5b244825203dca7a0783",
+    "src/pokesim/search/evaluation.py": "fae77b0f530da8760dd2fc56a65afaff885ff3de5276710b30539e9df5b042dc",
+    "src/pokesim/search/planner.py": "73f749c42119a6c471816c89313c45db1b58866538e8257c31f70b7ff6b67980",
+    "src/pokesim/search/budget.py": "05aa745a69b23a3500030f928c159e6ed0fe60e40d9b383863fc4133ed38f32a",
+    "src/pokesim/search/review.py": "8b09a8f3707a0d15267876911a497b87c783a15d785ab808584f8cc7716c1483",
+    "src/pokesim/search/lookahead.py": "7e04d542e7475667f258f38332ae0ced5087e5114f2fae3b5fe0cc798ed120b1",
+    "src/pokesim/search/counterplay.py": "5cfec65c5ed241939e29ed832d41544acb28104e4e3c151888065a5c3361c7d4",
+    "src/pokesim/live/lineup_search.py": "b1a149f0ca24b3c7ef41f0040781b9a9ef5fd53db2620344176da1224d1f2f90",
+    "src/pokesim/live/selection.py": "48fe28d2edaee77556d7654e81faa7650fe2873b239b4e71ea5e6d1f4d9227d3",
+    "src/pokesim/live/advisor.py": "91b5256ddecb0990055b62f79216a14e7c6686450336fee893ee0c2e5b5a7f37",
+    "services/sim-tools/state_codec.js": "5ac605cb028fd2dcbc98a50c6a1c989521ec2bb8a24c6fdef3504ddfe63254a2",
+    "services/sim-tools/lookahead.js": "4e911ea52a39122d0f6558c5e1a3b85fae0e772c4e8785f079cff943e1767bda",
+    "services/sim-tools/action_filter.js": "08239dcc6bca4bf207953f126f21cb7c204e5924832cc6b89ebc0d901e50ec3e",
+    "services/sim-tools/policy_net.js": "614a41eba976cf856e9219f4253a364701212788659ba395482610ba05a77339",
+    "services/sim-tools/root_tactics.js": "f29a4246bf1069e3f714af977d9de4b8553333aab980f3cf86050195df9b1d43",
+    "services/sim-tools/belief.js": "eaec31413e5ae3dfeecd427ef755ee1a9e590b996d6732224e37e828e5ad1ff7",
+    "services/sim-tools/policy_features.js": "8bf3f92bdf35064e02aba2888f77a77a702f7cc5a1967889fb6d8dea6d185bb2",
+    "services/sim-tools/terminal_search.js": "fa7581f99268b7660ba6bf4ae20db49322f9d0b982168a3c2e3f92c3290c584a",
+    "services/sim-tools/branch_matches.js": "33d381d01e872d3d43ee18477b6e4d581d6bb1ce3e66f21b895827c3a0e78158",
+    "services/sim-tools/public_policy.js": "401063d483ec4fab7c2e0e93bf217c9b03200c8d2df2c0f171a2f20a54752fcd",
+    "services/sim-tools/damage_sample.js": "9edfdc358647e648db22ce0d638a352d286c3189b8e8b28e62f5cf89d550b877",
+    "services/sim-tools/stats.js": "c62424cc69ca9f560b3a1139643502fe256274e31cdaaaeaeaa8002449ab978c",
+    "services/sim-tools/lineup_matches.js": "ef2b86f81c7a74d710e083993bb283b69c2af614b757526688a09a2bc44110ab",
+    "services/sim-tools/record_value_views.js": "10ce24f40434a3ae78702ed01667c0ac9c98c018d130c8e55624de07fbff9c7b",
+    "services/sim-tools/policy_net_dump.js": "7ef1c0476f6f5acabca7898608c140891df4e1d7a73db7afe53bc9aefc7b40a9",
+    "services/sim-tools/public_observation.js": "ae1108c81824395bd7ab5825ab704f6679039f8cb5fd845931db7725c690bc50",
+    "services/sim-tools/value_search.js": "b11dae54db565e7d05994a578f07270092d762d5107421270606a1ce5019e5bd",
+    "services/sim-tools/public_plans.js": "068f012124f95a6cb580dd73a964f58d2d6a5fc2166044778022eee955111bfd",
+    "services/sim-tools/relay_strategy.js": "6db0fe1748fe078c78fe84dc766ffd49b735ae03cdfcdc84321056b71793265f",
+    "services/sim-tools/policy_features_dump.js": "b973811335f29f6aa96eb2a330285386c4ead07955917e43ce465962cb179596",
+    "services/sim-tools/validate_teams.js": "310f68f3ea518ce0ab19dcaad466f183e64fcc4e6df5b6b02472f59bc50ee93f",
+    "services/sim-tools/public_damage.js": "ed37ed546ac56a94e430fa27e39cb1b98aba6581151b80defac58d77505a6df4",
+    "services/sim-tools/public_replays.js": "7f965caca439e86dfc8904504ed60402c5c8468e11e6d5218b04657f68c5fc4c",
+    "services/sim-tools/preview_matchups.js": "0166c366f67a86f3e66f06c9ec7e4641b647d8ab507da618249087b58ced646a",
+    "services/sim-tools/observe.js": "18153d365ff3f73f186a971a180a2ea4074dfe9094936b6d8645ce73cc209849",
+    "services/sim-tools/counterplay_policy.js": "1f5bd8346ddaada788ff002542cacaf502fb763ac41231e2550bffcf51402cfe",
+    "scripts/eval_value_utility.py": "ae3acd913043eb2ee8ce844df4a2b97d5f3e78e36e9ea44ca3c73973fcd84db5",
+    "scripts/eval_relay_tempo.py": "8461a0fb903a2544211a95fc9a177b4806bde594ca5f1842df26b228bdcf4c3d"
+  },
+  "validation": {
+    "pytest": "356 passed in 74.49s",
+    "ruff": "passed",
+    "node_check": "branch_matches.js, terminal_search.js, record_value_views.js passed",
+    "git_diff_check": "passed"
+  }
+}

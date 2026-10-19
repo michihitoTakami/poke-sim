@@ -37,15 +37,19 @@ def test_material_damage_and_recovery_create_real_score_differences_at_a_flat_mo
     assert health('20/100y') == (.2, '')
 
 
-def test_setup_has_diminishing_returns_and_open_values_stay_below_terminal_values():
+def test_raw_setup_counts_do_not_reward_unusable_boosts_or_claim_a_terminal_win():
     obs = observation()
     scores = []
     for stages in [0, 2, 4, 6, 8]:
         obs['public']['mons']['p1']['me']['boosts'] = {'spa': stages}
         scores.append(leaf_value(obs, 1))
-    assert scores[0] < scores[1] < scores[2] < scores[3] == scores[4]
-    assert scores[1] - scores[0] > scores[3] - scores[2]
+    assert len(set(scores)) == 1
     assert max(scores) <= .85
+    # A boost's learned survival/attack benefit is retained; only the unconditional stage bonus is gone.
+    assert leaf_value(obs, .8) > leaf_value(obs, .5)
+    assert leaf_value(obs, .5, utility='reference-material-v1') > leaf_value(obs, .5)
+    with pytest.raises(ValueError, match='unsupported'):
+        leaf_value(obs, .5, utility='unsupported')
 
 
 def test_action_scores_and_exclusions_are_not_confused_with_one_hot_selection_probabilities():

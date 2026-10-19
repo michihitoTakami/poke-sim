@@ -38,7 +38,26 @@ def load_checkpoint(path, dataset_id=None):
     saved = torch.load(path, map_location='cpu', weights_only=True)
     if saved.get('schema_version') != 1 or (dataset_id and saved['dataset_id'] != dataset_id):
         raise ValueError('checkpoint schema or feature dataset mismatch')
-    model = ValueModel(**saved['model_config'])
+    model = model_from_config(saved['model_config'])
     model.load_state_dict(saved['state_dict'])
     model.eval()
     return model, saved
+
+
+def model_from_config(config):
+    config = dict(config)
+    architecture = config.pop('architecture', 'mlp-v1')
+    if architecture == 'nested-sets-v2':
+        from pokesim.value.set_model import SetValueModel
+
+        return SetValueModel(**config)
+    if architecture != 'mlp-v1':
+        raise ValueError('unsupported value model architecture')
+    return ValueModel(**config)
+
+
+def create_model(features, hidden):
+    config = dict(public_dim=len(features['public']), private_dim=len(features['private']), hidden=hidden)
+    if 'sets' in features:
+        config.update(architecture='nested-sets-v2', sets=features['sets'])
+    return model_from_config(config)
