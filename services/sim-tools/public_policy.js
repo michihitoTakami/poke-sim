@@ -4,7 +4,7 @@ const {estimateDamage, megaSource} = require('./public_damage');
 const VERSION = 'public-reference-v2';
 // Keep the training reference frozen. The live tree uses the revised policy explicitly;
 // its V_ref remains a v2 bootstrap estimate, not a value trained for this new continuation.
-const BATON_VERSION = 'public-baton-v3';
+const BATON_VERSION = 'public-baton-v4';
 const stage = s => s >= 0 ? (2 + s) / 2 : 2 / (2 - s);
 
 function choosePublic(view, name, dex, baton = false, mechanics = baton) {

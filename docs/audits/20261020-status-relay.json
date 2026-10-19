@@ -1,0 +1,906 @@
+{
+  "scope": "development diagnostics; inspected records and hypothetical worlds; no prospective human win-rate claim",
+  "baseline": "b039f449b7d03bacd3358f0304888d17d05ff50c",
+  "frozen_last50": {
+    "start": "20261020-001149",
+    "end": "20261020-031427",
+    "wins": 28,
+    "losses": 22,
+    "opponents": 38,
+    "primarina_revealed": {
+      "wins": 1,
+      "losses": 5
+    }
+  },
+  "versions": {
+    "state": "observed-state-v4",
+    "plans": "public-plans-v4",
+    "baton": "public-baton-v4",
+    "relay": "public-relay-goals-v2",
+    "counterplay": "public-counterplay-v2",
+    "selection": "preview-evidence-v6"
+  },
+  "neural_checkpoints_retrained": false,
+  "neural_checkpoints_adopted": false,
+  "live_value": "runs/value-replays-v1",
+  "live_opponent": "runs/opp-replays-v1/opp-seed0.json",
+  "budget_ms": 15000,
+  "checks": {
+    "pytest": 590,
+    "ruff": "passed",
+    "node_check": "passed",
+    "diff_check": "passed"
+  },
+  "artifacts": {
+    "data/processed/status-relay-20261020/cases.json": {
+      "sha256": "3bd8ae2a306107ec84196686ee25896427683755d334a56a8948e48a89c9938e",
+      "bytes": 620
+    },
+    "data/processed/status-relay-20261020/priors.json": {
+      "sha256": "a599610bd0dc8c4870fd3404e89a9a822ef3e22d18194168e6b53ba788d0cad7",
+      "bytes": 2122095
+    },
+    "data/processed/status-relay-20261020/priors.json.manifest.json": {
+      "sha256": "154a5c64c4d93b25044a55c959ce7b7417a476e45ab0edddd2aaf36f18aba815",
+      "bytes": 890
+    },
+    "data/processed/status-relay-20261020/observed-frozen.json": {
+      "sha256": "506f24b828c1f1a5bf210aa132315e1e2ba5bfb8eb481f346c30ea37f2c1f75c",
+      "bytes": 55667
+    },
+    "data/processed/status-relay-20261020/replay-current/report.json": {
+      "sha256": "10b70ee51402ae5bb5ee28196e49bed34b27cca30f35c8c06891d189a8e2f299",
+      "bytes": 163289
+    },
+    "data/processed/status-relay-20261020/selection-final/report.json": {
+      "sha256": "bfe201006b52ed50ba5839d9f59beb3c6b34a0865c59de8950ab8ebedaa8e8ae",
+      "bytes": 152854
+    },
+    "data/processed/status-relay-20261020/crossplay-cases.json": {
+      "sha256": "a694d89b57bbd7d0e47a1725c1e85f74aee73a7d944b8fdcb4945b29e8a3e9e5",
+      "bytes": 42812
+    },
+    "data/processed/status-relay-20261020/crossplay.json": {
+      "sha256": "96f822a1fe0c7f853af9201254cba9d923ad6c2448ca470460e412caddda5409",
+      "bytes": 43584
+    },
+    "/home/michihito/Working/poke-sim/data/processed/diagnostics/pr44-last50-20261020-0315-reviewed.json": {
+      "sha256": "45f63223dab78fcd578410b3a3ad958be39c09ca674bc011146c8c636596b23d",
+      "bytes": 148361
+    }
+  },
+  "replays": [
+    {
+      "record": "20261020-010902-2701095776.json",
+      "sha256": "b2ec3868689fb1dbc47edcf4036c220f8ab6ac67a51087d5a1933e5aca917c77",
+      "turn": 8,
+      "variants": {
+        "before": {
+          "chosen": "move:torchsong",
+          "utility": 0.7061108894878324,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:slackoff": {
+              "win": 31,
+              "loss": 1,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:torchsong": {
+              "win": 32,
+              "loss": 0,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "switch:floetteeternal": {
+              "win": 16,
+              "loss": 16,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        },
+        "after": {
+          "chosen": "move:torchsong",
+          "utility": 0.06336091337306902,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:slackoff": {
+              "win": 25,
+              "loss": 7,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:torchsong": {
+              "win": 32,
+              "loss": 0,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "switch:floetteeternal": {
+              "win": 16,
+              "loss": 16,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        }
+      }
+    },
+    {
+      "record": "20261020-021601-xj7amjnhe4ixebdfpvwneq0x2dc4r5lpw.json",
+      "sha256": "435ab579102006c823e35c3696944da3a91a689dcf5e095ebbe25aa41ca57b62",
+      "turn": 2,
+      "variants": {
+        "before": {
+          "chosen": "move:batonpass",
+          "utility": -0.4709152197368063,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:batonpass": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:protect": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:substitute": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        },
+        "after": {
+          "chosen": "move:batonpass",
+          "utility": -0.47105589793489877,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:batonpass": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:protect": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:substitute": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        }
+      }
+    },
+    {
+      "record": "20261020-021601-xj7amjnhe4ixebdfpvwneq0x2dc4r5lpw.json",
+      "sha256": "435ab579102006c823e35c3696944da3a91a689dcf5e095ebbe25aa41ca57b62",
+      "turn": 3,
+      "variants": {
+        "before": {
+          "chosen": "move:synthesis:mega",
+          "utility": -0.4946679803432569,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:calmmind": {
+              "win": 1,
+              "loss": 31,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:moonblast": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:moonblast:mega": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:synthesis:mega": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        },
+        "after": {
+          "chosen": "move:synthesis:mega",
+          "utility": -0.4946679803432569,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:calmmind": {
+              "win": 1,
+              "loss": 31,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:moonblast": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:moonblast:mega": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:synthesis:mega": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        }
+      }
+    },
+    {
+      "record": "20261020-010534-2701093588.json",
+      "sha256": "11a2247fdb3f175a434fe06ae197cc811c0ae9027e455a0861e1d79f50f2ab5f",
+      "turn": 3,
+      "variants": {
+        "before": {
+          "chosen": "move:calmmind",
+          "utility": 0.12627411858981163,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:batonpass": {
+              "win": 5,
+              "loss": 27,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:calmmind": {
+              "win": 9,
+              "loss": 23,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:snarl": {
+              "win": 16,
+              "loss": 16,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        },
+        "after": {
+          "chosen": "move:calmmind",
+          "utility": 0.08032775051508458,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:batonpass": {
+              "win": 5,
+              "loss": 27,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:calmmind": {
+              "win": 7,
+              "loss": 25,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:snarl": {
+              "win": 10,
+              "loss": 22,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        }
+      }
+    },
+    {
+      "record": "20261020-013758-2701111596.json",
+      "sha256": "5bfd1040e200538f8b5209eb46080e30161e4765ab02235f4592cdf73b749484",
+      "turn": 3,
+      "variants": {
+        "before": {
+          "chosen": "move:recover",
+          "utility": -0.5105049425670701,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:flashcannon": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:nastyplot": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:recover": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        },
+        "after": {
+          "chosen": "move:recover",
+          "utility": -0.5099084920328478,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:flashcannon": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:nastyplot": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "move:recover": {
+              "win": 0,
+              "loss": 32,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        }
+      }
+    },
+    {
+      "record": "20261020-001149-2701065068.json",
+      "sha256": "eb8ecb11aeb2c2d5de8f01be6a4b14cf4a7bee5c80b14ad7585984b4f3d2a473",
+      "turn": 2,
+      "variants": {
+        "before": {
+          "chosen": "switch:umbreon",
+          "utility": 0.09991227742849672,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:slackoff": {
+              "win": 6,
+              "loss": 26,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "switch:gholdengo": {
+              "win": 9,
+              "loss": 23,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "switch:umbreon": {
+              "win": 18,
+              "loss": 14,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        },
+        "after": {
+          "chosen": "switch:umbreon",
+          "utility": 0.03337102763103132,
+          "simulation_failed": 0,
+          "terminal": {
+            "move:slackoff": {
+              "win": 16,
+              "loss": 16,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "switch:gholdengo": {
+              "win": 12,
+              "loss": 20,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            },
+            "switch:umbreon": {
+              "win": 24,
+              "loss": 8,
+              "draw": 0,
+              "unfinished": 0,
+              "failed": 0,
+              "trials": 32
+            }
+          }
+        }
+      }
+    }
+  ],
+  "selections": [
+    {
+      "file": "20261020-010902-2701095776.json",
+      "sha256": "b2ec3868689fb1dbc47edcf4036c220f8ab6ac67a51087d5a1933e5aca917c77",
+      "candidates": 39,
+      "worlds": 7,
+      "stress_worlds": [
+        "disruption",
+        "special_setup",
+        "status_conversion"
+      ],
+      "new_seconds": 11.59311074798461,
+      "variants": {
+        "before": {
+          "trials": 819,
+          "failed": 0,
+          "top": {
+            "lineup": [
+              "Floette-Eternal",
+              "Gholdengo",
+              "Salamence"
+            ],
+            "utility": 0.7609302943836054,
+            "simulation_utility": 0.8130952380952381,
+            "history_weight": 0.14470519057037473,
+            "wins": 16,
+            "losses": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "payload_games": 0,
+            "two_hop_games": 0
+          }
+        },
+        "after": {
+          "trials": 819,
+          "failed": 0,
+          "top": {
+            "lineup": [
+              "Floette-Eternal",
+              "Gholdengo",
+              "Salamence"
+            ],
+            "utility": 0.7609302943836054,
+            "simulation_utility": 0.8130952380952381,
+            "history_weight": 0.14470519057037473,
+            "wins": 16,
+            "losses": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "payload_games": 0,
+            "two_hop_games": 0
+          }
+        }
+      }
+    },
+    {
+      "file": "20261020-021601-xj7amjnhe4ixebdfpvwneq0x2dc4r5lpw.json",
+      "sha256": "435ab579102006c823e35c3696944da3a91a689dcf5e095ebbe25aa41ca57b62",
+      "candidates": 36,
+      "worlds": 7,
+      "stress_worlds": [
+        "disruption",
+        "physical_setup",
+        "special_setup"
+      ],
+      "new_seconds": 9.894054359057918,
+      "variants": {
+        "before": {
+          "trials": 756,
+          "failed": 0,
+          "top": {
+            "lineup": [
+              "Floette-Eternal",
+              "Gholdengo",
+              "Salamence"
+            ],
+            "utility": 0.44326024756140037,
+            "simulation_utility": 0.4511904761904762,
+            "history_weight": 0.14470519057037473,
+            "wins": 13,
+            "losses": 8,
+            "unfinished": 0,
+            "failed": 0,
+            "payload_games": 0,
+            "two_hop_games": 0
+          }
+        },
+        "after": {
+          "trials": 756,
+          "failed": 0,
+          "top": {
+            "lineup": [
+              "Floette-Eternal",
+              "Gholdengo",
+              "Salamence"
+            ],
+            "utility": 0.44326024756140037,
+            "simulation_utility": 0.4511904761904762,
+            "history_weight": 0.14470519057037473,
+            "wins": 13,
+            "losses": 8,
+            "unfinished": 0,
+            "failed": 0,
+            "payload_games": 0,
+            "two_hop_games": 0
+          }
+        }
+      }
+    },
+    {
+      "file": "20261020-010534-2701093588.json",
+      "sha256": "11a2247fdb3f175a434fe06ae197cc811c0ae9027e455a0861e1d79f50f2ab5f",
+      "candidates": 40,
+      "worlds": 7,
+      "stress_worlds": [
+        "disruption",
+        "physical_setup",
+        "special_setup"
+      ],
+      "new_seconds": 10.276529037975706,
+      "variants": {
+        "before": {
+          "trials": 840,
+          "failed": 0,
+          "top": {
+            "lineup": [
+              "Scolipede",
+              "Salamence",
+              "Floette-Eternal"
+            ],
+            "utility": 0.537270469153377,
+            "simulation_utility": 0.5523809523809523,
+            "history_weight": 0.12443909379446208,
+            "wins": 10,
+            "losses": 11,
+            "unfinished": 0,
+            "failed": 0,
+            "payload_games": 19,
+            "two_hop_games": 4
+          }
+        },
+        "after": {
+          "trials": 840,
+          "failed": 0,
+          "top": {
+            "lineup": [
+              "Scolipede",
+              "Salamence",
+              "Floette-Eternal"
+            ],
+            "utility": 0.5747945079907572,
+            "simulation_utility": 0.5952380952380951,
+            "history_weight": 0.12443909379446208,
+            "wins": 11,
+            "losses": 10,
+            "unfinished": 0,
+            "failed": 0,
+            "payload_games": 19,
+            "two_hop_games": 4
+          }
+        }
+      }
+    },
+    {
+      "file": "20261020-001149-2701065068.json",
+      "sha256": "eb8ecb11aeb2c2d5de8f01be6a4b14cf4a7bee5c80b14ad7585984b4f3d2a473",
+      "candidates": 37,
+      "worlds": 7,
+      "stress_worlds": [
+        "disruption",
+        "physical_setup",
+        "status_conversion"
+      ],
+      "new_seconds": 10.588359354995191,
+      "variants": {
+        "before": {
+          "trials": 777,
+          "failed": 0,
+          "top": {
+            "lineup": [
+              "Umbreon",
+              "Salamence",
+              "Skeledirge"
+            ],
+            "utility": 0.8166600849395939,
+            "simulation_utility": 0.8559523809523809,
+            "history_weight": 0.12208504801097393,
+            "wins": 19,
+            "losses": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "payload_games": 9,
+            "two_hop_games": 1
+          }
+        },
+        "after": {
+          "trials": 777,
+          "failed": 0,
+          "top": {
+            "lineup": [
+              "Scolipede",
+              "Gholdengo",
+              "Floette-Eternal"
+            ],
+            "utility": 0.8137878518169678,
+            "simulation_utility": 0.8714285714285714,
+            "history_weight": 0.09762562743218092,
+            "wins": 17,
+            "losses": 4,
+            "unfinished": 0,
+            "failed": 0,
+            "payload_games": 21,
+            "two_hop_games": 4
+          }
+        }
+      }
+    }
+  ],
+  "crossplay": {
+    "before": {
+      "outcomes": {
+        "win": 64,
+        "loss": 64
+      },
+      "passes": 125,
+      "by_opponent": {
+        "tactical": {
+          "win": 17,
+          "loss": 15
+        },
+        "disrupt": {
+          "win": 18,
+          "loss": 14
+        },
+        "expert": {
+          "win": 17,
+          "loss": 15
+        },
+        "counterplay": {
+          "win": 12,
+          "loss": 20
+        }
+      }
+    },
+    "after": {
+      "outcomes": {
+        "win": 64,
+        "loss": 64
+      },
+      "passes": 131,
+      "by_opponent": {
+        "tactical": {
+          "win": 17,
+          "loss": 15
+        },
+        "disrupt": {
+          "win": 18,
+          "loss": 14
+        },
+        "expert": {
+          "win": 17,
+          "loss": 15
+        },
+        "counterplay": {
+          "loss": 20,
+          "win": 12
+        }
+      }
+    },
+    "worlds": 16,
+    "seeds": [
+      11,
+      43
+    ],
+    "unseen_evaluation": false
+  },
+  "observed_prior": {
+    "frozen_records": 807,
+    "brought_species": 206,
+    "cutoff": "20261020-031427",
+    "species": {
+      "primarina": {
+        "abilities": {},
+        "brought": 133,
+        "items": {
+          "airballoon": 2,
+          "chestoberry": 5,
+          "focussash": 1,
+          "redcard": 1,
+          "sitrusberry": 42
+        },
+        "leads": 37,
+        "mega": 0,
+        "moves": {
+          "aquajet": 31,
+          "calmmind": 31,
+          "drainingkiss": 6,
+          "encore": 15,
+          "flipturn": 4,
+          "haze": 2,
+          "hydropump": 3,
+          "hypervoice": 1,
+          "moonblast": 65,
+          "perishsong": 2,
+          "psychicnoise": 1,
+          "rest": 5,
+          "sparklingaria": 67,
+          "surf": 24
+        },
+        "previews": 224
+      },
+      "bellibolt": {
+        "abilities": {},
+        "brought": 7,
+        "items": {
+          "airballoon": 1,
+          "sitrusberry": 1
+        },
+        "leads": 1,
+        "mega": 0,
+        "moves": {
+          "paraboliccharge": 1,
+          "slackoff": 2,
+          "soak": 2,
+          "toxic": 4,
+          "voltswitch": 5
+        },
+        "previews": 21
+      },
+      "mimikyu": {
+        "abilities": {
+          "disguise": 2
+        },
+        "brought": 58,
+        "items": {
+          "airballoon": 1,
+          "leftovers": 1,
+          "lifeorb": 3,
+          "sitrusberry": 2
+        },
+        "leads": 10,
+        "mega": 0,
+        "moves": {
+          "curse": 6,
+          "drainpunch": 1,
+          "playrough": 25,
+          "shadowclaw": 22,
+          "shadowsneak": 33,
+          "swordsdance": 27,
+          "trick": 2,
+          "trickroom": 1
+        },
+        "previews": 122
+      },
+      "zoroarkhisui": {
+        "abilities": {},
+        "brought": 12,
+        "items": {
+          "focussash": 5
+        },
+        "leads": 9,
+        "mega": 0,
+        "moves": {
+          "agility": 1,
+          "bittermalice": 5,
+          "curse": 1,
+          "flamethrower": 2,
+          "focusblast": 2,
+          "hypervoice": 2,
+          "icywind": 2,
+          "nastyplot": 2,
+          "shadowball": 4,
+          "sludgebomb": 1,
+          "substitute": 1
+        },
+        "previews": 24
+      },
+      "meowscarada": {
+        "abilities": {},
+        "brought": 33,
+        "items": {
+          "focussash": 3
+        },
+        "leads": 21,
+        "mega": 0,
+        "moves": {
+          "brickbreak": 1,
+          "flowertrick": 8,
+          "knockoff": 22,
+          "leechseed": 3,
+          "playrough": 1,
+          "suckerpunch": 2,
+          "taunt": 3,
+          "toxicspikes": 3,
+          "tripleaxel": 14,
+          "uturn": 3
+        },
+        "previews": 90
+      }
+    },
+    "scope": "opponent revealed moves only; own manual actions are not imitation targets"
+  }
+}

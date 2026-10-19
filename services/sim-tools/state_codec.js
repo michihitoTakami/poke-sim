@@ -1,6 +1,6 @@
 // Simulator reconstruction boundary. Explicit fields carry known/sample state; unknown counters stay sampled.
 const path = require('path');
-const VERSION = 'observed-state-v3';
+const VERSION = 'observed-state-v4';
 
 function createCodec(dir) {
   const { Battle, Teams, Pokemon } = require(path.resolve(dir, 'dist/sim'));
@@ -60,6 +60,13 @@ function createCodec(dir) {
           if (mon.canMegaEvo) battle.actions.runMegaEvo(mon);
         }
         if (spec.megaUsed) mon.canMegaEvo = null;
+        if (s.types !== undefined) {
+          // Restore after Transform/forme/Mega, which can reset the base types. Future real switches and
+          // Mega Evolution still use the engine's normal reset rules; this is an observation, not a new set.
+          if (i !== 0 || !Array.isArray(s.types) || !s.types.length || s.types.length > 2 ||
+              s.types.some(t => !battle.dex.types.get(t).exists || t === 'Stellar') ||
+              !mon.setType(s.types)) throw new Error('Invalid observed type change');
+        }
         // This ability's entry multiplier depends on previous faints. Setup entry ran before the roster was
         // restored; future real entries still run the simulator's onStart normally.
         if (mon.isActive && mon.ability === 'supremeoverlord') {

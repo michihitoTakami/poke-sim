@@ -148,6 +148,10 @@ class TrackedBattle(Battle):
         parsed = parts[:3] + parts[4:] if kind == '-mega' and len(parts) > 4 else parts
         super().parse_message(parsed)
         current = self.active_pokemon if role == self.player_role else self.opponent_active_pokemon
+        if kind in {'detailschange', '-formechange', '-mega'} and current is not None:
+            # The engine's setSpecies/formeChange resets Soak. poke-env leaves _temporary_types behind.
+            current._temporary_types = []
+            current.effects.pop(Effect.TYPECHANGE, None)
         if entry and kind == 'move' and len(parts) > 3 and current is not None:
             mid = move_id(parts[3])
             if mid in current.moves:

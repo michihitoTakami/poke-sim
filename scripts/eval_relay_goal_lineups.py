@@ -103,10 +103,16 @@ def main():
                         min(t["target"] or 0 for t in trials if t["world"] == w)
                         for w in range(len(req["lineupMatches"]["worlds"]))
                     ]
+                    lineup = [m["species"] for m in trio]
+                    evidence = next(e for e in info['candidates'] if e['lineup'] == lineup)
+                    simulation = 0.7 * mean + 0.3 * sum(worst) / len(worst)
+                    history_weight = evidence['history_weight']
                     scores.append(
                         {
-                            "lineup": [m["species"] for m in trio],
-                            "utility": 0.7 * mean + 0.3 * sum(worst) / len(worst),
+                            "lineup": lineup,
+                            "utility": (1 - history_weight) * simulation + history_weight * evidence['history_mean'],
+                            "simulation_utility": simulation,
+                            "history_weight": history_weight,
                             "wins": sum(t["outcome"] == "win" for t in trials),
                             "losses": sum(t["outcome"] == "loss" for t in trials),
                             "unfinished": sum(t["outcome"] == "unfinished" for t in trials),
@@ -128,6 +134,7 @@ def main():
                     "new_seconds": elapsed,
                     "candidates": len(req["lineupMatches"]["ours"]),
                     "worlds": len(req["lineupMatches"]["worlds"]),
+                    "stress_worlds": info['stress_worlds'],
                     "policies": req["lineupMatches"]["policies"],
                 }
             )

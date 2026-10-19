@@ -9,6 +9,7 @@ function estimateDamage(view, dex, source, target, raw, sourceBoosts, targetBoos
   const observed = m => m.details ? (m.active ? view.public.mons[view.side][view.public.active[view.side]] :
     Object.values(view.public.mons[view.side]).find(p => species(p).baseSpecies === species(m).baseSpecies)) : m;
   const boosts = m => m.details && !m.active ? {} : observed(m)?.boosts || {};
+  const typesOf = m => m.types || observed(m)?.types || species(m).types;
   const stat = (m, s, projected) => (m.stats?.[s] ??
     Math.floor((2 * species(m).baseStats[s] + 47) / 2) + 5) * stage((projected || boosts(m))[s] || 0);
   const own = view.request.side.pokemon.find(m => m.active);
@@ -35,7 +36,7 @@ function estimateDamage(view, dex, source, target, raw, sourceBoosts, targetBoos
   if (move.type === 'Normal' && convert[ability]) { move.type = convert[ability]; power *= 1.2; }
   if (ability === 'normalize') { move.type = 'Normal'; power *= 1.2; }
   if (ability === 'liquidvoice' && move.flags?.sound) move.type = 'Water';
-  const types = target.types || species(target).types;
+  const types = typesOf(target);
   if (!dex.getImmunity(move.type, types)) return 0;
   const bypass = ['moldbreaker', 'teravolt', 'turboblaze'].includes(ability) && target.item !== 'abilityshield';
   if (move.type === 'Ground' && target.item === 'airballoon') return 0;
@@ -63,7 +64,7 @@ function estimateDamage(view, dex, source, target, raw, sourceBoosts, targetBoos
   if (Array.isArray(move.multihit)) power *= 3; else power *= move.multihit || 1;
   let damage = ((22 * power * attack / Math.max(1, stat(target, defenceStat, defenceBoosts))) / 50 + 2) * .925;
   if (critical) damage *= 1.5;
-  if (species(source).types.includes(move.type)) damage *= ability === 'adaptability' ? 2 : 1.5;
+  if (typesOf(source).includes(move.type)) damage *= ability === 'adaptability' ? 2 : 1.5;
   damage *= 2 ** dex.getEffectiveness(move.type, types);
   if (['sunnyday', 'desolateland'].includes(weather)) damage *= move.type === 'Fire' ? 1.5 : move.type === 'Water' ? .5 : 1;
   if (['raindance', 'primordialsea'].includes(weather)) damage *= move.type === 'Water' ? 1.5 : move.type === 'Fire' ? .5 : 1;
@@ -85,7 +86,7 @@ function megaSource(view, dex, mon) {
   if (!to.exists) return mon;
   const stats = mon.stats ? Object.fromEntries(Object.entries(mon.stats).map(([s, n]) =>
     [s, n + (to.baseStats[s] || 0) - (from.baseStats[s] || 0)])) : undefined;
-  return {...mon, details: name, ability: id(to.abilities['0']), stats};
+  return {...mon, details: name, ability: id(to.abilities['0']), stats, types: to.types};
 }
 
 module.exports = {estimateDamage, megaSource};

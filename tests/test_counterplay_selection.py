@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from pokesim.live.lineup_search import LineupSearch
+from pokesim.live.lineup_search import LineupSearch, counterplay_worlds
 from pokesim.live.selection import OpponentPicks
 
 
@@ -97,3 +97,16 @@ def test_final_ranking_retains_real_ladder_evidence_without_overriding_a_clear_s
     assert by_names[tuple(second[0])] > by_names[tuple(first[0])]
     assert any(e['history_weight'] == .35 for e in info['candidates'])
     assert all(e['history_weight'] == 0 for e in info['candidates'] if e['lineup'] not in [first[0], second[0]])
+
+
+def test_preview_stresses_special_setup_and_soak_toxic_using_complete_prior_sets():
+    selector, _, picks, _ = selection_fixture()
+    def sample(name):
+        return {'species': name, 'moves': ['Calm Mind', 'Moonblast'] if name == 'x' else
+                ['Soak', 'Toxic', 'Thunderbolt'] if name == 'y' else ['Tackle']}
+    selector.engine.sampler.sample = sample
+    worlds, tags = counterplay_worlds(selector.engine.sampler, picks)
+    assert tags == ['special_setup', 'status_conversion']
+    assert worlds[0][0]['moves'] == ['Calm Mind', 'Moonblast']
+    assert worlds[1][0]['moves'] == ['Soak', 'Toxic', 'Thunderbolt']
+    assert all(len(world) == 3 for world in worlds)
