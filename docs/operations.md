@@ -235,3 +235,12 @@ expert継続はpublic-baton-v3、計画方策はpublic-plans-v3。鉄壁の必�
 収集は従来と同じ`runs/value-replays-v1` / `runs/opp-replays-v1/opp-seed0.json`を使用する。
 候補の失敗を理由に品質ゲートを緩めたり、新形式の未採用重みを通常ロードしたりしない。
 再現と未見期間の比較は[集合NNと学習経路の監査](audits/20261019-structured-learning.md)を参照。
+
+## みずびたし・特殊バトンと型集計（2026-10-20）
+
+状態codecはv4、計画はpublic-plans-v4、バトンはpublic-baton-v4、選出はpreview-evidence-v6。
+現在のタイプ変化を探索へ復元し、公開済みのSoak／Toxic／Yawnに対する予防と、加速を受けていない
+瞑想バトンも評価する。counterplay-v2は特殊積みとSoak→Toxicを含む。
+更新時は収集を停止し、`data/processed/observed_sets.json`を退避した上で
+`python -m pokesim.live.observed`を実行する。再戦・イリュージョンの修正を既存データへ反映するため。
+NN重みと15秒予算は維持する。[検証と限界](audits/20261020-status-relay.md)を参照。

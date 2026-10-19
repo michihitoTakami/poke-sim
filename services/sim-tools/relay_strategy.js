@@ -1,7 +1,7 @@
 // Executable relay goals from public observations. No species whitelist, hidden sets, or raw boost reward.
 const {health, id, legalChoices} = require('./public_observation');
 const {estimateDamage, megaSource} = require('./public_damage');
-const VERSION = 'public-relay-goals-v1';
+const VERSION = 'public-relay-goals-v2';
 const stage = n => n >= 0 ? (2 + n) / 2 : 2 / (2 - n);
 const DISRUPTION = new Set(['curse', 'encore', 'taunt', 'haze', 'clearsmog', 'roar', 'whirlwind']);
 
@@ -64,14 +64,14 @@ function relayStrategy(view, dex) {
   const faster = (mon, boosts = {}) => !trickRoom && speed(mon, boosts) > speed(foe, foe.boosts, true);
   const attacks = foe.moves.map(mid => dex.moves.get(mid)).filter(m => m.category !== 'Status');
   // No generic attack is invented for the dedicated physical plan: scout before committing to defence.
-  if (!attacks.length && !mine.volatiles.includes('curse')) return null;
+  const revealedAttack = attacks.length > 0;
   if (foe.moves.length < 4) for (const type of species(foe).types) attacks.push({type, basePower: 90,
     category: species(foe).baseStats.atk >= species(foe).baseStats.spa ? 'Physical' : 'Special'});
   // A public safety margin, not an inferred set: bound offensive EVs/nature and known Life Orb.
   const upperFoe = {...foe, stats: Object.fromEntries(['atk', 'spa', 'def', 'spd'].map(s =>
     [s, Math.floor((species(foe).baseStats[s] + 52) * 1.1)]))};
-  const hit = (target, boosts = {}, publicView = view, list = attacks) => Math.max(0, ...list.map(m =>
-    estimateDamage(publicView, dex, upperFoe, target, {...m, accuracy: true}, foe.boosts, boosts) / .925 *
+  const hit = (target, boosts = {}, publicView = view, list = attacks, foeBoosts = foe.boosts) => Math.max(0, ...list.map(m =>
+    estimateDamage(publicView, dex, upperFoe, target, {...m, accuracy: true}, foeBoosts, boosts) / .925 *
       (foe.item === 'lifeorb' ? 1.3 : 1)));
   const priorityHit = (target, boosts = {}) => hit(target, boosts, view, attacks.filter(m => m.priority > 0));
   const residual = (mon, curse = false) => {
@@ -136,6 +136,35 @@ function relayStrategy(view, dex) {
     return null;
   }
 
+  // Prevent publicly revealed status pressure before it lands. A new shield cannot cure existing Yawn/toxic.
+  const statusThreats = foe.moves.filter(mid => ['soak', 'toxic', 'yawn'].includes(mid));
+  const currentTypes = mine.types || species(me).types;
+  const vulnerable = statusThreats.some(mid => mid === 'soak' ?
+    !(currentTypes.length === 1 && currentTypes[0] === 'Water') :
+    !current.status && !(mid === 'toxic' && currentTypes.some(t => ['Steel', 'Poison'].includes(t))));
+  const bypass = ['moldbreaker', 'teravolt', 'turboblaze'].includes(foe.ability);
+  if (vulnerable && !protectedNow && !mine.volatiles.includes('yawn') &&
+      (bypass || !['goodasgold', 'magicbounce'].includes(me.ability))) {
+    const shield = move('substitute');
+    if (shield && faster(projectedMe, payload) && foe.ability !== 'infiltrator' &&
+        !attacks.some(m => m.flags?.sound || m.flags?.bypasssub || m.multihit) &&
+        hit(projectedMe, payload) < current.maxhp / 4 && current.hp > current.maxhp / 2 &&
+        mine.substituteBrokenTurn !== view.turn - 1)
+      return answer(shield, 'prevent-status-with-substitute', {moves: statusThreats});
+    // Keep a useful payload when the immune recipient can take the entry hit; otherwise use a normal switch.
+    const immune = !bypass && bench.filter(mon => mon.ability === 'goodasgold' && endpoint(mon) &&
+      health(mon.condition).hp - entryCost(mon) - hit(mon) - residual(mon) > health(mon.condition).maxhp / 4);
+    if (immune?.length) {
+      const pass = move('batonpass');
+      if (pass && Object.values(payload).some(n => n > 0) && canPass())
+        return answer(pass, 'pass-to-status-immunity', {receiver: immune[0].details, moves: statusThreats});
+      const choice = options.find(([cmd]) => cmd === `switch ${own.indexOf(immune[0]) + 1}`);
+      if (choice) return answer(choice, 'switch-to-status-immunity', {moves: statusThreats});
+    }
+  }
+
+  if (!revealedAttack) return null;
+
   if (['slp', 'frz', 'tox'].includes(current.status)) return null;
 
   const physical = hit(projectedMe, payload, view, attacks.filter(m => m.category === 'Physical'));
@@ -178,10 +207,11 @@ function relayStrategy(view, dex) {
   // With a usable recovery move, first reach the receiver's survival threshold, then cash in or pass.
   const heal = ['moonlight', 'synthesis', 'morningsun', 'recover', 'slackoff', 'roost'].map(move).find(Boolean);
   const calm = move('calmmind'), incoming = hit(projectedMe, payload), r = residual(me);
-  if (calm && heal && (payload.spe || 0) > 0 && special > physical && faster(projectedMe, payload) && !disrupted &&
+  if (calm && heal && special > physical && !disrupted &&
       !foe.volatiles.includes('focusenergy') && !attacks.some(m => m.willCrit)) {
     const h = healing(me), healHit = recoveryHit(projectedMe, payload);
-    const afterHeal = Math.min(current.maxhp, current.hp + h) - healHit - r;
+    const afterHeal = faster(projectedMe, payload) ? Math.min(current.maxhp, current.hp + h) - healHit - r :
+      current.hp > healHit ? Math.min(current.maxhp, current.hp - healHit + h) - r : -1;
     if (current.hp < current.maxhp && current.hp <= 2 * (healHit + r) &&
         (afterHeal > current.hp + 1 || current.hp <= healHit + r) && afterHeal > 0)
       return answer(heal, 'recover-before-preparing', {healing: h, incoming});
@@ -189,10 +219,18 @@ function relayStrategy(view, dex) {
       const receiver = bench.find(mon => ready(mon, payload));
       if (receiver) return answer(pass, 'special-receiver-ready', {receiver: receiver.details});
     }
+    // Snarl trades a turn for the whole relay's survival, including a slow Calm Mind passer.
+    const snarl = move('snarl'), lower = {...foe.boosts, spa: Math.max(-6, (foe.boosts.spa || 0) - 1)};
+    const lowerHit = hit(projectedMe, payload, view, attacks, lower);
+    if (snarl && (foe.boosts.spa || 0) > 0 && !foe.volatiles.includes('substitute') &&
+        !['clearbody', 'whitesmoke', 'fullmetalbody', 'mirrorarmor', 'competitive', 'defiant', 'contrary', 'soundproof'].includes(foe.ability) &&
+        estimateDamage(view, dex, projectedMe, foe, dex.moves.get('snarl'), payload) > 0 &&
+        current.hp - (faster(projectedMe, payload) ? lowerHit : incoming) - r > lowerHit + r)
+      return answer(snarl, 'contain-special-setup-before-relay', {specialAttack: lower.spa});
     const projected = {...payload, spa: Math.min(6, (payload.spa || 0) + 1), spd: Math.min(6, (payload.spd || 0) + 1)};
     const nextHit = hit(projectedMe, projected);
-    if ((payload.spd || 0) < 2 && priorityHit(me, payload) < current.hp &&
-        current.hp - nextHit - r > current.maxhp * .1 && nextHit + r < h)
+    const setupHit = faster(projectedMe, payload) ? Math.max(nextHit, priorityHit(me, payload)) : incoming;
+    if ((payload.spd || 0) < 2 && current.hp - setupHit - r > current.maxhp * .1 && nextHit + r < h)
       return answer(calm, 'prepare-special-survival', {incoming: nextHit, specialDefence: projected.spd});
   }
 

@@ -2,7 +2,7 @@
 const {health, id, legalChoices} = require('./public_observation');
 const {chooseBatonPublic} = require('./public_policy');
 const {estimateDamage} = require('./public_damage');
-const VERSION = 'public-plans-v3';
+const VERSION = 'public-plans-v4';
 const stage = n => n >= 0 ? (2 + n) / 2 : 2 / (2 - n);
 
 function assess(view, dex) {

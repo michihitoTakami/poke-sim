@@ -95,6 +95,7 @@ class PublicObservation {
         this.state.mons[side][key] = {...known, ...entry.revealed, species: p[3].split(',')[0],
           condition: p[4] || disguised.condition, boosts: {...disguised.boosts},
           volatiles: disguised.volatiles.slice(), lastMove: disguised.lastMove,
+          ...(disguised.types ? {types: disguised.types.slice()} : {}),
           moves: [...new Set([...(known.moves || []), ...entry.moves])]};
         this.names[side][name] = key;
         this.state.active[side] = key;
@@ -110,6 +111,7 @@ class PublicObservation {
         this.pendingBaton[side] = false;
         if (previous) {
           previous.boosts = {}; previous.volatiles = [];
+          delete previous.types;
           if (previous.transformOriginal) {
             Object.assign(previous, previous.transformOriginal); delete previous.transformOriginal;
           }
@@ -119,6 +121,7 @@ class PublicObservation {
         this.entries[side] = {key, known: this.state.mons[side][key] ? clone(old) : null, moves: [], revealed: {}};
         this.state.mons[side][key] = {...old, species: p[3].split(',')[0], condition: p[4], boosts: passedBoosts,
                                     volatiles: passedVolatiles, moves: old.moves || [], lastMove: null};
+        delete this.state.mons[side][key].types;
         this.state.active[side] = key;
         continue;
       }
@@ -131,9 +134,13 @@ class PublicObservation {
           mon.transformOriginal = {species: mon.species, moves: mon.moves.slice(), ability: mon.ability};
           mon.species = target.species; mon.moves = target.moves.slice(); mon.boosts = {...target.boosts};
           mon.ability = target.ability;
+          if (target.types) mon.types = target.types.slice(); else delete mon.types;
         }
       }
-      if (['detailschange', '-formechange'].includes(kind)) mon.species = p[3].split(',')[0];
+      if (['detailschange', '-formechange'].includes(kind)) {
+        mon.species = p[3].split(',')[0]; delete mon.types;
+      }
+      if (kind === '-start' && effectId(p[3]) === 'typechange') mon.types = p[4].split('/');
       if (kind === 'faint') mon.condition = '0 fnt';
       if (['-damage', '-heal', '-sethp'].includes(kind)) mon.condition = p[3];
       if (kind === '-status') mon.condition = mon.condition.split(' ')[0] + ' ' + p[3];
@@ -156,7 +163,8 @@ class PublicObservation {
       if (kind === '-unboost') mon.boosts[p[3]] = Math.max(-6, (mon.boosts[p[3]] || 0) - Number(p[4]));
       if (kind === '-setboost') mon.boosts[p[3]] = Number(p[4]);
       if (kind === '-clearboost') mon.boosts = {};
-      if (kind === '-start' && !mon.volatiles.includes(effectId(p[3]))) mon.volatiles.push(effectId(p[3]));
+      if (kind === '-start' && effectId(p[3]) !== 'typechange' && !mon.volatiles.includes(effectId(p[3])))
+        mon.volatiles.push(effectId(p[3]));
       if (kind === '-end') {
         mon.volatiles = mon.volatiles.filter(x => x !== effectId(p[3]));
         if (effectId(p[3]) === 'substitute') mon.substituteBrokenTurn = this.state.turn;

@@ -90,7 +90,7 @@ def solve_zero_sum(payoff: np.ndarray, iters: int = 3000) -> tuple[np.ndarray, n
 
 OBSERVED_WEIGHT = 5.0   # one battle of ours = this many published teams
 UTILITY_PSEUDO = 0.03   # share of teams given to each learnable utility move
-UTILITY_MOVES = {"stealthrock", "spikes", "toxicspikes", "stickyweb", "yawn", "curse", "substitute", "protect",
+UTILITY_MOVES = {"stealthrock", "spikes", "toxicspikes", "stickyweb", "yawn", "curse", "soak", "substitute", "protect",
                  "taunt", "encore", "willowisp", "toxic", "thunderwave", "glare", "roar", "whirlwind", "dragontail",
                  "haze", "clearsmog", "trick", "uturn", "voltswitch", "flipturn", "partingshot", "knockoff",
                  "rapidspin", "defog", "recover", "roost", "slackoff", "synthesis", "moonlight", "painsplit",

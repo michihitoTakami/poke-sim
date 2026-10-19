@@ -24,6 +24,15 @@ def _minutes(rec: dict) -> int:
     return int(started[:8]) * 1440 + int(started[9:11]) * 60 + int(started[11:13]) if len(started) >= 13 else 0
 
 
+def same_record(a: dict, b: dict) -> bool:
+    # `replayed frames` is a source KIND, not a battle identity. Only ladder tags are stable here.
+    first, second = [r.get('source', '') for r in (a, b)]
+    if first.startswith('showdown battle-') or second.startswith('showdown battle-'):
+        return first == second
+    overlap = {to_id(s) for s in a['preview']['species']} & {to_id(s) for s in b['preview']['species']}
+    return len(overlap) >= 4 and abs(_minutes(a) - _minutes(b)) <= 15
+
+
 def load_records(sources: list[Path] = SOURCES) -> list[dict]:
     """All records, one per battle. The same battle can be in two sources (live record and one rebuilt from frames:
     4+ of the opponent's 6 in common, started within 15 minutes); the later source wins (frames re-read with the
@@ -34,9 +43,9 @@ def load_records(sources: list[Path] = SOURCES) -> list[dict]:
             rec = json.loads(p.read_text())
             if not (rec.get("preview") and rec.get("log") and rec.get("started", "") >= "20261012-2"):
                 continue
-            opp = {to_id(s) for s in rec["preview"]["species"]}  # previews can differ by a misread slot
-            out = [r for r in out if not (len(opp & {to_id(s) for s in r["preview"]["species"]}) >= 4
-                                          and abs(_minutes(r) - _minutes(rec)) <= 15)]
+            # Ladder rematches are independent battles, even against the same six within fifteen minutes.
+            # Prefer stable identities; the old visual/frame fallback is restricted to non-ladder sources.
+            out = [r for r in out if not same_record(r, rec)]
             out.append(rec)
     return out
 
@@ -51,7 +60,9 @@ def collect(records: list[dict], side: str = "p2") -> dict[str, dict]:
     for rec in records:
         for sp in rec["preview"]["species"]:
             entry(to_id(sp))["previews"] += 1
-        names: dict[str, str] = {}  # "p2a: Charizard" -> species id
+        names: dict[str, dict] = {}
+        appearances = []
+        active = None
         brought: set[str] = set()
         moves: dict[str, set[str]] = {}
         items: dict[str, set[str]] = {}
@@ -65,20 +76,33 @@ def collect(records: list[dict], side: str = "p2") -> dict[str, dict]:
             kind, who = parts[1], parts[2].split(": ", 1)[-1]
             if kind in ("switch", "drag"):
                 sid = to_id(parts[3].split(",")[0])
-                names[who] = sid
-                brought.add(sid)
-                lead = lead or sid
-            sid = names.get(who)
-            if sid is None:
+                active = {'sid': sid, 'moves': set(), 'items': set(), 'abilities': set(), 'mega': False}
+                appearances.append(active)
+                names[who] = active
+            if kind == 'replace' and active is not None:
+                # Illusion corrects the entire current appearance, including moves already used under disguise.
+                active['sid'] = to_id(parts[3].split(',')[0])
+                names[who] = active
+            appearance = names.get(who)
+            if appearance is None:
                 continue
             if kind == "move" and "[from]" not in line:
-                moves.setdefault(sid, set()).add(to_id(parts[3]))
+                appearance['moves'].add(to_id(parts[3]))
             elif kind in ("-item", "-enditem"):
-                items.setdefault(sid, set()).add(to_id(parts[3]))
+                appearance['items'].add(to_id(parts[3]))
             elif kind == "-ability":
-                abilities.setdefault(sid, set()).add(to_id(parts[3]))
+                appearance['abilities'].add(to_id(parts[3]))
             elif kind == "detailschange" and "-Mega" in parts[3]:
+                appearance['mega'] = True
+        for appearance in appearances:
+            sid = appearance['sid']
+            brought.add(sid)
+            moves.setdefault(sid, set()).update(appearance['moves'])
+            items.setdefault(sid, set()).update(appearance['items'])
+            abilities.setdefault(sid, set()).update(appearance['abilities'])
+            if appearance['mega']:
                 mega.add(sid)
+        lead = appearances[0]['sid'] if appearances else None
         for sid in brought:
             e = entry(sid)
             e["brought"] += 1

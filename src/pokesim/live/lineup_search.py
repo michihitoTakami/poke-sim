@@ -10,11 +10,11 @@ import numpy as np
 from pokesim.config import FORMAT
 from pokesim.rl.myteam import to_id
 
-VERSION = 'preview-evidence-v5'
+VERSION = 'preview-evidence-v6'
 POLICIES = ['counterplay', 'disrupt', 'expert']
 
 
-def counterplay_worlds(sampler, picks, limit=2):
+def counterplay_worlds(sampler, picks, limit=4):
     """Stress hypotheses use complete sampled sets, never the opponent's later actual moves.
 
     Keep their prior weight out of the expected score; they contribute only to downside robustness.
@@ -25,12 +25,16 @@ def counterplay_worlds(sampler, picks, limit=2):
         joint = catalog.draw(picks.species, {}, sampler.rng) if catalog is not None else {}
         draws.append([joint.get(to_id(s)) or sampler.sample(to_id(s)) for s in picks.species])
     worlds, tags = [], []
-    for kind in ('disruption', 'physical_setup'):
+    for kind in ('disruption', 'physical_setup', 'special_setup', 'status_conversion'):
         def strength(mon):
             moves = set(map(to_id, mon.get('moves', [])))
             if kind == 'disruption':
                 return len(moves & {'taunt', 'haze', 'roar', 'whirlwind', 'encore', 'clearsmog'})
-            return len(moves & {'swordsdance', 'dragondance', 'tidyup', 'bulkup', 'shellsmash'})
+            if kind == 'physical_setup':
+                return len(moves & {'swordsdance', 'dragondance', 'tidyup', 'bulkup', 'shellsmash'})
+            if kind == 'special_setup':
+                return len(moves & {'calmmind', 'nastyplot', 'quiverdance', 'shellsmash'})
+            return int('soak' in moves) + int('toxic' in moves)
         choices = [(strength(mon), team, mon) for team in draws for mon in team if strength(mon)]
         if not choices:
             continue

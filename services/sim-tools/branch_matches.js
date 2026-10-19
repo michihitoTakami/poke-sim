@@ -5,7 +5,7 @@ const {choosePublic, observedStep, VERSION} = require('./public_policy');
 const {chooseBatonPublic} = require('./public_policy');
 const {loadPolicyNet} = require('./policy_net');
 const {PlanPolicy, VERSION: PLAN_VERSION} = require('./public_plans');
-const {chooseCounterplay} = require('./counterplay_policy');
+const {chooseCounterplay, VERSION: COUNTERPLAY_VERSION} = require('./counterplay_policy');
 
 function evaluateBranches(req, {setUp, choices, step, policy, State, extractChannelMessages}) {
   const cfg = req.branches;
@@ -135,7 +135,8 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
   });
   return {actions, trials, ...(isPublic ? {informationScope: scope,
     policyVersion: (names.some(n => n.includes('planned')) ? PLAN_VERSION : VERSION) +
-      (cfg.livePolicies ? '+live' : '') + (net ? '+net:' + net.sha : ''),
+      (cfg.livePolicies ? '+live' : '') +
+      (names.some(n => n.includes('counterplay')) ? '+' + COUNTERPLAY_VERSION : '') + (net ? '+net:' + net.sha : ''),
     continuationNet: net?.sha || null} : {})};
 }
 
