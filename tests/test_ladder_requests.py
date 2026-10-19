@@ -87,6 +87,40 @@ def test_a_current_choice_includes_rqid_and_duplicates_are_ignored(state):
     assert entry['active']['species'] == 'gholdengo'
 
 
+@pytest.mark.parametrize('reason', ['taunt', 'empty_pp'])
+def test_request_only_struggle_is_legal_advice_and_sends_without_quality_stop(state, reason):
+    import numpy as np
+    from poke_env.environment import SinglesEnv
+
+    from pokesim.live.advisor import action_label
+    from pokesim.search.lookahead import label_to_action
+
+    player, session, battle = state
+    request = session.request()
+    if reason == 'taunt':
+        battle.parse_message(['', '-start', 'p1a: Gholdengo', 'move: Taunt'])
+    else:
+        for m in battle.active_pokemon.moves.values():
+            m._current_pp = 0
+    request['active'][0]['moves'] = [dict(move='Struggle', id='struggle', target='randomNormal', disabled=False)]
+    battle.parse_request(request)
+    assert label_to_action('move:struggle', battle) == 6
+    assert action_label(6, battle) == 'move:struggle'
+    assert label_to_action('move:shadowball', battle) is None
+    assert str(SinglesEnv.action_to_order(np.int64(6), battle, strict=True)) == '/choose move struggle'
+    from pokesim.live.advisor import Advisor
+
+    advisor = Advisor([GHOLDENGO], policy=None, lookahead=False, opponent_policy=None, belief=False)
+    advisor.engine = SimpleNamespace(query=lambda *a, **kw: [
+        {'p1': ['move:struggle'], 'p2': ['move:moonblast'], 'payoff': [[0.]]}], opponent_model={})
+    assert advisor.advise(battle).actions == [('move:struggle', 1.)]
+    player.advisor.advise.return_value = Suggestion([('move:struggle', 1)], status={})
+    asyncio.run(player._handle_battle_request(battle))
+    assert player.advice[battle.battle_tag][0]['chosen'] == 'move:struggle'
+    assert not player.quality_issues
+    assert player.ps_client.send_message.await_args.args[0].startswith('/choose move struggle|')
+
+
 def test_old_request_is_ignored_before_it_can_revert_the_battle_state(state):
     player, session, battle = state
     old = session.request()

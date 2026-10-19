@@ -84,3 +84,16 @@ const {chooseCounterplay}=require('./services/sim-tools/counterplay_policy');
 console.log(JSON.stringify(chooseCounterplay(obs.view(b.p1),b.dex)[1]));b.destroy();
 """)
     assert action == 'move:taunt'
+
+
+def test_final_ranking_retains_real_ladder_evidence_without_overriding_a_clear_simulated_loss():
+    selector, ranking, picks, _ = selection_fixture()
+    first, second = ranking[:2]
+    # Both candidates have the same simulated matchup; a reliable real-game difference breaks that tie.
+    ranking[0] = (first[0], first[1], {'history': {'mean': .1, 'ordered_games': 80, 'trio_games': 100}})
+    ranking[1] = (second[0], second[1], {'history': {'mean': .8, 'ordered_games': 80, 'trio_games': 100}})
+    ranked, info = selector.rerank(ranking, picks)
+    by_names = {tuple(r[0]): r[1] for r in ranked}
+    assert by_names[tuple(second[0])] > by_names[tuple(first[0])]
+    assert any(e['history_weight'] == .35 for e in info['candidates'])
+    assert all(e['history_weight'] == 0 for e in info['candidates'] if e['lineup'] not in [first[0], second[0]])

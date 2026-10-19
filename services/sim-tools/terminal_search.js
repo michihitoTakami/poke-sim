@@ -59,6 +59,7 @@ function immediateWin(snapshot, a, c, deps, deadline, limit = 4096) {
 class Search {
   constructor(req, deps) {
     this.deps = deps; this.history = req.observationLog; this.nodes = new Map(); this.pending = new Map();
+    this.valueUtility = req.valueUtility || 'reference-material-v2';
     this.opponentSelection = req.opponentSelection || null;
     this.policy = req.batonPolicy === false ? choosePublic : choosePlannedPublic;
     this.policyVersion = req.batonPolicy === false ? VERSION : PLAN_VERSION;
@@ -404,7 +405,8 @@ class Search {
       failed: this.failures, errors: this.errors,
       tree_nodes: this.nodes.size, max_tree_decisions: this.maxTreeDepth, max_rollout_turns: this.maxRolloutTurns,
       horizon_turns: this.maxTurns, prior_weight: this.priorWeight, minimum_reply_trials: this.minimumTrials,
-      value_kind: 'bounded-reference-material-utility-v1', calibrated_win_probability: false,
+      value_kind: 'bounded-' + this.valueUtility.replace('reference-material', 'reference-material-utility'),
+      calibrated_win_probability: false,
       action_filter: this.actionFilter,
       unfinished_at_deadline: this.unfinishedAtDeadline, predicted_columns: this.columns !== null,
       chance_paths: this.chancePaths, immediate_wins: this.certified, policy_nets: this.policyNets,

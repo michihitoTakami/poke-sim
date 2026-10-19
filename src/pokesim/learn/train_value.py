@@ -15,7 +15,9 @@ ensemble, with the paired difference's 90% interval excluding 0.
 """
 import argparse
 import json
+import os
 import platform
+import re
 import time
 from pathlib import Path
 
@@ -27,7 +29,7 @@ from pokesim.data.dataset import sidecar
 from pokesim.evaluation.metrics import reliability
 from pokesim.runtime.bundle import file_hash, git_commit
 from pokesim.value.evaluate import group_means, intervals, losses
-from pokesim.value.model import ValueModel, load_checkpoint, predict
+from pokesim.value.model import create_model, load_checkpoint, predict
 from pokesim.value.train import hp_fit, hp_predict, set_seed
 
 
@@ -41,9 +43,17 @@ def concat(paths):
     parts = [load(Path(p)) for p in paths]
     keys = [k for k in parts[0] if k != 'meta']
     data = {k: np.concatenate([p[k] for p in parts]) for k in keys}
+    data['group'] = battle_groups(data['group'])
+    _, inverse = np.unique(data['group'], return_inverse=True)
+    data['weight'] = data['weight'] / np.bincount(inverse, weights=data['weight'])[inverse]
     data['weight'] = data['weight'] / data['weight'].sum() * len(data['weight'])
     data['meta'] = [p['meta'] for p in parts]
     return data
+
+
+def battle_groups(groups):
+    """Both public replay actors, and all their turns, belong to one statistical unit."""
+    return np.array([re.sub(r':p[12]$', '', str(g)) for g in groups])
 
 
 def dev_log_loss(model, dev, device) -> float:
@@ -95,6 +105,9 @@ def reference_predictions(run: Path, dev: dict) -> np.ndarray | None:
 
 
 def main() -> None:
+    os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
+    torch.use_deterministic_algorithms(True)
+    torch.set_num_threads(2)
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--out', required=True)
     ap.add_argument('--pretrain', nargs='*', default=[])
@@ -102,6 +115,7 @@ def main() -> None:
     ap.add_argument('--train', nargs='+', required=True)
     ap.add_argument('--dev', nargs='+', required=True)
     ap.add_argument('--reference-run', default=None)
+    ap.add_argument('--reference-dev', type=Path, help='aligned development tensors for a different incumbent encoder')
     ap.add_argument('--seeds', type=int, nargs='+', default=[0, 1, 2])
     ap.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu')
     ap.add_argument('--hidden', type=int, default=256)
@@ -130,11 +144,11 @@ def main() -> None:
     metas = [m for d in (train, dev, pretrain) if d for m in d['meta']]
     if len({m['feature_code_sha'] for m in metas}) != 1 or len({m['dex_sha'] for m in metas}) != 1:
         raise ValueError('tensors were built with different feature code or dex')
-    if set(train['group']) & set(dev['group']):
+    if set(train['group']) & set(dev['group']) or (
+            pretrain is not None and set(pretrain['group']) & set(dev['group'])):
         raise ValueError('a battle appears in both training and development data')
     device = torch.device(args.device)
     features = train['meta'][0]['features']
-    public_dim, private_dim = len(features['public']), len(features['private'])
     initial = None
     if args.init_run:
         initial = json.loads((args.init_run / 'report.json').read_text())
@@ -146,11 +160,17 @@ def main() -> None:
     contract = {'schema_version': 1, 'target': 'real_outcome', 'feature_version': train['meta'][0]['feature_version'],
                 'features': features, 'feature_code_sha': train['meta'][0]['feature_code_sha'],
                 'dex_sha': train['meta'][0]['dex_sha'], 'code': git_commit(), 'torch': str(torch.__version__),
+                'training_code_sha': file_hash(Path(__file__)),
+                'model_code_sha': {name: file_hash(Path(__file__).parents[1] / 'value' / name)
+                                   for name in ('model.py', 'set_model.py')},
+                'grouping': 'underlying battle; replay :p1/:p2 perspectives kept together; total battle weight=1',
+                'deterministic': True,
                 'python': platform.python_version(), 'device': str(device),
                 'train': [{'path': p, 'sha': file_hash(Path(p))} for p in args.train],
                 'dev': [{'path': p, 'sha': file_hash(Path(p))} for p in args.dev],
                 'pretrain': [{'path': p, 'sha': file_hash(Path(p))} for p in args.pretrain],
-                'settings': {**vars(args), 'init_run': str(args.init_run) if args.init_run else None},
+                'settings': {**vars(args), 'init_run': str(args.init_run) if args.init_run else None,
+                             'reference_dev': str(args.reference_dev) if args.reference_dev else None},
                 'initialization': {'run': str(args.init_run),
                                    'report_sha': file_hash(args.init_run / 'report.json'),
                                    'checkpoints': {}} if args.init_run else None}
@@ -159,7 +179,7 @@ def main() -> None:
     models, stages = [], {}
     for seed in args.seeds:
         set_seed(seed)
-        model = ValueModel(public_dim, private_dim, args.hidden)
+        model = create_model(features, args.hidden)
         log(f'seed {seed}')
         result = {}
         if initial:
@@ -191,7 +211,10 @@ def main() -> None:
                    'hp': hp_predict(hp_fit(train), dev),
                    'real': np.mean([predict(m, dev) for m in models], axis=0)}
     if args.reference_run:
-        predictions['reference_v2'] = reference_predictions(Path(args.reference_run), dev)
+        reference_dev = concat([args.reference_dev]) if args.reference_dev else dev
+        if any(not np.array_equal(reference_dev[k], dev[k]) for k in ('group', 'turn', 'target')):
+            raise ValueError('incumbent development rows are not aligned with candidate rows')
+        predictions['reference_v2'] = reference_predictions(Path(args.reference_run), reference_dev)
     y, w, g = dev['target'], dev['weight'], dev['group']
     cached = {name: {k: group_means(v, g, w)[1] for k, v in losses(p, y).items()} for name, p in predictions.items()}
     report = {'schema_version': 1, 'provenance': contract, 'stages': stages, 'dev_rows': int(len(y)),

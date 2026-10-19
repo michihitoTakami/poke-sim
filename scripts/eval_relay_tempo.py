@@ -12,7 +12,7 @@ from pokesim.config import ROOT, SHOWDOWN_DIR
 from pokesim.data.prior_bundle import load_bundle, sampler
 from pokesim.evaluation.branch_matches import atomic_json, file_sha, hash_seed, summarize, tree_sha
 from pokesim.evaluation.shadow import position
-from pokesim.search.evaluation import leaf_value
+from pokesim.search.evaluation import VERSION, leaf_value
 from pokesim.search.lookahead import Lookahead, Worker, to_id
 from pokesim.search.planner import plan
 from pokesim.search.terminal import search
@@ -32,14 +32,15 @@ class ReplayWorker(Worker):
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
 
 
-def fixed_search(root, request, value, trials):
+def fixed_search(root, request, value, trials, *, utility=None):
+    utility = utility or request.get('valueUtility', VERSION)
     worker = ReplayWorker(ROOT / 'scripts/replay_fixed_search.js', root)
     try:
         reply = worker.query({'op': 'start', 'request': request}, 120.)
         remaining = trials
         while True:
             probabilities = value.probabilities([p['observation'] for p in reply['pending']])
-            feedback = [{'id': row['id'], 'p': (leaf_value(row['observation'], float(p)) + 1) / 2}
+            feedback = [{'id': row['id'], 'p': (leaf_value(row['observation'], float(p), utility=utility) + 1) / 2}
                         for row, p in zip(reply['pending'], probabilities, strict=True)]
             count = min(8, remaining)
             reply = worker.query({'op': 'advance', 'feedback': feedback, 'trials': count}, 120.)

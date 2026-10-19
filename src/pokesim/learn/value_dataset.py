@@ -12,6 +12,7 @@ games) serve pretraining; ladder rows (us as p1) are the on-distribution set.
 import argparse
 import gzip
 import json
+import re
 import time
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -21,6 +22,7 @@ import numpy as np
 from pokesim.config import ROOT
 from pokesim.data.dataset import write_metadata
 from pokesim.runtime.bundle import file_hash
+from pokesim.value.contracts import code_hash, encoder
 from pokesim.value.features import VERSION, Encoder
 
 DEX = ROOT / 'data/processed/public_value/training-dex-v1.json'
@@ -37,9 +39,12 @@ def normalise(view: dict) -> dict:
     public['active'] = {swap[k]: v for k, v in view['public']['active'].items()}
     public['preview'] = {swap[k]: v for k, v in view['public']['preview'].items()}
     public['conditions'] = {swap[k]: v for k, v in (view['public'].get('conditions') or {}).items()}
+    history = [re.sub(r'(?<![a-zA-Z0-9])p([12])(?=[a-z]?:|\|)',
+                      lambda m: 'p' + ('2' if m[1] == '1' else '1'), line)
+               for line in view.get('history', [])]
     request = dict(view['request'])
     request['side'] = dict(request['side'], id='p1')
-    return dict(view, side='p1', public=public, request=request)
+    return dict(view, side='p1', public=public, request=request, history=history)
 
 
 def encode_row(row: dict) -> dict | None:
@@ -54,6 +59,11 @@ def encode_row(row: dict) -> dict | None:
     return {'public': public, 'private': private, 'baseline': baseline, 'flags': flags,
             'target': float(row['outcome']), 'turn': row['turn'], 'rating': float(rating or 0),
             'group': row['battle_id'], 'source': row.get('source', ''), 'schema': schema}
+
+
+def init_encoder(version, dex):
+    global _ENCODER
+    _ENCODER = encoder(version, dex)
 
 
 def build(args) -> None:
@@ -71,7 +81,9 @@ def build(args) -> None:
                     rows.append(row)
     started = time.perf_counter()
     encoded, dropped = [], 0
-    with ProcessPoolExecutor(args.jobs) as ex:
+    version = getattr(args, 'feature_version', VERSION)
+    dex = Path(getattr(args, 'dex', DEX))
+    with ProcessPoolExecutor(args.jobs, initializer=init_encoder, initargs=(version, dex)) as ex:
         for item in ex.map(encode_row, rows, chunksize=64):
             if item is None:
                 dropped += 1
@@ -89,9 +101,9 @@ def build(args) -> None:
     per = dict(zip(groups, counts))
     arrays['weight'] = np.array([1 / per[g] for g in arrays['group']], np.float32)
     np.savez_compressed(out, **arrays)
-    write_metadata(out, {'schema_version': 2, 'feature_version': VERSION, 'features': schema,
-                         'feature_code_sha': file_hash(ROOT / 'src/pokesim/value/features.py'),
-                         'dex_sha': file_hash(DEX), 'rows': [str(p) for p in args.rows],
+    write_metadata(out, {'schema_version': 2, 'feature_version': version, 'features': schema,
+                         'feature_code_sha': code_hash(version),
+                         'dex_sha': file_hash(dex), 'rows': [str(p) for p in args.rows],
                          'row_shas': {str(p): file_hash(Path(p)) for p in args.rows}, 'sides': sorted(sides or []),
                          'examples': len(encoded), 'battles': int(len(groups)), 'dropped': dropped,
                          'target': 'real outcome of the game for the actor (1 win / 0 loss / .5 draw)',
@@ -106,6 +118,8 @@ def main() -> None:
     ap.add_argument('--out', required=True)
     ap.add_argument('--sides', nargs='*', default=None)
     ap.add_argument('--jobs', type=int, default=4)
+    ap.add_argument('--feature-version', choices=[VERSION, 'observed-value-sets-v2'], default=VERSION)
+    ap.add_argument('--dex', type=Path, default=DEX)
     build(ap.parse_args())
 
 

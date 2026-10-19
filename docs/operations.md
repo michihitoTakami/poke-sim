@@ -226,3 +226,12 @@ expert継続はpublic-baton-v3、計画方策はpublic-plans-v3。鉄壁の必�
 ルートでは従来の効用差0.03以内で計画を採用し、反撃確認・勝利証明を優先する。
 `relay_plan.strategy`に根拠を記録する。NN重み・参照方策v2は維持。
 判断条件、固定局面と選出の検証、未解決の局面は[今回の監査](audits/20261019-relay-goals.md)を参照。
+
+## 集合NN候補と実戦評価の分離（2026-10-19）
+
+探索の既定効用は`reference-material-v2`。能力ランクへの一律加点を除き、選出は実戦の事後成績も
+最終スコアへ残す`preview-evidence-v5`を使う。Struggleの合法手変換も修正した。
+新しい集合NNと、対応付き終局比較による行動・継続価値の学習は実行したが、採用条件は満たしていない。
+収集は従来と同じ`runs/value-replays-v1` / `runs/opp-replays-v1/opp-seed0.json`を使用する。
+候補の失敗を理由に品質ゲートを緩めたり、新形式の未採用重みを通常ロードしたりしない。
+再現と未見期間の比較は[集合NNと学習経路の監査](audits/20261019-structured-learning.md)を参照。

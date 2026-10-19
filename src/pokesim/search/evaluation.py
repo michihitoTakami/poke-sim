@@ -7,7 +7,8 @@ import math
 
 from pokesim.value.features import health as observed_health
 
-VERSION = 'reference-material-v1'
+VERSION = 'reference-material-v2'
+LEGACY_VERSION = 'reference-material-v1'
 REFERENCE_WEIGHT = .5
 OPEN_LIMIT = .85
 
@@ -17,7 +18,7 @@ def health(condition):
     return hp, status
 
 
-def position_value(observation: dict) -> float:
+def position_value(observation: dict, *, stage_bonus=False) -> float:
     """Use only the acting player's request and public observations, with unseen opponents explicitly unknown."""
     side = observation['side']
     foe = 'p2' if side == 'p1' else 'p1'
@@ -38,22 +39,25 @@ def position_value(observation: dict) -> float:
     other_alive += unseen
     other_hp += unseen
 
-    def boosts(team):
-        mon = public[team].get(observation['public']['active'][team], {})
-        b = mon.get('boosts', {})
-        # Diminishing gains, with no value assigned to stacking beyond the legal cap.
-        return sum(weight * math.tanh(max(-6, min(6, b.get(stat, 0))) / 3)
-                   for stat, weight in {'atk': .10, 'spa': .10, 'def': .07, 'spd': .07, 'spe': .08}.items())
-
+    # Setup is valued through simulated survival/damage and the learned value, not stage counts.
+    # In particular, a passive passer's SpA or Defense against a special attacker is not material.
     advantage = .70 * (alive - other_alive) + .35 * (hp - other_hp) + .10 * (other_status - status)
-    advantage += boosts(side) - boosts(foe)
+    if stage_bonus:  # Frozen v1 ablation, selected explicitly; never the live default.
+        def boosts(team):
+            mon = public[team].get(observation['public']['active'][team], {})
+            b = mon.get('boosts', {})
+            return sum(weight * math.tanh(max(-6, min(6, b.get(stat, 0))) / 3)
+                       for stat, weight in {'atk': .10, 'spa': .10, 'def': .07, 'spd': .07, 'spe': .08}.items())
+        advantage += boosts(side) - boosts(foe)
     return math.tanh(advantage)
 
 
-def leaf_value(observation: dict, reference_probability: float) -> float:
+def leaf_value(observation: dict, reference_probability: float, *, utility=VERSION) -> float:
     """Terminal results are handled by the simulator; open leaves cannot claim a certain win or loss."""
     if not math.isfinite(reference_probability) or not 0 <= reference_probability <= 1:
         raise ValueError('invalid reference value')
+    if utility not in (VERSION, LEGACY_VERSION):
+        raise ValueError('unsupported search value utility')
     value = REFERENCE_WEIGHT * (2 * reference_probability - 1)
-    value += (1 - REFERENCE_WEIGHT) * position_value(observation)
+    value += (1 - REFERENCE_WEIGHT) * position_value(observation, stage_bonus=utility == LEGACY_VERSION)
     return max(-OPEN_LIMIT, min(OPEN_LIMIT, value))

@@ -29,7 +29,7 @@ const source = fs.readFileSync(process.argv[1], 'utf8');
 vm.runInNewContext(source, sandbox);
 vm.runInContext(process.argv[4], sandbox);
 vm.runInContext(`module.exports = req => require(${JSON.stringify(path.join(sandbox.__dirname,
-  'branch_matches.js'))}).evaluateBranches(req, {setUp,choices,step,policy,State});`, sandbox);
+  'branch_matches.js'))}).evaluateBranches(req, {setUp,choices,step,policy,State,extractChannelMessages});`, sandbox);
 try { console.log(JSON.stringify(sandbox.module.exports(JSON.parse(process.argv[3])))); }
 catch(e) { console.log(JSON.stringify({error: e.message})); }
 """
@@ -103,6 +103,16 @@ def test_rejects_unsupported_root_and_invalid_settings():
     assert "unknown continuation" in worker(request(continuations=["missing/greedy"]))["error"]
     assert "distinct" in worker(request(seeds=[0, 0]))["error"]
     assert "positive" in worker(request(maxTurns=0))["error"]
+
+
+def test_public_branch_league_includes_counterplay_with_actor_only_information():
+    req = request(continuations=['planned/counterplay'], informationScope='public_observation',
+                  observationLog=['|switch|p1a: Me|Garchomp, L50|1/100',
+                                  '|switch|p2a: Foe|Hippowdon, L50|5/100', '|turn|1'])
+    result = worker(req)
+    assert 'error' not in result
+    assert not any(t['outcome'] == 'failed' for t in result['trials'])
+    assert result['informationScope'] == 'public_observation'
 
 
 def test_tally_keeps_unknown_mass_in_bounds_and_policy_breakdown():

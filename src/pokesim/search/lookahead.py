@@ -623,14 +623,27 @@ def aggregate(results: list[dict], opponent_model: dict | None = None, last_move
                           "failed_cells": failed_cells})
 
 
+def action_moves(battle: Battle) -> list:
+    """Match SinglesEnv's request-only move slot (Struggle, including Taunt with PP left)."""
+    known = list(battle.active_pokemon.moves.values())[:4] if battle.active_pokemon else []
+    available = battle.available_moves
+    if len(available) == 1 and available[0].id not in {m.id for m in known}:
+        return available
+    return known
+
+
 def label_to_action(label: str, battle: Battle) -> int | None:
     """Map a lookahead label to poke-env's SinglesEnv action index (0-5 switch, 6-9 move, 10-13 move+mega)."""
     kind, _, rest = label.partition(":")
     if kind == "switch":
         matches = [i for i, mon in enumerate(battle.team.values()) if switch_species_matches(rest, mon)]
         return matches[0] if len(matches) == 1 else None
+    if kind != 'move':
+        return None
     move_id, _, mega = rest.partition(":")
-    moves = list(battle.active_pokemon.moves.keys())[:4]
+    if mega not in ('', 'mega'):
+        return None
+    moves = [m.id for m in action_moves(battle)]
     if move_id not in moves:
         return None
     return (10 if mega else 6) + moves.index(move_id)

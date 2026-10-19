@@ -27,7 +27,45 @@ from pokesim.evaluation.branch_matches import (
 )
 
 AUDIT = ROOT / "docs/audits/20261018-post-update-analysis.json"
-CONTINUATIONS = ["planned/tactical", "planned/disrupt", "planned/expert"]
+LEGACY_CONTINUATIONS = ["planned/tactical", "planned/disrupt", "planned/expert"]
+CONTINUATIONS = [*LEGACY_CONTINUATIONS, "planned/counterplay"]
+
+
+def confident_pairs(trials, actions, minimum_worlds=4):
+    """Paired world bootstrap, retaining policy diversity. Seeds within a world are not independent evidence.
+
+    A single fortunate crit or one weak opponent controller cannot teach a confident action preference.
+    Censored/failed trials and incomplete comparisons produce no preference, rather than a loss label.
+    """
+    by_action = {a: {} for a in actions}
+    for t in trials:
+        key = (t['world'], t['seed'], t['continuation'])
+        bucket = by_action[t['action']]
+        if key in bucket:
+            raise ValueError('duplicate paired branch trial')
+        bucket[key] = t['target']
+    weights = np.zeros((len(actions), len(actions)), np.float32)
+    for i, a in enumerate(actions):
+        for j, b in enumerate(actions):
+            if i == j or set(by_action[a]) != set(by_action[b]):
+                continue
+            keys = sorted(by_action[a])
+            if any(by_action[a][k] is None or by_action[b][k] is None for k in keys):
+                continue
+            worlds = sorted({k[0] for k in keys})
+            if len(worlds) < minimum_worlds:
+                continue
+            delta = {k: by_action[a][k] - by_action[b][k] for k in keys}
+            # No teaching preference if any named opponent policy reverses its sign on average.
+            if any(np.mean([v for k, v in delta.items() if k[2] == name]) < 0
+                   for name in {k[2] for k in keys}):
+                continue
+            per_world = np.array([np.mean([v for k, v in delta.items() if k[0] == w]) for w in worlds])
+            rng = np.random.default_rng(0)
+            lower = np.quantile(rng.choice(per_world, (2000, len(worlds))).mean(1), .05)
+            if lower > 0:
+                weights[i, j] = per_world.mean()
+    return weights.tolist()
 
 
 def battle_identity(value: str) -> str:
@@ -196,7 +234,8 @@ def examples(out: Path):
         cfg = manifest["contract"]
         if manifest["experiment_id"] != digest(cfg):
             raise ValueError("modified branch manifest")
-        if cfg["continuations"] != CONTINUATIONS or manifest["information_scope"] != "public_observation":
+        if (cfg["continuations"] not in (LEGACY_CONTINUATIONS, CONTINUATIONS) or
+                manifest["information_scope"] != "public_observation"):
             raise ValueError("unsupported continuation target")
         ranks[split], values[split], groups[split] = [], [], set()
         for case in cfg["positions"]:
@@ -223,6 +262,8 @@ def examples(out: Path):
                         "view": obs,
                         "actions": list(by_action),
                         "targets": [float(np.mean([t["target"] for t in ts])) for ts in by_action.values()],
+                        "pair_weights": confident_pairs(trials, list(by_action)),
+                        "policy_version": result['result']['policyVersion'],
                         "root_provenance": result.get("root_provenance", {}),
                         "baseline_action": next(
                             d.get("policyRecommendation") for d in trials[0]["trajectory"] if d["side"] == "p1"
@@ -317,8 +358,9 @@ def train(args):
     from pokesim.learn.model import PolicyNet, export_json, load_checkpoint, save_checkpoint
     from pokesim.learn.train_value import fit as fit_value
     from pokesim.runtime.bundle import file_hash
-    from pokesim.value.features import Encoder
-    from pokesim.value.model import ValueModel, predict
+    from pokesim.value.contracts import code_hash
+    from pokesim.value.contracts import encoder as load_encoder
+    from pokesim.value.model import create_model, model_from_config, predict
     from pokesim.value.runtime import ValueEnsemble
 
     if args.out.exists():
@@ -330,6 +372,17 @@ def train(args):
     torch.set_num_threads(2)
     torch.manual_seed(args.seed)
     encoded = {k: encode_ranks(v) for k, v in ranks.items()}
+    if not args.fixed_policy and not any(np.asarray(r['pair_weights']).any() for r in encoded['train']):
+        raise ValueError('no confident paired action preferences; generate more worlds instead of teaching noise')
+    source_contracts = [json.loads((args.data / split / 'manifest.json').read_text())['contract']
+                        for split in ranks if (args.data / split / 'manifest.json').exists()]
+    if len({tuple(c['continuations']) for c in source_contracts}) != 1:
+        raise ValueError('opponent continuation league differs between splits')
+    continuations = source_contracts[0]['continuations']
+    versions = {r['policy_version'] for rows in ranks.values() for r in rows}
+    if len(versions) != 1:
+        raise ValueError('continuation policy version differs between splits')
+    policy_version = next(iter(versions))
     first = encoded["train"][0]
     policy = PolicyNet(
         len(first["state"]), first["features"].shape[1], hidden=64, embed=32, action_hidden=24, scorer_hidden=32
@@ -373,10 +426,9 @@ def train(args):
     for epoch in range(0 if args.fixed_policy else args.epochs):
         for row in encoded["train"]:
             score = logits(row)
-            q = torch.tensor(row["targets"])
-            # Every pair compares terminal branch means, weighted by their difference; ties teach no preference.
-            delta = q[:, None] - q[None, :]
-            mask = delta > 1e-7
+            delta = torch.tensor(row['pair_weights'])
+            # Only complete, paired and world-robust differences become teachers.
+            mask = delta > 0
             if not mask.any():
                 continue
             gap = (score[:, None] - score[None, :])[mask]
@@ -390,7 +442,8 @@ def train(args):
             best, best_epoch = metric, epoch + 1
             saved = {k: v.detach().clone() for k, v in policy.state_dict().items()}
     policy.load_state_dict(saved)
-    encoder = Encoder.load(DEX)
+    feature_version = getattr(args, 'feature_version', 'observed-value-v1')
+    encoder = load_encoder(feature_version, DEX)
     schema = None
 
     def value_data(rows):
@@ -414,11 +467,13 @@ def train(args):
         }
 
     train_data, dev_data = value_data(values["train"]), value_data(values["development"])
-    initial = ValueEnsemble(args.init_value) if args.init_value else None
+    initial = ValueEnsemble(args.init_value, allow_candidate=True) if args.init_value else None
     if initial:
+        if initial.features != schema:
+            raise ValueError('initial value encoder differs from branch observations')
         value = initial.models[0]
     else:
-        value = ValueModel(train_data["public"].shape[1], train_data["private"].shape[1], hidden=48)
+        value = create_model(schema, getattr(args, 'hidden', 48))
     reference_state = {k: v.detach().clone() for k, v in value.state_dict().items()}
     before = predict(value, dev_data)
     selection = fit_value(
@@ -439,17 +494,19 @@ def train(args):
         "feature_version": VERSION,
         "feature_contract": file_hash(SCHEMA),
         "target": "terminal-branch-pairwise-ranking",
-        "continuation": CONTINUATIONS,
+        "continuation": continuations,
+        "teacher": "complete paired-world CI90 positive; no opponent-policy sign reversal; minimum 4 worlds",
         "source_split_sha": file_sha(args.data / "split.json"),
     }
     save_checkpoint(args.out / "ours.pt", policy, policy_contract)
     export_json(args.out / "ours.json", policy, policy_contract)
     cfg = {
         "target": "terminal_branch_continuation",
-        "feature_code_sha": file_hash(ROOT / "src/pokesim/value/features.py"),
+        "feature_version": feature_version,
+        "feature_code_sha": code_hash(feature_version),
         "dex_sha": file_hash(DEX),
         "features": schema,
-        "reference": {"own": "planned", "opponent_pool": CONTINUATIONS, "version": "public-plans-v1"},
+        "reference": {"own": "planned", "opponent_pool": continuations, "version": policy_version},
         "source_split_sha": file_sha(args.data / "split.json"),
         "worker_code_sha": tree_sha(ROOT / "services/sim-tools", {".js"}),
         "initial_value_report": file_sha(args.init_value / "report.json") if initial else None,
@@ -459,7 +516,6 @@ def train(args):
         import shutil
 
         shutil.copyfile(args.fixed_policy, args.out / "ours.json")
-        cfg["reference"]["version"] += "+net:" + file_sha(args.fixed_policy)
         cfg["reference"]["policy_sha"] = file_sha(args.fixed_policy)
     checkpoint = args.out / "value.pt"
     torch.save(
@@ -498,7 +554,7 @@ def train(args):
         # Calibration is scored once, after epoch selection. No threshold/epoch choices use it.
         held = value_data(values["calibration"])
         new = predict(value, held)
-        reference = ValueModel(**value.config)
+        reference = model_from_config(value.config)
         reference.load_state_dict(reference_state)
         old = predict(reference, held)
         delta = (new - held["target"]) ** 2 - (old - held["target"]) ** 2
@@ -545,6 +601,9 @@ def main():
     fit.add_argument("--fixed-policy", type=Path, help="keep this ranking policy while refreshing its own value")
     fit.add_argument("--epochs", type=int, default=40)
     fit.add_argument("--seed", type=int, default=0)
+    fit.add_argument('--feature-version', choices=['observed-value-v1', 'observed-value-sets-v2'],
+                     default='observed-value-v1')
+    fit.add_argument('--hidden', type=int, default=48)
     args = parser.parse_args()
     (generate if args.command == "generate" else train)(args)
 

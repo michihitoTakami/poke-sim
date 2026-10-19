@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from pokesim.search.evaluation import leaf_value
+from pokesim.search.evaluation import LEGACY_VERSION, VERSION, leaf_value
 
 
 def column_weights(results, predictor):
@@ -132,7 +132,8 @@ def search(engine, request, *, started=None, max_budget=20., predictor=None):
     cells are pooled (merge_replies). A worker that fails mid-decision is dropped; the rest decide.
     """
     started = time.monotonic() if started is None else started
-    if request.get('valueUtility', 'reference-material-v1') != 'reference-material-v1':
+    utility = request.setdefault('valueUtility', VERSION)
+    if utility not in (VERSION, LEGACY_VERSION):
         raise ValueError('unsupported search value utility')
     budget = float(request.pop('decisionMs', 8500)) / 1000
     if not .1 <= budget <= max_budget:
@@ -188,7 +189,8 @@ def search(engine, request, *, started=None, max_budget=20., predictor=None):
             for k, reply in replies.items():
                 probabilities = engine.value_model.probabilities([p['observation'] for p in reply['pending']])
                 # p on this wire is a normalized bounded utility, not a calibrated human-game win probability.
-                feedback[k] = [{'id': row['id'], 'p': (leaf_value(row['observation'], float(p)) + 1) / 2}
+                feedback[k] = [{'id': row['id'],
+                                'p': (leaf_value(row['observation'], float(p), utility=utility) + 1) / 2}
                                for row, p in zip(reply['pending'], probabilities, strict=True)]
             inference_ms += 1000 * (time.monotonic() - start_inference)
             merged = merge_replies(list(replies.values()), prior_visits) if len(replies) > 1 else \
