@@ -3813,5 +3813,25 @@
     "budget_ms": 2500,
     "workers": 1,
     "scope": "local plumbing smoke with incumbent weights; not candidate win-rate evidence"
+  },
+  "prior_refresh": {
+    "records": 1074,
+    "raw_ladder_records": 1049,
+    "species_brought": 224,
+    "old_sha256": "569b1f7870375b6f2ac69d2181b90f25fcda4210581339e68b411edd7f85744d",
+    "new_sha256": "68417072bb64f41f0cccb19ef3ca5bccf8fbd07801c7e5dcc3ed2f6075ef052b",
+    "old_backup": "/data/poke-sim/collect/observed-sets-pre-continuation.json"
+  },
+  "refreshed_prior_smoke": {
+    "observed_sha": "68417072bb64f41f0cccb19ef3ca5bccf8fbd07801c7e5dcc3ed2f6075ef052b",
+    "worker_sha": "3ac7edfff41ce268bc57b146ba25c01f732c38001ad0f22aaacd58006831171e",
+    "decisions": [
+      {
+        "record": "20261020-142055-2701444168.json",
+        "turn": 9,
+        "chosen": "switch:umbreon",
+        "seconds": 9.805393554037437
+      }
+    ]
   }
 }
