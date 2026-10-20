@@ -1,14 +1,15 @@
 """Known counters only: never invent exact sleep duration or substitute HP from a public effect flag."""
 from poke_env.battle import Pokemon
 
-VERSION = 'observed-state-v4'
+VERSION = 'observed-state-v5'
 
 
 def known_counters(mon: Pokemon, active: bool, own: bool = False) -> dict:
     out = {}
     if active and any(e.name == 'TYPECHANGE' for e in mon.effects):
-        # Soak changes effectiveness AND STAB until a switch/forme reset. Species alone is insufficient.
-        out['types'] = [t.name.title() for t in mon.types]
+        # Keep the engine's typeless slot after Burn Up / Double Shock. It is not an unknown observation
+        # or Normal, and preserving it also matters to Burn Up + Roost's grounding rule.
+        out['types'] = ['???' if t.name == 'THREE_QUESTION_MARKS' else t.name.title() for t in mon.types]
     # None is an observed empty slot (consumed/removed); only unknown_item means unknown.
     # Keep current equipment separate from the original team sheet on BOTH sides.
     if mon.item != "unknown_item":

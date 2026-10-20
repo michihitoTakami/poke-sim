@@ -1,0 +1,126 @@
+{
+  "baseline": "abf3c4225708333066e1ab69ce3191117ccd5876",
+  "state_codec": "observed-state-v5",
+  "record": "20261020-050357-2701224222.json",
+  "record_sha256": "f2054c0c12d455db329e1a574cd89ec46984b166bd014e975c3009ad1afe8ec4",
+  "scope": "saved request and public prefix regression, no live orders; same pre-match observed prior as PR45",
+  "replay_artifact": {
+    "path": "data/processed/type-loss-20261020/replay.json",
+    "sha256": "a91bcc6156bad377d0e20293f8225a3354e5a5ad8154db4981453a91ab52466a"
+  },
+  "decisions": [
+    {
+      "turn": 6,
+      "force": false,
+      "chosen": "move:slackoff",
+      "seconds": 9.721517135971226,
+      "opponent_state": {
+        "hp": 1.0,
+        "mega": false,
+        "types": [
+          "???",
+          "Fighting"
+        ],
+        "lastMove": "doubleshock",
+        "boosts": {},
+        "volatiles": []
+      },
+      "state_codec": "observed-state-v5",
+      "simulation_failed": 0,
+      "fallback": null
+    },
+    {
+      "turn": 7,
+      "force": false,
+      "chosen": "move:willowisp",
+      "seconds": 9.408997392980382,
+      "opponent_state": {
+        "hp": 1.0,
+        "mega": false,
+        "types": [
+          "???",
+          "Fighting"
+        ],
+        "lastMove": "revivalblessing",
+        "boosts": {},
+        "volatiles": []
+      },
+      "state_codec": "observed-state-v5",
+      "simulation_failed": 0,
+      "fallback": null
+    },
+    {
+      "turn": 10,
+      "force": true,
+      "chosen": "switch:gholdengo",
+      "seconds": 14.483566744020209,
+      "opponent_state": {
+        "hp": 1.0,
+        "mega": false,
+        "types": [
+          "???",
+          "Fighting"
+        ],
+        "lastMove": "doubleshock",
+        "boosts": {},
+        "volatiles": []
+      },
+      "state_codec": "observed-state-v5",
+      "simulation_failed": 0,
+      "fallback": null
+    },
+    {
+      "turn": 11,
+      "force": false,
+      "chosen": "move:recover",
+      "seconds": 8.951365215005353,
+      "opponent_state": {
+        "hp": 1.0,
+        "mega": false,
+        "types": [
+          "???",
+          "Fighting"
+        ],
+        "lastMove": "doubleshock",
+        "boosts": {},
+        "volatiles": []
+      },
+      "state_codec": "observed-state-v5",
+      "simulation_failed": 0,
+      "fallback": null
+    },
+    {
+      "turn": 12,
+      "force": false,
+      "chosen": "move:recover",
+      "seconds": 8.926396808004938,
+      "opponent_state": {
+        "hp": 1.0,
+        "mega": false,
+        "types": [
+          "???",
+          "Fighting"
+        ],
+        "lastMove": "icepunch",
+        "boosts": {},
+        "volatiles": []
+      },
+      "state_codec": "observed-state-v5",
+      "simulation_failed": 0,
+      "fallback": null
+    }
+  ],
+  "checks": {
+    "pytest": 609,
+    "ruff": "passed",
+    "node_syntax": "passed",
+    "diff_check": "passed"
+  },
+  "live_changes": {
+    "neural_weights": false,
+    "observed_prior": false,
+    "team": false,
+    "decision_ms": 15000,
+    "workers": 4
+  }
+}
