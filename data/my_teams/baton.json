@@ -4,7 +4,7 @@
  {"species": "Gholdengo", "item": "Air Balloon", "ability": "Good as Gold", "nature": "Modest",
   "moves": ["Shadow Ball", "Flash Cannon", "Recover", "Nasty Plot"], "evs": {"hp": 13, "atk": 0, "def": 0, "spa": 21, "spd": 0, "spe": 32}, "level": 50},
  {"species": "Salamence", "item": "Salamencite", "ability": "Intimidate", "nature": "Adamant",
-  "moves": ["Double-Edge", "Earthquake", "Dragon Dance", "Roost"], "evs": {"hp": 32, "atk": 32, "def": 0, "spa": 0, "spd": 0, "spe": 2}, "level": 50},
+  "moves": ["Double-Edge", "Earthquake", "Dragon Dance", "Roost"], "evs": {"hp": 5, "atk": 31, "def": 0, "spa": 0, "spd": 0, "spe": 30}, "level": 50},
  {"species": "Floette-Eternal", "item": "Floettite", "ability": "Flower Veil", "nature": "Bold",
   "moves": ["Moonblast", "Substitute", "Synthesis", "Calm Mind"], "evs": {"hp": 24, "atk": 0, "def": 32, "spa": 10, "spd": 0, "spe": 0}, "level": 50},
  {"species": "Skeledirge", "item": "Sitrus Berry", "ability": "Unaware", "nature": "Bold",
