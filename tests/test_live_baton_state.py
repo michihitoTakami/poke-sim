@@ -16,11 +16,14 @@ from pokesim.state.tracker import TrackedBattle
 
 SETS = json.loads((ROOT / 'data/my_teams/baton.json').read_text())
 CASES = json.loads((ROOT / 'tests/fixtures/baton-received.json').read_text())
+# These October 16 replays used H32/A32/S2, before the production spread changed in PR #49.
+HISTORICAL_SETS = [dict(s, evs={'hp': 32, 'atk': 32, 'def': 0, 'spa': 0, 'spd': 0, 'spe': 2})
+                   if s['species'] == 'Salamence' else s for s in SETS]
 
 
 @pytest.mark.parametrize('case', CASES, ids=lambda c: c['source'])
 def test_real_baton_log_survives_the_next_request_and_search_reconstruction(case):
-    session, battle = position(case['record'], SETS, case['turn'])
+    session, battle = position(case['record'], HISTORICAL_SETS, case['turn'])
     active = battle.active_pokemon
     assert {s: n for s, n in active.boosts.items() if n} == case['boosts']
     assert (Effect.SUBSTITUTE in active.effects) == case['substitute']
@@ -31,7 +34,7 @@ def test_real_baton_log_survives_the_next_request_and_search_reconstruction(case
         entry = GenData.from_gen(9).pokedex[sid]
         return to_id(entry.get('baseSpecies') if entry.get('forme', '').startswith('Mega') else sid)
     engine.sampler = type('Sampler', (), {'base_id': staticmethod(base_id)})()
-    own = engine.own_side(battle, {to_id(s['species']): s for s in SETS})
+    own = engine.own_side(battle, {to_id(s['species']): s for s in HISTORICAL_SETS})
     result = worker("""
 const b=setUp(sample,format,1), m=b.p1.active[0];
 console.log(JSON.stringify({boosts:m.boosts,substitute:!!m.volatiles.substitute,speed:m.getActionSpeed()}));
@@ -94,7 +97,7 @@ def test_online_player_creates_the_same_tracked_battle_as_the_replay_session():
 
 @pytest.mark.parametrize('case', CASES, ids=lambda c: c['source'])
 def test_online_protocol_and_next_real_request_retain_the_baton_payload(case):
-    session, _ = position(case['record'], SETS, case['turn'])
+    session, _ = position(case['record'], HISTORICAL_SETS, case['turn'])
     class Probe(TrackedPlayer):
         def choose_move(self, battle):
             raise AssertionError('No network move should be required in a protocol replay')

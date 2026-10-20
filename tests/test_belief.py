@@ -365,7 +365,9 @@ def test_speed_evidence_uses_actual_scarf_paralysis_tailwind_and_trick_room(
 def test_an_already_mega_evolved_pokemon_uses_its_new_speed(worker):
     from test_expert_continuation import GHOLDENGO, side
 
-    mence = next(s for s in SETS if s['species'] == 'Salamence')
+    # Freeze the speed bracket this scenario tests, independent of the production team's tuning.
+    mence = dict(next(s for s in SETS if s['species'] == 'Salamence'),
+                 evs={'hp': 32, 'atk': 32, 'def': 0, 'spa': 0, 'spd': 0, 'spe': 2})
     sample = {'p1': side([mence]), 'p2': side([GHOLDENGO]), 'field': {}}
     job = dict(sample=sample, candidates=[GHOLDENGO], moves=('doubleedge', 'shadowball'))
     plain = worker.run([job])[0][0]

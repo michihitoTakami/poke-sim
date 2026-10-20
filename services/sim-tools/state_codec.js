@@ -1,6 +1,6 @@
 // Simulator reconstruction boundary. Explicit fields carry known/sample state; unknown counters stay sampled.
 const path = require('path');
-const VERSION = 'observed-state-v5';
+const VERSION = 'observed-state-v6';
 
 function createCodec(dir) {
   const { Battle, Teams, Pokemon } = require(path.resolve(dir, 'dist/sim'));
@@ -204,6 +204,19 @@ function createCodec(dir) {
     }
     if (!battle.ended) {
       battle.checkFainted();
+      // A live pivot chooses its receiver before an already fainted foe chooses its replacement.
+      // checkFainted marks that foe too early for this intermediate request. Defer its flag until the
+      // engine resumes after our switch; it then issues the foe's real replacement request itself.
+      for (const side of battle.sides) {
+        const spec = sample[side.id];
+        if (!spec.forceSwitch) continue;
+        const active = side.active[0];
+        if (active.fainted || spec.incoming !== undefined || !side.foe.active[0].fainted) {
+          throw new Error('Invalid live pivot replacement phase');
+        }
+        active.switchFlag = spec.switchMove || true;
+        side.foe.active[0].switchFlag = false;
+      }
       // makeRequest reads cached disable flags; restoration does not pass through nextTurn's refresh.
       for (const side of battle.sides) for (const mon of side.active) {
         if (!mon || mon.fainted) continue;

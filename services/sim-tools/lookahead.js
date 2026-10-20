@@ -23,6 +23,8 @@
 //            "mega": bool}], "megaUsed": bool, "conditions": {"stealthrock": 1, "reflect": turns, ...}}
 //   FIELD = {"weather", "weatherTurns", "terrain", "terrainTurns", "trickroom": turns}
 //   SIDE may include incoming (zero-based bench index) and switchMove (Baton Pass): execute its entry after restoring.
+//   forceSwitch marks a live pivot's pending replacement while the opposing active is already fainted;
+//   switchMove preserves Baton Pass's payload. The foe chooses its replacement after this switch resolves.
 // Response: {"results": [{"p1": [labels], "p2": [labels], "payoff": [[...]], "invalid": [[...]],
 //              "resolved": [[...]], "byContinuation": {name: [[...]]}}, ...]}
 //   payoff from p1's view, averaged over the (seed, continuation) runs that ran; null when none did. invalid: per
