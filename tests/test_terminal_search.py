@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from test_expert_continuation import CHOMP, HIPPO, side
+from test_expert_continuation import CHOMP, HIPPO, PASSER, side
 
 from pokesim.config import ROOT, SHOWDOWN_DIR
 from pokesim.search.lookahead import Lookahead
@@ -229,7 +229,7 @@ console.log(JSON.stringify({paused,pending:pending.length,censored:final.summary
                                      'terminal': 0, 'unfinished': 1, 'scored': 0}
 
 
-def cell_values(prior_visits, rollout_policies=None):
+def cell_values(prior_visits, rollout_policies=None, *, stress_check=False):
     js = r"""
 const fs=require('fs'),vm=require('vm');
 const sandbox={__dirname:process.cwd()+'/services/sim-tools',
@@ -245,15 +245,40 @@ cell.prior=.6; cell.priorSpeed=.2;
 const before=s.reply().results[0];
 cell.n=1; cell.sum=-1; cell.speed=0; cell.ends=1;
 const after=s.reply().results[0];
+let stress=null;
+if(opts.stressCheck) {
+ d.observedStep=require('./services/sim-tools/public_policy').observedStep;
+ let calls=0,netCalls=0;const policy=s.policy;
+ s.policy=(view,name,dex)=>{if(name==='counterplay')calls++;return policy(view,name,dex);};
+ s.nets.p2={prior:(v,d,c)=>c.map(()=>1/c.length),sample:()=>{netCalls++;throw Error('net erased stress policy');}};
+ s.rolloutMix.p2=1;s.rolloutTemperature.p2=1;
+ // Expand once and then roll out, with a real battle and the production dispatch.
+ s.treeChoice=(b,obs,side)=>({choice:d.choices(b,side)[0][0],fresh:true});
+ const trial=s.trial([0,0,0],false,[]);while(!trial.next().done){}
+ stress={calls,netCalls,failed:s.failures};
+}
 console.log(JSON.stringify({before:before.payoff[0][0],after:after.payoff[0][0],speed:after.winSpeed[0][0],
- stats:after.stats[0][0],version:s.policyVersion,policies:s.rolloutPolicies}));
+ stats:after.stats[0][0],version:s.policyVersion,policies:s.rolloutPolicies,stress}));
 """
-    opts = {'priorVisits': prior_visits}
+    opts = {'priorVisits': prior_visits, 'stressCheck': stress_check}
+    if stress_check:
+        opts.update(samples=[{'p1': side([PASSER]),
+                              'p2': side([dict(HIPPO, moves=['Splash'])]), 'field': {}}],
+                    observationLog=['|poke|p1|Scolipede, L50|', '|poke|p2|Hippowdon, L50|',
+                                    '|switch|p1a: Scolipede|Scolipede, L50|100/100',
+                                    '|switch|p2a: Hippowdon|Hippowdon, L50|100/100', '|turn|1'])
     if rollout_policies is not None:
         opts['rolloutPolicies'] = rollout_policies
     out = subprocess.run(['node', '-e', js, str(SHOWDOWN_DIR), json.dumps(opts)], cwd=ROOT, text=True,
                          capture_output=True, check=True, timeout=20)
     return json.loads(out.stdout)
+
+
+def test_named_counterplay_rollout_is_executed_even_with_a_fully_weighted_opponent_net():
+    result = cell_values(4, {'p2': ['counterplay']}, stress_check=True)
+    assert result['stress']['calls'] > 0
+    assert result['stress']['netCalls'] == result['stress']['failed'] == 0
+    assert result['version'].endswith('+public-counterplay-v3')
 
 
 def test_the_value_bootstrap_keeps_its_weight_against_a_single_rollout_only_when_asked():

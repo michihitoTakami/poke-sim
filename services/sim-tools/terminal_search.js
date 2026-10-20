@@ -7,6 +7,7 @@ const {choosePublic, chooseBatonPublic, observedStep, VERSION, BATON_VERSION} = 
 const {PlanPolicy, choosePlannedPublic, VERSION: PLAN_VERSION} = require('./public_plans');
 const {loadPolicyNet} = require('./policy_net');
 const {VERSION: STATE_VERSION} = require('./state_codec');
+const {chooseCounterplay, VERSION: COUNTERPLAY_VERSION} = require('./counterplay_policy');
 
 // A small deterministic random source per trial (xorshift32), separate from the engine's PRNG so loading a
 // policy net does not change the chance events of a trial that does not consult it.
@@ -61,7 +62,8 @@ class Search {
     this.deps = deps; this.history = req.observationLog; this.nodes = new Map(); this.pending = new Map();
     this.valueUtility = req.valueUtility || 'reference-material-v2';
     this.opponentSelection = req.opponentSelection || null;
-    this.policy = req.batonPolicy === false ? choosePublic : choosePlannedPublic;
+    const basePolicy = req.batonPolicy === false ? choosePublic : choosePlannedPublic;
+    this.policy = (view, name, dex) => name === 'counterplay' ? chooseCounterplay(view, dex) : basePolicy(view, name, dex);
     this.policyVersion = req.batonPolicy === false ? VERSION : PLAN_VERSION;
     // stream: an independent random stream over the same worlds (offline oracles merge several; live uses none).
     this.id = hash(req.stream ? [req.samples, this.history, req.stream] : [req.samples, this.history]);
@@ -84,7 +86,7 @@ class Search {
     const rotation = (side, fallback) => {
       const list = req.rolloutPolicies && req.rolloutPolicies[side];
       if (!Array.isArray(list) || !list.length) return fallback;
-      for (const name of list) if (!['greedy', 'tactical', 'expert', 'disrupt', 'planned'].includes(name)) {
+      for (const name of list) if (!['greedy', 'tactical', 'expert', 'disrupt', 'planned', 'counterplay'].includes(name)) {
         throw Error(`unknown rollout policy ${name}`);
       }
       return list;
@@ -93,6 +95,8 @@ class Search {
     const custom = req.rolloutPolicies && (req.rolloutPolicies.p1 || req.rolloutPolicies.p2);
     this.policyVersion = this.policyVersion + (custom ?
       `+p1:${this.rolloutPolicies.p1.join(',')}/p2:${this.rolloutPolicies.p2.join(',')}` : '');
+    if (Object.values(this.rolloutPolicies).some(p => p.includes('counterplay')))
+      this.policyVersion += '+' + COUNTERPLAY_VERSION;
     // Learned public policies (policy_net.js): policyNets {ours, opp} give the tree's priors (PUCT) and, with
     // probability rolloutMix[side], the rollout choice for the first rolloutNetTurns turns after expansion.
     this.nets = {p1: null, p2: null};
@@ -276,7 +280,9 @@ class Search {
     const controllers = {p1: new PlanPolicy(), p2: new PlanPolicy()};
     const rollout = side => {
       const view = obs.view(side), net = this.nets[side.id];
-      if (net && rolloutTurns < this.rolloutNetTurns && random() < this.rolloutMix[side.id]) {
+      const name = names[side.id][serial % names[side.id].length];
+      // A stress trial must execute its named response, rather than mostly drawing from the old opponent net.
+      if (name !== 'counterplay' && net && rolloutTurns < this.rolloutNetTurns && random() < this.rolloutMix[side.id]) {
         const legal = legalChoices(view);
         if (legal.length) {
           if (this.rolloutTemperature[side.id] <= 0) {
@@ -286,7 +292,6 @@ class Search {
           return net.sample(view, b.dex, legal, random, this.rolloutTemperature[side.id])[0];
         }
       }
-      const name = names[side.id][serial % names[side.id].length];
       return (name === 'planned' ? controllers[side.id].choose(view, b.dex) : this.policy(view, name, b.dex))[0];
     };
     const advance = (a, c) => {

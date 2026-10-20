@@ -40,15 +40,16 @@ def test_selection_covers_every_trio_and_ranks_the_weakest_response_without_a_sp
     selector, ranking, picks, calls = selection_fixture()
     original = selector.engine.sampler.rng.getstate()
     ranked, info = selector.rerank(ranking, picks)
-    cfg = calls[0]
+    cfg = calls[-1]
     assert len({tuple(sorted(m['species'] for m in team)) for team in cfg['ours']}) == 20
     assert 'wall' in ranked[0][0]
-    assert info['nominal_worlds'] == 4 and info['worlds'] == 6
-    assert info['stress_worlds'] == ['disruption', 'physical_setup']
+    assert info['nominal_worlds'] == 4 and info['worlds'] == 8
+    assert info['stress_worlds'] == ['disruption', 'physical_setup', 'best_response', 'best_response']
     assert cfg['worlds'][4][0]['species'] == 'x' and cfg['worlds'][5][0]['species'] == 'y'
     assert all(set(m['species'] for m in team) <= set(picks.species) for team in cfg['worlds'])
     assert selector.engine.sampler.rng.getstate() == original
-    assert selector.rerank(ranking, picks) == (ranked, info) and len(calls) == 1
+    assert selector.rerank(ranking, picks) == (ranked, info) and len(calls) == 3
+    assert all(len(c['ours']) == 60 and c['oursPolicy'] == 'counterplay' for c in calls[:-1])
 
 
 @pytest.mark.parametrize('corruption', ['missing', 'duplicate', 'failed'])
@@ -57,6 +58,8 @@ def test_incomplete_comparisons_cannot_silently_rerank_lineups(corruption):
     query = selector.engine._query
     def broken(request):
         reply = query(request)
+        if request['lineupMatches'].get('oursPolicy'):
+            return reply
         if corruption == 'missing':
             reply['trials'].pop()
         elif corruption == 'duplicate':
@@ -110,3 +113,47 @@ def test_preview_stresses_special_setup_and_soak_toxic_using_complete_prior_sets
     assert worlds[0][0]['moves'] == ['Calm Mind', 'Moonblast']
     assert worlds[1][0]['moves'] == ['Soak', 'Toxic', 'Thunderbolt']
     assert all(len(world) == 3 for world in worlds)
+
+
+def test_reverse_search_compares_all_opponent_selections_against_the_same_own_mixture():
+    from pokesim.live.best_response import responses
+
+    selector, ranking, picks, _ = selection_fixture()
+    seen = []
+    def query(request):
+        cfg = request['lineupMatches']
+        seen.append(cfg)
+        return {'version': 'synergy-fixture', 'informationScope': 'public_observation', 'trials': [
+            {'candidate': i, 'world': w, 'opponent': 'planned', 'outcome': 'win' if wins else 'loss',
+             'target': float(wins)}
+            for i, team in enumerate(cfg['ours'])
+            for wins in [team[0]['species'] == 'y' and {m['species'] for m in team} == {'y', 'z', 'w'}]
+            for w in range(len(cfg['worlds']))]}
+    worlds, evidence = responses(selector.sets, ranking, picks, selector.engine.sampler, query, worlds=1)
+    assert [m['species'] for m in worlds[0]][0] == 'y'
+    assert {m['species'] for m in worlds[0]} == {'y', 'z', 'w'}
+    assert len(seen[0]['ours']) == 60 and len(seen[0]['worlds']) == 3
+    assert seen[0]['oursPolicy'] == 'counterplay' and seen[0]['policies'] == ['planned']
+    assert evidence[0]['selected']['bounds'] == [1., 1.]
+    assert evidence[0]['trials'] == 180
+
+
+@pytest.mark.parametrize('corruption', ['missing', 'duplicate', 'failed'])
+def test_reverse_search_abstains_on_broken_comparisons_and_restores_sampler(corruption):
+    selector, ranking, picks, _ = selection_fixture()
+    query = selector.engine._query
+    original = selector.engine.sampler.rng
+    state = original.getstate()
+    def broken(request):
+        reply = query(request)
+        if corruption == 'missing':
+            reply['trials'].pop()
+        elif corruption == 'duplicate':
+            reply['trials'].append(reply['trials'][0])
+        else:
+            reply['trials'][0].update(target=None, outcome='failed')
+        return reply
+    selector.engine._query = broken
+    with pytest.raises(ValueError, match='reverse selection comparison'):
+        selector.rerank(ranking, picks)
+    assert selector.engine.sampler.rng is original and original.getstate() == state

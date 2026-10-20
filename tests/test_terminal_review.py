@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from pokesim.search.planner import plan
-from pokesim.search.review import preferred, review, summarize
+from pokesim.search.review import CONTINUATIONS, preferred, review, summarize
 
 
 def evidence():
@@ -26,7 +26,7 @@ def test_review_requires_a_completed_gain_without_a_worse_world_or_opponent_poli
 def test_unfinished_games_do_not_become_losses_and_missing_pairs_are_rejected():
     trials = [{'action': 'move:a', 'world': 0, 'seed': s, 'continuation': c,
                'outcome': 'win', 'target': 1}
-              for s, c in itertools.product([0, 1], ['planned/tactical', 'planned/disrupt', 'planned/expert'])]
+              for s, c in itertools.product([0, 1], CONTINUATIONS)]
     reply = {'informationScope': 'public_observation', 'trials': trials}
     assert summarize(reply, ['move:a'], 1)['complete']
     trials[-1].update(outcome='unfinished', target=None)

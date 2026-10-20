@@ -247,7 +247,7 @@ def test_passer_led_trios_get_full_games_even_when_static_coverage_ranks_them_la
                              _query=query)
     picks = OpponentPicks(['x', 'y', 'z'], [1., 1., 1.], [1., 0., 0.], [(['x', 'y', 'z'], 1.)])
     ranked, info = LineupSearch(sets, engine).rerank(ranking, picks)
-    tested = [[s['species'] for s in team] for team in calls[0]['ours']]
+    tested = [[s['species'] for s in team] for team in calls[-1]['ours']]
     assert sum(trio[0] in {'scolipede', 'umbreon'} for trio in tested) == 20
     assert len(tested) == len({tuple(t) for t in tested})
     assert ranked[0][0] == desired

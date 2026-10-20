@@ -159,7 +159,8 @@ class Advisor:
                                           lostPathPenalty=0, maxTurns=8, valueUtility='reference-material-v2',
                                           priorVisits=4, rootProgress=False, focusTopTwo=False,
                                           terminalReview=True, rootCounterplay=True,
-                                          rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert']},
+                                          rolloutPolicies={'p1': ['expert'], 'p2': ['disrupt', 'tactical', 'expert',
+                                                                                 'counterplay']},
                                           workers=int(os.environ.get('POKESIM_SEARCH_WORKERS', 4)))
             self.planner['search'].update({k: v for k, v in requested.items()
                                           if k not in ('plans', 'continuations', 'tiebreak', 'lostPathPenalty')})

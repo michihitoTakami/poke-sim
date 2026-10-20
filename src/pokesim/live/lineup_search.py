@@ -10,7 +10,7 @@ import numpy as np
 from pokesim.config import FORMAT
 from pokesim.rl.myteam import to_id
 
-VERSION = 'preview-evidence-v6'
+VERSION = 'preview-adversarial-v7'
 POLICIES = ['counterplay', 'disrupt', 'expert']
 
 
@@ -56,9 +56,10 @@ def counterplay_worlds(sampler, picks, limit=4):
 
 
 class LineupSearch:
-    def __init__(self, sets, engine, *, shortlist=4, worlds=4, max_turns=160):
+    def __init__(self, sets, engine, *, shortlist=4, worlds=4, max_turns=160, reverse_worlds=2):
         self.sets, self.engine = sets, engine
         self.shortlist, self.worlds, self.max_turns = shortlist, worlds, max_turns
+        self.reverse_worlds = reverse_worlds
         self.cache = OrderedDict()
 
     def rerank(self, ranking, picks):
@@ -97,7 +98,7 @@ class LineupSearch:
             return ranking, {'version': VERSION, 'skipped': 'less-than-two-candidates'}
         signature = json.dumps([VERSION, POLICIES, getattr(getattr(self.engine.sampler, 'catalog', None), 'sha', None),
                                 self.sets, [r[0] for r in pool], picks.species, picks.lineups,
-                                picks.context, self.worlds, self.max_turns], sort_keys=True)
+                                picks.context, self.worlds, self.max_turns, self.reverse_worlds], sort_keys=True)
         key = hashlib.sha256(signature.encode()).hexdigest()
         if key not in self.cache:
             sampler, saved = self.engine.sampler, self.engine.sampler.rng
@@ -116,6 +117,12 @@ class LineupSearch:
                     worlds.append([joint.get(to_id(s)) or sampler.sample(to_id(s)) for s in trio])
                 stress, tags = counterplay_worlds(sampler, picks)
                 worlds.extend(stress)
+                from pokesim.live.best_response import responses
+
+                reverse, reverse_evidence = responses(self.sets, pool, picks, sampler, self.engine._query,
+                                                      worlds=self.reverse_worlds)
+                worlds.extend(reverse)
+                tags.extend(['best_response'] * len(reverse))
             finally:
                 sampler.rng = saved
             by_id = {to_id(s['species']): s for s in self.sets}
@@ -127,6 +134,7 @@ class LineupSearch:
                 raise ValueError('preview continuation must use public actor observations')
             reply['world_lineups'] = [[s['species'] for s in world] for world in worlds]
             reply['stress_tags'] = tags
+            reply['reverse_selection'] = reverse_evidence
             self.cache[key] = reply
             while len(self.cache) > 64:
                 self.cache.popitem(last=False)
@@ -178,6 +186,7 @@ class LineupSearch:
                 'score_kind': 'public-continuation-with-ladder-evidence', 'calibrated_win_probability': False,
                 'candidates': evidence, 'worlds': len(reply['world_lineups']), 'nominal_worlds': self.worlds,
                 'stress_worlds': reply['stress_tags'], 'opponent_hypotheses': reply['world_lineups'],
+                'reverse_selection': reply['reverse_selection'],
                 'additional_relay_candidates': relay_candidates,
                 'additional_trio_candidates': additional_trios, 'policies': POLICIES,
                 'unknown_outcomes': 'bounds-only; never training loss labels'}

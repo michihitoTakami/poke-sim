@@ -88,7 +88,7 @@ def main():
             ranked, info = selection.rerank(ranking, picks)
             elapsed = time.monotonic() - t
             after._query = original
-            req = captured[0]
+            req = next(r for r in captured if not r['lineupMatches'].get('oursPolicy'))
             atomic_json(out / (stamp + ".request.json"), req)
             old = before._query(req)
             new = selection.cache[next(reversed(selection.cache))]
