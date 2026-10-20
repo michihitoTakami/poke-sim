@@ -244,3 +244,10 @@ expert継続はpublic-baton-v3、計画方策はpublic-plans-v3。鉄壁の必�
 更新時は収集を停止し、`data/processed/observed_sets.json`を退避した上で
 `python -m pokesim.live.observed`を実行する。再戦・イリュージョンの修正を既存データへ反映するため。
 NN重みと15秒予算は維持する。[検証と限界](audits/20261020-status-relay.md)を参照。
+
+### タイプ消失の品質停止修正（2026-10-20）
+
+codec v5はDouble Shock／Burn Up後の`???`を、エンジンのタイプ消失スロットとして保持する。
+v4ではこの状態を拒否し、パーモットが出た試合後に収集が停止した。
+品質停止条件を緩めず、元の5失敗判断の再実行と、単タイプ・複合タイプ・Roostとの組合せを検証した。
+NN・型事前分布・探索設定は維持する。[原因と検証](audits/20261020-type-loss.md)を参照。

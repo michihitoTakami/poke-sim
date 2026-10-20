@@ -1,6 +1,6 @@
 // Simulator reconstruction boundary. Explicit fields carry known/sample state; unknown counters stay sampled.
 const path = require('path');
-const VERSION = 'observed-state-v4';
+const VERSION = 'observed-state-v5';
 
 function createCodec(dir) {
   const { Battle, Teams, Pokemon } = require(path.resolve(dir, 'dist/sim'));
@@ -63,8 +63,10 @@ function createCodec(dir) {
         if (s.types !== undefined) {
           // Restore after Transform/forme/Mega, which can reset the base types. Future real switches and
           // Mega Evolution still use the engine's normal reset rules; this is an observation, not a new set.
+          // Literal ??? is the engine's typeless slot (Burn Up/Double Shock), not an unknown dex type.
           if (i !== 0 || !Array.isArray(s.types) || !s.types.length || s.types.length > 2 ||
-              s.types.some(t => !battle.dex.types.get(t).exists || t === 'Stellar') ||
+              s.types.some(t => typeof t !== 'string' ||
+                (t !== '???' && (!battle.dex.types.get(t).exists || battle.dex.types.get(t).name === 'Stellar'))) ||
               !mon.setType(s.types)) throw new Error('Invalid observed type change');
         }
         // This ability's entry multiplier depends on previous faints. Setup entry ran before the roster was
