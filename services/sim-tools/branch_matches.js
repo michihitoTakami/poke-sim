@@ -14,6 +14,8 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
     throw new Error('unknown branch information scope');
   }
   const net = cfg.policyNets?.ours ? loadPolicyNet(cfg.policyNets.ours) : null;
+  if (cfg.trajectorySample && (!Number.isInteger(cfg.trajectorySample.continuations) ||
+      cfg.trajectorySample.continuations < 1)) throw Error('positive trajectory sample size required');
   if (net && cfg.continuationNetSha && cfg.continuationNetSha !== net.sha) throw Error('continuation policy changed');
   const isPublic = scope === 'public_observation';
   const seeds = cfg.seeds, names = cfg.continuations, maxTurns = cfg.maxTurns;
@@ -74,7 +76,7 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
               const view = observer.view(side);
               const options = legalChoices(view);
               const recommend = (fresh = false) => {
-                if (net && side.id === 'p1') {
+                if (net && side.id === 'p1' && net.supports(view)) {
                   const weights = net.prior(view, battle.dex, options);
                   return options[weights.indexOf(Math.max(...weights))];
                 }
@@ -88,6 +90,7 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
               if (cfg.recordTrajectories !== false) row.trajectory.push({step: decisionStep, side: side.id, phase: view.phase,
                 observation: view, legal: options.map(([, label]) => label), action: selection[1],
                 policyRecommendation: fixedAction !== null ? recommend(true)[1] : selection[1],
+                ...(fixedAction !== null ? {referenceRecommendation: new PlanPolicy().choose(view, battle.dex)[1]} : {}),
                 behavior: policyName, plan: plans[side.id].plan, rootIntervention: decisionStep === 0, target: null});
               return selection[0];
             };
@@ -124,6 +127,14 @@ function evaluateBranches(req, {setUp, choices, step, policy, State, extractChan
           } finally {
             if (isPublic) for (const decision of row.trajectory) {
               decision.target = row.target === null ? null : decision.side === 'p1' ? row.target : 1 - row.target;
+            }
+            if (isPublic && cfg.trajectorySample) {
+              // Select only after the complete game, without consuming battle randomness or changing actions.
+              const root = row.trajectory.filter(d => d.side === 'p1' && d.rootIntervention);
+              const future = row.trajectory.filter(d => d.side === 'p1' && d.phase === 'move' && !d.rootIntervention);
+              const n = Math.min(cfg.trajectorySample.continuations, future.length);
+              const indices = Array.from({length:n}, (_, i) => n === 1 ? 0 : Math.round(i * (future.length - 1) / (n - 1)));
+              row.trajectory = [...root, ...indices.map(i => future[i])];
             }
             row.turns = battle.turn - start;
             battle.destroy();

@@ -32,6 +32,8 @@ class PolicyNet {
     if (data.feature_version !== schema.version) throw Error('policy net was trained on other features');
     this.sha = createHash('sha256').update(text).digest('hex');
     this.head = data.head;
+    this.decisionScope = data.decision_scope || 'all';
+    if (!['all', 'move'].includes(this.decisionScope)) throw Error('unknown policy decision scope');
     this.trunk = data.trunk.map(dense); this.action = data.action.map(dense); this.scorer = data.scorer.map(dense);
     if (this.trunk[0].inp !== schema.state.length || this.action[0].inp !== schema.action.length) {
       throw Error('policy net feature sizes differ from the schema');
@@ -51,7 +53,10 @@ class PolicyNet {
   }
 
   // Probabilities of each legal (choice, label) pair of a view.
+  supports(view) { return this.decisionScope === 'all' || view.phase === 'move'; }
+
   prior(view, dex, legal, temperature = 1) {
+    if (!this.supports(view)) throw Error('policy does not support this decision phase');
     const state = pf.vector(pf.stateFeatures(view, dex), schema.state);
     const actions = legal.map(([choice, label]) => pf.vector(pf.actionFeatures(view, dex, choice, label), schema.action));
     const logits = this.logits(state, actions).map(x => x / temperature);

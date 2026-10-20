@@ -103,6 +103,22 @@ PLAN_MARGIN = 0.1
 PLANNER = {"mode": "shadow", "rho": 0.3, "cloned_weight": OPPONENT_POLICY_WEIGHT, "search": PLANNER_SEARCH}
 
 
+def branch_rollouts(value_model):
+    """The fixed actor/league predicted by a continuation value must also execute its search rollouts."""
+    reference = value_model.version['reference']
+    opponents = []
+    for pair in reference['opponent_pool']:
+        own, opponent = pair.split('/')
+        if own != 'planned' or opponent not in {'tactical', 'disrupt', 'expert', 'counterplay'}:
+            raise ValueError('unsupported branch value rollout contract')
+        if opponent not in opponents:
+            opponents.append(opponent)
+    if not opponents or not reference.get('policy_sha'):
+        raise ValueError('branch value needs a fixed actor and opponent league')
+    return {'rolloutPolicies': {'p1': ['planned'], 'p2': opponents},
+            'rolloutMix': {'ours': 1., 'opp': 0.}, 'rolloutTemperature': {'ours': 0.}, 'rolloutNetTurns': 200}
+
+
 class Advisor:
     def __init__(
         self,
@@ -208,9 +224,7 @@ class Advisor:
         if self.engine and getattr(self.engine.value_model, 'branch_policy', None):
             self.planner['search'].setdefault('policyNets', {})['ours'] = self.engine.value_model.branch_policy
             if self.engine.value_model.version['reference'].get('policy_sha'):
-                self.planner['search'].setdefault('rolloutMix', {})['ours'] = 1.
-                self.planner['search'].setdefault('rolloutTemperature', {})['ours'] = 0.
-                self.planner['search']['rolloutNetTurns'] = 200
+                self.planner['search'].update(branch_rollouts(self.engine.value_model))
         base = self.engine.sampler.base_id if self.engine else (lambda s: s)
         self.own_sets = {base(to_id(s["species"])): s for s in sets}
         self.opponent_policy = None

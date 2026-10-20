@@ -75,6 +75,9 @@ def review(engine, request, matrices, deadline):
     trial['branches'] = {'informationScope': 'public_observation', 'observationLog': request['observationLog'],
         'seeds': [0, 1], 'maxTurns': 120, 'actions': actions, 'recordTrajectories': False, 'livePolicies': True,
         'continuations': CONTINUATIONS}
+    own_policy = request.get('policyNets', {}).get('ours')
+    if own_policy:
+        trial['branches']['policyNets'] = {'ours': own_policy}
     previous = getattr(engine, 'query_timeout', 30.)
     started = time.monotonic()
     try:

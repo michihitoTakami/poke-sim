@@ -31,12 +31,17 @@ LEGACY_CONTINUATIONS = ["planned/tactical", "planned/disrupt", "planned/expert"]
 CONTINUATIONS = [*LEGACY_CONTINUATIONS, "planned/counterplay"]
 
 
-def confident_pairs(trials, actions, minimum_worlds=4):
+def confident_pairs(trials, actions, minimum_worlds=4, world_keys=None):
     """Paired world bootstrap, retaining policy diversity. Seeds within a world are not independent evidence.
 
     A single fortunate crit or one weak opponent controller cannot teach a confident action preference.
     Censored/failed trials and incomplete comparisons produce no preference, rather than a loss label.
     """
+    if world_keys is not None:
+        representatives = {}
+        for world, key in enumerate(world_keys):
+            representatives.setdefault(key, world)
+        trials = [t for t in trials if t['world'] in set(representatives.values())]
     by_action = {a: {} for a in actions}
     for t in trials:
         key = (t['world'], t['seed'], t['continuation'])
@@ -222,12 +227,12 @@ def generate(args):
         engine.close()
 
 
-def examples(out: Path):
+def examples(out: Path, *, include_calibration=True):
     """Position-level action means and non-intervened continuation values, with battle weights."""
     ranks, values, stats, groups = {}, {}, Counter(), {}
     for split in ("train", "development", "calibration"):
         directory = out / split
-        if not (directory / "manifest.json").exists():
+        if (split == 'calibration' and not include_calibration) or not (directory / "manifest.json").exists():
             ranks[split], values[split], groups[split] = [], [], set()
             continue
         manifest = json.loads((directory / "manifest.json").read_text())
@@ -244,7 +249,7 @@ def examples(out: Path):
                 stats["missing_positions"] += 1
                 continue
             result = load_result(path, manifest, case)
-            bid = cfg["battle_ids"][case["file"]]
+            bid = cfg.get('analysis_groups', {}).get(case['file'], cfg["battle_ids"][case["file"]])
             if case["file"] in development_files() and split != "development":
                 raise ValueError("inspected #37 position is outside development")
             groups[split].add(bid)
@@ -262,11 +267,13 @@ def examples(out: Path):
                         "view": obs,
                         "actions": list(by_action),
                         "targets": [float(np.mean([t["target"] for t in ts])) for ts in by_action.values()],
-                        "pair_weights": confident_pairs(trials, list(by_action)),
+                        "pair_weights": confident_pairs(trials, list(by_action), world_keys=[
+                            digest(s) for s in result.get('simulation_request', {}).get('samples', [])] or None),
                         "policy_version": result['result']['policyVersion'],
                         "root_provenance": result.get("root_provenance", {}),
                         "baseline_action": next(
-                            d.get("policyRecommendation") for d in trials[0]["trajectory"] if d["side"] == "p1"
+                            d.get('referenceRecommendation', d.get('policyRecommendation'))
+                            for d in trials[0]["trajectory"] if d["side"] == "p1"
                         ),
                     }
                 )
@@ -299,6 +306,8 @@ def examples(out: Path):
                             "target": d["target"],
                             "weight": 1 / len(ds),
                             "lineage": kind,
+                            'action': d['action'],
+                            'legal': d['legal'],
                         }
                     )
                 stats[kind] += len(ds)
@@ -365,7 +374,11 @@ def train(args):
 
     if args.out.exists():
         raise ValueError("choose a new run directory")
-    ranks, values, counts = examples(args.data)
+    rank_only = getattr(args, 'rank_only', False)
+    if rank_only and args.fixed_policy:
+        raise ValueError('rank-only cannot refresh a fixed policy value')
+    ranks, values, counts = examples(args.data, include_calibration=not (
+        getattr(args, 'defer_calibration', False) or rank_only))
     for split in ("train", "development"):
         if not ranks[split] or not values[split]:
             raise ValueError(f"no complete ranking/continuation-value examples in {split}")
@@ -420,6 +433,32 @@ def train(args):
         mean = np.mean([np.mean([v for v, g in zip(regrets, groups) if g == k]) for k in set(groups)])
         return {"regret": float(mean), "positions": len(rows), "battles": len(set(groups))}, regrets, groups
 
+    distilled = 0
+    if not args.fixed_policy and getattr(args, 'distill_per_group', 0):
+        # Learn the simulated reference actor's own continuation behaviour, never manual root interventions.
+        # A bounded deterministic sample per source group prevents long games from dominating the warm start.
+        by_group = {}
+        for row in values['train']:
+            key = digest([row['view'], row['action']])
+            by_group.setdefault(row['group'], {})[key] = row
+        distilled_rows = []
+        for group in sorted(by_group):
+            for key in sorted(by_group[group])[:args.distill_per_group]:
+                row = by_group[group][key]
+                distilled_rows.append({'view': row['view'], 'actions': row['legal'], 'group': group,
+                                       'label': row['action']})
+        imitation = encode_ranks(distilled_rows)
+        for _ in range(10):
+            for row in imitation:
+                target = torch.tensor([row['actions'].index(row['label'])])
+                loss = nn.functional.cross_entropy(logits(row)[None], target)
+                optimizer.zero_grad()
+                loss.backward()
+                nn.utils.clip_grad_norm_(policy.parameters(), 5.)
+                optimizer.step()
+        distilled = len(imitation)
+        print(f'distilled {distilled} simulated reference states before paired ranking', flush=True)
+
     best, saved, best_epoch = rank_metrics(encoded["development"])[0]["regret"], None, 0
     saved = {k: v.detach().clone() for k, v in policy.state_dict().items()}
     battle_counts = Counter(r["group"] for r in encoded["train"])
@@ -442,6 +481,25 @@ def train(args):
             best, best_epoch = metric, epoch + 1
             saved = {k: v.detach().clone() for k, v in policy.state_dict().items()}
     policy.load_state_dict(saved)
+    args.out.mkdir(parents=True)
+    policy_contract = {
+        'head': 'ours', 'feature_version': VERSION, 'feature_contract': file_hash(SCHEMA),
+        'target': 'terminal-branch-pairwise-ranking', 'continuation': continuations, 'decision_scope': 'move',
+        'teacher': 'complete paired CI90 positive; no policy reversal; minimum 4 distinct sampled worlds',
+        'source_split_sha': file_sha(args.data / 'split.json')}
+    save_checkpoint(args.out / 'ours.pt', policy, policy_contract)
+    export_json(args.out / 'ours.json', policy, policy_contract)
+    if rank_only:
+        report = {'provenance': policy_contract, 'rank': {
+                    'epoch': best_epoch, 'development': rank_metrics(encoded['development'])[0]},
+                  'policy': {'path': 'ours.json', 'sha': file_hash(args.out / 'ours.json')},
+                  'counts': counts, 'policy_distillation': {'states': distilled},
+                  'training_code_sha': tree_sha(ROOT / 'src/pokesim/learn', {'.py'}),
+                  'data': str(args.data.resolve()),
+                  'gate': {'passed': False, 'reason': 'ranking actor only; fixed-policy value and calibration pending'}}
+        atomic_json(args.out / 'report.json', report)
+        print(json.dumps(report['rank']), flush=True)
+        return
     feature_version = getattr(args, 'feature_version', 'observed-value-v1')
     encoder = load_encoder(feature_version, DEX)
     schema = None
@@ -488,18 +546,6 @@ def train(args):
         device="cpu",
         log=lambda s: print(s, flush=True),
     )
-    args.out.mkdir(parents=True)
-    policy_contract = {
-        "head": "ours",
-        "feature_version": VERSION,
-        "feature_contract": file_hash(SCHEMA),
-        "target": "terminal-branch-pairwise-ranking",
-        "continuation": continuations,
-        "teacher": "complete paired-world CI90 positive; no opponent-policy sign reversal; minimum 4 worlds",
-        "source_split_sha": file_sha(args.data / "split.json"),
-    }
-    save_checkpoint(args.out / "ours.pt", policy, policy_contract)
-    export_json(args.out / "ours.json", policy, policy_contract)
     cfg = {
         "target": "terminal_branch_continuation",
         "feature_version": feature_version,
@@ -511,6 +557,9 @@ def train(args):
         "worker_code_sha": tree_sha(ROOT / "services/sim-tools", {".js"}),
         "initial_value_report": file_sha(args.init_value / "report.json") if initial else None,
     }
+    split_meta = json.loads((args.data / 'split.json').read_text())
+    if split_meta.get('curriculum_sha'):
+        cfg['grouped_curriculum_sha'] = split_meta['curriculum_sha']
     if args.fixed_policy:
         # Copy the exact exported actor to preserve its content hash, rather than reserializing it.
         import shutil
@@ -544,6 +593,9 @@ def train(args):
             "development_brier_after": float(np.average((after - dev_data["target"]) ** 2, weights=dev_data["weight"])),
         },
         "counts": counts,
+        'policy_distillation': {'states': distilled, 'per_group': getattr(args, 'distill_per_group', 0),
+                                'source': 'simulated non-intervened reference continuation; not human actions'},
+        'training_code_sha': tree_sha(ROOT / 'src/pokesim/learn', {'.py'}),
         "data": str(args.data.resolve()),
         "gate": {
             "passed": False,
@@ -556,7 +608,8 @@ def train(args):
         new = predict(value, held)
         reference = model_from_config(value.config)
         reference.load_state_dict(reference_state)
-        old = predict(reference, held)
+        references = [reference, *initial.models[1:]] if initial else [reference]
+        old = np.mean([predict(model, held) for model in references], axis=0)
         delta = (new - held["target"]) ** 2 - (old - held["target"]) ** 2
         interval = paired_interval(delta, held["group"], weights=held["weight"])
         rank_score, regret, groups = rank_metrics(encoded["calibration"])
@@ -564,22 +617,32 @@ def train(args):
         rank_interval = paired_interval(np.array(regret) - baseline, groups)
         enough = len(set(groups)) >= 20
         passed = (
-            enough and interval[1] < 0 and np.average(delta, weights=held["weight"]) <= -0.015 and rank_interval[1] < 0
+            initial is not None and enough and interval[1] < 0 and
+            np.average(delta, weights=held["weight"]) <= -0.015 and rank_interval[1] < 0
         )
         report["gate"] = {
-            "passed": bool(passed),
+            "passed": bool(passed and not cfg.get('grouped_curriculum_sha')),
+            'statistical_passed': bool(passed),
+            'pending_policy_crossplay': bool(cfg.get('grouped_curriculum_sha')),
             "calibration_rank": rank_score,
             "value_brier_delta_interval90": interval,
             "rank_regret_delta_interval90": rank_interval,
             "minimum_battles": 20,
             "calibration_battles": len(set(groups)),
-            "reason": "paired battle-level calibration; excludes development and censored branches",
+            'calibration_unit': 'connected opponent/preview group' if cfg.get('grouped_curriculum_sha') else 'battle',
+            'value_baseline': 'incumbent-ensemble' if initial else 'random-initialization; cannot authorize adoption',
+            "reason": "paired source-group historical calibration; excludes development and censored branches",
         }
     atomic_json(args.out / "report.json", report)
     print(json.dumps(report["gate"], ensure_ascii=False, indent=2))
 
 
 def main():
+    import atexit
+
+    import poke_env.concurrency as concurrency
+
+    atexit.unregister(concurrency.__clear_loop)
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate")
@@ -601,6 +664,9 @@ def main():
     fit.add_argument("--fixed-policy", type=Path, help="keep this ranking policy while refreshing its own value")
     fit.add_argument("--epochs", type=int, default=40)
     fit.add_argument("--seed", type=int, default=0)
+    fit.add_argument('--defer-calibration', action='store_true', help='reserve calibration for the final fixed actor')
+    fit.add_argument('--rank-only', action='store_true', help='freeze the actor before generating its value targets')
+    fit.add_argument('--distill-per-group', type=int, default=0, help='reference warm-start states per group')
     fit.add_argument('--feature-version', choices=['observed-value-v1', 'observed-value-sets-v2'],
                      default='observed-value-v1')
     fit.add_argument('--hidden', type=int, default=48)
