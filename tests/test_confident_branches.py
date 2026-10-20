@@ -26,6 +26,8 @@ def test_confident_comparisons_keep_winning_setup_and_reject_a_single_lucky_worl
 
 def test_repeated_chance_seeds_do_not_replace_hidden_world_coverage():
     assert not np.asarray(confident_pairs(trials(1) * 1, ['attack', 'setup'])).any()
+    assert not np.asarray(confident_pairs(trials(), ['attack', 'setup'], world_keys=['same'] * 8)).any()
+    assert np.asarray(confident_pairs(trials(), ['attack', 'setup'], world_keys=list(range(8)))).any()
 
 
 def test_censoring_missing_pairs_and_stronger_opponent_counterplay_cannot_teach_false_certainty():

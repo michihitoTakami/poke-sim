@@ -65,6 +65,9 @@ class ValueEnsemble:
         if not allow_candidate and (not report.get('gate', {}).get('passed') or
                                     not cfg['reference'].get('policy_sha')):
             raise ValueError('branch candidate has not passed the untouched calibration gate')
+        if (not allow_candidate and cfg.get('grouped_curriculum_sha') and
+                not report['gate'].get('policy_crossplay', {}).get('passed')):
+            raise ValueError('grouped curriculum candidate has not beaten its reference continuation')
         feature_version = cfg.get('feature_version', 'observed-value-v1')
         if (cfg['feature_code_sha'] != code_hash(feature_version) or
                 cfg['dex_sha'] != file_hash(DEX) or

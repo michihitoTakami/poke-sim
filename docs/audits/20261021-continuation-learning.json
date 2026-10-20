@@ -1,0 +1,3817 @@
+{
+  "scope": "historical grouped simulator experiment; rejected candidate; no prospective win-rate claim",
+  "baseline_commit": "7def148cf88a93c6940b09180898de57ac3e5d08",
+  "cutoff": "20261021-003620",
+  "cohort": {
+    "version": "grouped-branch-curriculum-v1",
+    "before": "20261021-003620",
+    "seed": 20261021,
+    "cases": [
+      {
+        "file": "20261019-073818-2700711350.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-073818-2700711350.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261018-194247-2700437383.json",
+        "turn": 4,
+        "split": "train"
+      },
+      {
+        "file": "20261018-194247-2700437383.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261019-053438-r90qm9p0mra4grh3ka1113xb1gymyoypw.json",
+        "turn": 10,
+        "split": "train"
+      },
+      {
+        "file": "20261019-053438-r90qm9p0mra4grh3ka1113xb1gymyoypw.json",
+        "turn": 11,
+        "split": "train"
+      },
+      {
+        "file": "20261019-100226-2700764954.json",
+        "turn": 7,
+        "split": "train"
+      },
+      {
+        "file": "20261019-100226-2700764954.json",
+        "turn": 15,
+        "split": "train"
+      },
+      {
+        "file": "20261019-145455-o84no6r0bt4ko5fpfpfiyhj3lfjpfn0pw.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261019-145455-o84no6r0bt4ko5fpfpfiyhj3lfjpfn0pw.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261020-001625-dnma3q76sab61s90rn2t59u6n402soypw.json",
+        "turn": 5,
+        "split": "train"
+      },
+      {
+        "file": "20261020-001625-dnma3q76sab61s90rn2t59u6n402soypw.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261019-041748-2700627563.json",
+        "turn": 6,
+        "split": "train"
+      },
+      {
+        "file": "20261019-041748-2700627563.json",
+        "turn": 17,
+        "split": "train"
+      },
+      {
+        "file": "20261020-153358-2701463463.json",
+        "turn": 12,
+        "split": "train"
+      },
+      {
+        "file": "20261020-153358-2701463463.json",
+        "turn": 6,
+        "split": "train"
+      },
+      {
+        "file": "20261018-103357-he6kgy9nngw82gjinci78i06o4gajdapw.json",
+        "turn": 15,
+        "split": "train"
+      },
+      {
+        "file": "20261018-103357-he6kgy9nngw82gjinci78i06o4gajdapw.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261020-004525-2701082854.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261020-004525-2701082854.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261019-025004-2700590334.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261019-025004-2700590334.json",
+        "turn": 14,
+        "split": "train"
+      },
+      {
+        "file": "20261018-193141-2700434823.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261018-193141-2700434823.json",
+        "turn": 4,
+        "split": "train"
+      },
+      {
+        "file": "20261018-082536-2700236610.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261018-082536-2700236610.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261020-130149-2701420982.json",
+        "turn": 4,
+        "split": "train"
+      },
+      {
+        "file": "20261020-130149-2701420982.json",
+        "turn": 10,
+        "split": "train"
+      },
+      {
+        "file": "20261018-095627-2700268763.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261018-095627-2700268763.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-134545-2700843146.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-134545-2700843146.json",
+        "turn": 4,
+        "split": "train"
+      },
+      {
+        "file": "20261020-235552-2701650796.json",
+        "turn": 7,
+        "split": "train"
+      },
+      {
+        "file": "20261020-235552-2701650796.json",
+        "turn": 6,
+        "split": "train"
+      },
+      {
+        "file": "20261019-114912-2700806092.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-114912-2700806092.json",
+        "turn": 4,
+        "split": "train"
+      },
+      {
+        "file": "20261019-130151-2700829717.json",
+        "turn": 4,
+        "split": "train"
+      },
+      {
+        "file": "20261019-130151-2700829717.json",
+        "turn": 14,
+        "split": "train"
+      },
+      {
+        "file": "20261020-221047-2701597193.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261020-221047-2701597193.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261018-152220-2700374173.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261018-152220-2700374173.json",
+        "turn": 5,
+        "split": "train"
+      },
+      {
+        "file": "20261020-100748-2701356281.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261020-100748-2701356281.json",
+        "turn": 4,
+        "split": "train"
+      },
+      {
+        "file": "20261020-031427-9b4cybxcbbv5rsnbs2r3uv6l1fl5abypw.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261020-031427-9b4cybxcbbv5rsnbs2r3uv6l1fl5abypw.json",
+        "turn": 4,
+        "split": "train"
+      },
+      {
+        "file": "20261018-124108-2700325366.json",
+        "turn": 5,
+        "split": "train"
+      },
+      {
+        "file": "20261018-124108-2700325366.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261019-093240-2700754321.json",
+        "turn": 7,
+        "split": "train"
+      },
+      {
+        "file": "20261019-093240-2700754321.json",
+        "turn": 8,
+        "split": "train"
+      },
+      {
+        "file": "20261019-054208-4tn9teqxiamjea1x0esiwmsb2sku4y9pw.json",
+        "turn": 6,
+        "split": "train"
+      },
+      {
+        "file": "20261019-054208-4tn9teqxiamjea1x0esiwmsb2sku4y9pw.json",
+        "turn": 5,
+        "split": "train"
+      },
+      {
+        "file": "20261020-004922-3xo2m8yl5k46ljtm1yw3go668hrcspvpw.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261020-004922-3xo2m8yl5k46ljtm1yw3go668hrcspvpw.json",
+        "turn": 6,
+        "split": "train"
+      },
+      {
+        "file": "20261018-190628-2700427828.json",
+        "turn": 18,
+        "split": "train"
+      },
+      {
+        "file": "20261018-190628-2700427828.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-090631-g61r611kbv7u9ewu6c96e3kmyr3evvopw.json",
+        "turn": 7,
+        "split": "train"
+      },
+      {
+        "file": "20261019-090631-g61r611kbv7u9ewu6c96e3kmyr3evvopw.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-132257-2700836435.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261019-132257-2700836435.json",
+        "turn": 9,
+        "split": "train"
+      },
+      {
+        "file": "20261019-043207-71c4dq9qfcur4qm822b41190bppw270pw.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-043207-71c4dq9qfcur4qm822b41190bppw270pw.json",
+        "turn": 5,
+        "split": "train"
+      },
+      {
+        "file": "20261020-190213-2701526261.json",
+        "turn": 7,
+        "split": "train"
+      },
+      {
+        "file": "20261020-190213-2701526261.json",
+        "turn": 9,
+        "split": "train"
+      },
+      {
+        "file": "20261020-222441-2701602513.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261020-222441-2701602513.json",
+        "turn": 9,
+        "split": "train"
+      },
+      {
+        "file": "20261020-005425-5y31emrahasxucekhkehfebqw8j5nhtpw.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261020-005425-5y31emrahasxucekhkehfebqw8j5nhtpw.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261020-130940-wywc2io10228uvsrvmy0uvabinqdu5cpw.json",
+        "turn": 14,
+        "split": "train"
+      },
+      {
+        "file": "20261020-130940-wywc2io10228uvsrvmy0uvabinqdu5cpw.json",
+        "turn": 15,
+        "split": "train"
+      },
+      {
+        "file": "20261020-004152-2701081581.json",
+        "turn": 8,
+        "split": "train"
+      },
+      {
+        "file": "20261020-004152-2701081581.json",
+        "turn": 7,
+        "split": "train"
+      },
+      {
+        "file": "20261020-024109-2701147124.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261020-024109-2701147124.json",
+        "turn": 8,
+        "split": "train"
+      },
+      {
+        "file": "20261019-053754-2700662302.json",
+        "turn": 6,
+        "split": "train"
+      },
+      {
+        "file": "20261019-053754-2700662302.json",
+        "turn": 8,
+        "split": "train"
+      },
+      {
+        "file": "20261020-003859-2701079265.json",
+        "turn": 7,
+        "split": "train"
+      },
+      {
+        "file": "20261020-003859-2701079265.json",
+        "turn": 10,
+        "split": "train"
+      },
+      {
+        "file": "20261019-231100-w7wqd1vgfovuey0agb0ibqyvih0jt54pw.json",
+        "turn": 8,
+        "split": "train"
+      },
+      {
+        "file": "20261019-231100-w7wqd1vgfovuey0agb0ibqyvih0jt54pw.json",
+        "turn": 5,
+        "split": "train"
+      },
+      {
+        "file": "20261019-095046-2700760393.json",
+        "turn": 8,
+        "split": "train"
+      },
+      {
+        "file": "20261019-095046-2700760393.json",
+        "turn": 12,
+        "split": "train"
+      },
+      {
+        "file": "20261019-131645-ojtju2of6839es1bvk6y252cfck7p4ypw.json",
+        "turn": 10,
+        "split": "train"
+      },
+      {
+        "file": "20261019-131645-ojtju2of6839es1bvk6y252cfck7p4ypw.json",
+        "turn": 28,
+        "split": "train"
+      },
+      {
+        "file": "20261018-091302-2700253474.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261018-091302-2700253474.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-230027-2701027561.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261019-230027-2701027561.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261020-022626-2701138000.json",
+        "turn": 5,
+        "split": "train"
+      },
+      {
+        "file": "20261020-022626-2701138000.json",
+        "turn": 10,
+        "split": "train"
+      },
+      {
+        "file": "20261019-101040-2700767949.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261019-101040-2700767949.json",
+        "turn": 14,
+        "split": "train"
+      },
+      {
+        "file": "20261018-183026-2700419323.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261018-183026-2700419323.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261020-170208-2701488642.json",
+        "turn": 6,
+        "split": "train"
+      },
+      {
+        "file": "20261020-170208-2701488642.json",
+        "turn": 7,
+        "split": "train"
+      },
+      {
+        "file": "20261020-232112-2701632156.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261020-232112-2701632156.json",
+        "turn": 3,
+        "split": "train"
+      },
+      {
+        "file": "20261019-065419-2700694574.json",
+        "turn": 1,
+        "split": "train"
+      },
+      {
+        "file": "20261019-065419-2700694574.json",
+        "turn": 2,
+        "split": "train"
+      },
+      {
+        "file": "20261020-204932-2701564077.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261020-204932-2701564077.json",
+        "turn": 6,
+        "split": "development"
+      },
+      {
+        "file": "20261019-045307-2700643354.json",
+        "turn": 10,
+        "split": "development"
+      },
+      {
+        "file": "20261019-045307-2700643354.json",
+        "turn": 8,
+        "split": "development"
+      },
+      {
+        "file": "20261018-081916-2700233703.json",
+        "turn": 13,
+        "split": "development"
+      },
+      {
+        "file": "20261018-081916-2700233703.json",
+        "turn": 11,
+        "split": "development"
+      },
+      {
+        "file": "20261020-165643-ulp0hd8nkv94mgfgamg9giq861xp9cnpw.json",
+        "turn": 3,
+        "split": "development"
+      },
+      {
+        "file": "20261020-165643-ulp0hd8nkv94mgfgamg9giq861xp9cnpw.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261019-100549-2700766806.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261019-100549-2700766806.json",
+        "turn": 5,
+        "split": "development"
+      },
+      {
+        "file": "20261020-045542-salr734lx4wagfbnc7t48xa94thhje5pw.json",
+        "turn": 27,
+        "split": "development"
+      },
+      {
+        "file": "20261020-045542-salr734lx4wagfbnc7t48xa94thhje5pw.json",
+        "turn": 4,
+        "split": "development"
+      },
+      {
+        "file": "20261019-033149-2700606512.json",
+        "turn": 4,
+        "split": "development"
+      },
+      {
+        "file": "20261019-033149-2700606512.json",
+        "turn": 12,
+        "split": "development"
+      },
+      {
+        "file": "20261018-093050-2700259608.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261018-093050-2700259608.json",
+        "turn": 6,
+        "split": "development"
+      },
+      {
+        "file": "20261020-044057-7bk5co46wi7db29f1lmh97rwkmk9t7ppw.json",
+        "turn": 5,
+        "split": "development"
+      },
+      {
+        "file": "20261020-044057-7bk5co46wi7db29f1lmh97rwkmk9t7ppw.json",
+        "turn": 3,
+        "split": "development"
+      },
+      {
+        "file": "20261020-142055-2701444168.json",
+        "turn": 9,
+        "split": "development"
+      },
+      {
+        "file": "20261020-142055-2701444168.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261018-104058-2700283899.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261018-104058-2700283899.json",
+        "turn": 5,
+        "split": "development"
+      },
+      {
+        "file": "20261019-040752-2700623208.json",
+        "turn": 16,
+        "split": "development"
+      },
+      {
+        "file": "20261019-040752-2700623208.json",
+        "turn": 15,
+        "split": "development"
+      },
+      {
+        "file": "20261020-142705-2701445648.json",
+        "turn": 11,
+        "split": "development"
+      },
+      {
+        "file": "20261020-142705-2701445648.json",
+        "turn": 4,
+        "split": "development"
+      },
+      {
+        "file": "20261018-110317-2700291496.json",
+        "turn": 19,
+        "split": "development"
+      },
+      {
+        "file": "20261018-110317-2700291496.json",
+        "turn": 22,
+        "split": "development"
+      },
+      {
+        "file": "20261020-020007-2701124307.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261020-020007-2701124307.json",
+        "turn": 2,
+        "split": "development"
+      },
+      {
+        "file": "20261020-044313-2701213910.json",
+        "turn": 2,
+        "split": "development"
+      },
+      {
+        "file": "20261020-044313-2701213910.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261018-095338-2700267584.json",
+        "turn": 3,
+        "split": "development"
+      },
+      {
+        "file": "20261018-095338-2700267584.json",
+        "turn": 4,
+        "split": "development"
+      },
+      {
+        "file": "20261020-122916-2701408635.json",
+        "turn": 6,
+        "split": "development"
+      },
+      {
+        "file": "20261020-122916-2701408635.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261018-085728-2700247592.json",
+        "turn": 1,
+        "split": "development"
+      },
+      {
+        "file": "20261018-085728-2700247592.json",
+        "turn": 9,
+        "split": "development"
+      },
+      {
+        "file": "20261019-092108-2700750116.json",
+        "turn": 7,
+        "split": "development"
+      },
+      {
+        "file": "20261019-092108-2700750116.json",
+        "turn": 6,
+        "split": "development"
+      },
+      {
+        "file": "20261020-210950-y03l4pfr5m7ohtdapri7fubge62gt9jpw.json",
+        "turn": 8,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-210950-y03l4pfr5m7ohtdapri7fubge62gt9jpw.json",
+        "turn": 11,
+        "split": "calibration"
+      },
+      {
+        "file": "20261018-163258-2700390584.json",
+        "turn": 6,
+        "split": "calibration"
+      },
+      {
+        "file": "20261018-163258-2700390584.json",
+        "turn": 7,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-042341-2700631284.json",
+        "turn": 1,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-042341-2700631284.json",
+        "turn": 5,
+        "split": "calibration"
+      },
+      {
+        "file": "20261018-191829-2700430905.json",
+        "turn": 1,
+        "split": "calibration"
+      },
+      {
+        "file": "20261018-191829-2700430905.json",
+        "turn": 4,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-134627-7o4h69ao3my6xexaxn97uh436wfu99ypw.json",
+        "turn": 4,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-134627-7o4h69ao3my6xexaxn97uh436wfu99ypw.json",
+        "turn": 5,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-172539-2701495687.json",
+        "turn": 10,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-172539-2701495687.json",
+        "turn": 8,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-000513-2701062068.json",
+        "turn": 10,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-000513-2701062068.json",
+        "turn": 6,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-212816-2701576700.json",
+        "turn": 25,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-212816-2701576700.json",
+        "turn": 24,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-110642-2700790047.json",
+        "turn": 4,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-110642-2700790047.json",
+        "turn": 6,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-103242-2700776530.json",
+        "turn": 12,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-103242-2700776530.json",
+        "turn": 9,
+        "split": "calibration"
+      },
+      {
+        "file": "20261018-183511-2700419913.json",
+        "turn": 4,
+        "split": "calibration"
+      },
+      {
+        "file": "20261018-183511-2700419913.json",
+        "turn": 1,
+        "split": "calibration"
+      },
+      {
+        "file": "20261018-182740-2700418356.json",
+        "turn": 1,
+        "split": "calibration"
+      },
+      {
+        "file": "20261018-182740-2700418356.json",
+        "turn": 10,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-034811-2701182164.json",
+        "turn": 10,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-034811-2701182164.json",
+        "turn": 8,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-044724-2700640485.json",
+        "turn": 12,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-044724-2700640485.json",
+        "turn": 1,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-013843-2701113502.json",
+        "turn": 1,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-235235-2701054963.json",
+        "turn": 7,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-235235-2701054963.json",
+        "turn": 2,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-220257-2701591184.json",
+        "turn": 16,
+        "split": "calibration"
+      },
+      {
+        "file": "20261020-220257-2701591184.json",
+        "turn": 10,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-134949-2700843864.json",
+        "turn": 6,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-134949-2700843864.json",
+        "turn": 4,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-144630-6hgpupedev4mscixolhprftj80le2p4pw.json",
+        "turn": 6,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-144630-6hgpupedev4mscixolhprftj80le2p4pw.json",
+        "turn": 1,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-051124-0lyxs5ux4eq9gol1tikvjkk55u7klekpw.json",
+        "turn": 16,
+        "split": "calibration"
+      },
+      {
+        "file": "20261019-051124-0lyxs5ux4eq9gol1tikvjkk55u7klekpw.json",
+        "turn": 2,
+        "split": "calibration"
+      }
+    ],
+    "analysis_groups": {
+      "20261019-073818-2700711350.json": "55ec7b4d60f3c109c074",
+      "20261018-194247-2700437383.json": "1f0cd99f873a601b2eaa",
+      "20261019-053438-r90qm9p0mra4grh3ka1113xb1gymyoypw.json": "01a9c53153e5566ef8cf",
+      "20261019-100226-2700764954.json": "b20d9702a06e31a20edc",
+      "20261019-145455-o84no6r0bt4ko5fpfpfiyhj3lfjpfn0pw.json": "5d25f3417768fe8a3bf8",
+      "20261020-001625-dnma3q76sab61s90rn2t59u6n402soypw.json": "943631cd55c7e03851f9",
+      "20261019-041748-2700627563.json": "fb98dea1408da216e51d",
+      "20261020-153358-2701463463.json": "65deceeb129895c7f77d",
+      "20261018-103357-he6kgy9nngw82gjinci78i06o4gajdapw.json": "aaf7432354a8fce0764e",
+      "20261020-004525-2701082854.json": "01c923dce5c0da35b535",
+      "20261019-025004-2700590334.json": "7215e16679c3e4c5d182",
+      "20261018-193141-2700434823.json": "58164e424395a862f223",
+      "20261018-082536-2700236610.json": "bd435a57c97e148221d4",
+      "20261020-130149-2701420982.json": "fc146289d60e6bf7ffc4",
+      "20261018-095627-2700268763.json": "cc04b4741174b00cda91",
+      "20261019-134545-2700843146.json": "575205729b4d0d1c7e3f",
+      "20261020-235552-2701650796.json": "09f522f5145f436bd05a",
+      "20261019-114912-2700806092.json": "06892cca8b483a07a554",
+      "20261019-130151-2700829717.json": "47856750ea43d1f389ff",
+      "20261020-221047-2701597193.json": "66e1ec0fdebcc15d8fc2",
+      "20261018-152220-2700374173.json": "50ba8f4342ee31536fcf",
+      "20261020-100748-2701356281.json": "370f22ea0d34de9ccd33",
+      "20261020-031427-9b4cybxcbbv5rsnbs2r3uv6l1fl5abypw.json": "a4f6489337f261a5fdc0",
+      "20261018-124108-2700325366.json": "629ff7c6f24f225a79e7",
+      "20261019-093240-2700754321.json": "3698ebc79816eaaa549c",
+      "20261019-054208-4tn9teqxiamjea1x0esiwmsb2sku4y9pw.json": "9b3152cf9054ba858735",
+      "20261020-004922-3xo2m8yl5k46ljtm1yw3go668hrcspvpw.json": "ec1d4897e4ca78ee96b7",
+      "20261018-190628-2700427828.json": "34515ccc22b4cdc635cf",
+      "20261019-090631-g61r611kbv7u9ewu6c96e3kmyr3evvopw.json": "1403078fd586a08e10b1",
+      "20261019-132257-2700836435.json": "310adb9d9490bd62a035",
+      "20261019-043207-71c4dq9qfcur4qm822b41190bppw270pw.json": "4d67173d7c117c99491a",
+      "20261020-190213-2701526261.json": "1d5cbe623bf8ab96ca7a",
+      "20261020-222441-2701602513.json": "981c2416423b41341254",
+      "20261020-005425-5y31emrahasxucekhkehfebqw8j5nhtpw.json": "18b4ef97e15450f5cfb0",
+      "20261020-130940-wywc2io10228uvsrvmy0uvabinqdu5cpw.json": "b22fae5f2f9d27cdbc59",
+      "20261020-004152-2701081581.json": "7b39490aed62a9bf8520",
+      "20261020-024109-2701147124.json": "3c05ac0298d888fff36e",
+      "20261019-053754-2700662302.json": "1583cd82a28ab550d7fa",
+      "20261020-003859-2701079265.json": "7c0555acec20181ddb93",
+      "20261019-231100-w7wqd1vgfovuey0agb0ibqyvih0jt54pw.json": "4488fcad666621dee1c7",
+      "20261019-095046-2700760393.json": "0c8afbb3d9acf5a94608",
+      "20261019-131645-ojtju2of6839es1bvk6y252cfck7p4ypw.json": "4aa9723e0c9c22612e1a",
+      "20261018-091302-2700253474.json": "1c88ecfd42a5057f5b25",
+      "20261019-230027-2701027561.json": "949f6c07fb3b43618ee6",
+      "20261020-022626-2701138000.json": "9ca7a87dd0558decead2",
+      "20261019-101040-2700767949.json": "088a57f660c1b50e0f95",
+      "20261018-183026-2700419323.json": "cebb174a9894f4eef247",
+      "20261020-170208-2701488642.json": "5151db2ee6f578c46649",
+      "20261020-232112-2701632156.json": "7e5bf5222ff9d4538032",
+      "20261019-065419-2700694574.json": "22018395a4ca6fbf0113",
+      "20261020-204932-2701564077.json": "100cff4f2b696017dbcf",
+      "20261019-045307-2700643354.json": "9c2cc600b866dc1da98b",
+      "20261018-081916-2700233703.json": "18b470e6e2015489b22b",
+      "20261020-165643-ulp0hd8nkv94mgfgamg9giq861xp9cnpw.json": "86766b7b82769c731c91",
+      "20261019-100549-2700766806.json": "85a0cff8c21532d8b4aa",
+      "20261020-045542-salr734lx4wagfbnc7t48xa94thhje5pw.json": "82227adf8bbc60061f07",
+      "20261019-033149-2700606512.json": "3b6c45af3ab908da6ba2",
+      "20261018-093050-2700259608.json": "60ba611008519cdcf6d3",
+      "20261020-044057-7bk5co46wi7db29f1lmh97rwkmk9t7ppw.json": "d0baea6baec046abd7b4",
+      "20261020-142055-2701444168.json": "2c45b8045501af08d7bb",
+      "20261018-104058-2700283899.json": "cd0223a513053b717c75",
+      "20261019-040752-2700623208.json": "8062fa746b5585eb264d",
+      "20261020-142705-2701445648.json": "0a148fc45cc137628ef6",
+      "20261018-110317-2700291496.json": "cbd8a6a151a388a5fc05",
+      "20261020-020007-2701124307.json": "3dd25d6d43b7941eae68",
+      "20261020-044313-2701213910.json": "8338c6c0432ceaa7ef63",
+      "20261018-095338-2700267584.json": "068ab156f70ca4c6e6a4",
+      "20261020-122916-2701408635.json": "d769dd065d81af950feb",
+      "20261018-085728-2700247592.json": "db9cf846c68dc6a63feb",
+      "20261019-092108-2700750116.json": "9d83cab373e8328b5d56",
+      "20261020-210950-y03l4pfr5m7ohtdapri7fubge62gt9jpw.json": "a19fe89f6d19cee7fe37",
+      "20261018-163258-2700390584.json": "1abcbca4b0d5d8e69fd0",
+      "20261019-042341-2700631284.json": "f43f27a3c5a51bfb8515",
+      "20261018-191829-2700430905.json": "092c15e9dfbb6ac08420",
+      "20261020-134627-7o4h69ao3my6xexaxn97uh436wfu99ypw.json": "8f32394b68bfa8ec8692",
+      "20261020-172539-2701495687.json": "de55a32d567b7ea07029",
+      "20261020-000513-2701062068.json": "2d63b55db1195ee20557",
+      "20261020-212816-2701576700.json": "e6b494834c996859c516",
+      "20261019-110642-2700790047.json": "e0b92f437f2dab8b42bc",
+      "20261019-103242-2700776530.json": "a26e1a32a0dd48800b37",
+      "20261018-183511-2700419913.json": "c19c3eacbfcefc1a0cd4",
+      "20261018-182740-2700418356.json": "2581598d19694f9fee95",
+      "20261020-034811-2701182164.json": "d96b5c80476c4bb46e78",
+      "20261019-044724-2700640485.json": "cbbe1e7dee0fe4a14b74",
+      "20261020-013843-2701113502.json": "f5df26dae4c84dc04b13",
+      "20261019-235235-2701054963.json": "9df5d16a95724609b93c",
+      "20261020-220257-2701591184.json": "c1e58aa8be3b1555500e",
+      "20261019-134949-2700843864.json": "061800d4a869f762ee9b",
+      "20261019-144630-6hgpupedev4mscixolhprftj80le2p4pw.json": "13b4dda9bd0c8bce1ba5",
+      "20261019-051124-0lyxs5ux4eq9gol1tikvjkk55u7klekpw.json": "b78f5079df0d96424c44"
+    },
+    "group_splits": {
+      "55ec7b4d60f3c109c074": "train",
+      "1f0cd99f873a601b2eaa": "train",
+      "01a9c53153e5566ef8cf": "train",
+      "b20d9702a06e31a20edc": "train",
+      "5d25f3417768fe8a3bf8": "train",
+      "943631cd55c7e03851f9": "train",
+      "fb98dea1408da216e51d": "train",
+      "65deceeb129895c7f77d": "train",
+      "aaf7432354a8fce0764e": "train",
+      "01c923dce5c0da35b535": "train",
+      "7215e16679c3e4c5d182": "train",
+      "58164e424395a862f223": "train",
+      "bd435a57c97e148221d4": "train",
+      "fc146289d60e6bf7ffc4": "train",
+      "cc04b4741174b00cda91": "train",
+      "575205729b4d0d1c7e3f": "train",
+      "09f522f5145f436bd05a": "train",
+      "06892cca8b483a07a554": "train",
+      "47856750ea43d1f389ff": "train",
+      "66e1ec0fdebcc15d8fc2": "train",
+      "50ba8f4342ee31536fcf": "train",
+      "370f22ea0d34de9ccd33": "train",
+      "a4f6489337f261a5fdc0": "train",
+      "629ff7c6f24f225a79e7": "train",
+      "3698ebc79816eaaa549c": "train",
+      "9b3152cf9054ba858735": "train",
+      "ec1d4897e4ca78ee96b7": "train",
+      "34515ccc22b4cdc635cf": "train",
+      "1403078fd586a08e10b1": "train",
+      "310adb9d9490bd62a035": "train",
+      "4d67173d7c117c99491a": "train",
+      "1d5cbe623bf8ab96ca7a": "train",
+      "981c2416423b41341254": "train",
+      "18b4ef97e15450f5cfb0": "train",
+      "b22fae5f2f9d27cdbc59": "train",
+      "7b39490aed62a9bf8520": "train",
+      "3c05ac0298d888fff36e": "train",
+      "1583cd82a28ab550d7fa": "train",
+      "7c0555acec20181ddb93": "train",
+      "4488fcad666621dee1c7": "train",
+      "0c8afbb3d9acf5a94608": "train",
+      "4aa9723e0c9c22612e1a": "train",
+      "1c88ecfd42a5057f5b25": "train",
+      "949f6c07fb3b43618ee6": "train",
+      "9ca7a87dd0558decead2": "train",
+      "088a57f660c1b50e0f95": "train",
+      "cebb174a9894f4eef247": "train",
+      "5151db2ee6f578c46649": "train",
+      "7e5bf5222ff9d4538032": "train",
+      "22018395a4ca6fbf0113": "train",
+      "100cff4f2b696017dbcf": "development",
+      "9c2cc600b866dc1da98b": "development",
+      "18b470e6e2015489b22b": "development",
+      "86766b7b82769c731c91": "development",
+      "85a0cff8c21532d8b4aa": "development",
+      "82227adf8bbc60061f07": "development",
+      "3b6c45af3ab908da6ba2": "development",
+      "60ba611008519cdcf6d3": "development",
+      "d0baea6baec046abd7b4": "development",
+      "2c45b8045501af08d7bb": "development",
+      "cd0223a513053b717c75": "development",
+      "8062fa746b5585eb264d": "development",
+      "0a148fc45cc137628ef6": "development",
+      "cbd8a6a151a388a5fc05": "development",
+      "3dd25d6d43b7941eae68": "development",
+      "8338c6c0432ceaa7ef63": "development",
+      "068ab156f70ca4c6e6a4": "development",
+      "d769dd065d81af950feb": "development",
+      "db9cf846c68dc6a63feb": "development",
+      "9d83cab373e8328b5d56": "development",
+      "a19fe89f6d19cee7fe37": "calibration",
+      "1abcbca4b0d5d8e69fd0": "calibration",
+      "f43f27a3c5a51bfb8515": "calibration",
+      "092c15e9dfbb6ac08420": "calibration",
+      "8f32394b68bfa8ec8692": "calibration",
+      "de55a32d567b7ea07029": "calibration",
+      "2d63b55db1195ee20557": "calibration",
+      "e6b494834c996859c516": "calibration",
+      "e0b92f437f2dab8b42bc": "calibration",
+      "a26e1a32a0dd48800b37": "calibration",
+      "c19c3eacbfcefc1a0cd4": "calibration",
+      "2581598d19694f9fee95": "calibration",
+      "d96b5c80476c4bb46e78": "calibration",
+      "cbbe1e7dee0fe4a14b74": "calibration",
+      "f5df26dae4c84dc04b13": "calibration",
+      "9df5d16a95724609b93c": "calibration",
+      "c1e58aa8be3b1555500e": "calibration",
+      "061800d4a869f762ee9b": "calibration",
+      "13b4dda9bd0c8bce1ba5": "calibration",
+      "b78f5079df0d96424c44": "calibration"
+    },
+    "connected_members": {
+      "82227adf8bbc60061f07": [
+        "20261018-062554-luuvp3c2vwiggfi8agmf2elhuf9y2ympw.json",
+        "20261019-083647-trrrcays73jx9ah1u2csbep6ifqwqpipw.json",
+        "20261019-091148-u2b78sc43o5nneeueof0etyh5ef11bmpw.json",
+        "20261019-091834-u7ot29kiqitm6ixyla5nspes79k62dopw.json",
+        "20261019-122334-2logsrpu3rb9fyxacdl8yrn4vtdo3jvpw.json",
+        "20261020-045542-salr734lx4wagfbnc7t48xa94thhje5pw.json"
+      ],
+      "629ff7c6f24f225a79e7": [
+        "20261018-062929-2700191467.json",
+        "20261018-090149-2700249342.json",
+        "20261018-091101-2700252896.json",
+        "20261018-124108-2700325366.json",
+        "20261018-195353-imokh98s2tunl34td3d0d8sr17cjgo8pw.json",
+        "20261019-042059-2700630016.json",
+        "20261019-042606-2700632132.json"
+      ],
+      "5151db2ee6f578c46649": [
+        "20261018-075625-2700225092.json",
+        "20261020-050025-2701221694.json",
+        "20261020-170208-2701488642.json"
+      ],
+      "d0baea6baec046abd7b4": [
+        "20261018-081400-s8obl6f8clf4q3g7hlw27dsdkwtrkpppw.json",
+        "20261020-040634-2lracw1gccrlud6vnib24kl5mtxdhwipw.json",
+        "20261020-042043-7aq6nrwtl90ojnc0wro3rcn8gu22h6rpw.json",
+        "20261020-044057-7bk5co46wi7db29f1lmh97rwkmk9t7ppw.json"
+      ],
+      "18b470e6e2015489b22b": [
+        "20261018-081916-2700233703.json"
+      ],
+      "bd435a57c97e148221d4": [
+        "20261018-082536-2700236610.json",
+        "20261018-083041-2700238162.json",
+        "20261018-085304-2700246064.json",
+        "20261018-091643-2700254334.json",
+        "20261019-094451-2700758545.json"
+      ],
+      "db9cf846c68dc6a63feb": [
+        "20261018-085728-2700247592.json"
+      ],
+      "1c88ecfd42a5057f5b25": [
+        "20261018-091302-2700253474.json"
+      ],
+      "60ba611008519cdcf6d3": [
+        "20261018-092050-2700255883.json",
+        "20261018-093050-2700259608.json",
+        "20261018-124325-2700327728.json"
+      ],
+      "068ab156f70ca4c6e6a4": [
+        "20261018-095338-2700267584.json"
+      ],
+      "cc04b4741174b00cda91": [
+        "20261018-095627-2700268763.json"
+      ],
+      "f5df26dae4c84dc04b13": [
+        "20261018-100122-2700270482.json",
+        "20261020-013843-2701113502.json"
+      ],
+      "aaf7432354a8fce0764e": [
+        "20261018-103357-he6kgy9nngw82gjinci78i06o4gajdapw.json",
+        "20261019-074750-fis9yls2k540panwg4hcd2h6sduashopw.json",
+        "20261019-075651-bqboyfllkg9ku6hjjja8krk6bfnsopepw.json"
+      ],
+      "cd0223a513053b717c75": [
+        "20261018-104058-2700283899.json"
+      ],
+      "cbd8a6a151a388a5fc05": [
+        "20261018-105439-2700289496.json",
+        "20261018-110317-2700291496.json"
+      ],
+      "e6b494834c996859c516": [
+        "20261018-125638-2700331477.json",
+        "20261018-132004-2700339148.json",
+        "20261020-212816-2701576700.json"
+      ],
+      "a19fe89f6d19cee7fe37": [
+        "20261018-131157-u4t6gei1vms0e40mp8vbhvahfnx2g8tpw.json",
+        "20261020-210950-y03l4pfr5m7ohtdapri7fubge62gt9jpw.json"
+      ],
+      "50ba8f4342ee31536fcf": [
+        "20261018-141033-2700354637.json",
+        "20261018-152220-2700374173.json",
+        "20261019-074043-2700712443.json"
+      ],
+      "100cff4f2b696017dbcf": [
+        "20261018-150354-jppfgh8apmno4v87wlj88gg843inw3fpw.json",
+        "20261018-200454-2700442640.json",
+        "20261019-115650-30pmxmf2yb66fma19xyolwh1oqu31gspw.json",
+        "20261019-132851-n9paf0o7b19trs75tnt1rknoh839ebkpw.json",
+        "20261020-125354-7opb9hdbovbwo6xl16rgmnq8lmtmr82pw.json",
+        "20261020-154428-2701465116.json",
+        "20261020-183051-mwwxb2mdbwnxmmx2cm1te2bl37lbjc3pw.json",
+        "20261020-203112-2701556641.json",
+        "20261020-203354-2701558291.json",
+        "20261020-204932-2701564077.json"
+      ],
+      "310adb9d9490bd62a035": [
+        "20261018-151006-2700370716.json",
+        "20261019-132257-2700836435.json"
+      ],
+      "1abcbca4b0d5d8e69fd0": [
+        "20261018-163258-2700390584.json"
+      ],
+      "f43f27a3c5a51bfb8515": [
+        "20261018-165420-2700395648.json",
+        "20261018-190954-2700428798.json",
+        "20261018-191358-2700430261.json",
+        "20261018-195701-2700440956.json",
+        "20261019-042341-2700631284.json"
+      ],
+      "cebb174a9894f4eef247": [
+        "20261018-180740-2700413547.json",
+        "20261018-183026-2700419323.json"
+      ],
+      "34515ccc22b4cdc635cf": [
+        "20261018-181659-2700415739.json",
+        "20261018-190628-2700427828.json"
+      ],
+      "2581598d19694f9fee95": [
+        "20261018-182740-2700418356.json",
+        "20261020-211706-2701574402.json"
+      ],
+      "c19c3eacbfcefc1a0cd4": [
+        "20261018-183511-2700419913.json"
+      ],
+      "092c15e9dfbb6ac08420": [
+        "20261018-191829-2700430905.json"
+      ],
+      "1f0cd99f873a601b2eaa": [
+        "20261018-192950-2700431852.json",
+        "20261018-194247-2700437383.json",
+        "20261018-194942-2700438858.json"
+      ],
+      "58164e424395a862f223": [
+        "20261018-193141-2700434823.json",
+        "20261019-030945-2700598504.json",
+        "20261020-132040-2701427328.json",
+        "20261020-134332-2701433893.json",
+        "20261020-223050-2701606415.json",
+        "20261020-225334-2701617767.json"
+      ],
+      "7215e16679c3e4c5d182": [
+        "20261019-025004-2700590334.json"
+      ],
+      "3b6c45af3ab908da6ba2": [
+        "20261019-033149-2700606512.json"
+      ],
+      "8062fa746b5585eb264d": [
+        "20261019-040752-2700623208.json"
+      ],
+      "fb98dea1408da216e51d": [
+        "20261019-041748-2700627563.json"
+      ],
+      "4d67173d7c117c99491a": [
+        "20261019-043207-71c4dq9qfcur4qm822b41190bppw270pw.json"
+      ],
+      "cbbe1e7dee0fe4a14b74": [
+        "20261019-044724-2700640485.json",
+        "20261019-234830-2701053562.json"
+      ],
+      "9c2cc600b866dc1da98b": [
+        "20261019-045307-2700643354.json"
+      ],
+      "b78f5079df0d96424c44": [
+        "20261019-050137-yhs929xgey8a7qw153sofej3r1fw1e7pw.json",
+        "20261019-051124-0lyxs5ux4eq9gol1tikvjkk55u7klekpw.json"
+      ],
+      "9d83cab373e8328b5d56": [
+        "20261019-050650-2700649671.json",
+        "20261019-051810-2700653651.json",
+        "20261019-053110-2700659555.json",
+        "20261019-081639-2700726024.json",
+        "20261019-084633-2700737037.json",
+        "20261019-085338-2700739839.json",
+        "20261019-091501-2700747836.json",
+        "20261019-092108-2700750116.json"
+      ],
+      "01a9c53153e5566ef8cf": [
+        "20261019-053438-r90qm9p0mra4grh3ka1113xb1gymyoypw.json"
+      ],
+      "1583cd82a28ab550d7fa": [
+        "20261019-053754-2700662302.json"
+      ],
+      "9b3152cf9054ba858735": [
+        "20261019-054208-4tn9teqxiamjea1x0esiwmsb2sku4y9pw.json",
+        "20261019-061322-yywwscmoef4lxkye0o43lj4hy2firl3pw.json"
+      ],
+      "22018395a4ca6fbf0113": [
+        "20261019-055601-2700670430.json",
+        "20261019-064651-2700691144.json",
+        "20261019-065419-2700694574.json",
+        "20261019-070032-2700696971.json",
+        "20261019-075510-2700717596.json"
+      ],
+      "4488fcad666621dee1c7": [
+        "20261019-063913-cuym33pma86c3h67w8ducxhwxlw6lk5pw.json",
+        "20261019-231100-w7wqd1vgfovuey0agb0ibqyvih0jt54pw.json",
+        "20261020-003435-ws7b9t81kp7i3guia12k8f1l3l8henvpw.json"
+      ],
+      "a4f6489337f261a5fdc0": [
+        "20261019-071123-fslvklps9xc2xs4ci614u4gpng5882jpw.json",
+        "20261020-031427-9b4cybxcbbv5rsnbs2r3uv6l1fl5abypw.json"
+      ],
+      "061800d4a869f762ee9b": [
+        "20261019-073139-2700708538.json",
+        "20261019-114445-2700802768.json",
+        "20261019-132655-2700838167.json",
+        "20261019-133855-2700841010.json",
+        "20261019-134949-2700843864.json"
+      ],
+      "55ec7b4d60f3c109c074": [
+        "20261019-073818-2700711350.json"
+      ],
+      "1403078fd586a08e10b1": [
+        "20261019-081942-g321gbvp7r616veqkieiune9hfl9sutpw.json",
+        "20261019-090631-g61r611kbv7u9ewu6c96e3kmyr3evvopw.json",
+        "20261019-103905-xdsg4olt45cctvxlof0d3wk363pegc3pw.json",
+        "20261019-105304-l5snymj4cvadtl6gtwrwovqsyo0j4m8pw.json",
+        "20261019-145146-82xuopgxubcx9rfutopfq6plmn50cvgpw.json"
+      ],
+      "3698ebc79816eaaa549c": [
+        "20261019-092543-2700752106.json",
+        "20261019-093240-2700754321.json",
+        "20261019-094102-2700757479.json"
+      ],
+      "fc146289d60e6bf7ffc4": [
+        "20261019-092950-2700752910.json",
+        "20261019-133531-2700839169.json",
+        "20261019-144027-2700858115.json",
+        "20261020-130149-2701420982.json"
+      ],
+      "0c8afbb3d9acf5a94608": [
+        "20261019-095046-2700760393.json"
+      ],
+      "b20d9702a06e31a20edc": [
+        "20261019-100226-2700764954.json"
+      ],
+      "85a0cff8c21532d8b4aa": [
+        "20261019-100549-2700766806.json"
+      ],
+      "088a57f660c1b50e0f95": [
+        "20261019-101040-2700767949.json"
+      ],
+      "a26e1a32a0dd48800b37": [
+        "20261019-103242-2700776530.json"
+      ],
+      "e0b92f437f2dab8b42bc": [
+        "20261019-110642-2700790047.json",
+        "20261020-105342-2701374950.json"
+      ],
+      "06892cca8b483a07a554": [
+        "20261019-114912-2700806092.json"
+      ],
+      "47856750ea43d1f389ff": [
+        "20261019-130151-2700829717.json"
+      ],
+      "4aa9723e0c9c22612e1a": [
+        "20261019-131645-ojtju2of6839es1bvk6y252cfck7p4ypw.json"
+      ],
+      "575205729b4d0d1c7e3f": [
+        "20261019-134545-2700843146.json"
+      ],
+      "13b4dda9bd0c8bce1ba5": [
+        "20261019-143451-8yc86tcyb48lyu66w9glyoocrhyxmmkpw.json",
+        "20261019-144630-6hgpupedev4mscixolhprftj80le2p4pw.json"
+      ],
+      "5d25f3417768fe8a3bf8": [
+        "20261019-145455-o84no6r0bt4ko5fpfpfiyhj3lfjpfn0pw.json"
+      ],
+      "949f6c07fb3b43618ee6": [
+        "20261019-230027-2701027561.json"
+      ],
+      "7c0555acec20181ddb93": [
+        "20261019-233259-2701043601.json",
+        "20261020-003859-2701079265.json"
+      ],
+      "9df5d16a95724609b93c": [
+        "20261019-235235-2701054963.json",
+        "20261020-234827-2701646418.json"
+      ],
+      "09f522f5145f436bd05a": [
+        "20261020-000222-2701060418.json",
+        "20261020-193622-2701538223.json",
+        "20261020-235552-2701650796.json"
+      ],
+      "2d63b55db1195ee20557": [
+        "20261020-000513-2701062068.json"
+      ],
+      "943631cd55c7e03851f9": [
+        "20261020-001625-dnma3q76sab61s90rn2t59u6n402soypw.json"
+      ],
+      "7b39490aed62a9bf8520": [
+        "20261020-004152-2701081581.json"
+      ],
+      "01c923dce5c0da35b535": [
+        "20261020-004525-2701082854.json"
+      ],
+      "ec1d4897e4ca78ee96b7": [
+        "20261020-004922-3xo2m8yl5k46ljtm1yw3go668hrcspvpw.json"
+      ],
+      "18b4ef97e15450f5cfb0": [
+        "20261020-005425-5y31emrahasxucekhkehfebqw8j5nhtpw.json"
+      ],
+      "3dd25d6d43b7941eae68": [
+        "20261020-020007-2701124307.json"
+      ],
+      "9ca7a87dd0558decead2": [
+        "20261020-022626-2701138000.json",
+        "20261020-023332-2701143013.json",
+        "20261020-025055-2701151405.json"
+      ],
+      "3c05ac0298d888fff36e": [
+        "20261020-024109-2701147124.json"
+      ],
+      "d96b5c80476c4bb46e78": [
+        "20261020-034811-2701182164.json"
+      ],
+      "8338c6c0432ceaa7ef63": [
+        "20261020-044313-2701213910.json"
+      ],
+      "370f22ea0d34de9ccd33": [
+        "20261020-100748-2701356281.json"
+      ],
+      "1d5cbe623bf8ab96ca7a": [
+        "20261020-102610-2701363592.json",
+        "20261020-190213-2701526261.json",
+        "20261020-192031-2701531796.json"
+      ],
+      "d769dd065d81af950feb": [
+        "20261020-122916-2701408635.json"
+      ],
+      "b22fae5f2f9d27cdbc59": [
+        "20261020-130940-wywc2io10228uvsrvmy0uvabinqdu5cpw.json"
+      ],
+      "8f32394b68bfa8ec8692": [
+        "20261020-134627-7o4h69ao3my6xexaxn97uh436wfu99ypw.json"
+      ],
+      "2c45b8045501af08d7bb": [
+        "20261020-142055-2701444168.json"
+      ],
+      "0a148fc45cc137628ef6": [
+        "20261020-142705-2701445648.json"
+      ],
+      "65deceeb129895c7f77d": [
+        "20261020-153358-2701463463.json"
+      ],
+      "86766b7b82769c731c91": [
+        "20261020-165643-ulp0hd8nkv94mgfgamg9giq861xp9cnpw.json"
+      ],
+      "de55a32d567b7ea07029": [
+        "20261020-172539-2701495687.json"
+      ],
+      "66e1ec0fdebcc15d8fc2": [
+        "20261020-202126-2701553146.json",
+        "20261020-221047-2701597193.json"
+      ],
+      "c1e58aa8be3b1555500e": [
+        "20261020-220257-2701591184.json"
+      ],
+      "981c2416423b41341254": [
+        "20261020-222441-2701602513.json"
+      ],
+      "7e5bf5222ff9d4538032": [
+        "20261020-232112-2701632156.json",
+        "20261020-232838-2701635705.json"
+      ]
+    },
+    "records": {
+      "20261018-081916-2700233703.json": "6d6afb167b4138501740655f177a9e25f43034c430802091929b74be5b57de55",
+      "20261018-082536-2700236610.json": "ac8cf7bd4843a62ea12e9ba1fb5477c87f8a18fc69033063e6361e5b8892eebb",
+      "20261018-085728-2700247592.json": "7ce4c6b5b06bbf42daa7f008c65b2292f45c1825be5f78659c6a597eab8ba924",
+      "20261018-091302-2700253474.json": "f9c1456b09dc1319c06a9307954c5a6fc8aa02d381ea09c407168473548b4ffc",
+      "20261018-093050-2700259608.json": "5e0517087c702a5423b608bb621fdf9e62bdca73286e66109f2954a145677270",
+      "20261018-095338-2700267584.json": "02cb8bc389acfad2ac969ff288f64f8a492e4e86bba1101f1d9926e045687d10",
+      "20261018-095627-2700268763.json": "c05f67c25de1a479bc0cbb94016c0f3e252ae44aeeb3a394e559a948c60d558b",
+      "20261018-103357-he6kgy9nngw82gjinci78i06o4gajdapw.json": "b668ec1e7752611f25a17c5785ef1bc0d998f16ca51f46026d471265fa2ab570",
+      "20261018-104058-2700283899.json": "8ad739489da2265bdca6dfb2cc87a8698347322581e4a5c3ff85e44114eedcfe",
+      "20261018-110317-2700291496.json": "0536023049e6463d3614d03f3e329f6f52bdf362cc74fb5a732e9ab7b02393bd",
+      "20261018-124108-2700325366.json": "f3e72e9d83c6dd52ae4964a071c01d22981b648ee8ffb7e64ec315f36a2a1ade",
+      "20261018-152220-2700374173.json": "607edd2a7182affe5522d0fbd4da11b4d62daa4840e52cf785951840be0a48f6",
+      "20261018-163258-2700390584.json": "a51c4c238e09c3721adbee28fb5ab3778b807fbaa079d0f0101b5d259267f287",
+      "20261018-182740-2700418356.json": "20641c44d9a1741e42258256dbc1084a824a0f72cdee5e3710bf9768c5c166ba",
+      "20261018-183026-2700419323.json": "7a48a068380767e6cc7d166ccf2bda22dbece8dc2db8040b697df55313baf666",
+      "20261018-183511-2700419913.json": "d976489a08a36a8ceab9a0875a0c0f8724d4926a88e743e4ec28946fa0dee2b6",
+      "20261018-190628-2700427828.json": "cec8637a41f8ca3428bddbe8ae20c289c9b904c16886f54c3fa0a4c7b575cb34",
+      "20261018-191829-2700430905.json": "a9aaef4dfd2eb8879b8eabf44e7aae62f5d18a733d6eb2a14a711c50421a0797",
+      "20261018-193141-2700434823.json": "1b5abbb58b111f30282060b41398c132506cb46f68c873f0c8d91aa04ca9b0d7",
+      "20261018-194247-2700437383.json": "ccdb3c42a2182882cd88c2e7b6bfdab239abe77aa2fb7964adc35df7a168143b",
+      "20261019-025004-2700590334.json": "032ad0f41e828e429ddb2ef7ecc55ff19959d2a32f1b005531bc7c6c8b17a092",
+      "20261019-033149-2700606512.json": "4c5b5be6f94c953533c3b9e2fdc327555bc09fb07b11613ad47bff145439ee0a",
+      "20261019-040752-2700623208.json": "693658708f8df1042b521ca9ed11496482222ca186eabc3107599f103089b445",
+      "20261019-041748-2700627563.json": "d918e9fc20ff205f496f5a2634e355692ff927e1160311b848670e94c09e435f",
+      "20261019-042341-2700631284.json": "248b8064679b40e70f157747baa4868d030f339e24d4c2e7873645e2255d93e4",
+      "20261019-043207-71c4dq9qfcur4qm822b41190bppw270pw.json": "3139022ffd82c8e4f02164dd2d357e0c552ec3750bd02e1f4e14461413c285fe",
+      "20261019-044724-2700640485.json": "9d726c81610c0bedef34cdcd01317aa0347ebe05fdf73f7593b0204780ca8227",
+      "20261019-045307-2700643354.json": "3281e08d618173d36cdd3a1bcae3a7d5c9b6c57dd82d3f847564cec26dcfa0d5",
+      "20261019-051124-0lyxs5ux4eq9gol1tikvjkk55u7klekpw.json": "01e439471ea0a3d05a8ba530e1593ab24591b5b93261e70edb0a850b0ded61f7",
+      "20261019-053438-r90qm9p0mra4grh3ka1113xb1gymyoypw.json": "fae0d0c0a3a29960bc65b9739b6d88fb925c16af898db54bf780a3e1e4c952bb",
+      "20261019-053754-2700662302.json": "5805c8b6dccc39b08dbc27d00696be86ceef68bba0dfef8dece7dedb16669d60",
+      "20261019-054208-4tn9teqxiamjea1x0esiwmsb2sku4y9pw.json": "fcec2933e2d43af09950091689a87c26164c6a0fd3400896ff88ba82b0d2ced4",
+      "20261019-065419-2700694574.json": "205bad0e479dd5e5210975cd3aa04782e9a4a0de51189f5375feb9ca6a3a26a7",
+      "20261019-073818-2700711350.json": "1d4e3be8c62f1c7863d0fd539ba7004fa3277c912574c9a8cdbe26a7d5a57581",
+      "20261019-090631-g61r611kbv7u9ewu6c96e3kmyr3evvopw.json": "b7a231b446cba72b5ca2f349ad3a5e5067c4ee24fbcb7df22c4645b1bfc3b3eb",
+      "20261019-092108-2700750116.json": "af2f3e690394651a0c82a4a49f48d040e14e829179ceb7c0b15a27997980fad3",
+      "20261019-093240-2700754321.json": "6a3d5fccb8e268fdd9463a487eb9e4f0860fe45659ed8d2dedc047d4e8ce9095",
+      "20261019-095046-2700760393.json": "edc7473ea82c9e6dcc4f4fad645e8d9e0b5ab90e1c0349616d96f8aabc40470b",
+      "20261019-100226-2700764954.json": "e5db048d7d0cc4ba3af1bf1e4126eb8c485e525bdd47035eaedc24f691fe1e55",
+      "20261019-100549-2700766806.json": "e002bb2503f05d6636b2edcd6670b4cff9afce3db8bc78b3949a0e1b02c2f36f",
+      "20261019-101040-2700767949.json": "85e7e91b00316575f0a138f19de54dacefab8f4112cacbc5e0d2604583f68694",
+      "20261019-103242-2700776530.json": "0b2bdc662fb6d9bde6ba2ae5b0d6ed9c74bd662c2083c07fe0c48f061ebc73e7",
+      "20261019-110642-2700790047.json": "ea1201ee2794f44d2c8793c1f1d3d831033492d93b40c54c424e7e8ff914b8ff",
+      "20261019-114912-2700806092.json": "62fd88663c252418b0fb5ccc648e063ce6529055f3873f399554f2683c058a03",
+      "20261019-130151-2700829717.json": "055afa8bcbc49d94d0154baa98fc7f95903124ec6b7b3f137ff56e2aac2f042f",
+      "20261019-131645-ojtju2of6839es1bvk6y252cfck7p4ypw.json": "02282cb70b3c4570d4a844a8d422c5390269d14f6a8b946db0cc6b3b7be9ab0b",
+      "20261019-132257-2700836435.json": "8cdc68b80239ffa35fe9d4273c4bb8ab7b1dc15941932eae34a99b27047b8dfd",
+      "20261019-134545-2700843146.json": "b13500d7326e629eb7a00f60ef1f01effacad58a6c891578f7e2489b379b6163",
+      "20261019-134949-2700843864.json": "18c81fbcdda18d55df1125f12e8ee242ebc4ddca53ffe5a575be0d0ed5ceed26",
+      "20261019-144630-6hgpupedev4mscixolhprftj80le2p4pw.json": "c65bc2581e83ffb1e1d66a8f8d3dea94aa329004239646df2a9112b7fb15c058",
+      "20261019-145455-o84no6r0bt4ko5fpfpfiyhj3lfjpfn0pw.json": "f244ef37f8725f7e6f8ee2c4630224849600e092aefc241d37b45369275d939a",
+      "20261019-230027-2701027561.json": "f6696142733c1e23fe1cfe1db881e5b02f0655f94d13e7bb89b99c55017e58fe",
+      "20261019-231100-w7wqd1vgfovuey0agb0ibqyvih0jt54pw.json": "32ed3ffe40fb0241c09a4d6ed5607c69654fd2584b1db9ad257e3c1b16789874",
+      "20261019-235235-2701054963.json": "71bdd4fec17af0b2da90d937b4bb3aaf551fd2bdc3e1fa6017c4fced57dda064",
+      "20261020-000513-2701062068.json": "87e147f01c48f8c5f738ea6ba03f03ca50fe6acedfb0695bc32975c9fed98b3c",
+      "20261020-001625-dnma3q76sab61s90rn2t59u6n402soypw.json": "0eece88a719d59369b907d77ed881cfc83b63e6945e01782104b9ea0537abe90",
+      "20261020-003859-2701079265.json": "8d7c1e3847b60e6260618f94a5ac8af81c636d15568142016818651d1949c715",
+      "20261020-004152-2701081581.json": "3b493eabd572ba3e0e9628f0e51baebafc53a2954bdade300d3f453cfa483043",
+      "20261020-004525-2701082854.json": "3237d98978f95b3410dcf3484a94613ec88e54af0bc3e198932821d33f1b0018",
+      "20261020-004922-3xo2m8yl5k46ljtm1yw3go668hrcspvpw.json": "8380ee8055ade2a200334d92f579921f5c28592f3f522d5d1d2d4b9292156ba6",
+      "20261020-005425-5y31emrahasxucekhkehfebqw8j5nhtpw.json": "ee62b6cb90acb0dd3b397cf5b8055edf6c5aa0508246580c144a35573848d8e9",
+      "20261020-013843-2701113502.json": "a8567dbfe9990cdd370d75b1a29bc06f0e5e32246f0cc5ef95fd93daeccd90f2",
+      "20261020-020007-2701124307.json": "7e7add3621d84734d3c5513d5573d0960b990abc9c0791a10e7916e96325dcf0",
+      "20261020-022626-2701138000.json": "3592c77271dd20bb0c1667142b79498f4c67295069798b4dd72563650af4f49d",
+      "20261020-024109-2701147124.json": "f12aad70a9a616d2e3846623ef4e3226a20b4b7f198354de1f2398339d1af537",
+      "20261020-031427-9b4cybxcbbv5rsnbs2r3uv6l1fl5abypw.json": "4f9bfe1f69249c6baad512f460a4932d353ea123f1e160e3e98b7b01fc520049",
+      "20261020-034811-2701182164.json": "331dd277f7f54cdd19242fadf4e4c633088e2b16c7f579610e636d591c5bcfb6",
+      "20261020-044057-7bk5co46wi7db29f1lmh97rwkmk9t7ppw.json": "ea50d3ffc30ea0d137505fa8d56ec6de117ed39475d98006d85e167aea7b6bf3",
+      "20261020-044313-2701213910.json": "bf981fd7ebc6001abb502273376cfae85d2f7c38745a7bee7af62a29e765e30b",
+      "20261020-045542-salr734lx4wagfbnc7t48xa94thhje5pw.json": "326b9570274739e00577abc971fa2e22d9df0088ed78d2a9c87116a25e38af9d",
+      "20261020-100748-2701356281.json": "bc66272c91ffafdf1ae0114af5c383651ca80908843cf2fc75256361b211541a",
+      "20261020-122916-2701408635.json": "3fe9c7bea65acaefb24fe078361865cf6733cabd37c3c4e5f1ba741d08ec791f",
+      "20261020-130149-2701420982.json": "9cae2e2c20ba56386665941ee0d28ed4d3fb799804ba19837e941025f0f15ce0",
+      "20261020-130940-wywc2io10228uvsrvmy0uvabinqdu5cpw.json": "259243e3e5caea4f9df6b379ebf29418e359be95f2059847e21dc017f52508c1",
+      "20261020-134627-7o4h69ao3my6xexaxn97uh436wfu99ypw.json": "46825de893c41ab0f01e6160493b9d94ddbf90877feade2ac21a92b815683d76",
+      "20261020-142055-2701444168.json": "ae323b62ada0139434244867cb2d51c2bedc6e6af7826d36d87112a065f3d451",
+      "20261020-142705-2701445648.json": "8a0213e6258e79c51dcc2dfa1291878b82fdddfcf8cb99c49be09a6f03675f20",
+      "20261020-153358-2701463463.json": "b4c3cc4e3914d2f7275c6b51fed1a27e899fa82dce5e86dacd2a17f87b69e5ec",
+      "20261020-165643-ulp0hd8nkv94mgfgamg9giq861xp9cnpw.json": "9e9fe679e71f42e8906886f1d498606d7c3e770d25d7a346db3e6c69522046c3",
+      "20261020-170208-2701488642.json": "af3c8acd403d501c711b8c7d184ea058c941ac5c2ca6eca8ff562b8035764863",
+      "20261020-172539-2701495687.json": "f53097e5bb86be327dced173db3470016caad98ea391b989c3a0bc6e154e5413",
+      "20261020-190213-2701526261.json": "a1adbf53f4a1c38c49196bf8b254ea3cfd367c306258ac6bf9d641bbc0e7d597",
+      "20261020-204932-2701564077.json": "d3e23bbdc02554fd30af96c6d553c679d5851c57c0be2ee49a047fb67a12d5bc",
+      "20261020-210950-y03l4pfr5m7ohtdapri7fubge62gt9jpw.json": "bb7eb58bf6322b9a53d9c6dd094d5b7d296d6ec98d945a2449b9d0568b8c23f3",
+      "20261020-212816-2701576700.json": "4add897cc0fe2e9dcf151502e39b379f8843a7d7e6caaed6c3479331c840525b",
+      "20261020-220257-2701591184.json": "246c3ee1fd105fc5b7dd29100b9777b542123e430f53426262ea7b18ed5dfe10",
+      "20261020-221047-2701597193.json": "b93b233d40d82c5bbe286fad5a02aac7877991f87f2d5baf9a0905245d81639a",
+      "20261020-222441-2701602513.json": "f95aad9aa5f02c62b00eb173873cce34a4c8e79ae86a52d1a4477fa653ed0c8f",
+      "20261020-232112-2701632156.json": "0afcefcea028e28697c96f228b5e327a5d73217c0b3932bf292a68f85252ccd6",
+      "20261020-235552-2701650796.json": "74a9a1aefaf4a6fbe7fdcdd179df591efeb8dc1e482c7c49ff5de24b58cbcf82"
+    },
+    "quarantined": [
+      "20261018-062339-2700189858.json",
+      "20261018-063254-2700192711.json",
+      "20261018-064207-2700196866.json",
+      "20261018-064632-2700198436.json",
+      "20261018-065819-2700203189.json",
+      "20261018-070332-2700205690.json",
+      "20261018-070955-2700207980.json",
+      "20261018-072329-2700213195.json",
+      "20261018-072915-2700215695.json",
+      "20261018-073711-2700218120.json",
+      "20261018-074641-2700221155.json",
+      "20261018-075202-2700224174.json",
+      "20261018-080821-2700229097.json",
+      "20261018-081504-2700232862.json",
+      "20261018-082109-2700234898.json",
+      "20261018-100420-2700271515.json",
+      "20261018-103049-2700280293.json",
+      "20261018-110810-2700294044.json",
+      "20261018-120531-2700314480.json",
+      "20261018-142445-2700358861.json",
+      "20261018-202551-2700447746.json",
+      "20261019-081125-wd6yyosodrxrq7yc2yc0ydaulx7uxitpw.json",
+      "20261019-082738-vll7h48byihhcufdjwlgq2g3ohx1hxbpw.json",
+      "20261019-095512-2700762502.json",
+      "20261019-102204-2700772815.json",
+      "20261019-102820-2700774168.json",
+      "20261019-232253-2701039171.json",
+      "20261019-234109-2701048668.json",
+      "20261020-010534-2701093588.json",
+      "20261020-013758-2701111596.json",
+      "20261020-120136-ttkg8530b0j95g0qq64oxmfda3dkcxfpw.json",
+      "20261020-163935-dfnudhdvhhndq10brovbluxmmhkjqfmpw.json",
+      "20261020-171655-fqxm4pdkpvi5dw59vb7ldwetd5m2qs9pw.json",
+      "20261020-211912-2701575822.json",
+      "20261021-002207-2701664388.json",
+      "20261021-002538-2701666387.json",
+      "20261018-092809-2700258841.json",
+      "20261018-094245-2700263926.json",
+      "20261018-105035-2700287862.json",
+      "20261018-120242-2700313806.json",
+      "20261018-121344-2700317501.json",
+      "20261018-132404-2700340653.json",
+      "20261018-145431-2700366717.json",
+      "20261019-114718-2700805243.json",
+      "20261019-132505-2700837474.json",
+      "20261020-130453-2701422019.json"
+    ],
+    "inherited_split_sha": "09904d9c1199f6cdda1ef871f478aa7cdb3b50c81e8dd654243ea357ce58d427",
+    "scope": "historical grouped holdout; inspected development data are not a new prospective ladder test"
+  },
+  "producer_artifacts": {
+    "planned": {
+      "train": {
+        "positions": 100,
+        "groups": 50,
+        "trials": {
+          "loss": 10011,
+          "win": 10757
+        },
+        "saved_decisions": {
+          "p1:move": 79725
+        },
+        "distinct_sampled_worlds_per_position": {
+          "4": 100
+        },
+        "manifest_sha256": "2b8fbf84960acd30966e0d8f95941d6afd524b900dc4b13a0fe2437657784897",
+        "files_sha256": {
+          "data/processed/continuation-20261021/planned/train/positions/067868c295a1467bf9b1.json": "bf9a408ba93e2ab8a71f7cb2b4bc81fc88de56ea0c65d3944cead4ae3ddd3907",
+          "data/processed/continuation-20261021/planned/train/positions/b07295a176d2f396cfad.json": "a35ef50844a34c3b7ce78322e0651cd8b57e1e5c26a4a454a27a7b6c83347bc9",
+          "data/processed/continuation-20261021/planned/train/positions/3e0cf794870ac81d405f.json": "61f9420a55828152968e10ca130247cc5c2813ac81c501c261d16b070697f72b",
+          "data/processed/continuation-20261021/planned/train/positions/0ac0dedf479f98c78072.json": "7819acbdfe812a11828bf9829f9ec087666bba4083bc4fc4fbfb593924ea8dbb",
+          "data/processed/continuation-20261021/planned/train/positions/7d6127d491fc39e1b750.json": "aa5aae0fe4278052c7e145fb1be7bc2e9b7db94f3ea2df3af41e2f5aeb0b0307",
+          "data/processed/continuation-20261021/planned/train/positions/bbb3c795ae2c3db6e9e1.json": "9675bbafe2e804cf70304a3a3db0811805d2f73270f84ab7cf25e7854340c8cc",
+          "data/processed/continuation-20261021/planned/train/positions/8822bb95650c5175b161.json": "060e3ae02cc12b908b465538f02381264e3998cb76f22dccb93fe77e729140f8",
+          "data/processed/continuation-20261021/planned/train/positions/c9c1667d9b9a733b8562.json": "5f3d5da3ab4d89e9f86ad69204ea28b6a4052107600e463d50b915ac7125806e",
+          "data/processed/continuation-20261021/planned/train/positions/3c948a4422844d159fae.json": "4851c2e95aa03cd07e6f5bfbbb4c6e7a10a083ccccc557db4d61b2de4cbb3348",
+          "data/processed/continuation-20261021/planned/train/positions/efc9e03492c9e238f08c.json": "96fab39eca13747af1682af75c713f3c39b8aea77d1afdc9f60e3fb7c4abcc0b",
+          "data/processed/continuation-20261021/planned/train/positions/5e7ac44529ef1852830a.json": "e895ec42c182ac107c1f448f19903d3a5f89eee67c102ee01883f3c63d63fcc7",
+          "data/processed/continuation-20261021/planned/train/positions/6ea08aa9c2359fa4f009.json": "388935f9947779a5c214c554b77c8ae669ebabe21bdeedd46e5d91c699915cf9",
+          "data/processed/continuation-20261021/planned/train/positions/8c7e4072c6a5aa0cc662.json": "ddf48446fd9c966ad5347b1afd70d3d21867cdddabff4dcbf6c6b399074a857b",
+          "data/processed/continuation-20261021/planned/train/positions/c63a3b4fcc11b7e37586.json": "5ed08c49263e90c2fd5f0ec0cda34488d76d81efc842f3054ee33e22d7bbfbda",
+          "data/processed/continuation-20261021/planned/train/positions/ad6d0da2cd03451e9af8.json": "9ce9150de783228dc57ad5357e806cfd3d0241433a63b576a073e1f98c5a74c7",
+          "data/processed/continuation-20261021/planned/train/positions/bd71cee607534f0597af.json": "75660c71d59626b6df518576b26c0763f8cbcdfa749170a55633853297b80b50",
+          "data/processed/continuation-20261021/planned/train/positions/7d12e892bd7126a620a9.json": "37e11391cc980f728e9453ebd7734340344efc513e9d24450d834601458cf0c2",
+          "data/processed/continuation-20261021/planned/train/positions/f52e32ce108a6b0c3e39.json": "d271c665a242193c247cbba0998f14f542760bbcec78ab08e3f5ecc13a45548c",
+          "data/processed/continuation-20261021/planned/train/positions/e50be5610bfe91b0dae2.json": "b3b91e1cc0bd802232c9b9395012d6e1654a743054f3bef2b9cd735ef576d4b5",
+          "data/processed/continuation-20261021/planned/train/positions/db8bc3fe1f7aaa4c3348.json": "1768cf2294f6fdbceb9d0ebc72ef3185cb07b9f2ec8cc6ac89c0354c9c15b155",
+          "data/processed/continuation-20261021/planned/train/positions/653b45442fb8441edf98.json": "f0899f2ff700bcc735f03bdf0e62939bfa83f737d9d3c56b752507e5b9715acd",
+          "data/processed/continuation-20261021/planned/train/positions/b7827d6a5ce1cbc65d85.json": "201f2312903b0518d96902ceb3be3ae2c471cf4e3775328e902d3efccb5a7642",
+          "data/processed/continuation-20261021/planned/train/positions/94b005d89c0e5951f9bb.json": "5a07481d75b0e067459850091002261401962243c2ac8cbe112af9c402a0e353",
+          "data/processed/continuation-20261021/planned/train/positions/074e77a2cbb16b6de63a.json": "67b465f42035e8ce75b7f450dddcfb2a391ea6d7962848a146f8c0d04534a2e9",
+          "data/processed/continuation-20261021/planned/train/positions/db3a63f2322da2448dcc.json": "4addc54676b3490b32da6c917e42c8bf8421f91659b0e61dd58b7116c6b24dec",
+          "data/processed/continuation-20261021/planned/train/positions/e4619af4966581207cf1.json": "f008683a4d68eb5852ac27a6ea9ed74254a0f000a1ef3658d14a0b69975defdc",
+          "data/processed/continuation-20261021/planned/train/positions/27409646c40174642964.json": "3bb13ddfc69071b0fcca37a491921c25bfa53cf2ec31af15716a783537d13b81",
+          "data/processed/continuation-20261021/planned/train/positions/c7543ce3c95c9f3022ad.json": "c0b0ee9638d37a261267ccb8711bf92cab97157cd2cf3e68346ade3f633f372d",
+          "data/processed/continuation-20261021/planned/train/positions/771981846639e8b98f73.json": "986e5a0a5a2a6e5ebb59bf5cd4169f4e97ad643f7890828b5ed1c364b3ba680c",
+          "data/processed/continuation-20261021/planned/train/positions/2930ea6c17ea409a2b2a.json": "321034b2fbe0cd7e6d4c6a83981bafe5904c855f10780b58635be81baab44d7c",
+          "data/processed/continuation-20261021/planned/train/positions/7265ce25c38c34c916f0.json": "c445f73c09238ab4bdfc67712168c7e62411685614f8b25228f84683e146c5cf",
+          "data/processed/continuation-20261021/planned/train/positions/c058b73449f00e20ce9b.json": "37eb6403954d85092cb581094d393fe02314d1b330cb9d00a3958f510c13ce29",
+          "data/processed/continuation-20261021/planned/train/positions/01b72de9df6c74871155.json": "1081e6ccbf71691cfc89b5b96c0f2b64d47210b02a501b04d3d23c74b9c485f2",
+          "data/processed/continuation-20261021/planned/train/positions/e04f193f4dbf0436d2df.json": "85c3f061a352fbd6403e3637a623c328a459ad04bb7d0a99afcc620c752319c5",
+          "data/processed/continuation-20261021/planned/train/positions/717cf8323120b7947b7d.json": "4d4550c3ef4aa3384287ffe1794651933eaa7cb15fe135de90a69453bc495b4d",
+          "data/processed/continuation-20261021/planned/train/positions/a49601bbf52de2472a5d.json": "d009aeae8d3d50fb5801d63382ab5b8cb07bf931f66f81dd6cd708d4871294c0",
+          "data/processed/continuation-20261021/planned/train/positions/44a1b0e5281214d46298.json": "b9ad403aab2d63e2a175f723cba96856712874ed61288f6da625960312b393fc",
+          "data/processed/continuation-20261021/planned/train/positions/4bf8b304ad932d22e2cd.json": "5db030accbaff1530908526b55cc07f624757da8e6e05e26209da6c267f2e4ed",
+          "data/processed/continuation-20261021/planned/train/positions/6b30b5ab2d277ca1668b.json": "ea5cb52e7589f8cd447a947abcd0a0d3d68e9ccf71195adaf4b033e5659a9fa5",
+          "data/processed/continuation-20261021/planned/train/positions/a67860a367a95fb89eb5.json": "92e8a4c77d5583f4e89032443ffe5fa38841fbf3dcf02861ebd2150b879b8df5",
+          "data/processed/continuation-20261021/planned/train/positions/464bd01ac663152e2751.json": "83945d55986b653f624ea20b39452c2fe42883e69ac94ed19654b3e3ab14bf32",
+          "data/processed/continuation-20261021/planned/train/positions/5b52e0d7c1b71cf9a647.json": "22e04b45e2d4f44d3351933cde8c7ef0db09bc622f2052bb371596e495f5eb90",
+          "data/processed/continuation-20261021/planned/train/positions/2fd097dd11e677003736.json": "d2a308bd6dad46d01d21ea856ed9c34ffe1b897b8f5781932dafb7fd086687af",
+          "data/processed/continuation-20261021/planned/train/positions/06816b520588274067e5.json": "287cb59d6531739a2c66684c647f8ea1dd0b96c397f6c36d582b12f86702d37a",
+          "data/processed/continuation-20261021/planned/train/positions/7aa380bdf22b81e6a4b1.json": "104e2cadac02d6ebbbb33f4f71bbcc45f3a0be5787415ed9441447b95aa318f9",
+          "data/processed/continuation-20261021/planned/train/positions/1e484f0ec60734f8c69b.json": "4e11223a3d19a4da362123facbaffc06a6a92a077d4a7b11273d83b14ceec9d4",
+          "data/processed/continuation-20261021/planned/train/positions/e6c7a490c81a47d9429d.json": "1a38354b331510a7e684baea3e8a85c27cbb873c2dadb861bd1c41c35e9d29d9",
+          "data/processed/continuation-20261021/planned/train/positions/35ec3a6166356ab5ecb5.json": "80b2e33d209ee6ef8abf65b09aed725b18eb09ff1e7aeea867c004a9fb57a164",
+          "data/processed/continuation-20261021/planned/train/positions/562b3c26a4e9aa4c422e.json": "c9dad89ff3b7a8716c162ae172903c2d8a03894553727f99b3452ea38428eaaa",
+          "data/processed/continuation-20261021/planned/train/positions/0faacd3fd53bb8469951.json": "f31fb8c0a642a38ab68e5df5e37fea773a9ba1c0cfce497139aa797d28655e6b",
+          "data/processed/continuation-20261021/planned/train/positions/43cf645472f6335a464f.json": "e994011cbbf4142da33371cab1abad2d9f5415d02a078d8bb7e12220b65eee68",
+          "data/processed/continuation-20261021/planned/train/positions/76b489a094a0dca7ca52.json": "653e5c8c55b2e896295badc4128fa905622f56a2cec28a525a43e13bfdc3d01e",
+          "data/processed/continuation-20261021/planned/train/positions/6bdb27b5350836fb4354.json": "e295043511c9e77f1c5254dfaee4ecdf286dc07915ebb67ac41ebf9f13885ab0",
+          "data/processed/continuation-20261021/planned/train/positions/41511aafc66110578750.json": "ec3ee2a146a3c39cbbab1bdf8f4d2ad4ec4de2ac1d527393c7923520b0bcc4cf",
+          "data/processed/continuation-20261021/planned/train/positions/d2c40e20648b193c802a.json": "196513ff3a9c88ae97e166d0ff3a8b5a6d08666b00aff33f1c4ccea7e61b780f",
+          "data/processed/continuation-20261021/planned/train/positions/70c814e09acfd0362854.json": "76724b66df88ee736d8a9c62a09dafa26dc682d37cef3eb67ee11400b0cf1dd3",
+          "data/processed/continuation-20261021/planned/train/positions/d28904602c4b9ca9640f.json": "648cc7341428bbe2e1bb03ff5c8e8d43d8bf7b6e5527ba1f6d8c480f97c30413",
+          "data/processed/continuation-20261021/planned/train/positions/4410f7d857f9931e79e9.json": "737493016002de48bcce599c380f89367187a2020dc8cef6c58672154e053ff3",
+          "data/processed/continuation-20261021/planned/train/positions/c6fe7994a62e80421e16.json": "12f4ee0bf5b6f6ee26617fba9c6a0d7e6b475fe092a878a374a19dc006a382e2",
+          "data/processed/continuation-20261021/planned/train/positions/c021425e4e977215e82b.json": "813a42e570e0faca57606d3b9b70942117b8b8380625ff1c97458c5337369fd9",
+          "data/processed/continuation-20261021/planned/train/positions/c93b4fc248f7f4be76c0.json": "cd4498df9985cdf52ed72e1a864dc87402fcdfc6e3c6734af3609016c8941a5b",
+          "data/processed/continuation-20261021/planned/train/positions/86d793d5c9d1afd5498d.json": "4d7709ff09636fae5b06e79f314eb4c039ddf7a2a98256666a1e1bc9f53d2928",
+          "data/processed/continuation-20261021/planned/train/positions/529afc761dc5b2aba070.json": "e8feee06e571829d49ddaec4d1fbe2a99948819f41b6a4890b13e37456800784",
+          "data/processed/continuation-20261021/planned/train/positions/22dd31c06ffbb7a4f7e7.json": "aa321b59ecd98ef752d2ac7e3c44fe7048cbd97816bceae52c6299a1c91a3d8a",
+          "data/processed/continuation-20261021/planned/train/positions/cbd9a6998cb0815ed6b6.json": "30ce0eeef8ed08d1d5e07c259a60b7f144c27f356851539adb8374d1874a1290",
+          "data/processed/continuation-20261021/planned/train/positions/cd3daa83fa16ba8fae7b.json": "1fcfee6dcacec939da983c0f5d5083114a765deaa32f4577566d80ec12464c6a",
+          "data/processed/continuation-20261021/planned/train/positions/ab8a726383ac832cfdcb.json": "800dac73c68bf8370844f6e123ec72aa3f056c2c046792abec493e7ab3db5295",
+          "data/processed/continuation-20261021/planned/train/positions/1ed02fec69395379e8b7.json": "6e3ef3e3343ed87255ff9959a5022aae887df78b7a4194ec30f152665468e20a",
+          "data/processed/continuation-20261021/planned/train/positions/71c686768e1c6801d869.json": "6823b959f1dd12ebf1705c8f2aaccbad1974639c88824960a3c04539c873e39d",
+          "data/processed/continuation-20261021/planned/train/positions/43f4409374e7965ce1b0.json": "8f8e46db0352491861f06f435a83999160f23f150cda1f2f9a7851d93f9c13cf",
+          "data/processed/continuation-20261021/planned/train/positions/60173f0069ac90c9ec0b.json": "96439940fc548e7a0113b12c746c32dfde14487989864331080f28aa642eff25",
+          "data/processed/continuation-20261021/planned/train/positions/0984ad35c3fe15ec48e4.json": "27325964098b030e7b5f514df5ac57a5ebfb14ad9d12c80221d1d9c2215ddbcd",
+          "data/processed/continuation-20261021/planned/train/positions/d5608999ac8c015692b1.json": "104f3ef52ab2db2f9fb8aeea7c16559ccff7a63cf890a34feb44318295c5bd04",
+          "data/processed/continuation-20261021/planned/train/positions/e2475afb5c6dbd8f6348.json": "131069a11fc8d161d3b26cb828813668cf336d5fa095afe5552649721b4ab856",
+          "data/processed/continuation-20261021/planned/train/positions/2e0d9beb211a82bd206f.json": "5e519465bf9d30f397c3d9ac54729b275b06680eabe4ac3023927d7d51e103a5",
+          "data/processed/continuation-20261021/planned/train/positions/a10f94684907a808170a.json": "0a6b53f5f57d124c3a48bca66e73bd289ecef475740f39ab95a2520a70f4760e",
+          "data/processed/continuation-20261021/planned/train/positions/4d79aabf5f9b1e56764a.json": "3a59e1a34af8859a52856590c4ede887a975057892f98848792442af4170856e",
+          "data/processed/continuation-20261021/planned/train/positions/256f08c01bb2d3e7bb81.json": "b7be6b33a0a9205e1f69b9318a29cea373fd71c34b362efcd947e0520948bc40",
+          "data/processed/continuation-20261021/planned/train/positions/00a7d9b1677fddf14be1.json": "1835dadec166f375be64fe20f1c588ab328590e346fc452ce6131ac01e694377",
+          "data/processed/continuation-20261021/planned/train/positions/d9ee3c50ea4773d22a8b.json": "3363466b46c00a41dafdc48b39d6d8f543d38f4b08ed67ce90b4aff2356c971c",
+          "data/processed/continuation-20261021/planned/train/positions/c7e42a7b8bfd3c29d466.json": "610d4a3afab83e076f4c2c0cd1520113b8f09474b6c4fcf0fac652610047dd1c",
+          "data/processed/continuation-20261021/planned/train/positions/ebd72d0fe0899b2b4c18.json": "d5d877c1f8571e72fbcb3b85a924d7bf26c89e524d7a4f493ea6b260312728e1",
+          "data/processed/continuation-20261021/planned/train/positions/bb75e4c68ce8e61499ee.json": "866840aa648cd094a48acc70bb2997406de60c3ff800a42de34f36fcbeb6b2cb",
+          "data/processed/continuation-20261021/planned/train/positions/ecabb145a9bd9391a04c.json": "6c54fcc70dd29cc316c6852d2576f6a1ed7a433afc4a427e48e19d64d83ec1f5",
+          "data/processed/continuation-20261021/planned/train/positions/9ef9ea956e66a57259c4.json": "48d4b03ce6a8ce2b6d5118b938cde06aa8df7989b5e7b864f72dc9167db73eec",
+          "data/processed/continuation-20261021/planned/train/positions/12bd605f99fedaa55f2b.json": "8670344301385bc249fe835c7dd37830632f5fd8d8f3eb5bbf9cacc635524a36",
+          "data/processed/continuation-20261021/planned/train/positions/3962db2659e3fc8c5ed2.json": "2c8d5a4f1d5434773e57c89ad0ca0c19560e27294517e0e2cb863ff2ac223c85",
+          "data/processed/continuation-20261021/planned/train/positions/9cc53874d7f727bc9425.json": "8295ed0c3ad62e765bd24cc4120fb23bf40a5ded734173795ccebaa94af13a76",
+          "data/processed/continuation-20261021/planned/train/positions/3e81ad0f3cfb13cfd2ef.json": "aab171b77b65300a314231691a447ed76e26f7c3ea5cc982661fa03f16394521",
+          "data/processed/continuation-20261021/planned/train/positions/1b5758814fde1018f208.json": "84e3f31fc5354f162a1f87a8569cb775c92659085acdcbb789a8b92d1177f6b3",
+          "data/processed/continuation-20261021/planned/train/positions/7db152d2008640ffffa4.json": "35cad1f41e1e7325c52abc56862168b57a16219f8b8305223069d88b981da1ed",
+          "data/processed/continuation-20261021/planned/train/positions/3d3d09c7b4902d7f3c23.json": "682f005b1bf4b43883fd47d8f8f2e65f6484801e07552357b31b6bf7078edbd0",
+          "data/processed/continuation-20261021/planned/train/positions/38a96acfdb5019dee972.json": "750844b59b4165f0e9ed857eeb2694add1de75fb812444f6c6fbac65602885e0",
+          "data/processed/continuation-20261021/planned/train/positions/1110ebf364129ed4e3aa.json": "ca735d42fa4c2814ebc44eebcb95adae3bdccf477aac366eaafbbe680165e222",
+          "data/processed/continuation-20261021/planned/train/positions/c42536dafd5ec215189a.json": "d3d0670a836a2452599ddd02cb458ae64238b6c54f2d189af19d1e54b68860c2",
+          "data/processed/continuation-20261021/planned/train/positions/6698c97abfd06c7ca649.json": "158f0447f8e755b40b0e1260996565a29f7d56b361c643f7fb3ff9e380464e03",
+          "data/processed/continuation-20261021/planned/train/positions/0b2f71858a4ea8f99e9a.json": "003152a863e061850c6c44cbda7a6f0a7de5ebc39b307f4b536306dd2ba40cec",
+          "data/processed/continuation-20261021/planned/train/positions/14fa14679cc0b2db2b4a.json": "2a6a65a3b697553e1e947cab20834ddfb8b5f9093b44163c1d9682b3e59ff138",
+          "data/processed/continuation-20261021/planned/train/positions/ec4ff460e40073e27b9b.json": "dddbcf8ddec3f5101b9472ab71100e0e238b1d9ed8e401eadaefeaf0ea1bc385",
+          "data/processed/continuation-20261021/planned/train/positions/5139ca5d9d2958e31992.json": "ff187f5dcfb35b63b446d32c43d4404b4c65ad933a88d9e91975419bad19d3eb"
+        }
+      },
+      "development": {
+        "positions": 40,
+        "groups": 20,
+        "trials": {
+          "loss": 4275,
+          "win": 4077
+        },
+        "saved_decisions": {
+          "p1:move": 31737
+        },
+        "distinct_sampled_worlds_per_position": {
+          "4": 40
+        },
+        "manifest_sha256": "f419115355025092c59d6c078e9bb4d62031074e881b6c8e658945b68ed4d0f7",
+        "files_sha256": {
+          "data/processed/continuation-20261021/planned/development/positions/5c2bb34c55a51894858b.json": "43718e1c20ae5f83c8a2a09a4cf87f3f5c4b94c5afc61162c4dc6ddb771de09d",
+          "data/processed/continuation-20261021/planned/development/positions/00860324b1372a010d0b.json": "e0157bf2282ef0d16543345bfd3ff79c93968963b7a0670ca05cd6a6f74691ef",
+          "data/processed/continuation-20261021/planned/development/positions/8391239397cf62e6ec53.json": "5954052cff24058b074e8477655ff2a2f13edd70bf70646eaa48b52ab9b61c6c",
+          "data/processed/continuation-20261021/planned/development/positions/57b534fa518fbfea7e26.json": "ee4918b9a6255678ed1ccf5a0a5cdfa69974295585501b07db8260a2f8a41f60",
+          "data/processed/continuation-20261021/planned/development/positions/90a85108c20e419410e9.json": "5b1f45c9655ae52b3036fd858f15b1bb6e5ba4fcac0ca9b74e1c8c2c7e2f6448",
+          "data/processed/continuation-20261021/planned/development/positions/2064ef8895e26accf09a.json": "6ed276ce000623f17ee6251b8c0e738af60584bdf00f6819b27c0ab627ce024d",
+          "data/processed/continuation-20261021/planned/development/positions/2d41540126ced903c6b9.json": "d9f9d7de923654b1bf6638cebaff8796b037d253a7183e33a88cd3683a4f731e",
+          "data/processed/continuation-20261021/planned/development/positions/7e81569c0a9c20303d63.json": "d221f4c6fbcb726cc6942b16a3e1e656b4ac997271ce7bb87d939ef818fdb79f",
+          "data/processed/continuation-20261021/planned/development/positions/a4a26480798d074e9c27.json": "33862db5cac156b23dc1d24b161c375ff92416b09b3dd35640861e44f1c6e30b",
+          "data/processed/continuation-20261021/planned/development/positions/d19532b9350b14de50e2.json": "942f66c3833a6a0ef8eed2b0f89103ad26a450f51223248503f2dd7fbaf67a35",
+          "data/processed/continuation-20261021/planned/development/positions/4a3fb2a398e57a7a2fcd.json": "8100f150cb6f09b69c58d90822be4083bee8f08038cd7c31f31c6927f57c8c1c",
+          "data/processed/continuation-20261021/planned/development/positions/767a12481b22a47271cf.json": "0abc4ec93151166c65485255af48d1111f4e815d8954b2e64ece094ed3eabaa0",
+          "data/processed/continuation-20261021/planned/development/positions/5a11ab6eb03994beb9e1.json": "bde32f3ea4a72e5dc4c10342f59cf5ad1076058188ca06ae55617eb0cdd355b2",
+          "data/processed/continuation-20261021/planned/development/positions/ca3c1adc4a6b79fdef10.json": "928168b0d19639d70981f117af3a18bde7c3d52414dfab087baff2b1a516add5",
+          "data/processed/continuation-20261021/planned/development/positions/3dd0f9b8bbecc49a85e7.json": "32373d299e3921d0c2dc99465656c3ec2f3ccfcf3d459bbe5e08529c751ec967",
+          "data/processed/continuation-20261021/planned/development/positions/6ce0901838e167badca3.json": "f89fa6087a1700498719d19ea3b40ed3f7d76cfb6d736db1b857852b8557c9b1",
+          "data/processed/continuation-20261021/planned/development/positions/1c6709276aac3f29d494.json": "ff95f74845be780d44c1b69a7816341f7016d4ef6482b6f8d0df014012a7b192",
+          "data/processed/continuation-20261021/planned/development/positions/b38f36e052bb323368e2.json": "dbc8efc66d4f44320ad21b52c3383f859de87ddb15757507fdea21cd20e34cbc",
+          "data/processed/continuation-20261021/planned/development/positions/74d45eef2703b6ae1d96.json": "af5faee9097f2207a7c1bbd7173b7cc9957abfb9565b650a5f00f01a8cbf58d4",
+          "data/processed/continuation-20261021/planned/development/positions/94cd6e6fa748ca30fe23.json": "36ba14baa99a8b2b4edf5fb4f1f57615b2e752cdbedf8d63e01643ada2b7609c",
+          "data/processed/continuation-20261021/planned/development/positions/2b8a1f5e2441d40d757a.json": "f9efc41e03d6fab8423e5fdb10a06233df96fa0b0522be790d39ef5b72764d5f",
+          "data/processed/continuation-20261021/planned/development/positions/0795b2ae6363c84ab515.json": "7a0f769561068c64141701f7710e900460da0ceb1a8776adc5fe952036f4fa8a",
+          "data/processed/continuation-20261021/planned/development/positions/3b33ee8d3f516645582c.json": "5d409474e931a1c74a6c4ca70d6e35c4188910f08c08afda882e65478cbe6df1",
+          "data/processed/continuation-20261021/planned/development/positions/dd6f5331c0b95581b7b6.json": "0ec43f027581221b1ede4814910fcc0ce00a6c8393bed19fcf161a129d05caa2",
+          "data/processed/continuation-20261021/planned/development/positions/f472c51ec44cbe66c31d.json": "4ae77522cab26f65da067e69ffe39a2a18e752ed7f1ffb7d96dbb66c8d6e4883",
+          "data/processed/continuation-20261021/planned/development/positions/1c3a702e590a8b90bf24.json": "587d2e14444340d70f7af8db3a3e482c8c786d9c3475837b18723725c46c8f60",
+          "data/processed/continuation-20261021/planned/development/positions/a7a86c8a55c37cc3c2a8.json": "3047271b42fee7510b0a5b9876051093d5e2f932eace61181d07e8047cac6f53",
+          "data/processed/continuation-20261021/planned/development/positions/d0a1898ce734bae3cb75.json": "10e9664ee7775b9a3bbc8a706f0b536471a685aaaf703803bea6f81d4477d0d3",
+          "data/processed/continuation-20261021/planned/development/positions/2d1e510da8d9a26fb71f.json": "3f4767a6a2c28d201b239003b60997e78f305ad372082087e7f8f8abd37da4f3",
+          "data/processed/continuation-20261021/planned/development/positions/3995fa12705c6769f729.json": "d2316f9ee0a56e43ccf3656cc6c3334f8c8b706ae3678ae2a497d2b8914ca6e8",
+          "data/processed/continuation-20261021/planned/development/positions/0e74c2247f0004da6832.json": "9e8f6280511974a2c0bd9173148e1f5e9de60f2b4dddba8b065e07bb265c94d7",
+          "data/processed/continuation-20261021/planned/development/positions/e3015f488af9a6dbe90e.json": "7f52ef7e8c2fbb5a530cdd7c1c779871fae16a4964fc01eaf08c7b45b7dd2925",
+          "data/processed/continuation-20261021/planned/development/positions/dccb084bd1f27a2f7b50.json": "412aa454c99591f990488f6781e3baba98d606352d1dd6602159454715092c12",
+          "data/processed/continuation-20261021/planned/development/positions/98955c197afaeaa5b8ed.json": "54d9e0c55928ae54b37d78532c1ac1d5500627730f8d8091c229d640779b7172",
+          "data/processed/continuation-20261021/planned/development/positions/1ca32732bd8f013c9d1a.json": "130dfbc62236a0001e409d86ded6df8fa55e54e8c0074b2d5342024c2ce8da0b",
+          "data/processed/continuation-20261021/planned/development/positions/662938dfc3856061fb88.json": "728888374fe3151acbdc2ef1137dcc6af57104ba76bfbbec1a429ad40efe2383",
+          "data/processed/continuation-20261021/planned/development/positions/5d4dfe2ee59a0cc4ec83.json": "65b4e6c31b5c9a08f5f6ab38a1414d6ada774c66518f5ccd91206f3cf15985ab",
+          "data/processed/continuation-20261021/planned/development/positions/6352836d954e25fb4d4e.json": "feb4dce3bc0d0d0fed43850b9bb6b755e92f541705775f0b2e60999ea72a8af2",
+          "data/processed/continuation-20261021/planned/development/positions/70bd4b4827bd53eb3e73.json": "d2defbd729f38ea410385141b19400f8d2db72ea1bb87014e5ac9b88a0edd622",
+          "data/processed/continuation-20261021/planned/development/positions/aac10213f51775695175.json": "08d31c9235a452bcc5f7939fab714dcc87de3258af1d5cccb71fb275d150f947"
+        }
+      },
+      "calibration": {
+        "positions": 39,
+        "groups": 20,
+        "trials": {
+          "win": 3961,
+          "loss": 4327
+        },
+        "saved_decisions": {
+          "p1:move": 31093
+        },
+        "distinct_sampled_worlds_per_position": {
+          "4": 39
+        },
+        "manifest_sha256": "4b3752f090123417e40f4df33925d49e34178c0094404816fed0e75fc2778c31",
+        "files_sha256": {
+          "data/processed/continuation-20261021/planned/calibration/positions/7957fe56b3b6cbc46a11.json": "f445341aa63dd7d240b8f1c061c28199eaf7fbbfdc5086bc74cb4cb638a082b5",
+          "data/processed/continuation-20261021/planned/calibration/positions/8d02798fd63bf82f6f41.json": "7056e6160b830b0c8abe61aceec0789a3d38b0a82cf87ddb9209532cdd26b2ed",
+          "data/processed/continuation-20261021/planned/calibration/positions/47c146c4228dc4858aa9.json": "a2e5c809260acffb8b32d935cfb40ea70d7c3236aa58c8b980a87321b7708e95",
+          "data/processed/continuation-20261021/planned/calibration/positions/ee16b3fb4fc3bb494738.json": "9faca22ad4098cb061e7b78ec6cc069b48ac198a1cf072f3a8e85301bb887741",
+          "data/processed/continuation-20261021/planned/calibration/positions/c836a2797656c9d1ca76.json": "53ea4b71744abae78b4633ea6187afc0bbad8124d69932cb9c11fbae99642ec2",
+          "data/processed/continuation-20261021/planned/calibration/positions/3f28be18a00545111ac4.json": "186d95901fe8ae416b0bfb3cac5b6cf31d1bf5172ecc8c15a0adf8217c527d84",
+          "data/processed/continuation-20261021/planned/calibration/positions/c5766c8d2f8410bdd5ad.json": "18f91b6245dc0336f00f71b3cd83d1fd03c794a2878d335eb53d42c675d66a24",
+          "data/processed/continuation-20261021/planned/calibration/positions/4259e807db6570ee0950.json": "c9b80281d1d36db943e9f442313478205455ba9c99dca9cbf86da43d08637a46",
+          "data/processed/continuation-20261021/planned/calibration/positions/17d881fb72eb8a17defd.json": "acf05c743ac75f97abff4185cdd5360fc0b2f4761532976bd748de080c09d1c7",
+          "data/processed/continuation-20261021/planned/calibration/positions/d0a122fe9c17a04de236.json": "2366960bf6212e752764dca15f6f17ef9f26141c949c3584aaea114ffff82b09",
+          "data/processed/continuation-20261021/planned/calibration/positions/d74664d161f030fe5f2f.json": "b254c6a1fa0480d63e720fee994d87aaed539658fed20196a2ece72163643a39",
+          "data/processed/continuation-20261021/planned/calibration/positions/c8392f65790072ff21df.json": "ad63761b07b81b4cb76bec64ba17a4fe1e6fb8fc900533695192c6124f988971",
+          "data/processed/continuation-20261021/planned/calibration/positions/3818736d15e708ff56c6.json": "aae1551bd75ae683663b1d3282e3b9e876ef19145e7b22227eff82cf7f1360d2",
+          "data/processed/continuation-20261021/planned/calibration/positions/4967cf705a71b891f6de.json": "3aeb951eb2a25566d2118cd9f868af49b1ae8b7852f24a250006d31956fb1c63",
+          "data/processed/continuation-20261021/planned/calibration/positions/c8e62b1adc283b8d8bda.json": "f59d948d4a5e2af6c222638dfd3e153fdfc0bb93bbea00a53e2dc7a531054630",
+          "data/processed/continuation-20261021/planned/calibration/positions/4bb9c659572e6ebb14f2.json": "9712569c8fd98f86dbab2946346b857cea99f0fd3877cca23fa14c70ab0371af",
+          "data/processed/continuation-20261021/planned/calibration/positions/9c925205397eed25585b.json": "93d0c2a4b533ed2bbf7d7204617acd799fe4b42806a51c66ac4b98f5f022115c",
+          "data/processed/continuation-20261021/planned/calibration/positions/984bbbf9bc825eaa7246.json": "edf0510d8febbf2a799bdab0a985124bfa37e8ec9d70044313729a33595fc69f",
+          "data/processed/continuation-20261021/planned/calibration/positions/c64c62becb491830269c.json": "af50e3590987cc6d511e4568597080a13c4fd78ade29ac4fe2620abbe6b8b71d",
+          "data/processed/continuation-20261021/planned/calibration/positions/4344d36deaeddea294a4.json": "8f9d6be63ef1b29d2eaf42b4983f19889111b425fb251d542c35dc70a6d5dda4",
+          "data/processed/continuation-20261021/planned/calibration/positions/d21795035a50e42bd45f.json": "8a2a0063498e5c6273dbda0232214620fa4335b5153e9bbbad5e6283543d5107",
+          "data/processed/continuation-20261021/planned/calibration/positions/a3e86c66d015c4c6333a.json": "c698d1d64d7009a006f983d8167c1e4150737cd77b7b9f177346d7c0e4118ea4",
+          "data/processed/continuation-20261021/planned/calibration/positions/9ef4b9e1e6ae5fb86900.json": "8e7e557fcc197d102b276270a37b7f3ca38278748a7d3c46e3cbd43942e1fbe4",
+          "data/processed/continuation-20261021/planned/calibration/positions/c2aad41d1a6833bdd619.json": "84da1a4b07315ed2c5add0e95a4b0f4a499a5b27f2e8941748f90e79e828dbc2",
+          "data/processed/continuation-20261021/planned/calibration/positions/b82fc43857d6dfa512d8.json": "d042441f3f9d61d3e27860cac668519b03e3bef3650e98d9f1b1ea01c666db8b",
+          "data/processed/continuation-20261021/planned/calibration/positions/b83eaf595c59535c01e6.json": "22fd154079aab499197cb149538904cf4e7560dad96841524445d83e1eefdb7d",
+          "data/processed/continuation-20261021/planned/calibration/positions/a81cbd5876f78ec751be.json": "24023c3767df389a4852f361478c49b2528bfdeafd2c4e78a059ef3c7d78fd55",
+          "data/processed/continuation-20261021/planned/calibration/positions/ad57dba2e1237d0e782b.json": "04160e10cfb377903fc5c9e7b3c764ac6b58de651167d4574b58458e23585fed",
+          "data/processed/continuation-20261021/planned/calibration/positions/64f20c83313059c0dc56.json": "404077762a50f3f3dc7fcbf03df2ec594e9ba564f5b16f087600449743d2d1df",
+          "data/processed/continuation-20261021/planned/calibration/positions/162f160f4c5fe3dda6b9.json": "3f6f33b4311c8aa485d5af6cb534e93bf3914c5aedad05cabae4327408b48343",
+          "data/processed/continuation-20261021/planned/calibration/positions/00cec63703a209d3bd29.json": "72974b021759256b9e8d7bf929878b4cdee787ce4f23be67ada39a079fd782eb",
+          "data/processed/continuation-20261021/planned/calibration/positions/f1ad44e662bf72f980a1.json": "d6d9be147e72b880e3c42418dec57bc4d53db29601154e22d8b1c5a1beec1a41",
+          "data/processed/continuation-20261021/planned/calibration/positions/5ac45cb37ca1386bbfa9.json": "5e47a7cce500579f3bcde0d9cca0e8d50626904d214b006ab778d96f1de8e806",
+          "data/processed/continuation-20261021/planned/calibration/positions/b6d49a7d72d823239359.json": "f644acb88d52e0be7f6f6b702b25a7163a9ecad8288e2f496e43c7ac5a9b9e02",
+          "data/processed/continuation-20261021/planned/calibration/positions/4556530c936480367ca2.json": "4f8932c163f81a21f215b4785de80235eb64739b35339a05274738494b2c86b6",
+          "data/processed/continuation-20261021/planned/calibration/positions/08ac607555e25cdb5b26.json": "402b50ae7207f1b980893ac17396b4c2a12ea89913575a470643da4cd5c26769",
+          "data/processed/continuation-20261021/planned/calibration/positions/aed181e9a1f3fb110338.json": "fda59c271f93486a1e65545dc3b64f24412cfa43bd1e5ec75beb9c44f0a23411",
+          "data/processed/continuation-20261021/planned/calibration/positions/95483095eff9b1ae11d2.json": "4c16b511940e6ff7233104931824bf96242df726c477b661cb7a10ad2cb23689",
+          "data/processed/continuation-20261021/planned/calibration/positions/b0f08f697132db52931c.json": "243da34ea893ea9420fb3ba67a285e5223c168abbf9a989b67e9f9a8e41fdb67"
+        }
+      }
+    },
+    "learned-move": {
+      "train": {
+        "positions": 100,
+        "groups": 50,
+        "trials": {
+          "loss": 10425,
+          "win": 10343
+        },
+        "saved_decisions": {
+          "p1:move": 79429
+        },
+        "distinct_sampled_worlds_per_position": {
+          "4": 100
+        },
+        "manifest_sha256": "3296a9d4c4e881ec7d8009413a36a72b8905711a5d3264f166ba78742e4cbe71",
+        "files_sha256": {
+          "data/processed/continuation-20261021/learned-move/train/positions/067868c295a1467bf9b1.json": "32b23da8e853c40902b4488257aeb0cea0b8f8907e250ef415a46ef0b97b1106",
+          "data/processed/continuation-20261021/learned-move/train/positions/b07295a176d2f396cfad.json": "1c6befa5c366dafc2a52a144abe383f3c2cfc777c8b2268f5d3990cc59dfe195",
+          "data/processed/continuation-20261021/learned-move/train/positions/3e0cf794870ac81d405f.json": "78685b45902bd70b3952d74c62ff5db5c3082e24aedad5e7b4a0773345edc837",
+          "data/processed/continuation-20261021/learned-move/train/positions/0ac0dedf479f98c78072.json": "d8d49f8121e1de97a7f3ba56d5b6d467f89efe127f9b2bcd473989eb05abfa89",
+          "data/processed/continuation-20261021/learned-move/train/positions/7d6127d491fc39e1b750.json": "9869ba4dac68dd46b497c9a2780ead61f322aafd70b71f58aa8b977404740812",
+          "data/processed/continuation-20261021/learned-move/train/positions/bbb3c795ae2c3db6e9e1.json": "6ecf430cb4a13f3a8435a5cf0e6fa160496810d247e65ba6d610c30d280d7c36",
+          "data/processed/continuation-20261021/learned-move/train/positions/8822bb95650c5175b161.json": "8c2f1bf6a4c3f69b1d00d042efab4735ca74e844ddbae2e0d923b6eb3457f803",
+          "data/processed/continuation-20261021/learned-move/train/positions/c9c1667d9b9a733b8562.json": "2e260aeca95edb3e0b110d2b3fba7c50c2c2e56e6157de90c1900f54fa9262ff",
+          "data/processed/continuation-20261021/learned-move/train/positions/3c948a4422844d159fae.json": "22398efa20f1356f6234e626601466591d08ef8ae3bad74b303c7bbb97847a3f",
+          "data/processed/continuation-20261021/learned-move/train/positions/efc9e03492c9e238f08c.json": "163817a9792669adf28530e395f8ec1e5e4ce3f72b4aa3e8c7f7c69696ddf0f0",
+          "data/processed/continuation-20261021/learned-move/train/positions/5e7ac44529ef1852830a.json": "f0a0472572bf77ddf01036abb9a09be0d7aeea38353916a7d55df83b22ccbae7",
+          "data/processed/continuation-20261021/learned-move/train/positions/6ea08aa9c2359fa4f009.json": "e03ed71cf556ee3a1b920f9c8a180a882e48267212ca3f74c815347dddbdf3e6",
+          "data/processed/continuation-20261021/learned-move/train/positions/8c7e4072c6a5aa0cc662.json": "688b0f5040afc277ee5e2e16a4e9702761772561adf231bd3e2e9a1d69ff73e1",
+          "data/processed/continuation-20261021/learned-move/train/positions/c63a3b4fcc11b7e37586.json": "c29044ef7bf038240d916d0b5b0c6057f369b57d0c752086dc418ccf66eb00a2",
+          "data/processed/continuation-20261021/learned-move/train/positions/ad6d0da2cd03451e9af8.json": "8c92bc5f81dca8bb5734b7bbcb89833db742805638f387c7fa9f4c290d7127c3",
+          "data/processed/continuation-20261021/learned-move/train/positions/bd71cee607534f0597af.json": "7aaf5f45b1aaf74f9d466cc9fab4ee7683b99d45c66edbc9ee5ddf73304afcf7",
+          "data/processed/continuation-20261021/learned-move/train/positions/7d12e892bd7126a620a9.json": "6d6f1c691a26e6b1f79e2a9018209d1b267f969bc646097d880fab87d8c64f8c",
+          "data/processed/continuation-20261021/learned-move/train/positions/f52e32ce108a6b0c3e39.json": "a73c67a44a3ad9bed74490c69d388063531434d7e5373a7956174091341202d7",
+          "data/processed/continuation-20261021/learned-move/train/positions/e50be5610bfe91b0dae2.json": "ba8aa9290db3f8f48086b1e012dca26f7c7a8c1696afb05cc6e63d267165c7db",
+          "data/processed/continuation-20261021/learned-move/train/positions/db8bc3fe1f7aaa4c3348.json": "25e5d96b60e6ae66f8895e26588d6cc8a5ddc98fc7bb3acfe762ee4f50460d73",
+          "data/processed/continuation-20261021/learned-move/train/positions/653b45442fb8441edf98.json": "1cffe3b57a477aae537d26a7c75571dd11e9eb05a80b665a2dcd6884b0899aa8",
+          "data/processed/continuation-20261021/learned-move/train/positions/b7827d6a5ce1cbc65d85.json": "024b2b8a25c94f75062a62febe1d8848b0835be791a18d3dfb4e846bc449c364",
+          "data/processed/continuation-20261021/learned-move/train/positions/94b005d89c0e5951f9bb.json": "88c9889a36e1e3ec9b7274be71d54a35a6d1b8966b4ce14baef4cfe7e28ae26c",
+          "data/processed/continuation-20261021/learned-move/train/positions/074e77a2cbb16b6de63a.json": "0087f25874477e7f8218c6e749311861b55ac9d52adfd3ca6e7828fe7c6c6fa4",
+          "data/processed/continuation-20261021/learned-move/train/positions/db3a63f2322da2448dcc.json": "9ae17f0587710e871b92f8442460c2511db209f92279505acb7095709d1744bc",
+          "data/processed/continuation-20261021/learned-move/train/positions/e4619af4966581207cf1.json": "44db576b7c7548ccb433487e7b00ee30b8da02e91bfff23338c3f1c7fc338bd9",
+          "data/processed/continuation-20261021/learned-move/train/positions/27409646c40174642964.json": "61282d2af648168f97b9920f6f5aa7fe6922213c6e4460da664fa5ff47be144f",
+          "data/processed/continuation-20261021/learned-move/train/positions/c7543ce3c95c9f3022ad.json": "4fbe2a9827f9776dce2ae4b33c06e65ae882b5c74ab4c989a37ab0340f5e1513",
+          "data/processed/continuation-20261021/learned-move/train/positions/771981846639e8b98f73.json": "047d5f4283cdbd126636670e7c62cee4e2bc802a318ceb4e31de90031ccc2604",
+          "data/processed/continuation-20261021/learned-move/train/positions/2930ea6c17ea409a2b2a.json": "5837b6145966e5a8d06a5dca7230510129b18f157cbb57b0549ae8a45b341e1c",
+          "data/processed/continuation-20261021/learned-move/train/positions/7265ce25c38c34c916f0.json": "6505b92d24ef6d1b4ab7fae997be2f9f45f8a2f454aab0ad9181795e51c473ec",
+          "data/processed/continuation-20261021/learned-move/train/positions/c058b73449f00e20ce9b.json": "010ee9410fbde520614362382011abb7f03411a47d35e228037c73d636389345",
+          "data/processed/continuation-20261021/learned-move/train/positions/01b72de9df6c74871155.json": "29a070839bf1299015ecf77d314d9e0328be9e16eca919051241533ee734b4d0",
+          "data/processed/continuation-20261021/learned-move/train/positions/e04f193f4dbf0436d2df.json": "baad5ed13a8f5d0f1c580d82633d313f1a3c43c1482c5952df7238fbddc82829",
+          "data/processed/continuation-20261021/learned-move/train/positions/717cf8323120b7947b7d.json": "da8de5d2d940fd37bd1ea915a6fd78b0ad734d3c7572be4091c3c14a2b012f8b",
+          "data/processed/continuation-20261021/learned-move/train/positions/a49601bbf52de2472a5d.json": "96485ada51b11dab272abca9626a5d09d78889c2347f5593480a92eb30b21011",
+          "data/processed/continuation-20261021/learned-move/train/positions/44a1b0e5281214d46298.json": "d18c148ab428e110ada59187cac31e3131e896beed15fe475be735cb556a67f5",
+          "data/processed/continuation-20261021/learned-move/train/positions/4bf8b304ad932d22e2cd.json": "1ca9e70af1bc16d0c61012ee2e4a31d5f3e4078efbe2df3fa6e6819b15028ac2",
+          "data/processed/continuation-20261021/learned-move/train/positions/6b30b5ab2d277ca1668b.json": "6f538f54cdc579283a37035115514a05bf552120f9c90524c497f9db850cce61",
+          "data/processed/continuation-20261021/learned-move/train/positions/a67860a367a95fb89eb5.json": "7ddb3f5e5cb8319b58ff7f344bb581969e1c53ad449284adfe400fae1a2bbf55",
+          "data/processed/continuation-20261021/learned-move/train/positions/464bd01ac663152e2751.json": "24d4d84143155fff0c607938f7317a580caa9b8a7f56af6bf9b0d3488e8253a6",
+          "data/processed/continuation-20261021/learned-move/train/positions/5b52e0d7c1b71cf9a647.json": "f68766fd2721a2f202d5f4be8fc6f0449250a8f9c399a85b241bb6fa29a4a373",
+          "data/processed/continuation-20261021/learned-move/train/positions/2fd097dd11e677003736.json": "2a05d8760d23006a08a36ea23809713214ffdea23e9861eb873172b65c2a728a",
+          "data/processed/continuation-20261021/learned-move/train/positions/06816b520588274067e5.json": "675bbc3642aabb011a3c115a64e1d620da9ac197085efa614ab9445cacf03a04",
+          "data/processed/continuation-20261021/learned-move/train/positions/7aa380bdf22b81e6a4b1.json": "500aedc0781af235960cbcd7ffc5d471d23cdda4f08eb62e0a92f25520f04e4b",
+          "data/processed/continuation-20261021/learned-move/train/positions/1e484f0ec60734f8c69b.json": "37e2e6d300fff5fc308bd0e8e47729d2212d68b95a4838f2c5b65e70557d40ca",
+          "data/processed/continuation-20261021/learned-move/train/positions/e6c7a490c81a47d9429d.json": "e3f32bf25e1cd6e91bc7d0626c8460f0e0b0b53b11f16cc777e9ad621db71daa",
+          "data/processed/continuation-20261021/learned-move/train/positions/35ec3a6166356ab5ecb5.json": "0cd82949fa11a63a18fecc0a94e1c378090f219bc84d93492a7539b0a0c96943",
+          "data/processed/continuation-20261021/learned-move/train/positions/562b3c26a4e9aa4c422e.json": "220a700c4ec650aa24d7b623d3ff27a1fd4b6ad45c4ba036a32739a11560c97e",
+          "data/processed/continuation-20261021/learned-move/train/positions/0faacd3fd53bb8469951.json": "4d57118d16f8bbb990e883324d7978e2605395c89cfb34607785a919ec1ae1d6",
+          "data/processed/continuation-20261021/learned-move/train/positions/43cf645472f6335a464f.json": "d37b0cfef576d08e39b9314dfe42c12526869aa330636250962bd931ee02fe62",
+          "data/processed/continuation-20261021/learned-move/train/positions/76b489a094a0dca7ca52.json": "a62d0601210fbeb6c51a4397a91397f6900b45819e6abe8ddb5c6b414c96abf4",
+          "data/processed/continuation-20261021/learned-move/train/positions/6bdb27b5350836fb4354.json": "3c3eb64e290894278be3f9344eea5049f609cabafc5c7b0ac90a21dc9636eada",
+          "data/processed/continuation-20261021/learned-move/train/positions/41511aafc66110578750.json": "8ead6a78c87e1eec7366838f660e428d49294221e8d54031531e8bc41e054942",
+          "data/processed/continuation-20261021/learned-move/train/positions/d2c40e20648b193c802a.json": "e8d79f44ccc7f972df6b324a4fe37c6cadf433f3c7536b12dd918c4b6b30a6fb",
+          "data/processed/continuation-20261021/learned-move/train/positions/70c814e09acfd0362854.json": "1af4222e8c2b61b0ee45cda4e155e235cf65b80d842ac99c7474b6d2141ea355",
+          "data/processed/continuation-20261021/learned-move/train/positions/d28904602c4b9ca9640f.json": "c28fd637913e312626cc28861a25a1be5f54d7605769ebc29cd010f86ffaf0fe",
+          "data/processed/continuation-20261021/learned-move/train/positions/4410f7d857f9931e79e9.json": "ad5e8aa16d033a7ec3090ae55f548dc357d1dc90607cef37781ef0de091223d0",
+          "data/processed/continuation-20261021/learned-move/train/positions/c6fe7994a62e80421e16.json": "d1deecc3c55c6fa63c9c7e57bad056ac3aad4df09b4ddd31488227b090cdf302",
+          "data/processed/continuation-20261021/learned-move/train/positions/c021425e4e977215e82b.json": "b21dbe7ea67d0d01ef5c32d762d559ee108a73e8102e8b5e14a56ddbb1a23a8c",
+          "data/processed/continuation-20261021/learned-move/train/positions/c93b4fc248f7f4be76c0.json": "f714d5a160cd2fada25ce853f6cc730e9f0c177083139e42fe19ad3eaa51b9ea",
+          "data/processed/continuation-20261021/learned-move/train/positions/86d793d5c9d1afd5498d.json": "6591ee766b4efb7930fb2965599a341f80f48d43a98b4a01d28ccfecdcfbc7c4",
+          "data/processed/continuation-20261021/learned-move/train/positions/529afc761dc5b2aba070.json": "ff76ab08f0968bc7ee738de479a8e02d773ffa9542ed841e025aa3861a929c32",
+          "data/processed/continuation-20261021/learned-move/train/positions/22dd31c06ffbb7a4f7e7.json": "f44426199cb8bcd109395046f11ca822d6ff8e5f65f60f93f6546b2e65aab7b9",
+          "data/processed/continuation-20261021/learned-move/train/positions/cbd9a6998cb0815ed6b6.json": "f151ceda14cb093da6384644a5d40c13bd7e31f7e1623fd6528541cf61c7fbbb",
+          "data/processed/continuation-20261021/learned-move/train/positions/cd3daa83fa16ba8fae7b.json": "f4cf9689050b4833a6cf522a914195bcf27bb80d3c29402914e0fd0f60426c5d",
+          "data/processed/continuation-20261021/learned-move/train/positions/ab8a726383ac832cfdcb.json": "2a4905428aab59d7eae5182b81023b73725d36e603be8758f3810abace712e84",
+          "data/processed/continuation-20261021/learned-move/train/positions/1ed02fec69395379e8b7.json": "effe1f9c8c44fd4e07ddf7e90d79f9821ab623cd222d1b949fd8606af369a932",
+          "data/processed/continuation-20261021/learned-move/train/positions/71c686768e1c6801d869.json": "fcf83b9511fcd669966729a6e27adeae7a355b24f9e028e2a1af47c2fb504071",
+          "data/processed/continuation-20261021/learned-move/train/positions/43f4409374e7965ce1b0.json": "ab33eb5876c57f609c0de6e85d3ca2ae446758186a6d23429af5bffc6d950e27",
+          "data/processed/continuation-20261021/learned-move/train/positions/60173f0069ac90c9ec0b.json": "da994169be3aad590c2028e3e046a786dc70e23dfb887dc409ffc45ab0bda372",
+          "data/processed/continuation-20261021/learned-move/train/positions/0984ad35c3fe15ec48e4.json": "9207c459bc5716d551239655750f085aabf4af1e214216b7aeddc3435174739f",
+          "data/processed/continuation-20261021/learned-move/train/positions/d5608999ac8c015692b1.json": "eca731fee0341d8f61e448d32267e74f9fe9cdbf288c3f1e88305dad9f56b4cf",
+          "data/processed/continuation-20261021/learned-move/train/positions/e2475afb5c6dbd8f6348.json": "24c2ccdfd0827b61c764bd9e0c3ac8e90928e3aadc9d9c8bfce6acdecf8deaa5",
+          "data/processed/continuation-20261021/learned-move/train/positions/2e0d9beb211a82bd206f.json": "ab7aed4e9620afbeca17a0c2c11549e521a775de9f125ebd611c17955a234bb2",
+          "data/processed/continuation-20261021/learned-move/train/positions/a10f94684907a808170a.json": "c797a5971326ea2db2f86f8fb977d18a091996775473ee4a77f53b6c28e23f42",
+          "data/processed/continuation-20261021/learned-move/train/positions/4d79aabf5f9b1e56764a.json": "62acd8a06d768098a5d60004a1cb5b466007900ed6d237aacfa485f50620b8be",
+          "data/processed/continuation-20261021/learned-move/train/positions/256f08c01bb2d3e7bb81.json": "fcf0fa2c9382191f0f231c36976422a36828bb9cd4c46cee80c50a14461fe872",
+          "data/processed/continuation-20261021/learned-move/train/positions/00a7d9b1677fddf14be1.json": "fc89de2d0e4c2d15c206d3345bfda5eea5c07c3a42bb322c45fb677d15388f74",
+          "data/processed/continuation-20261021/learned-move/train/positions/d9ee3c50ea4773d22a8b.json": "6cd9daf92aba21a77a49c5388bdd43c1aa7aa715c1c1efcc122927fbf3887863",
+          "data/processed/continuation-20261021/learned-move/train/positions/c7e42a7b8bfd3c29d466.json": "cda51b4314d50d1a836bee3756649a9d9e2455b7738c4be2bf60c55b3a5868e8",
+          "data/processed/continuation-20261021/learned-move/train/positions/ebd72d0fe0899b2b4c18.json": "5657d80f9b5e7d24a622ee03b23067b35879857a95bad1cbd7b650979671737e",
+          "data/processed/continuation-20261021/learned-move/train/positions/bb75e4c68ce8e61499ee.json": "c98d49bda0902bad526a8a2bfbbc183ebe79f33490660139bb31a8b464077c39",
+          "data/processed/continuation-20261021/learned-move/train/positions/ecabb145a9bd9391a04c.json": "d2fff95d1a93a3979e136009d4ff22199a1ba6fadaebe7b02b069fe624c41743",
+          "data/processed/continuation-20261021/learned-move/train/positions/9ef9ea956e66a57259c4.json": "6e8030f68c6ebdc3b8ffb2face0b5f363a31e9339571f159af146a5ba91e7616",
+          "data/processed/continuation-20261021/learned-move/train/positions/12bd605f99fedaa55f2b.json": "430ba4d7802e46fd2e5b5ac2e9bffbf506f405e29af53ee8ce8f049c75659a1e",
+          "data/processed/continuation-20261021/learned-move/train/positions/3962db2659e3fc8c5ed2.json": "963d706a00cc06851fc3ccd69d683e27963b7bbe1bb15154b2abd25adea69a71",
+          "data/processed/continuation-20261021/learned-move/train/positions/9cc53874d7f727bc9425.json": "ed8f8a37243bc9ff8fe43872bf60df9ff4fe20fb523d689c8279659bc94d30bc",
+          "data/processed/continuation-20261021/learned-move/train/positions/3e81ad0f3cfb13cfd2ef.json": "d668935fe7c594f54af8879bdb4b055966dbf2c49732b911db706e7a793a7261",
+          "data/processed/continuation-20261021/learned-move/train/positions/1b5758814fde1018f208.json": "eeb8edcb7ead1d2eacf1b2af1fca939d718332df0a645e6cb7f30a6b4eb75b26",
+          "data/processed/continuation-20261021/learned-move/train/positions/7db152d2008640ffffa4.json": "c12ef54270559a83a44ab1794a31c4e5bf8d0ff8cc13b4b24613833abf79f961",
+          "data/processed/continuation-20261021/learned-move/train/positions/3d3d09c7b4902d7f3c23.json": "939debc91bb6168553f24bfe685aab0eba887cd4c00c316e49c8a50f670f72f6",
+          "data/processed/continuation-20261021/learned-move/train/positions/38a96acfdb5019dee972.json": "72169b137d1df4c7d9051c817f8b219f7609d2f6970b8cebba8c1196f3eb50cb",
+          "data/processed/continuation-20261021/learned-move/train/positions/1110ebf364129ed4e3aa.json": "51d83fc8cf10dbab9411bfe3e20c946e9cd3ad6306ae02f691580d81d085cd32",
+          "data/processed/continuation-20261021/learned-move/train/positions/c42536dafd5ec215189a.json": "bd9b413be83657890f82976db080b8072e8c5b1914a425107e8cffd3583e1d2f",
+          "data/processed/continuation-20261021/learned-move/train/positions/6698c97abfd06c7ca649.json": "7df7ac066c7e2a6267976b41c16a9d599ed14ad9c176cd93cc0ca362b4f610f1",
+          "data/processed/continuation-20261021/learned-move/train/positions/0b2f71858a4ea8f99e9a.json": "2ad1658254d5b38fdb7ffbeb8cb67cb0e5628cf2aea2b2de7f19c268952f42ea",
+          "data/processed/continuation-20261021/learned-move/train/positions/14fa14679cc0b2db2b4a.json": "030de332a6c8899a1bff28c879b9bfe3ca9941f8e1ad43867bd768c568eb5eca",
+          "data/processed/continuation-20261021/learned-move/train/positions/ec4ff460e40073e27b9b.json": "7a53a28a23b76cc21baeb10e5450b70273a99614c62c6e5aca77a9357265a878",
+          "data/processed/continuation-20261021/learned-move/train/positions/5139ca5d9d2958e31992.json": "f53015be62caab8deaa3da2632f97de32aa1a078358c246995e8adb80ab8cff1"
+        }
+      },
+      "development": {
+        "positions": 40,
+        "groups": 20,
+        "trials": {
+          "loss": 4487,
+          "win": 3865
+        },
+        "saved_decisions": {
+          "p1:move": 31584
+        },
+        "distinct_sampled_worlds_per_position": {
+          "4": 40
+        },
+        "manifest_sha256": "606790e100e8888dad94a5ca9924f7a2c2c2739ae0cce3d3adf99d5bb460f762",
+        "files_sha256": {
+          "data/processed/continuation-20261021/learned-move/development/positions/5c2bb34c55a51894858b.json": "8731c66bf13391d5f1d234141527038f7b233dd22d7133efd2ed7b4ba31d2c2c",
+          "data/processed/continuation-20261021/learned-move/development/positions/00860324b1372a010d0b.json": "c059625c16e0564d95af6308b471392af885c3e21056c81b24f21957042f4bfd",
+          "data/processed/continuation-20261021/learned-move/development/positions/8391239397cf62e6ec53.json": "4128aacaa32788c7c9d97d60d0855091f984071f97e51fc6c60c77dc1c46fa1a",
+          "data/processed/continuation-20261021/learned-move/development/positions/57b534fa518fbfea7e26.json": "2f83676c6a66bae7d3771596297884391ee432574390de4a974d78ce230edb77",
+          "data/processed/continuation-20261021/learned-move/development/positions/90a85108c20e419410e9.json": "c30f302ef470c378a7a4d711af6d67775a25ba7b98d56971cc68aa29f2b1194b",
+          "data/processed/continuation-20261021/learned-move/development/positions/2064ef8895e26accf09a.json": "d472a278d29464d639ba7f241af6f1f5d8de94e7e29b769cc6a226d883124547",
+          "data/processed/continuation-20261021/learned-move/development/positions/2d41540126ced903c6b9.json": "66f85dfc2bcf3d45fe1d62492a6b8327d18e2fb6dd3dc94b849e95cbe8fcc70d",
+          "data/processed/continuation-20261021/learned-move/development/positions/7e81569c0a9c20303d63.json": "46ecaf23eaf5d02ce7e468204565bb1779a198b2f42d973e548c6aacadd72f5a",
+          "data/processed/continuation-20261021/learned-move/development/positions/a4a26480798d074e9c27.json": "527997b415e364d56e493aecb8f425a89d4a8df942e90ef4643071c2abad357c",
+          "data/processed/continuation-20261021/learned-move/development/positions/d19532b9350b14de50e2.json": "513fc26cde41b2c2e182b09b71bbb14d04763375924c38a665eb741efa10d3cc",
+          "data/processed/continuation-20261021/learned-move/development/positions/4a3fb2a398e57a7a2fcd.json": "66a935a916882476057b564b1743d48de29c5d8b78f09e075cd7d6bb2158e91c",
+          "data/processed/continuation-20261021/learned-move/development/positions/767a12481b22a47271cf.json": "bac2c772fea5d341cee0bb68c943a39e051d742a4e2b5b0c8dd6560daa291e31",
+          "data/processed/continuation-20261021/learned-move/development/positions/5a11ab6eb03994beb9e1.json": "e6ea08995b2e3034e5228cff7629f124f9b410e16feebc1620644e390b7795cd",
+          "data/processed/continuation-20261021/learned-move/development/positions/ca3c1adc4a6b79fdef10.json": "42d027c613404d3e14675d04ddcc356962d67e19cd82cd62738144710264ebdf",
+          "data/processed/continuation-20261021/learned-move/development/positions/3dd0f9b8bbecc49a85e7.json": "3aacc5de7f2a551486decea4e6cfcc09baed40ce8952c4f14c9c071d1b66a25d",
+          "data/processed/continuation-20261021/learned-move/development/positions/6ce0901838e167badca3.json": "0a12070f50a02fee3f7f0676e84f183f5a72bde190072cf2c73eaf775ac8310a",
+          "data/processed/continuation-20261021/learned-move/development/positions/1c6709276aac3f29d494.json": "b66ece7594b2126cbc2bc429eb391e65d02e9116213da996dcc2429e5625ae74",
+          "data/processed/continuation-20261021/learned-move/development/positions/b38f36e052bb323368e2.json": "82aa282f711dbeb093f7f6630b7980d18387b57e11a8ee4601453eea52afe42f",
+          "data/processed/continuation-20261021/learned-move/development/positions/74d45eef2703b6ae1d96.json": "b37cbcdaf902dc58c4e3a96d80ebc825d3014f3986762216d7f058fb334a1f26",
+          "data/processed/continuation-20261021/learned-move/development/positions/94cd6e6fa748ca30fe23.json": "1b71cbaa24e72351b1397dd6bcad390fa3ab3def198cec037a79fd5b3897e16e",
+          "data/processed/continuation-20261021/learned-move/development/positions/2b8a1f5e2441d40d757a.json": "10a22bceed7b88e4729c07a9fc75be7172dae76ff356bad0d3a3889230c74078",
+          "data/processed/continuation-20261021/learned-move/development/positions/0795b2ae6363c84ab515.json": "19f79c83e8bde949003068516d71b5bfe264689e7bf897fe2af6dc15b91cd8e7",
+          "data/processed/continuation-20261021/learned-move/development/positions/3b33ee8d3f516645582c.json": "75513c25e33db3db3f9e05fb0b62516acda9906a6b2b690d5f9012570080c1b2",
+          "data/processed/continuation-20261021/learned-move/development/positions/dd6f5331c0b95581b7b6.json": "7e684c85018d12b10ed297dfe81a7b211b870f8afe22f558e16320a27014dd74",
+          "data/processed/continuation-20261021/learned-move/development/positions/f472c51ec44cbe66c31d.json": "f1f228e8fb2cd33b809e73f5b8f5fa6fd90fbccf27815f4f784dc351eaa4588c",
+          "data/processed/continuation-20261021/learned-move/development/positions/1c3a702e590a8b90bf24.json": "59c5f8a9982da854758fb091ed2ce86a2910d130304e0107327ed083f0c8ae63",
+          "data/processed/continuation-20261021/learned-move/development/positions/a7a86c8a55c37cc3c2a8.json": "bf01de9ef9dba4cccb67704d1c7900152db865c58c5025ad67bfb9de2394744d",
+          "data/processed/continuation-20261021/learned-move/development/positions/d0a1898ce734bae3cb75.json": "03a1e516d06bb6a4703b92780e7fb6726053c7c2c52f5b28a8f62f85ebde2ea7",
+          "data/processed/continuation-20261021/learned-move/development/positions/2d1e510da8d9a26fb71f.json": "172c6b057e8d61f62d3789405940efc23b416dc51fb101d88abbe3602846c65b",
+          "data/processed/continuation-20261021/learned-move/development/positions/3995fa12705c6769f729.json": "74117f093c8cd24e74dda40ed4c7a682f85b0caf0a5378d6c831db54de887353",
+          "data/processed/continuation-20261021/learned-move/development/positions/0e74c2247f0004da6832.json": "9616da6de29606055c65e2f8ffbdb100c61dab94a326ec1862f0399d4ae2c45b",
+          "data/processed/continuation-20261021/learned-move/development/positions/e3015f488af9a6dbe90e.json": "48fa1a96c7af1f8044b1eca899d59d413f602b19c39afe6f0406584ae2e171fe",
+          "data/processed/continuation-20261021/learned-move/development/positions/dccb084bd1f27a2f7b50.json": "1e6a634424c2cf76c9ca871ca87e24628f719d128cd88aca4b36713569b227bc",
+          "data/processed/continuation-20261021/learned-move/development/positions/98955c197afaeaa5b8ed.json": "64c5a1ab42adaf9e2bd1c64e5c8a2bcd165eaa431d6648e52504280927b3df4f",
+          "data/processed/continuation-20261021/learned-move/development/positions/1ca32732bd8f013c9d1a.json": "ca7b92666b7455a9172c7befed68368820250931a0888d3831a094d99e70f3aa",
+          "data/processed/continuation-20261021/learned-move/development/positions/662938dfc3856061fb88.json": "4244a51a052eb4760cb608ac60f54c0043dfd3c5e04633a7e155d398807059f5",
+          "data/processed/continuation-20261021/learned-move/development/positions/5d4dfe2ee59a0cc4ec83.json": "eea14fe61783243e87eb72d0e40d501748a448d0ab35a69a841506d5b01bbc34",
+          "data/processed/continuation-20261021/learned-move/development/positions/6352836d954e25fb4d4e.json": "977ad5f5be61a23add632b9e53290cad53941d37e179449e38726a1f0e095376",
+          "data/processed/continuation-20261021/learned-move/development/positions/70bd4b4827bd53eb3e73.json": "1fbb29022d4cb0709ac3fcfeb769faabb1c99727b472efe50f9127be2ca49bfe",
+          "data/processed/continuation-20261021/learned-move/development/positions/aac10213f51775695175.json": "404a9b5eb159654e9a02c60ca1ab97ffb999c590a0a212937066922da8c353a0"
+        }
+      },
+      "calibration": {
+        "positions": 39,
+        "groups": 20,
+        "trials": {
+          "loss": 4640,
+          "win": 3648
+        },
+        "saved_decisions": {
+          "p1:move": 30860
+        },
+        "distinct_sampled_worlds_per_position": {
+          "4": 39
+        },
+        "manifest_sha256": "f9083af91a7ee1d57d8c8ac30c2c93c1007fe7ee247a4a88db1d17f394e3ed34",
+        "files_sha256": {
+          "data/processed/continuation-20261021/learned-move/calibration/positions/7957fe56b3b6cbc46a11.json": "8b3776549af554220b4121aae9de0eccf35916594225a61ad1a6fe31b31b0816",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/8d02798fd63bf82f6f41.json": "eaf8b60a2934a5a8e0746f95a817cf94cf1bc09882efce2ec753856d83dee642",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/47c146c4228dc4858aa9.json": "cf16157bfa1273e515308047f095e53d708a4247d43483c16196ca0ca63c7a36",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/ee16b3fb4fc3bb494738.json": "2ce8150ec869831439a1b903ad7db15069fc02c6b684ca456c6b583fd14af97d",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/c836a2797656c9d1ca76.json": "311004d874f660f71ab15d6ada4fa682f57168fc1ce5a3c79c98e0c8eca0981e",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/3f28be18a00545111ac4.json": "c27e2f0bb33a0d39830e26ede4a0b238dba968ce65a6b7bd863ae694f53351c2",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/c5766c8d2f8410bdd5ad.json": "3e5a34e513f1d3a0e16ec1678d4f722b287b634d229e572351d3a931854580d1",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/4259e807db6570ee0950.json": "fd9fd6e4b65b79b8483e927f12405280d94ba30fc1bc280460dbf9b529253d99",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/17d881fb72eb8a17defd.json": "4b2797b139cb4acf8fa5cf768c05ee6aa1006f133e41c3bca909791720ad789f",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/d0a122fe9c17a04de236.json": "cd742c12907619ec8387c68fc59ec42c79adaf7ff674c5817c741e4c5ce0bc3f",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/d74664d161f030fe5f2f.json": "7cd42b07f61bbb1a3c9196e5fe10ab146a804e623043f3cfdfcc1d18017e7dd6",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/c8392f65790072ff21df.json": "be6243ba1c3d8994ed3148ca158b69930d537b2a9b45bd76b2da324fbc994ba6",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/3818736d15e708ff56c6.json": "d141283197abec6cfb96501a2e0c65b34ceec7633c07393065d75f4ad40ae4b3",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/4967cf705a71b891f6de.json": "fe64b291ac3ce682b7df8f5966a1c82bb3887a49c9bc4f00ff2836992b16a0d0",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/c8e62b1adc283b8d8bda.json": "64a951712850cd02ba5750e5527c1d3ac48d286af3cec954149c055ecd32018d",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/4bb9c659572e6ebb14f2.json": "668ab24b8808e89016589b6cccfeddd232443e405bf1d027400725426fa23682",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/9c925205397eed25585b.json": "1aafcb0f30b07b269bec11666728b9bf27599449fa57298119a9b1fcf5e2e94a",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/984bbbf9bc825eaa7246.json": "24b4706cee1c6662b9bc3c9d92600aa5225a812c89fb17672df86a174b53a083",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/c64c62becb491830269c.json": "8c1e082a623042dc6aa4acfec170c95616320742dd88f5155967df99c6a12f07",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/4344d36deaeddea294a4.json": "cb486738caea010c3475363477f33e698da558983e52ed9926ea0d3266ed2469",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/d21795035a50e42bd45f.json": "2667e26a5ac4237cfb5de3f0c9b503ad07a627eb88c56181c565afd81dc485b3",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/a3e86c66d015c4c6333a.json": "d6e26eeb0b9d1faf11f2267712b030f3c2b0a8200f93b7698ddb8235c72a8ad2",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/9ef4b9e1e6ae5fb86900.json": "1f3d6f1ed360d6d7915be15aad4315db44f49521439d2f346ae1dba6a2a51381",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/c2aad41d1a6833bdd619.json": "5b3b6ef083d4a4dee38d9fcea472435774092f93891c13738b95cd92625bfd52",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/b82fc43857d6dfa512d8.json": "fbac9f640128b59dd4e7e71dc8e82597b9ab5893902bf381652b0ec7cdf3ccb6",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/b83eaf595c59535c01e6.json": "2998c0d5204b05b096ac2b665f34c0f891e6376652a332e27f28bfa5f288a369",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/a81cbd5876f78ec751be.json": "e7f391baa7a0870dc371b1893477b375c5db532a68f851e191e64fb0e1cd681c",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/ad57dba2e1237d0e782b.json": "dbe2ecb6392a973447431145fb2e0ed7ec3b41d100869b0915c1a2997aa7b8d9",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/64f20c83313059c0dc56.json": "f3bcb2700ca8125a9ebcc914340910c8eae1f044fadf49d2df0abdfe66aba5f6",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/162f160f4c5fe3dda6b9.json": "29e6c9d2a5e2222ca0f518392992832bc1a5eed688b66f60aa08dc2109075d48",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/00cec63703a209d3bd29.json": "707f8057adf0eecc1e5ff4c2a6749e56a8efe415a40063b69d48749ac3025241",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/f1ad44e662bf72f980a1.json": "625be9df762145a80578add3521be4f8b03974fa38b680f37fe45d1d80c45ecc",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/5ac45cb37ca1386bbfa9.json": "c86050cb30a26326ba6031b20d5d24dee93a65fe0a75e009b9cdfe5c4b527729",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/b6d49a7d72d823239359.json": "24bf18449d917c33278cb89f52f347696a5330aad3693ed5e621506088e98111",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/4556530c936480367ca2.json": "a859de96a231672f09b86ed9fb277fadf0510898f2c2fd18f71606ddb12b8eaf",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/08ac607555e25cdb5b26.json": "3df615b3556dfe07d350f57bc04a4e5ed2cbb4e303cdd74d8e8ea2be604eef7a",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/aed181e9a1f3fb110338.json": "973b5c05403ad8132d096a5277778bdd2d9d9e51620a59452ce8b5031d07ddfa",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/95483095eff9b1ae11d2.json": "4aee34b0ee0f7823fb025cd63a6d70187f4c0462c017db87daea381215fecf08",
+          "data/processed/continuation-20261021/learned-move/calibration/positions/b0f08f697132db52931c.json": "24f79f6de69e0b0557505aba68b748a85b1dd5163498421dbace0713e2513abb"
+        }
+      }
+    },
+    "planned-reference": {
+      "calibration": {
+        "positions": 39,
+        "groups": 20,
+        "trials": {
+          "win": 3961,
+          "loss": 4327
+        },
+        "saved_decisions": {
+          "p1:move": 31093
+        },
+        "distinct_sampled_worlds_per_position": {
+          "4": 39
+        },
+        "manifest_sha256": "7cc0c2a744e3b57da8e17f04e4e03411b238495062b1b6526d6e3fab33d46b06",
+        "files_sha256": {
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/7957fe56b3b6cbc46a11.json": "c6391a9a9450c6e3cb9b73213a33fb7ba9539eb87985c0d7f19f751f0deee002",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/8d02798fd63bf82f6f41.json": "f52cf928579f4b3e1ff5940f1b33ef8938bfccdd35bb351e58a63a08a1a30b59",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/47c146c4228dc4858aa9.json": "bfa9b16a1c91cc70d00bdac13db7722466cf8c51095114debdb7ba6e01e41ddf",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/ee16b3fb4fc3bb494738.json": "e3e9097c7d2990b3578ad29e2a12d1a0fa4ade58cab9e2c0b5cd9994b519b158",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/c836a2797656c9d1ca76.json": "5c122a3a930489ebc1ef363d47603400e918ebe0c6a863a0d87049448282d571",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/3f28be18a00545111ac4.json": "5940d2056626d254ecfd75cf51d88ed861afa95a27951bb262f18b18d814ceab",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/c5766c8d2f8410bdd5ad.json": "ecc1df71e7144fc16d43ba2ecb4b5cd8fa7e9372b1570db46c5bba5bdbb5b358",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/4259e807db6570ee0950.json": "7f0efbdea8e0427e582ba1fa5eed345f9f37fd92a0d2f299c4dabe0b5b28c231",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/17d881fb72eb8a17defd.json": "fc4a08d56fe1f92963dd8fec36ade3bee8aa023cc3ca0ef49db8a3dcd67f65cd",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/d0a122fe9c17a04de236.json": "a75924b5c0ec65260774ac73d7799735fb21b69e244f68337746591f260b285e",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/d74664d161f030fe5f2f.json": "c63384da47107467d3aae2ea56140f676b2ff4419f609ff21208fb7f5d2bd09c",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/c8392f65790072ff21df.json": "ec6deb6ddab6ed9ebf11b54e9ae765da78508bd2142dd42555222bba10d6b5e1",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/3818736d15e708ff56c6.json": "f2cd1218f84200ccd80b417ad3113d8304f021873ade9ff59ac88f1e0ae95e27",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/4967cf705a71b891f6de.json": "a480fff63056f0c584fb510c5aab598b65db0f5003dc87844ba321a9f364e9ce",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/c8e62b1adc283b8d8bda.json": "a477321e8f9650e17918c84aa00ad4aa34affc2f2b3f98df12fce7b76ad36e0c",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/4bb9c659572e6ebb14f2.json": "5088eb144365f5e387eec43568663a5321fd15d3505bc35ee84c38bf7c6123a5",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/9c925205397eed25585b.json": "b965955b5cbf785766b4353369df723bc2d2b982c9bd4385a922c0daf226a4d6",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/984bbbf9bc825eaa7246.json": "ab3ac08408ae1abd1f8029c4edbe6b2ebcb0f58d483a5b1e0620af4994c86323",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/c64c62becb491830269c.json": "45a9b4e6cdc532a4c700b2eec252e643aad1a33f8c68442656bbbd9472b2695b",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/4344d36deaeddea294a4.json": "5685b2dfb8922a82ca4c1dadb453bfbb849917be3e06daaa5a4c4e4889accd67",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/d21795035a50e42bd45f.json": "c8b0552b8152582ea2bc3d660b45adeed2d0929d7a365847dd8f623b01c52ed0",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/a3e86c66d015c4c6333a.json": "f8863be2f3be7639e31eba900cfa0da0949a7ac668a74031684fcf3a23a67633",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/9ef4b9e1e6ae5fb86900.json": "8b78673fad405085d0514d9602d82a6cb69cd66a1e70347db1aa9a72a3b7fa37",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/c2aad41d1a6833bdd619.json": "1cf7d3603932bab37493bd8bca9f4db1647787ef24b95d8b1841ffc10d4ce429",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/b82fc43857d6dfa512d8.json": "663a8af1680f77fe9817d0ad0921236aad48d77417b6417ae5980cd84c2c5c6e",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/b83eaf595c59535c01e6.json": "ec981645250f2386e8e861443af15c974fca6f835f14868042c3547c851f23a2",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/a81cbd5876f78ec751be.json": "cf2506cc330d4763a6167a843f584f49ffa30793479655cc2261c5942d157a3d",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/ad57dba2e1237d0e782b.json": "878edfec736214cd2ef43f48f6e9b25418eb2af713260877acd0a72a34ca7e85",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/64f20c83313059c0dc56.json": "c2385d5e8cdd2aab1c3f4068c3a1c4e3e8df882d3e425bf3cb61474cb60352aa",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/162f160f4c5fe3dda6b9.json": "c1be6267f578f1ba30d3eafd6bafeddce25ecdacbdaa84c0ecf5fdb76ffc67fe",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/00cec63703a209d3bd29.json": "11c38ba75546783696a34daf12de9e989947c9adaadaf8e7c673f3393cd13ef0",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/f1ad44e662bf72f980a1.json": "8db528c1d6aa87208d28c2e380cbaa319f8c29c3e5137390e8367caf73e286d3",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/5ac45cb37ca1386bbfa9.json": "194bd297045be5c979d47029670550ddc3dfaaf20af7f50711c5c5458ca3e49c",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/b6d49a7d72d823239359.json": "96da78450dfa0ac808684bf07a076e6a41f99b3e5b0daa944bf8475c9fca5e2d",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/4556530c936480367ca2.json": "03d0ad74a92173ea4d56c1015d54ae7207f28de176c1da9787a2f0ecdda4a5a8",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/08ac607555e25cdb5b26.json": "1b5a6740618308bef0b2efb72a3f047a855e93d5549d6929b26ae0b61c66a7ef",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/aed181e9a1f3fb110338.json": "8d19cdf43ddc841c70c2b16200dba9219d3b232b9203661d2d94153cf3dcec71",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/95483095eff9b1ae11d2.json": "9e93f52af1d8dac244efac0d4713296de60c69c40cdc1dd2108cfa213d99039f",
+          "data/processed/continuation-20261021/planned-reference/calibration/positions/b0f08f697132db52931c.json": "7142897092f47a8c30d0662675037330e5d31bfc64d2ec3fe68631c86874b665"
+        }
+      }
+    }
+  },
+  "policy": {
+    "provenance": {
+      "head": "ours",
+      "feature_version": "policy-features-v1",
+      "feature_contract": "2efe483198e2675f",
+      "target": "terminal-branch-pairwise-ranking",
+      "continuation": [
+        "planned/tactical",
+        "planned/disrupt",
+        "planned/expert",
+        "planned/counterplay"
+      ],
+      "decision_scope": "move",
+      "teacher": "complete paired CI90 positive; no policy reversal; minimum 4 distinct sampled worlds",
+      "source_split_sha": "f89b06cb18feae14ecf5b83ea3e9b9a07fcc8ae830998e587ec51e638075259e"
+    },
+    "rank": {
+      "epoch": 25,
+      "development": {
+        "regret": 0.12890625,
+        "positions": 40,
+        "battles": 20
+      }
+    },
+    "policy": {
+      "path": "ours.json",
+      "sha": "b3d30a435c122bf9"
+    },
+    "counts": {
+      "counterfactual-root+planned-continuation": 70993,
+      "unknown-root+planned-continuation": 11349
+    },
+    "policy_distillation": {
+      "states": 800
+    },
+    "training_code_sha": "8a6f182bbd9fa26c17ba3c70fc1080a0b9619414983208e4b70b1df7a08d27a2",
+    "data": "/home/michihito/Working/wt/continuation-learning-20261021/data/processed/continuation-20261021/planned",
+    "gate": {
+      "passed": false,
+      "reason": "ranking actor only; fixed-policy value and calibration pending"
+    }
+  },
+  "value": {
+    "provenance": {
+      "target": "terminal_branch_continuation",
+      "feature_version": "observed-value-v1",
+      "feature_code_sha": "abe5a04ed7a75fbe",
+      "dex_sha": "dff847db0cc3d5d7",
+      "features": {
+        "public": [
+          "own.active.species_known",
+          "own.active.base_hp",
+          "own.active.base_atk",
+          "own.active.base_def",
+          "own.active.base_spa",
+          "own.active.base_spd",
+          "own.active.base_spe",
+          "own.active.type_Bug",
+          "own.active.type_Dark",
+          "own.active.type_Dragon",
+          "own.active.type_Electric",
+          "own.active.type_Fairy",
+          "own.active.type_Fighting",
+          "own.active.type_Fire",
+          "own.active.type_Flying",
+          "own.active.type_Ghost",
+          "own.active.type_Grass",
+          "own.active.type_Ground",
+          "own.active.type_Ice",
+          "own.active.type_Normal",
+          "own.active.type_Poison",
+          "own.active.type_Psychic",
+          "own.active.type_Rock",
+          "own.active.type_Steel",
+          "own.active.type_Water",
+          "own.active.revealed",
+          "own.active.hp_known",
+          "own.active.hp",
+          "own.active.status_brn",
+          "own.active.status_par",
+          "own.active.status_psn",
+          "own.active.status_tox",
+          "own.active.status_slp",
+          "own.active.status_frz",
+          "own.active.status_fnt",
+          "own.active.boost_atk",
+          "own.active.boost_def",
+          "own.active.boost_spa",
+          "own.active.boost_spd",
+          "own.active.boost_spe",
+          "own.active.boost_accuracy",
+          "own.active.boost_evasion",
+          "own.active.volatile_substitute",
+          "own.active.volatile_yawn",
+          "own.active.volatile_taunt",
+          "own.active.volatile_encore",
+          "own.active.volatile_disable",
+          "own.active.volatile_leechseed",
+          "own.active.volatile_confusion",
+          "own.active.volatile_saltcure",
+          "own.active.volatile_perishsong",
+          "own.active.volatile_curse",
+          "own.active.volatile_ingrain",
+          "own.active.volatile_aquaring",
+          "own.active.item_known",
+          "own.active.ability_known",
+          "own.active.item_leftovers",
+          "own.active.item_sitrusberry",
+          "own.active.item_mentalherb",
+          "own.active.item_airballoon",
+          "own.active.item_focussash",
+          "own.active.item_choicescarf",
+          "own.active.item_choiceband",
+          "own.active.item_choicespecs",
+          "own.active.item_eviolite",
+          "own.active.item_lumberry",
+          "own.active.item_rockyhelmet",
+          "own.active.item_heavydutyboots",
+          "own.active.mega_item",
+          "own.active.ability_unaware",
+          "own.active.ability_goodasgold",
+          "own.active.ability_speedboost",
+          "own.active.ability_levitate",
+          "own.active.ability_regenerator",
+          "own.active.ability_illusion",
+          "own.active.ability_moldbreaker",
+          "own.active.ability_waterabsorb",
+          "own.active.ability_stormdrain",
+          "own.active.ability_flashfire",
+          "own.active.ability_sturdy",
+          "own.active.ability_magicbounce",
+          "own.active.ability_intimidate",
+          "own.active.ability_poisonheal",
+          "own.active.moves_seen",
+          "own.active.move_data_known",
+          "own.active.moves_Physical",
+          "own.active.moves_Special",
+          "own.active.moves_Status",
+          "own.active.max_power",
+          "own.active.priority",
+          "own.active.move_heal",
+          "own.active.move_protect",
+          "own.active.move_substitute",
+          "own.active.move_baton",
+          "own.active.move_phaze",
+          "own.active.move_encore",
+          "own.active.move_taunt",
+          "own.active.move_toxic",
+          "own.active.move_yawn",
+          "own.active.move_burn",
+          "own.active.move_pivot",
+          "own.active.move_bodypress",
+          "own.active.move_hazard_clear",
+          "own.active.setup_atk",
+          "own.active.setup_def",
+          "own.active.setup_spa",
+          "own.active.setup_spd",
+          "own.active.setup_spe",
+          "own.active.attack_Bug",
+          "own.active.attack_Dark",
+          "own.active.attack_Dragon",
+          "own.active.attack_Electric",
+          "own.active.attack_Fairy",
+          "own.active.attack_Fighting",
+          "own.active.attack_Fire",
+          "own.active.attack_Flying",
+          "own.active.attack_Ghost",
+          "own.active.attack_Grass",
+          "own.active.attack_Ground",
+          "own.active.attack_Ice",
+          "own.active.attack_Normal",
+          "own.active.attack_Poison",
+          "own.active.attack_Psychic",
+          "own.active.attack_Rock",
+          "own.active.attack_Steel",
+          "own.active.attack_Water",
+          "own.bench.species_known",
+          "own.bench.base_hp",
+          "own.bench.base_atk",
+          "own.bench.base_def",
+          "own.bench.base_spa",
+          "own.bench.base_spd",
+          "own.bench.base_spe",
+          "own.bench.type_Bug",
+          "own.bench.type_Dark",
+          "own.bench.type_Dragon",
+          "own.bench.type_Electric",
+          "own.bench.type_Fairy",
+          "own.bench.type_Fighting",
+          "own.bench.type_Fire",
+          "own.bench.type_Flying",
+          "own.bench.type_Ghost",
+          "own.bench.type_Grass",
+          "own.bench.type_Ground",
+          "own.bench.type_Ice",
+          "own.bench.type_Normal",
+          "own.bench.type_Poison",
+          "own.bench.type_Psychic",
+          "own.bench.type_Rock",
+          "own.bench.type_Steel",
+          "own.bench.type_Water",
+          "own.bench.revealed",
+          "own.bench.hp_known",
+          "own.bench.hp",
+          "own.bench.status_brn",
+          "own.bench.status_par",
+          "own.bench.status_psn",
+          "own.bench.status_tox",
+          "own.bench.status_slp",
+          "own.bench.status_frz",
+          "own.bench.status_fnt",
+          "own.bench.boost_atk",
+          "own.bench.boost_def",
+          "own.bench.boost_spa",
+          "own.bench.boost_spd",
+          "own.bench.boost_spe",
+          "own.bench.boost_accuracy",
+          "own.bench.boost_evasion",
+          "own.bench.volatile_substitute",
+          "own.bench.volatile_yawn",
+          "own.bench.volatile_taunt",
+          "own.bench.volatile_encore",
+          "own.bench.volatile_disable",
+          "own.bench.volatile_leechseed",
+          "own.bench.volatile_confusion",
+          "own.bench.volatile_saltcure",
+          "own.bench.volatile_perishsong",
+          "own.bench.volatile_curse",
+          "own.bench.volatile_ingrain",
+          "own.bench.volatile_aquaring",
+          "own.bench.item_known",
+          "own.bench.ability_known",
+          "own.bench.item_leftovers",
+          "own.bench.item_sitrusberry",
+          "own.bench.item_mentalherb",
+          "own.bench.item_airballoon",
+          "own.bench.item_focussash",
+          "own.bench.item_choicescarf",
+          "own.bench.item_choiceband",
+          "own.bench.item_choicespecs",
+          "own.bench.item_eviolite",
+          "own.bench.item_lumberry",
+          "own.bench.item_rockyhelmet",
+          "own.bench.item_heavydutyboots",
+          "own.bench.mega_item",
+          "own.bench.ability_unaware",
+          "own.bench.ability_goodasgold",
+          "own.bench.ability_speedboost",
+          "own.bench.ability_levitate",
+          "own.bench.ability_regenerator",
+          "own.bench.ability_illusion",
+          "own.bench.ability_moldbreaker",
+          "own.bench.ability_waterabsorb",
+          "own.bench.ability_stormdrain",
+          "own.bench.ability_flashfire",
+          "own.bench.ability_sturdy",
+          "own.bench.ability_magicbounce",
+          "own.bench.ability_intimidate",
+          "own.bench.ability_poisonheal",
+          "own.bench.moves_seen",
+          "own.bench.move_data_known",
+          "own.bench.moves_Physical",
+          "own.bench.moves_Special",
+          "own.bench.moves_Status",
+          "own.bench.max_power",
+          "own.bench.priority",
+          "own.bench.move_heal",
+          "own.bench.move_protect",
+          "own.bench.move_substitute",
+          "own.bench.move_baton",
+          "own.bench.move_phaze",
+          "own.bench.move_encore",
+          "own.bench.move_taunt",
+          "own.bench.move_toxic",
+          "own.bench.move_yawn",
+          "own.bench.move_burn",
+          "own.bench.move_pivot",
+          "own.bench.move_bodypress",
+          "own.bench.move_hazard_clear",
+          "own.bench.setup_atk",
+          "own.bench.setup_def",
+          "own.bench.setup_spa",
+          "own.bench.setup_spd",
+          "own.bench.setup_spe",
+          "own.bench.attack_Bug",
+          "own.bench.attack_Dark",
+          "own.bench.attack_Dragon",
+          "own.bench.attack_Electric",
+          "own.bench.attack_Fairy",
+          "own.bench.attack_Fighting",
+          "own.bench.attack_Fire",
+          "own.bench.attack_Flying",
+          "own.bench.attack_Ghost",
+          "own.bench.attack_Grass",
+          "own.bench.attack_Ground",
+          "own.bench.attack_Ice",
+          "own.bench.attack_Normal",
+          "own.bench.attack_Poison",
+          "own.bench.attack_Psychic",
+          "own.bench.attack_Rock",
+          "own.bench.attack_Steel",
+          "own.bench.attack_Water",
+          "own.preview.species_known",
+          "own.preview.base_hp",
+          "own.preview.base_atk",
+          "own.preview.base_def",
+          "own.preview.base_spa",
+          "own.preview.base_spd",
+          "own.preview.base_spe",
+          "own.preview.type_Bug",
+          "own.preview.type_Dark",
+          "own.preview.type_Dragon",
+          "own.preview.type_Electric",
+          "own.preview.type_Fairy",
+          "own.preview.type_Fighting",
+          "own.preview.type_Fire",
+          "own.preview.type_Flying",
+          "own.preview.type_Ghost",
+          "own.preview.type_Grass",
+          "own.preview.type_Ground",
+          "own.preview.type_Ice",
+          "own.preview.type_Normal",
+          "own.preview.type_Poison",
+          "own.preview.type_Psychic",
+          "own.preview.type_Rock",
+          "own.preview.type_Steel",
+          "own.preview.type_Water",
+          "own.seen",
+          "own.known_hp",
+          "own.fainted",
+          "own.unseen_selected",
+          "own.condition_stealthrock",
+          "own.condition_spikes",
+          "own.condition_toxicspikes",
+          "own.condition_stickyweb",
+          "own.condition_reflect",
+          "own.condition_lightscreen",
+          "own.condition_auroraveil",
+          "own.condition_tailwind",
+          "foe.active.species_known",
+          "foe.active.base_hp",
+          "foe.active.base_atk",
+          "foe.active.base_def",
+          "foe.active.base_spa",
+          "foe.active.base_spd",
+          "foe.active.base_spe",
+          "foe.active.type_Bug",
+          "foe.active.type_Dark",
+          "foe.active.type_Dragon",
+          "foe.active.type_Electric",
+          "foe.active.type_Fairy",
+          "foe.active.type_Fighting",
+          "foe.active.type_Fire",
+          "foe.active.type_Flying",
+          "foe.active.type_Ghost",
+          "foe.active.type_Grass",
+          "foe.active.type_Ground",
+          "foe.active.type_Ice",
+          "foe.active.type_Normal",
+          "foe.active.type_Poison",
+          "foe.active.type_Psychic",
+          "foe.active.type_Rock",
+          "foe.active.type_Steel",
+          "foe.active.type_Water",
+          "foe.active.revealed",
+          "foe.active.hp_known",
+          "foe.active.hp",
+          "foe.active.status_brn",
+          "foe.active.status_par",
+          "foe.active.status_psn",
+          "foe.active.status_tox",
+          "foe.active.status_slp",
+          "foe.active.status_frz",
+          "foe.active.status_fnt",
+          "foe.active.boost_atk",
+          "foe.active.boost_def",
+          "foe.active.boost_spa",
+          "foe.active.boost_spd",
+          "foe.active.boost_spe",
+          "foe.active.boost_accuracy",
+          "foe.active.boost_evasion",
+          "foe.active.volatile_substitute",
+          "foe.active.volatile_yawn",
+          "foe.active.volatile_taunt",
+          "foe.active.volatile_encore",
+          "foe.active.volatile_disable",
+          "foe.active.volatile_leechseed",
+          "foe.active.volatile_confusion",
+          "foe.active.volatile_saltcure",
+          "foe.active.volatile_perishsong",
+          "foe.active.volatile_curse",
+          "foe.active.volatile_ingrain",
+          "foe.active.volatile_aquaring",
+          "foe.active.item_known",
+          "foe.active.ability_known",
+          "foe.active.item_leftovers",
+          "foe.active.item_sitrusberry",
+          "foe.active.item_mentalherb",
+          "foe.active.item_airballoon",
+          "foe.active.item_focussash",
+          "foe.active.item_choicescarf",
+          "foe.active.item_choiceband",
+          "foe.active.item_choicespecs",
+          "foe.active.item_eviolite",
+          "foe.active.item_lumberry",
+          "foe.active.item_rockyhelmet",
+          "foe.active.item_heavydutyboots",
+          "foe.active.mega_item",
+          "foe.active.ability_unaware",
+          "foe.active.ability_goodasgold",
+          "foe.active.ability_speedboost",
+          "foe.active.ability_levitate",
+          "foe.active.ability_regenerator",
+          "foe.active.ability_illusion",
+          "foe.active.ability_moldbreaker",
+          "foe.active.ability_waterabsorb",
+          "foe.active.ability_stormdrain",
+          "foe.active.ability_flashfire",
+          "foe.active.ability_sturdy",
+          "foe.active.ability_magicbounce",
+          "foe.active.ability_intimidate",
+          "foe.active.ability_poisonheal",
+          "foe.active.moves_seen",
+          "foe.active.move_data_known",
+          "foe.active.moves_Physical",
+          "foe.active.moves_Special",
+          "foe.active.moves_Status",
+          "foe.active.max_power",
+          "foe.active.priority",
+          "foe.active.move_heal",
+          "foe.active.move_protect",
+          "foe.active.move_substitute",
+          "foe.active.move_baton",
+          "foe.active.move_phaze",
+          "foe.active.move_encore",
+          "foe.active.move_taunt",
+          "foe.active.move_toxic",
+          "foe.active.move_yawn",
+          "foe.active.move_burn",
+          "foe.active.move_pivot",
+          "foe.active.move_bodypress",
+          "foe.active.move_hazard_clear",
+          "foe.active.setup_atk",
+          "foe.active.setup_def",
+          "foe.active.setup_spa",
+          "foe.active.setup_spd",
+          "foe.active.setup_spe",
+          "foe.active.attack_Bug",
+          "foe.active.attack_Dark",
+          "foe.active.attack_Dragon",
+          "foe.active.attack_Electric",
+          "foe.active.attack_Fairy",
+          "foe.active.attack_Fighting",
+          "foe.active.attack_Fire",
+          "foe.active.attack_Flying",
+          "foe.active.attack_Ghost",
+          "foe.active.attack_Grass",
+          "foe.active.attack_Ground",
+          "foe.active.attack_Ice",
+          "foe.active.attack_Normal",
+          "foe.active.attack_Poison",
+          "foe.active.attack_Psychic",
+          "foe.active.attack_Rock",
+          "foe.active.attack_Steel",
+          "foe.active.attack_Water",
+          "foe.bench.species_known",
+          "foe.bench.base_hp",
+          "foe.bench.base_atk",
+          "foe.bench.base_def",
+          "foe.bench.base_spa",
+          "foe.bench.base_spd",
+          "foe.bench.base_spe",
+          "foe.bench.type_Bug",
+          "foe.bench.type_Dark",
+          "foe.bench.type_Dragon",
+          "foe.bench.type_Electric",
+          "foe.bench.type_Fairy",
+          "foe.bench.type_Fighting",
+          "foe.bench.type_Fire",
+          "foe.bench.type_Flying",
+          "foe.bench.type_Ghost",
+          "foe.bench.type_Grass",
+          "foe.bench.type_Ground",
+          "foe.bench.type_Ice",
+          "foe.bench.type_Normal",
+          "foe.bench.type_Poison",
+          "foe.bench.type_Psychic",
+          "foe.bench.type_Rock",
+          "foe.bench.type_Steel",
+          "foe.bench.type_Water",
+          "foe.bench.revealed",
+          "foe.bench.hp_known",
+          "foe.bench.hp",
+          "foe.bench.status_brn",
+          "foe.bench.status_par",
+          "foe.bench.status_psn",
+          "foe.bench.status_tox",
+          "foe.bench.status_slp",
+          "foe.bench.status_frz",
+          "foe.bench.status_fnt",
+          "foe.bench.boost_atk",
+          "foe.bench.boost_def",
+          "foe.bench.boost_spa",
+          "foe.bench.boost_spd",
+          "foe.bench.boost_spe",
+          "foe.bench.boost_accuracy",
+          "foe.bench.boost_evasion",
+          "foe.bench.volatile_substitute",
+          "foe.bench.volatile_yawn",
+          "foe.bench.volatile_taunt",
+          "foe.bench.volatile_encore",
+          "foe.bench.volatile_disable",
+          "foe.bench.volatile_leechseed",
+          "foe.bench.volatile_confusion",
+          "foe.bench.volatile_saltcure",
+          "foe.bench.volatile_perishsong",
+          "foe.bench.volatile_curse",
+          "foe.bench.volatile_ingrain",
+          "foe.bench.volatile_aquaring",
+          "foe.bench.item_known",
+          "foe.bench.ability_known",
+          "foe.bench.item_leftovers",
+          "foe.bench.item_sitrusberry",
+          "foe.bench.item_mentalherb",
+          "foe.bench.item_airballoon",
+          "foe.bench.item_focussash",
+          "foe.bench.item_choicescarf",
+          "foe.bench.item_choiceband",
+          "foe.bench.item_choicespecs",
+          "foe.bench.item_eviolite",
+          "foe.bench.item_lumberry",
+          "foe.bench.item_rockyhelmet",
+          "foe.bench.item_heavydutyboots",
+          "foe.bench.mega_item",
+          "foe.bench.ability_unaware",
+          "foe.bench.ability_goodasgold",
+          "foe.bench.ability_speedboost",
+          "foe.bench.ability_levitate",
+          "foe.bench.ability_regenerator",
+          "foe.bench.ability_illusion",
+          "foe.bench.ability_moldbreaker",
+          "foe.bench.ability_waterabsorb",
+          "foe.bench.ability_stormdrain",
+          "foe.bench.ability_flashfire",
+          "foe.bench.ability_sturdy",
+          "foe.bench.ability_magicbounce",
+          "foe.bench.ability_intimidate",
+          "foe.bench.ability_poisonheal",
+          "foe.bench.moves_seen",
+          "foe.bench.move_data_known",
+          "foe.bench.moves_Physical",
+          "foe.bench.moves_Special",
+          "foe.bench.moves_Status",
+          "foe.bench.max_power",
+          "foe.bench.priority",
+          "foe.bench.move_heal",
+          "foe.bench.move_protect",
+          "foe.bench.move_substitute",
+          "foe.bench.move_baton",
+          "foe.bench.move_phaze",
+          "foe.bench.move_encore",
+          "foe.bench.move_taunt",
+          "foe.bench.move_toxic",
+          "foe.bench.move_yawn",
+          "foe.bench.move_burn",
+          "foe.bench.move_pivot",
+          "foe.bench.move_bodypress",
+          "foe.bench.move_hazard_clear",
+          "foe.bench.setup_atk",
+          "foe.bench.setup_def",
+          "foe.bench.setup_spa",
+          "foe.bench.setup_spd",
+          "foe.bench.setup_spe",
+          "foe.bench.attack_Bug",
+          "foe.bench.attack_Dark",
+          "foe.bench.attack_Dragon",
+          "foe.bench.attack_Electric",
+          "foe.bench.attack_Fairy",
+          "foe.bench.attack_Fighting",
+          "foe.bench.attack_Fire",
+          "foe.bench.attack_Flying",
+          "foe.bench.attack_Ghost",
+          "foe.bench.attack_Grass",
+          "foe.bench.attack_Ground",
+          "foe.bench.attack_Ice",
+          "foe.bench.attack_Normal",
+          "foe.bench.attack_Poison",
+          "foe.bench.attack_Psychic",
+          "foe.bench.attack_Rock",
+          "foe.bench.attack_Steel",
+          "foe.bench.attack_Water",
+          "foe.preview.species_known",
+          "foe.preview.base_hp",
+          "foe.preview.base_atk",
+          "foe.preview.base_def",
+          "foe.preview.base_spa",
+          "foe.preview.base_spd",
+          "foe.preview.base_spe",
+          "foe.preview.type_Bug",
+          "foe.preview.type_Dark",
+          "foe.preview.type_Dragon",
+          "foe.preview.type_Electric",
+          "foe.preview.type_Fairy",
+          "foe.preview.type_Fighting",
+          "foe.preview.type_Fire",
+          "foe.preview.type_Flying",
+          "foe.preview.type_Ghost",
+          "foe.preview.type_Grass",
+          "foe.preview.type_Ground",
+          "foe.preview.type_Ice",
+          "foe.preview.type_Normal",
+          "foe.preview.type_Poison",
+          "foe.preview.type_Psychic",
+          "foe.preview.type_Rock",
+          "foe.preview.type_Steel",
+          "foe.preview.type_Water",
+          "foe.seen",
+          "foe.known_hp",
+          "foe.fainted",
+          "foe.unseen_selected",
+          "foe.condition_stealthrock",
+          "foe.condition_spikes",
+          "foe.condition_toxicspikes",
+          "foe.condition_stickyweb",
+          "foe.condition_reflect",
+          "foe.condition_lightscreen",
+          "foe.condition_auroraveil",
+          "foe.condition_tailwind",
+          "turn",
+          "weather_sunnyday",
+          "weather_raindance",
+          "weather_sandstorm",
+          "weather_snow",
+          "weather_hail",
+          "terrain_electricterrain",
+          "terrain_grassyterrain",
+          "terrain_psychicterrain",
+          "terrain_mistyterrain"
+        ],
+        "private": [
+          "available",
+          "can_mega",
+          "trapped",
+          "active.species_known",
+          "active.base_hp",
+          "active.base_atk",
+          "active.base_def",
+          "active.base_spa",
+          "active.base_spd",
+          "active.base_spe",
+          "active.type_Bug",
+          "active.type_Dark",
+          "active.type_Dragon",
+          "active.type_Electric",
+          "active.type_Fairy",
+          "active.type_Fighting",
+          "active.type_Fire",
+          "active.type_Flying",
+          "active.type_Ghost",
+          "active.type_Grass",
+          "active.type_Ground",
+          "active.type_Ice",
+          "active.type_Normal",
+          "active.type_Poison",
+          "active.type_Psychic",
+          "active.type_Rock",
+          "active.type_Steel",
+          "active.type_Water",
+          "active.revealed",
+          "active.hp_known",
+          "active.hp",
+          "active.status_brn",
+          "active.status_par",
+          "active.status_psn",
+          "active.status_tox",
+          "active.status_slp",
+          "active.status_frz",
+          "active.status_fnt",
+          "active.boost_atk",
+          "active.boost_def",
+          "active.boost_spa",
+          "active.boost_spd",
+          "active.boost_spe",
+          "active.boost_accuracy",
+          "active.boost_evasion",
+          "active.volatile_substitute",
+          "active.volatile_yawn",
+          "active.volatile_taunt",
+          "active.volatile_encore",
+          "active.volatile_disable",
+          "active.volatile_leechseed",
+          "active.volatile_confusion",
+          "active.volatile_saltcure",
+          "active.volatile_perishsong",
+          "active.volatile_curse",
+          "active.volatile_ingrain",
+          "active.volatile_aquaring",
+          "active.item_known",
+          "active.ability_known",
+          "active.item_leftovers",
+          "active.item_sitrusberry",
+          "active.item_mentalherb",
+          "active.item_airballoon",
+          "active.item_focussash",
+          "active.item_choicescarf",
+          "active.item_choiceband",
+          "active.item_choicespecs",
+          "active.item_eviolite",
+          "active.item_lumberry",
+          "active.item_rockyhelmet",
+          "active.item_heavydutyboots",
+          "active.mega_item",
+          "active.ability_unaware",
+          "active.ability_goodasgold",
+          "active.ability_speedboost",
+          "active.ability_levitate",
+          "active.ability_regenerator",
+          "active.ability_illusion",
+          "active.ability_moldbreaker",
+          "active.ability_waterabsorb",
+          "active.ability_stormdrain",
+          "active.ability_flashfire",
+          "active.ability_sturdy",
+          "active.ability_magicbounce",
+          "active.ability_intimidate",
+          "active.ability_poisonheal",
+          "active.moves_seen",
+          "active.move_data_known",
+          "active.moves_Physical",
+          "active.moves_Special",
+          "active.moves_Status",
+          "active.max_power",
+          "active.priority",
+          "active.move_heal",
+          "active.move_protect",
+          "active.move_substitute",
+          "active.move_baton",
+          "active.move_phaze",
+          "active.move_encore",
+          "active.move_taunt",
+          "active.move_toxic",
+          "active.move_yawn",
+          "active.move_burn",
+          "active.move_pivot",
+          "active.move_bodypress",
+          "active.move_hazard_clear",
+          "active.setup_atk",
+          "active.setup_def",
+          "active.setup_spa",
+          "active.setup_spd",
+          "active.setup_spe",
+          "active.attack_Bug",
+          "active.attack_Dark",
+          "active.attack_Dragon",
+          "active.attack_Electric",
+          "active.attack_Fairy",
+          "active.attack_Fighting",
+          "active.attack_Fire",
+          "active.attack_Flying",
+          "active.attack_Ghost",
+          "active.attack_Grass",
+          "active.attack_Ground",
+          "active.attack_Ice",
+          "active.attack_Normal",
+          "active.attack_Poison",
+          "active.attack_Psychic",
+          "active.attack_Rock",
+          "active.attack_Steel",
+          "active.attack_Water",
+          "active.exact_atk",
+          "active.exact_def",
+          "active.exact_spa",
+          "active.exact_spd",
+          "active.exact_spe",
+          "active.exact_hp_known",
+          "active.max_hp",
+          "active.pp_known",
+          "active.pp_remaining",
+          "active.pp_empty",
+          "active.moves_disabled",
+          "bench.species_known",
+          "bench.base_hp",
+          "bench.base_atk",
+          "bench.base_def",
+          "bench.base_spa",
+          "bench.base_spd",
+          "bench.base_spe",
+          "bench.type_Bug",
+          "bench.type_Dark",
+          "bench.type_Dragon",
+          "bench.type_Electric",
+          "bench.type_Fairy",
+          "bench.type_Fighting",
+          "bench.type_Fire",
+          "bench.type_Flying",
+          "bench.type_Ghost",
+          "bench.type_Grass",
+          "bench.type_Ground",
+          "bench.type_Ice",
+          "bench.type_Normal",
+          "bench.type_Poison",
+          "bench.type_Psychic",
+          "bench.type_Rock",
+          "bench.type_Steel",
+          "bench.type_Water",
+          "bench.revealed",
+          "bench.hp_known",
+          "bench.hp",
+          "bench.status_brn",
+          "bench.status_par",
+          "bench.status_psn",
+          "bench.status_tox",
+          "bench.status_slp",
+          "bench.status_frz",
+          "bench.status_fnt",
+          "bench.boost_atk",
+          "bench.boost_def",
+          "bench.boost_spa",
+          "bench.boost_spd",
+          "bench.boost_spe",
+          "bench.boost_accuracy",
+          "bench.boost_evasion",
+          "bench.volatile_substitute",
+          "bench.volatile_yawn",
+          "bench.volatile_taunt",
+          "bench.volatile_encore",
+          "bench.volatile_disable",
+          "bench.volatile_leechseed",
+          "bench.volatile_confusion",
+          "bench.volatile_saltcure",
+          "bench.volatile_perishsong",
+          "bench.volatile_curse",
+          "bench.volatile_ingrain",
+          "bench.volatile_aquaring",
+          "bench.item_known",
+          "bench.ability_known",
+          "bench.item_leftovers",
+          "bench.item_sitrusberry",
+          "bench.item_mentalherb",
+          "bench.item_airballoon",
+          "bench.item_focussash",
+          "bench.item_choicescarf",
+          "bench.item_choiceband",
+          "bench.item_choicespecs",
+          "bench.item_eviolite",
+          "bench.item_lumberry",
+          "bench.item_rockyhelmet",
+          "bench.item_heavydutyboots",
+          "bench.mega_item",
+          "bench.ability_unaware",
+          "bench.ability_goodasgold",
+          "bench.ability_speedboost",
+          "bench.ability_levitate",
+          "bench.ability_regenerator",
+          "bench.ability_illusion",
+          "bench.ability_moldbreaker",
+          "bench.ability_waterabsorb",
+          "bench.ability_stormdrain",
+          "bench.ability_flashfire",
+          "bench.ability_sturdy",
+          "bench.ability_magicbounce",
+          "bench.ability_intimidate",
+          "bench.ability_poisonheal",
+          "bench.moves_seen",
+          "bench.move_data_known",
+          "bench.moves_Physical",
+          "bench.moves_Special",
+          "bench.moves_Status",
+          "bench.max_power",
+          "bench.priority",
+          "bench.move_heal",
+          "bench.move_protect",
+          "bench.move_substitute",
+          "bench.move_baton",
+          "bench.move_phaze",
+          "bench.move_encore",
+          "bench.move_taunt",
+          "bench.move_toxic",
+          "bench.move_yawn",
+          "bench.move_burn",
+          "bench.move_pivot",
+          "bench.move_bodypress",
+          "bench.move_hazard_clear",
+          "bench.setup_atk",
+          "bench.setup_def",
+          "bench.setup_spa",
+          "bench.setup_spd",
+          "bench.setup_spe",
+          "bench.attack_Bug",
+          "bench.attack_Dark",
+          "bench.attack_Dragon",
+          "bench.attack_Electric",
+          "bench.attack_Fairy",
+          "bench.attack_Fighting",
+          "bench.attack_Fire",
+          "bench.attack_Flying",
+          "bench.attack_Ghost",
+          "bench.attack_Grass",
+          "bench.attack_Ground",
+          "bench.attack_Ice",
+          "bench.attack_Normal",
+          "bench.attack_Poison",
+          "bench.attack_Psychic",
+          "bench.attack_Rock",
+          "bench.attack_Steel",
+          "bench.attack_Water",
+          "bench.exact_atk",
+          "bench.exact_def",
+          "bench.exact_spa",
+          "bench.exact_spd",
+          "bench.exact_spe",
+          "bench.exact_hp_known",
+          "bench.max_hp",
+          "bench.pp_known",
+          "bench.pp_remaining",
+          "bench.pp_empty",
+          "bench.moves_disabled"
+        ],
+        "baseline": [
+          "hp",
+          "fainted",
+          "seen",
+          "turn"
+        ],
+        "slices": [
+          "early",
+          "middle",
+          "late",
+          "poison_yawn",
+          "setup",
+          "recovery_available",
+          "baton_available",
+          "substitute"
+        ],
+        "version": "observed-value-v1"
+      },
+      "reference": {
+        "own": "planned",
+        "opponent_pool": [
+          "planned/tactical",
+          "planned/disrupt",
+          "planned/expert",
+          "planned/counterplay"
+        ],
+        "version": "public-plans-v4+live+public-counterplay-v3+net:b3d30a435c122bf957826acdc57d989d67d68334102c5ee2eb3cc7217c4c6fbc",
+        "policy_sha": "b3d30a435c122bf957826acdc57d989d67d68334102c5ee2eb3cc7217c4c6fbc"
+      },
+      "source_split_sha": "f89b06cb18feae14ecf5b83ea3e9b9a07fcc8ae830998e587ec51e638075259e",
+      "worker_code_sha": "3ac7edfff41ce268bc57b146ba25c01f732c38001ad0f22aaacd58006831171e",
+      "initial_value_report": "b0d4be669e82c64b83b4a35b988f17869e07929d4b753c151a746feb301e278d",
+      "grouped_curriculum_sha": "02e6201a871b65c4c5544a94ca9e06641c22c5e6b3e6c6ccd676d0e3fb8e1cb3"
+    },
+    "rank_contract": {
+      "head": "ours",
+      "feature_version": "policy-features-v1",
+      "feature_contract": "2efe483198e2675f",
+      "target": "terminal-branch-pairwise-ranking",
+      "continuation": [
+        "planned/tactical",
+        "planned/disrupt",
+        "planned/expert",
+        "planned/counterplay"
+      ],
+      "decision_scope": "move",
+      "teacher": "complete paired CI90 positive; no policy reversal; minimum 4 distinct sampled worlds",
+      "source_split_sha": "f89b06cb18feae14ecf5b83ea3e9b9a07fcc8ae830998e587ec51e638075259e"
+    },
+    "stages": {
+      "branch": {
+        "checkpoint": "value.pt",
+        "sha": "34b9aaa45fa239ed"
+      }
+    },
+    "policy": {
+      "path": "ours.json",
+      "sha": "b3d30a435c122bf9"
+    },
+    "rank": {
+      "epoch": 0,
+      "development": {
+        "regret": 0.140625,
+        "positions": 40,
+        "battles": 20
+      }
+    },
+    "value": {
+      "selection": {
+        "best_epoch": 3,
+        "best_dev_log_loss": 0.4867164250318199
+      },
+      "development_brier_before": 0.22055040299892426,
+      "development_brier_after": 0.15814289450645447
+    },
+    "counts": {
+      "counterfactual-root+learned-policy-continuation": 90099,
+      "unknown-root+learned-policy-continuation": 14366
+    },
+    "policy_distillation": {
+      "states": 0,
+      "per_group": 0,
+      "source": "simulated non-intervened reference continuation; not human actions"
+    },
+    "training_code_sha": "4565ae0fd0911cb2d136468f940fa4a171f72b0d98722a958e1b9566f7a874bc",
+    "data": "/home/michihito/Working/wt/continuation-learning-20261021/data/processed/continuation-20261021/learned-move",
+    "gate": {
+      "passed": false,
+      "statistical_passed": false,
+      "pending_policy_crossplay": false,
+      "calibration_rank": {
+        "regret": 0.13828125,
+        "positions": 39,
+        "battles": 20
+      },
+      "value_brier_delta_interval90": [
+        -0.023546653613448144,
+        0.03037528879940509
+      ],
+      "rank_regret_delta_interval90": [
+        -0.0234375,
+        0.09609375
+      ],
+      "minimum_battles": 20,
+      "calibration_battles": 20,
+      "calibration_unit": "connected opponent/preview group",
+      "value_baseline": "incumbent-ensemble",
+      "reason": "paired source-group historical calibration; excludes development and censored branches",
+      "policy_crossplay": {
+        "passed": false,
+        "groups": 20,
+        "mean_delta": -0.08125,
+        "interval90": [
+          -0.1578125,
+          0.0008203124999999645
+        ],
+        "minimum_groups": 20,
+        "minimum_mean_gain": 0.03,
+        "incomplete_cases": [],
+        "cases": [
+          {
+            "case": {
+              "file": "20261020-210950-y03l4pfr5m7ohtdapri7fubge62gt9jpw.json",
+              "turn": 8,
+              "actions": null,
+              "id": "7957fe56b3b6cbc46a11"
+            },
+            "group": "a19fe89f6d19cee7fe37",
+            "reference_action": "move:calmmind",
+            "learned_action": "move:batonpass",
+            "reference_mean": 0.59375,
+            "learned_mean": 0.03125,
+            "delta": -0.5625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-210950-y03l4pfr5m7ohtdapri7fubge62gt9jpw.json",
+              "turn": 11,
+              "actions": null,
+              "id": "8d02798fd63bf82f6f41"
+            },
+            "group": "a19fe89f6d19cee7fe37",
+            "reference_action": "move:batonpass",
+            "learned_action": "move:snarl",
+            "reference_mean": 1.0,
+            "learned_mean": 0.90625,
+            "delta": -0.09375,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261018-163258-2700390584.json",
+              "turn": 6,
+              "actions": null,
+              "id": "47c146c4228dc4858aa9"
+            },
+            "group": "1abcbca4b0d5d8e69fd0",
+            "reference_action": "switch:floetteeternal",
+            "learned_action": "move:shadowball",
+            "reference_mean": 0.59375,
+            "learned_mean": 0.5625,
+            "delta": -0.03125,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261018-163258-2700390584.json",
+              "turn": 7,
+              "actions": null,
+              "id": "ee16b3fb4fc3bb494738"
+            },
+            "group": "1abcbca4b0d5d8e69fd0",
+            "reference_action": "switch:floetteeternal",
+            "learned_action": "move:shadowball",
+            "reference_mean": 0.78125,
+            "learned_mean": 1.0,
+            "delta": 0.21875,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-042341-2700631284.json",
+              "turn": 1,
+              "actions": null,
+              "id": "c836a2797656c9d1ca76"
+            },
+            "group": "f43f27a3c5a51bfb8515",
+            "reference_action": "move:doubleedge:mega",
+            "learned_action": "move:doubleedge:mega",
+            "reference_mean": 0.90625,
+            "learned_mean": 1.0,
+            "delta": 0.09375,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-042341-2700631284.json",
+              "turn": 5,
+              "actions": null,
+              "id": "3f28be18a00545111ac4"
+            },
+            "group": "f43f27a3c5a51bfb8515",
+            "reference_action": "switch:floetteeternal",
+            "learned_action": "move:shadowball",
+            "reference_mean": 0.5,
+            "learned_mean": 0.875,
+            "delta": 0.375,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261018-191829-2700430905.json",
+              "turn": 1,
+              "actions": null,
+              "id": "c5766c8d2f8410bdd5ad"
+            },
+            "group": "092c15e9dfbb6ac08420",
+            "reference_action": "move:doubleedge:mega",
+            "learned_action": "move:doubleedge:mega",
+            "reference_mean": 0.78125,
+            "learned_mean": 0.78125,
+            "delta": 0.0,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261018-191829-2700430905.json",
+              "turn": 4,
+              "actions": null,
+              "id": "4259e807db6570ee0950"
+            },
+            "group": "092c15e9dfbb6ac08420",
+            "reference_action": "move:shadowball",
+            "learned_action": "move:shadowball",
+            "reference_mean": 1.0,
+            "learned_mean": 0.96875,
+            "delta": -0.03125,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-134627-7o4h69ao3my6xexaxn97uh436wfu99ypw.json",
+              "turn": 4,
+              "actions": null,
+              "id": "17d881fb72eb8a17defd"
+            },
+            "group": "8f32394b68bfa8ec8692",
+            "reference_action": "move:torchsong",
+            "learned_action": "move:shadowball",
+            "reference_mean": 0.5,
+            "learned_mean": 0.375,
+            "delta": -0.125,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-134627-7o4h69ao3my6xexaxn97uh436wfu99ypw.json",
+              "turn": 5,
+              "actions": null,
+              "id": "d0a122fe9c17a04de236"
+            },
+            "group": "8f32394b68bfa8ec8692",
+            "reference_action": "switch:skeledirge",
+            "learned_action": "move:batonpass",
+            "reference_mean": 0.375,
+            "learned_mean": 0.25,
+            "delta": -0.125,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-172539-2701495687.json",
+              "turn": 10,
+              "actions": null,
+              "id": "d74664d161f030fe5f2f"
+            },
+            "group": "de55a32d567b7ea07029",
+            "reference_action": "move:earthquake",
+            "learned_action": "move:earthquake",
+            "reference_mean": 1.0,
+            "learned_mean": 1.0,
+            "delta": 0.0,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-172539-2701495687.json",
+              "turn": 8,
+              "actions": null,
+              "id": "c8392f65790072ff21df"
+            },
+            "group": "de55a32d567b7ea07029",
+            "reference_action": "move:roost",
+            "learned_action": "move:earthquake",
+            "reference_mean": 1.0,
+            "learned_mean": 0.5625,
+            "delta": -0.4375,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-000513-2701062068.json",
+              "turn": 10,
+              "actions": null,
+              "id": "3818736d15e708ff56c6"
+            },
+            "group": "2d63b55db1195ee20557",
+            "reference_action": "move:willowisp",
+            "learned_action": "move:torchsong",
+            "reference_mean": 1.0,
+            "learned_mean": 0.75,
+            "delta": -0.25,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-000513-2701062068.json",
+              "turn": 6,
+              "actions": null,
+              "id": "4967cf705a71b891f6de"
+            },
+            "group": "2d63b55db1195ee20557",
+            "reference_action": "move:roost:mega",
+            "learned_action": "move:roost:mega",
+            "reference_mean": 1.0,
+            "learned_mean": 0.375,
+            "delta": -0.625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-212816-2701576700.json",
+              "turn": 25,
+              "actions": null,
+              "id": "c8e62b1adc283b8d8bda"
+            },
+            "group": "e6b494834c996859c516",
+            "reference_action": "move:calmmind",
+            "learned_action": "move:snarl",
+            "reference_mean": 0.78125,
+            "learned_mean": 0.34375,
+            "delta": -0.4375,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-212816-2701576700.json",
+              "turn": 24,
+              "actions": null,
+              "id": "4bb9c659572e6ebb14f2"
+            },
+            "group": "e6b494834c996859c516",
+            "reference_action": "move:calmmind",
+            "learned_action": "move:snarl",
+            "reference_mean": 0.625,
+            "learned_mean": 0.5625,
+            "delta": -0.0625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-110642-2700790047.json",
+              "turn": 4,
+              "actions": null,
+              "id": "9c925205397eed25585b"
+            },
+            "group": "e0b92f437f2dab8b42bc",
+            "reference_action": "move:doubleedge:mega",
+            "learned_action": "move:earthquake:mega",
+            "reference_mean": 0.46875,
+            "learned_mean": 0.46875,
+            "delta": 0.0,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-110642-2700790047.json",
+              "turn": 6,
+              "actions": null,
+              "id": "984bbbf9bc825eaa7246"
+            },
+            "group": "e0b92f437f2dab8b42bc",
+            "reference_action": "move:doubleedge",
+            "learned_action": "move:earthquake",
+            "reference_mean": 0.65625,
+            "learned_mean": 0.46875,
+            "delta": -0.1875,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-103242-2700776530.json",
+              "turn": 12,
+              "actions": null,
+              "id": "c64c62becb491830269c"
+            },
+            "group": "a26e1a32a0dd48800b37",
+            "reference_action": "move:doubleedge",
+            "learned_action": "move:dragondance",
+            "reference_mean": 0.46875,
+            "learned_mean": 0.0,
+            "delta": -0.46875,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-103242-2700776530.json",
+              "turn": 9,
+              "actions": null,
+              "id": "4344d36deaeddea294a4"
+            },
+            "group": "a26e1a32a0dd48800b37",
+            "reference_action": "move:doubleedge:mega",
+            "learned_action": "move:doubleedge:mega",
+            "reference_mean": 0.25,
+            "learned_mean": 0.25,
+            "delta": 0.0,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261018-183511-2700419913.json",
+              "turn": 4,
+              "actions": null,
+              "id": "d21795035a50e42bd45f"
+            },
+            "group": "c19c3eacbfcefc1a0cd4",
+            "reference_action": "move:doubleedge:mega",
+            "learned_action": "move:roost:mega",
+            "reference_mean": 0.3125,
+            "learned_mean": 0.0,
+            "delta": -0.3125,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261018-183511-2700419913.json",
+              "turn": 1,
+              "actions": null,
+              "id": "a3e86c66d015c4c6333a"
+            },
+            "group": "c19c3eacbfcefc1a0cd4",
+            "reference_action": "move:protect",
+            "learned_action": "move:substitute",
+            "reference_mean": 0.3125,
+            "learned_mean": 0.46875,
+            "delta": 0.15625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261018-182740-2700418356.json",
+              "turn": 1,
+              "actions": null,
+              "id": "9ef4b9e1e6ae5fb86900"
+            },
+            "group": "2581598d19694f9fee95",
+            "reference_action": "move:protect",
+            "learned_action": "move:batonpass",
+            "reference_mean": 0.71875,
+            "learned_mean": 0.3125,
+            "delta": -0.40625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261018-182740-2700418356.json",
+              "turn": 10,
+              "actions": null,
+              "id": "c2aad41d1a6833bdd619"
+            },
+            "group": "2581598d19694f9fee95",
+            "reference_action": "move:batonpass",
+            "learned_action": "move:substitute",
+            "reference_mean": 0.0,
+            "learned_mean": 0.0,
+            "delta": 0.0,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-034811-2701182164.json",
+              "turn": 10,
+              "actions": null,
+              "id": "b82fc43857d6dfa512d8"
+            },
+            "group": "d96b5c80476c4bb46e78",
+            "reference_action": "move:batonpass",
+            "learned_action": "move:irondefense",
+            "reference_mean": 0.5,
+            "learned_mean": 0.65625,
+            "delta": 0.15625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-034811-2701182164.json",
+              "turn": 8,
+              "actions": null,
+              "id": "b83eaf595c59535c01e6"
+            },
+            "group": "d96b5c80476c4bb46e78",
+            "reference_action": "move:irondefense",
+            "learned_action": "move:irondefense",
+            "reference_mean": 0.625,
+            "learned_mean": 0.75,
+            "delta": 0.125,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-044724-2700640485.json",
+              "turn": 12,
+              "actions": null,
+              "id": "a81cbd5876f78ec751be"
+            },
+            "group": "cbbe1e7dee0fe4a14b74",
+            "reference_action": "move:doubleedge:mega",
+            "learned_action": "move:earthquake:mega",
+            "reference_mean": 0.375,
+            "learned_mean": 0.75,
+            "delta": 0.375,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-044724-2700640485.json",
+              "turn": 1,
+              "actions": null,
+              "id": "ad57dba2e1237d0e782b"
+            },
+            "group": "cbbe1e7dee0fe4a14b74",
+            "reference_action": "switch:salamence",
+            "learned_action": "move:batonpass",
+            "reference_mean": 0.5,
+            "learned_mean": 0.9375,
+            "delta": 0.4375,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-013843-2701113502.json",
+              "turn": 1,
+              "actions": null,
+              "id": "64f20c83313059c0dc56"
+            },
+            "group": "f5df26dae4c84dc04b13",
+            "reference_action": "move:torchsong",
+            "learned_action": "move:torchsong",
+            "reference_mean": 0.90625,
+            "learned_mean": 0.75,
+            "delta": -0.15625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-235235-2701054963.json",
+              "turn": 7,
+              "actions": null,
+              "id": "162f160f4c5fe3dda6b9"
+            },
+            "group": "9df5d16a95724609b93c",
+            "reference_action": "move:shadowball",
+            "learned_action": "move:shadowball",
+            "reference_mean": 0.40625,
+            "learned_mean": 0.1875,
+            "delta": -0.21875,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-235235-2701054963.json",
+              "turn": 2,
+              "actions": null,
+              "id": "00cec63703a209d3bd29"
+            },
+            "group": "9df5d16a95724609b93c",
+            "reference_action": "move:moonblast:mega",
+            "learned_action": "move:synthesis:mega",
+            "reference_mean": 0.5,
+            "learned_mean": 0.34375,
+            "delta": -0.15625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-220257-2701591184.json",
+              "turn": 16,
+              "actions": null,
+              "id": "f1ad44e662bf72f980a1"
+            },
+            "group": "c1e58aa8be3b1555500e",
+            "reference_action": "move:calmmind",
+            "learned_action": "move:batonpass",
+            "reference_mean": 0.0,
+            "learned_mean": 0.03125,
+            "delta": 0.03125,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261020-220257-2701591184.json",
+              "turn": 10,
+              "actions": null,
+              "id": "5ac45cb37ca1386bbfa9"
+            },
+            "group": "c1e58aa8be3b1555500e",
+            "reference_action": "move:calmmind",
+            "learned_action": "move:batonpass",
+            "reference_mean": 0.125,
+            "learned_mean": 0.125,
+            "delta": 0.0,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-134949-2700843864.json",
+              "turn": 6,
+              "actions": null,
+              "id": "b6d49a7d72d823239359"
+            },
+            "group": "061800d4a869f762ee9b",
+            "reference_action": "move:doubleedge:mega",
+            "learned_action": "move:doubleedge:mega",
+            "reference_mean": 0.78125,
+            "learned_mean": 0.78125,
+            "delta": 0.0,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-134949-2700843864.json",
+              "turn": 4,
+              "actions": null,
+              "id": "4556530c936480367ca2"
+            },
+            "group": "061800d4a869f762ee9b",
+            "reference_action": "switch:skeledirge",
+            "learned_action": "move:shadowball",
+            "reference_mean": 0.40625,
+            "learned_mean": 0.875,
+            "delta": 0.46875,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-144630-6hgpupedev4mscixolhprftj80le2p4pw.json",
+              "turn": 6,
+              "actions": null,
+              "id": "08ac607555e25cdb5b26"
+            },
+            "group": "13b4dda9bd0c8bce1ba5",
+            "reference_action": "move:moonblast:mega",
+            "learned_action": "move:moonblast:mega",
+            "reference_mean": 0.0,
+            "learned_mean": 0.0,
+            "delta": 0.0,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-144630-6hgpupedev4mscixolhprftj80le2p4pw.json",
+              "turn": 1,
+              "actions": null,
+              "id": "aed181e9a1f3fb110338"
+            },
+            "group": "13b4dda9bd0c8bce1ba5",
+            "reference_action": "move:calmmind",
+            "learned_action": "move:batonpass",
+            "reference_mean": 0.90625,
+            "learned_mean": 0.15625,
+            "delta": -0.75,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-051124-0lyxs5ux4eq9gol1tikvjkk55u7klekpw.json",
+              "turn": 16,
+              "actions": null,
+              "id": "95483095eff9b1ae11d2"
+            },
+            "group": "b78f5079df0d96424c44",
+            "reference_action": "move:protect",
+            "learned_action": "move:substitute",
+            "reference_mean": 0.25,
+            "learned_mean": 0.1875,
+            "delta": -0.0625,
+            "trials": 32
+          },
+          {
+            "case": {
+              "file": "20261019-051124-0lyxs5ux4eq9gol1tikvjkk55u7klekpw.json",
+              "turn": 2,
+              "actions": null,
+              "id": "b0f08f697132db52931c"
+            },
+            "group": "b78f5079df0d96424c44",
+            "reference_action": "move:batonpass",
+            "learned_action": "move:batonpass",
+            "reference_mean": 0.46875,
+            "learned_mean": 0.4375,
+            "delta": -0.03125,
+            "trials": 32
+          }
+        ],
+        "scope": "paired historical grouped simulator holdout; reference vs fixed learned actor; not live Elo"
+      }
+    }
+  },
+  "model_smoke": {
+    "production_load_rejected": "branch candidate has not passed the untouched calibration gate",
+    "candidate_probability": 0.13471727073192596,
+    "incumbent_probability": 0.4572455883026123,
+    "rollout_contract": {
+      "rolloutPolicies": {
+        "p1": [
+          "planned"
+        ],
+        "p2": [
+          "tactical",
+          "disrupt",
+          "expert",
+          "counterplay"
+        ]
+      },
+      "rolloutMix": {
+        "ours": 1.0,
+        "opp": 0.0
+      },
+      "rolloutTemperature": {
+        "ours": 0.0
+      },
+      "rolloutNetTurns": 200
+    }
+  },
+  "checks": {
+    "pytest": 633,
+    "ruff": "changed Python passed",
+    "node_syntax": "changed JavaScript passed",
+    "diff_check": "passed",
+    "normalized_account_preview_split_overlap": 0
+  },
+  "deployment_decision": {
+    "new_weights_adopted": false,
+    "reason": "value/ranking calibration did not improve; whole-policy mean delta -0.08125, interval includes zero",
+    "incumbent_value_run": "runs/value-replays-v1",
+    "incumbent_opponent_policy": "runs/opp-replays-v1/opp-seed0.json",
+    "decision_ms": 15000,
+    "workers": 4
+  },
+  "artifact_sha256": {
+    "data/processed/continuation-20261021/cohort/cohort.json": "02e6201a871b65c4c5544a94ca9e06641c22c5e6b3e6c6ccd676d0e3fb8e1cb3",
+    "data/processed/continuation-20261021/data-audit.json": "06dcadcb87ffc1e6e9cc8ecd1dca2b4b496fba688071a91535ae65f4974fe466",
+    "data/processed/continuation-20261021/published-priors.json": "a599610bd0dc8c4870fd3404e89a9a822ef3e22d18194168e6b53ba788d0cad7",
+    "data/processed/continuation-20261021/published-priors.json.manifest.json": "4252d0fc45cfbc57a4df45a4c07f7b6c669da099c8bd1fe336191c9bc03cc1dc",
+    "runs/continuation-20261021-policy-move/ours.json": "b3d30a435c122bf957826acdc57d989d67d68334102c5ee2eb3cc7217c4c6fbc",
+    "runs/continuation-20261021-policy-move/ours.pt": "68d7ca16da8bbcbfb3b9168a0d6556159e0d094b8f62b24913e0154ec40d6161",
+    "runs/continuation-20261021-policy-move/report.json": "a75cbd76e99e17f0c35c84851b88726c6be7130bf302df9cfa02f019fa149ab4",
+    "runs/continuation-20261021-value/value.pt": "34b9aaa45fa239ed3f9edd9ab18c26e76f47f242501c81e8d9de915f6f40c3fd",
+    "runs/continuation-20261021-value/ours.json": "b3d30a435c122bf957826acdc57d989d67d68334102c5ee2eb3cc7217c4c6fbc",
+    "runs/continuation-20261021-value/report.json": "aaa738e3fd32e5a5fddcc947a95fa92b8555a547859c929999ab4adedb993a70"
+  },
+  "local_smoke": {
+    "file": "/data/poke-sim/collect/continuation-smoke/20261021-011424-23.json",
+    "sha256": "27027cf74bea117eb524e1e8ac21f02d6c7c28412563b18e2a3d615e70fa6542",
+    "decisions": 18,
+    "fallbacks": 0,
+    "failed": 0,
+    "budget_ms": 2500,
+    "workers": 1,
+    "scope": "local plumbing smoke with incumbent weights; not candidate win-rate evidence"
+  }
+}

@@ -128,7 +128,8 @@ class Search {
       if (this.nets.p2 && !b.ended) {
         // The opponent net's view of its root replies in this world, for the driver's prediction.
         const obs = this.observer(b, st);
-        st.p2Prior = this.nets.p2.prior(obs.view(b.p2), b.dex, st.p2);
+        const view = obs.view(b.p2);
+        if (this.nets.p2.supports(view)) st.p2Prior = this.nets.p2.prior(view, b.dex, st.p2);
       }
       const view = this.observer(b, st).view(b.p1), mon = view.request.side.pokemon.find(m => m.active);
       // Goals use the same public prefix in every particle. They may break an existing utility tie;
@@ -205,7 +206,8 @@ class Search {
   // With a net: PUCT over the net's prior, computed once per node (nodes are keyed by the view).
   treeChoice(b, obs, side, trace) {
     const view = obs.view(side), options = this.deps.choices(b, side);
-    const key = hash([view, options]), net = this.nets[side.id];
+    const key = hash([view, options]), loaded = this.nets[side.id];
+    const net = loaded && (!loaded.supports || loaded.supports(view)) ? loaded : null;
     let node = this.nodes.get(key);
     if (!node) {
       node = {n: 0, sum: 0, actions: options.map(([choice]) => ({choice, n: 0, sum: 0}))};
@@ -282,7 +284,8 @@ class Search {
       const view = obs.view(side), net = this.nets[side.id];
       const name = names[side.id][serial % names[side.id].length];
       // A stress trial must execute its named response, rather than mostly drawing from the old opponent net.
-      if (name !== 'counterplay' && net && rolloutTurns < this.rolloutNetTurns && random() < this.rolloutMix[side.id]) {
+      if (name !== 'counterplay' && net && (!net.supports || net.supports(view)) &&
+          rolloutTurns < this.rolloutNetTurns && random() < this.rolloutMix[side.id]) {
         const legal = legalChoices(view);
         if (legal.length) {
           if (this.rolloutTemperature[side.id] <= 0) {

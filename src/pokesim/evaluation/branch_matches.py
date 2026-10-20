@@ -190,6 +190,8 @@ def run_case(engine: Lookahead, sets: list[dict], own_sets: dict, rec: dict, cas
     cfg = manifest["contract"]
     # position() consumes the protocol prefix ending at |turn|N, not the later moves, sets or outcome.
     session, battle = position(rec, sets, case["turn"])
+    if cfg.get('restore_private_request'):
+        restore_private_request(battle, rec, case['turn'])
     if battle.force_switch or battle.active_pokemon is None or battle.opponent_active_pokemon is None:
         raise ValueError("only normal turn-start decisions are supported")
     world_seed = int(digest([cfg["world_seed"], case["file"], case["turn"]])[:16], 16)
@@ -200,6 +202,10 @@ def run_case(engine: Lookahead, sets: list[dict], own_sets: dict, rec: dict, cas
     branches = {"seeds": cfg["seeds"], "continuations": cfg["continuations"], "maxTurns": cfg["max_turns"]}
     if cfg.get("information_scope") == "public_observation":
         branches.update(informationScope="public_observation", observationLog=session.log)
+    if cfg.get('live_policies'):
+        branches['livePolicies'] = True
+    if cfg.get('trajectory_sample'):
+        branches['trajectorySample'] = cfg['trajectory_sample']
     if cfg.get("policy_nets"):
         branches["policyNets"] = cfg["policy_nets"]
         branches["continuationNetSha"] = cfg.get("continuation_net_sha")
@@ -212,6 +218,20 @@ def run_case(engine: Lookahead, sets: list[dict], own_sets: dict, rec: dict, cas
            "observation": {"log": session.log, "request": battle.last_request},
            "simulation_request": request, "result": reply, "summary": summarize(reply)}
     return dict(row, payload_sha=digest(row))
+
+
+def restore_private_request(battle, rec, turn):
+    """Only our saved request at this decision; never a later turn or the opponent's hidden request."""
+    import copy
+
+    rows = [a for a in rec.get('advice', []) if a.get('turn') == turn and not a.get('force') and a.get('request')]
+    if not rows:
+        raise ValueError('missing exact private request for branch decision')
+    request = copy.deepcopy(rows[0]['request'])
+    request['side']['id'] = 'p1'
+    for mon in request['side']['pokemon']:
+        mon['ident'] = 'p1:' + mon['ident'].split(':', 1)[1]
+    battle.parse_request(request)
 
 
 def generate(args) -> None:
