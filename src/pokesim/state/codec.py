@@ -1,7 +1,7 @@
 """Known counters only: never invent exact sleep duration or substitute HP from a public effect flag."""
 from poke_env.battle import Pokemon
 
-VERSION = 'observed-state-v5'
+VERSION = 'observed-state-v6'
 
 
 def known_counters(mon: Pokemon, active: bool, own: bool = False) -> dict:

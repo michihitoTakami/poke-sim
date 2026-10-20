@@ -1,0 +1,366 @@
+{
+ "source": "20261021-023430-2701738214.json",
+ "source_sha256": "dbbb276dfa79cb807102d2a353fd9a2611de1c58af4bd6ecb50ecfaecba61c0b",
+ "scope": "observed prefix through T13 Baton Pass and exact own rqid33; no opponent replacement or later events",
+ "team": [
+  {
+   "species": "Scolipede",
+   "item": "Mental Herb",
+   "ability": "Speed Boost",
+   "nature": "Jolly",
+   "moves": [
+    "Iron Defense",
+    "Protect",
+    "Substitute",
+    "Baton Pass"
+   ],
+   "evs": {
+    "hp": 30,
+    "atk": 0,
+    "def": 13,
+    "spa": 0,
+    "spd": 0,
+    "spe": 23
+   },
+   "level": 50
+  },
+  {
+   "species": "Gholdengo",
+   "item": "Air Balloon",
+   "ability": "Good as Gold",
+   "nature": "Modest",
+   "moves": [
+    "Shadow Ball",
+    "Flash Cannon",
+    "Recover",
+    "Nasty Plot"
+   ],
+   "evs": {
+    "hp": 13,
+    "atk": 0,
+    "def": 0,
+    "spa": 21,
+    "spd": 0,
+    "spe": 32
+   },
+   "level": 50
+  },
+  {
+   "species": "Salamence",
+   "item": "Salamencite",
+   "ability": "Intimidate",
+   "nature": "Adamant",
+   "moves": [
+    "Double-Edge",
+    "Earthquake",
+    "Dragon Dance",
+    "Roost"
+   ],
+   "evs": {
+    "hp": 5,
+    "atk": 31,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 30
+   },
+   "level": 50
+  },
+  {
+   "species": "Floette-Eternal",
+   "item": "Floettite",
+   "ability": "Flower Veil",
+   "nature": "Bold",
+   "moves": [
+    "Moonblast",
+    "Substitute",
+    "Synthesis",
+    "Calm Mind"
+   ],
+   "evs": {
+    "hp": 24,
+    "atk": 0,
+    "def": 32,
+    "spa": 10,
+    "spd": 0,
+    "spe": 0
+   },
+   "level": 50
+  },
+  {
+   "species": "Skeledirge",
+   "item": "Sitrus Berry",
+   "ability": "Unaware",
+   "nature": "Bold",
+   "moves": [
+    "Torch Song",
+    "Will-O-Wisp",
+    "Shadow Ball",
+    "Slack Off"
+   ],
+   "evs": {
+    "hp": 32,
+    "atk": 0,
+    "def": 32,
+    "spa": 0,
+    "spd": 0,
+    "spe": 2
+   },
+   "level": 50
+  },
+  {
+   "species": "Umbreon",
+   "item": "Leftovers",
+   "ability": "Inner Focus",
+   "nature": "Bold",
+   "moves": [
+    "Snarl",
+    "Baton Pass",
+    "Calm Mind",
+    "Moonlight"
+   ],
+   "evs": {
+    "hp": 31,
+    "atk": 0,
+    "def": 20,
+    "spa": 0,
+    "spd": 15,
+    "spe": 0
+   },
+   "level": 50
+  }
+ ],
+ "preview": [
+  "politoed",
+  "emboar",
+  "greninja",
+  "venusaur",
+  "golisopod",
+  "torkoal"
+ ],
+ "lineup": [
+  "Umbreon",
+  "Gholdengo",
+  "Salamence"
+ ],
+ "turn": 13,
+ "request": {
+  "forceSwitch": [
+   true
+  ],
+  "side": {
+   "name": "me",
+   "id": "p1",
+   "pokemon": [
+    {
+     "ident": "p1: Umbreon",
+     "details": "Umbreon, L50, F",
+     "condition": "72/201",
+     "active": true,
+     "stats": {
+      "atk": 76,
+      "def": 165,
+      "spa": 80,
+      "spd": 165,
+      "spe": 85
+     },
+     "moves": [
+      "snarl",
+      "batonpass",
+      "calmmind",
+      "moonlight"
+     ],
+     "baseAbility": "innerfocus",
+     "item": "leftovers",
+     "pokeball": "pokeball",
+     "ability": "innerfocus",
+     "commanding": false,
+     "reviving": false
+    },
+    {
+     "ident": "p1: Gholdengo",
+     "details": "Gholdengo, L50",
+     "condition": "175/175",
+     "active": false,
+     "stats": {
+      "atk": 72,
+      "def": 115,
+      "spa": 191,
+      "spd": 111,
+      "spe": 136
+     },
+     "moves": [
+      "shadowball",
+      "flashcannon",
+      "recover",
+      "nastyplot"
+     ],
+     "baseAbility": "goodasgold",
+     "item": "airballoon",
+     "pokeball": "pokeball",
+     "ability": "goodasgold",
+     "commanding": false,
+     "reviving": false
+    },
+    {
+     "ident": "p1: Salamence",
+     "details": "Salamence, L50, F",
+     "condition": "175/175",
+     "active": false,
+     "stats": {
+      "atk": 204,
+      "def": 100,
+      "spa": 117,
+      "spd": 100,
+      "spe": 150
+     },
+     "moves": [
+      "doubleedge",
+      "earthquake",
+      "dragondance",
+      "roost"
+     ],
+     "baseAbility": "intimidate",
+     "item": "salamencite",
+     "pokeball": "pokeball",
+     "ability": "intimidate",
+     "commanding": false,
+     "reviving": false
+    }
+   ]
+  },
+  "noCancel": true,
+  "rqid": 33
+ },
+ "log": [
+  "|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by so1ro)",
+  "|inactive|Time left: 90 sec this turn | 420 sec total | 90 sec grace",
+  "|inactive|Cackleford967 also wants the timer to be on.",
+  "|teamsize|p2|3",
+  "|teamsize|p1|3",
+  "|start",
+  "|switch|p2a: Greninja|Greninja, L50, F|100/100",
+  "|switch|p1a: Umbreon|Umbreon, L50, F|201/201",
+  "|turn|1",
+  "|inactive|Time left: 55 sec this turn | 420 sec total",
+  "|switch|p2a: Venusaur|Venusaur, L50, F|100/100",
+  "|move|p1a: Umbreon|Calm Mind|p1a: Umbreon",
+  "|-boost|p1a: Umbreon|spa|1",
+  "|-boost|p1a: Umbreon|spd|1",
+  "|upkeep",
+  "|turn|2",
+  "|inactive|Time left: 55 sec this turn | 410 sec total",
+  "|move|p2a: Venusaur|Sludge Bomb|p1a: Umbreon",
+  "|-damage|p1a: Umbreon|146/201",
+  "|-damage|p2a: Venusaur|90/100|[from] item: Life Orb",
+  "|move|p1a: Umbreon|Calm Mind|p1a: Umbreon",
+  "|-boost|p1a: Umbreon|spa|1",
+  "|-boost|p1a: Umbreon|spd|1",
+  "|-heal|p1a: Umbreon|158/201|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|3",
+  "|inactive|Time left: 55 sec this turn | 400 sec total",
+  "|move|p2a: Venusaur|Sludge Bomb|p1a: Umbreon",
+  "|-damage|p1a: Umbreon|123/201",
+  "|-damage|p2a: Venusaur|80/100|[from] item: Life Orb",
+  "|move|p1a: Umbreon|Snarl|p2a: Venusaur",
+  "|-damage|p2a: Venusaur|49/100",
+  "|-unboost|p2a: Venusaur|spa|1",
+  "|-heal|p1a: Umbreon|135/201|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|4",
+  "|inactive|Time left: 55 sec this turn | 390 sec total",
+  "|switch|p2a: Torkoal|Torkoal, L50, F|100/100",
+  "|-weather|SunnyDay|[from] ability: Drought|[of] p2a: Torkoal",
+  "|move|p1a: Umbreon|Calm Mind|p1a: Umbreon",
+  "|-boost|p1a: Umbreon|spa|1",
+  "|-boost|p1a: Umbreon|spd|1",
+  "|-weather|SunnyDay|[upkeep]",
+  "|-heal|p1a: Umbreon|147/201|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|5",
+  "|inactive|Time left: 55 sec this turn | 380 sec total",
+  "|move|p1a: Umbreon|Snarl|p2a: Torkoal",
+  "|-damage|p2a: Torkoal|57/100",
+  "|-unboost|p2a: Torkoal|spa|1",
+  "|move|p2a: Torkoal|Stealth Rock|p1a: Umbreon",
+  "|-sidestart|p1: so1ro|move: Stealth Rock",
+  "|-weather|SunnyDay|[upkeep]",
+  "|-heal|p1a: Umbreon|159/201|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|6",
+  "|inactive|Time left: 55 sec this turn | 370 sec total",
+  "|move|p1a: Umbreon|Snarl|p2a: Torkoal",
+  "|-damage|p2a: Torkoal|14/100",
+  "|-unboost|p2a: Torkoal|spa|1",
+  "|move|p2a: Torkoal|Yawn|p1a: Umbreon",
+  "|-start|p1a: Umbreon|move: Yawn|[of] p2a: Torkoal",
+  "|-weather|SunnyDay|[upkeep]",
+  "|-heal|p1a: Umbreon|171/201|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|7",
+  "|inactive|Time left: 55 sec this turn | 360 sec total",
+  "|move|p1a: Umbreon|Snarl|p2a: Torkoal",
+  "|-damage|p2a: Torkoal|0 fnt",
+  "|faint|p2a: Torkoal",
+  "|-weather|SunnyDay|[upkeep]",
+  "|-heal|p1a: Umbreon|183/201|[from] item: Leftovers",
+  "|-end|p1a: Umbreon|move: Yawn|[silent]",
+  "|-status|p1a: Umbreon|slp",
+  "|upkeep",
+  "|switch|p2a: Greninja|Greninja, L50, F|100/100",
+  "|turn|8",
+  "|inactive|Time left: 55 sec this turn | 350 sec total",
+  "|move|p2a: Greninja|Weather Ball|p1a: Umbreon",
+  "|-start|p2a: Greninja|typechange|Fire|[from] ability: Protean",
+  "|-damage|p1a: Umbreon|143/201 slp",
+  "|cant|p1a: Umbreon|slp",
+  "|-weather|SunnyDay|[upkeep]",
+  "|-heal|p1a: Umbreon|155/201 slp|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|9",
+  "|inactive|Time left: 55 sec this turn | 340 sec total",
+  "|move|p2a: Greninja|Weather Ball|p1a: Umbreon",
+  "|-damage|p1a: Umbreon|115/201 slp",
+  "|cant|p1a: Umbreon|slp",
+  "|-weather|SunnyDay|[upkeep]",
+  "|-heal|p1a: Umbreon|127/201 slp|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|10",
+  "|inactive|Time left: 55 sec this turn | 330 sec total",
+  "|move|p2a: Greninja|Weather Ball|p1a: Umbreon",
+  "|-damage|p1a: Umbreon|87/201 slp",
+  "|-curestatus|p1a: Umbreon|slp|[msg]",
+  "|move|p1a: Umbreon|Calm Mind|p1a: Umbreon",
+  "|-boost|p1a: Umbreon|spa|1",
+  "|-boost|p1a: Umbreon|spd|1",
+  "|-weather|SunnyDay|[upkeep]",
+  "|-heal|p1a: Umbreon|99/201|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|11",
+  "|inactive|Time left: 55 sec this turn | 320 sec total",
+  "|move|p2a: Greninja|Weather Ball|p1a: Umbreon",
+  "|-damage|p1a: Umbreon|65/201",
+  "|move|p1a: Umbreon|Snarl|p2a: Greninja",
+  "|-damage|p2a: Greninja|38/100",
+  "|-unboost|p2a: Greninja|spa|1",
+  "|-weather|none",
+  "|-heal|p1a: Umbreon|77/201|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|12",
+  "|inactive|Time left: 55 sec this turn | 310 sec total",
+  "|switch|p2a: Venusaur|Venusaur, L50, F|49/100",
+  "|move|p1a: Umbreon|Snarl|p2a: Venusaur",
+  "|-damage|p2a: Venusaur|8/100",
+  "|-unboost|p2a: Venusaur|spa|1",
+  "|-heal|p1a: Umbreon|89/201|[from] item: Leftovers",
+  "|upkeep",
+  "|turn|13",
+  "|inactive|Time left: 55 sec this turn | 305 sec total",
+  "|move|p2a: Venusaur|Sludge Bomb|p1a: Umbreon",
+  "|-damage|p1a: Umbreon|72/201",
+  "|-damage|p2a: Venusaur|0 fnt|[from] item: Life Orb",
+  "|faint|p2a: Venusaur",
+  "|move|p1a: Umbreon|Baton Pass|p1a: Umbreon"
+ ]
+}

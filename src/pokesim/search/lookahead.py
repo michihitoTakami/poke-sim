@@ -399,8 +399,16 @@ class Lookahead:
                 "totalFainted": fainted_count(battle, battle.player_role, mons),
                 "megaUsed": battle.used_mega_evolve, "conditions": side_conditions(battle.side_conditions,
                                                                                     battle.turn)}
+        # A live pivot must replace before an already fainted opponent chooses its next member. No
+        # opponent attack is pending in this phase. Normal pivots against a living foe keep their existing
+        # reconstruction until their hidden, already committed attack can be represented explicitly.
+        pending_switch = (incoming is None and battle.force_switch and not active.fainted and
+                          battle.opponent_active_pokemon is not None and battle.opponent_active_pokemon.fainted)
+        if pending_switch:
+            out["forceSwitch"] = True
         if incoming is not None:
             out["incoming"] = mons.index(incoming)
+        if incoming is not None or pending_switch:
             if not active.fainted and active.last_move is not None and active.last_move.id == "batonpass":
                 out["switchMove"] = "batonpass"
         return out
