@@ -27,6 +27,7 @@ function relayTrace() {
 
 function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
   const cfg = req.lineupMatches;
+  if (cfg.oursPolicy && !['planned', 'counterplay'].includes(cfg.oursPolicy)) throw Error('unknown lineup actor');
   const trials = [];
   if (!cfg.ours?.length || !cfg.worlds?.length) throw Error('lineup matches require candidates and worlds');
   for (let candidate = 0; candidate < cfg.ours.length; candidate++) {
@@ -46,8 +47,10 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
         const choose = side => {
           const view = obs.view(side);
           if (side.id === 'p1') relay.observe(view);
-          return (side.id === 'p1' ? plans.p1.choose(view, battle.dex) :
+          return (side.id === 'p1' ? (cfg.oursPolicy === 'counterplay' ? chooseCounterplay(view, battle.dex) :
+            plans.p1.choose(view, battle.dex)) :
             opponent === 'counterplay' ? chooseCounterplay(view, battle.dex) :
+              opponent === 'planned' ? plans.p2.choose(view, battle.dex) :
               choosePlannedPublic(view, opponent, battle.dex))[0];
         };
         while (!battle.ended && battle.turn <= (cfg.maxTurns ?? 160)) {
@@ -64,6 +67,7 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
       trials.push(row);
     }
   }
-  return {version: VERSION + '+' + COUNTERPLAY_VERSION, informationScope: 'public_observation', trials};
+  return {version: VERSION + '+' + COUNTERPLAY_VERSION + '+ours:' + (cfg.oursPolicy || 'planned'),
+    informationScope: 'public_observation', trials};
 }
 module.exports = {lineupMatches};

@@ -249,7 +249,7 @@ def test_lineup_ranking_shares_foe_worlds_preserves_rng_and_returns_only_simulat
     ranking = [(['a', 'b', 'c'], .9, {}), (['b', 'a', 'c'], .8, {}),
                (['a', 'b', 'd'], .7, {}), (['a', 'c', 'd'], .6, {}), (['c', 'a', 'b'], .5, {})]
     before = rng.getstate()
-    selection = LineupSearch(ours, engine)
+    selection = LineupSearch(ours, engine, reverse_worlds=0)
     ranked, info = selection.rerank(ranking, picks)
     assert ranked[0][0] == ['a', 'b', 'd'] and len(ranked) == 4
     assert info['opponent_hypotheses'] == [['x', 'y', 'z']] * 4

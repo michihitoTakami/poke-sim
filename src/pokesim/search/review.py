@@ -3,7 +3,8 @@ import itertools
 import time
 from collections import defaultdict
 
-VERSION = 'paired-terminal-review-v2'
+VERSION = 'paired-terminal-review-v3'
+CONTINUATIONS = ['planned/tactical', 'planned/disrupt', 'planned/expert', 'planned/counterplay']
 
 
 def search_with_review(engine, request, *, started=None, predictor=None, max_budget=20., normal_move=True):
@@ -35,8 +36,7 @@ def search_with_review(engine, request, *, started=None, predictor=None, max_bud
 def summarize(reply, actions, worlds):
     if reply.get('informationScope') != 'public_observation':
         raise ValueError('terminal review must use actor observations')
-    expected = set(itertools.product(range(worlds), [0, 1],
-                   ['planned/tactical', 'planned/disrupt', 'planned/expert']))
+    expected = set(itertools.product(range(worlds), [0, 1], CONTINUATIONS))
     by_action = {}
     for action in actions:
         trials = [t for t in reply['trials'] if t['action'] == action]
@@ -52,7 +52,7 @@ def summarize(reply, actions, worlds):
         by_action[action] = {'mean': sum(values.values()) / len(values), 'cells': values,
                              'wins': sum(t['outcome'] == 'win' for t in trials), 'trials': len(trials)}
     return {'version': VERSION, 'complete': True, 'actions': by_action,
-            'scope': 'same sampled worlds/chance seeds; three fixed public opponent policies; not a proof'}
+            'scope': 'same sampled worlds/chance seeds; four public opponent policies incl. counterplay; not a proof'}
 
 
 def preferred(report, incumbent):
@@ -74,7 +74,7 @@ def review(engine, request, matrices, deadline):
     trial = {k: request[k] for k in ['format', 'samples', 'observationLog']}
     trial['branches'] = {'informationScope': 'public_observation', 'observationLog': request['observationLog'],
         'seeds': [0, 1], 'maxTurns': 120, 'actions': actions, 'recordTrajectories': False, 'livePolicies': True,
-        'continuations': ['planned/tactical', 'planned/disrupt', 'planned/expert']}
+        'continuations': CONTINUATIONS}
     previous = getattr(engine, 'query_timeout', 30.)
     started = time.monotonic()
     try:
