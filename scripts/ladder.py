@@ -38,6 +38,7 @@ from sb3_contrib import MaskablePPO
 
 from pokesim.config import FORMAT, PROCESSED_DIR, RAW_DIR, ROOT
 from pokesim.live.advisor import Advisor
+from pokesim.live.connection import LadderConnection
 from pokesim.live.preview_matchups import PreviewCoverage
 from pokesim.live.selection import LadderLineupModel, MatchupModel, PickModel
 from pokesim.rl.bc import CounterPickHeuristic
@@ -470,26 +471,42 @@ async def run(args) -> None:
                        account_configuration=AccountConfiguration(*cred),
                        server_configuration=ShowdownServerConfiguration, max_concurrent_battles=1,
                        start_timer_on_battle_start=True)
+    health = LadderConnection(me.ps_client, FORMAT)
     watched = model_files(args)
     stamp = code_stamp(watched)
-    for _ in range(args.battles):
-        # A long battle is fine (60 decisions of 8 s take over 10 minutes); a silent connection is not.
-        task = asyncio.ensure_future(me.ladder(1))
-        me.last_activity = time.monotonic()
-        while not task.done():
-            await asyncio.wait({task}, timeout=15)
-            if not task.done() and time.monotonic() - me.last_activity > args.battle_timeout:
-                task.cancel()
-                raise TimeoutError(f'no battle message for {args.battle_timeout:.0f} seconds')
-        task.result()
-        if me.quality_issues:
-            print('terminal search quality gate: stop after this battle: ' +
-                  ', '.join(sorted(set(me.quality_issues))), flush=True)
-            raise SystemExit(78)
-        if code_stamp(watched) != stamp:  # code, priors or models changed: exit so the caller restarts us
-            print("code changed: exiting to reload", flush=True)
-            break
-    print(f"done: {me.n_won_battles}-{me.n_lost_battles}")
+    task = None
+    try:
+        for _ in range(args.battles):
+            health.begin_search()
+            task = asyncio.ensure_future(me.ladder(1))
+            me.last_activity = time.monotonic()
+            while not task.done():
+                health.publish(me, args.connection_status)
+                await asyncio.wait({task}, timeout=5)
+                if not task.done() and (reason := health.failure(
+                        me, login_timeout=args.login_timeout, search_timeout=args.search_timeout,
+                        battle_timeout=args.battle_timeout)):
+                    raise TimeoutError('ladder connection: ' + reason)
+            task.result()
+            if me.quality_issues:
+                print('terminal search quality gate: stop after this battle: ' +
+                      ', '.join(sorted(set(me.quality_issues))), flush=True)
+                raise SystemExit(78)
+            if code_stamp(watched) != stamp:
+                print('code changed: exiting to reload', flush=True)
+                break
+        print(f'done: {me.n_won_battles}-{me.n_lost_battles}')
+    finally:
+        if task is not None and not task.done():
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+        try:
+            if hasattr(me.ps_client, 'websocket'):
+                await me.ps_client.stop_listening()
+            else:
+                me.ps_client._listening_coroutine.cancel()
+        finally:
+            me.advisor.close()
 
 
 def main() -> None:
@@ -505,6 +522,11 @@ def main() -> None:
     ap.add_argument('--battle-timeout', type=float, default=600,
                     help='restart when no battle message arrives for this long (seconds); a long battle itself '
                          'is not interrupted')
+    ap.add_argument('--login-timeout', type=float, default=60, help='maximum time to complete authentication')
+    ap.add_argument('--search-timeout', type=float, default=90,
+                    help='maximum time for the server to confirm matchmaking; confirmed search keeps waiting')
+    ap.add_argument('--connection-status', type=Path,
+                    default=Path(os.environ.get('COLLECT_DIR', '/data/poke-sim/collect')) / 'connection.json')
     ap.add_argument("--policy", nargs="+", default=[str(ROOT / "checkpoints/ppo_baton_v2.zip")],
                     help="one or more policies; with several, battles alternate between them")
     ap.add_argument("--out", default=str(OUT))

@@ -45,8 +45,8 @@ while [ ! -e "$C/STOP" ]; do
     echo "search quality gate failed; stopped for inspection $(date)" >> "$C/status.log"
     break
   fi
-  if [ $((after - before)) -eq 0 ]; then  # nothing saved (login / network trouble): back off, up to 30 min
-    fails=$((fails+1)); sleep $(( fails < 6 ? 60 * 2 ** (fails - 1) : 1800 ))
+  if [ $((after - before)) -eq 0 ]; then  # no game saved: retry login/search promptly after a server restart
+    fails=$((fails+1)); sleep $(( fails < 4 ? 30 * 2 ** (fails - 1) : 300 ))
   else
     fails=0; sleep 5
   fi
