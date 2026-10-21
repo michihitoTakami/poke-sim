@@ -29,12 +29,18 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
   const cfg = req.lineupMatches;
   if (cfg.oursPolicy && !['planned', 'counterplay'].includes(cfg.oursPolicy)) throw Error('unknown lineup actor');
   const trials = [];
+  const seeds = cfg.seeds || [0];
+  if (!seeds.length || new Set(seeds).size !== seeds.length ||
+      seeds.some(s => !Number.isInteger(s) || s < 0 || s > 65535)) throw Error('invalid lineup seeds');
+  const actionValue = cfg.actionValueRun ? require('./action_value').loadActionValue(cfg.actionValueRun) : null;
   if (!cfg.ours?.length || !cfg.worlds?.length) throw Error('lineup matches require candidates and worlds');
   for (let candidate = 0; candidate < cfg.ours.length; candidate++) {
-    for (let world = 0; world < cfg.worlds.length; world++) for (const opponent of cfg.policies || ['tactical', 'disrupt', 'expert']) {
+    for (let world = 0; world < cfg.worlds.length; world++) for (const seed of seeds) for (const opponent of cfg.policies || ['tactical', 'disrupt', 'expert']) {
       const sample = {p1: {team: cfg.ours[candidate]}, p2: {team: cfg.worlds[world]}};
-      const battle = startBattle(sample, req.format, world + 1);
+      const battle = startBattle(sample, req.format, world + 1 + seed * 1000003);
       const row = {candidate, world, opponent, outcome: null, target: null, turns: 0, error: null};
+      if (cfg.seeds) row.seed = seed;
+      if (actionValue) row.actionValueChanges = 0;
       try {
         // Initial entry/weather events are real simulator events. Replace only the shown six, not their sets.
         const history = battle.log.filter(l => !l.startsWith('|poke|'));
@@ -47,11 +53,14 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
         const choose = side => {
           const view = obs.view(side);
           if (side.id === 'p1') relay.observe(view);
-          return (side.id === 'p1' ? (cfg.oursPolicy === 'counterplay' ? chooseCounterplay(view, battle.dex) :
+          const selection = (side.id === 'p1' ? (cfg.oursPolicy === 'counterplay' ? chooseCounterplay(view, battle.dex) :
             plans.p1.choose(view, battle.dex)) :
             opponent === 'counterplay' ? chooseCounterplay(view, battle.dex) :
               opponent === 'planned' ? plans.p2.choose(view, battle.dex) :
-              choosePlannedPublic(view, opponent, battle.dex))[0];
+              choosePlannedPublic(view, opponent, battle.dex));
+          const chosen = side.id === 'p1' && actionValue ? actionValue.choose(view, battle.dex, selection) : selection;
+          if (side.id === 'p1' && actionValue && chosen[0] !== selection[0]) row.actionValueChanges++;
+          return chosen[0];
         };
         while (!battle.ended && battle.turn <= (cfg.maxTurns ?? 160)) {
           if (++requests > 1400) throw Error('lineup request guard exhausted');
@@ -67,7 +76,8 @@ function lineupMatches(req, {startBattle, step, extractChannelMessages}) {
       trials.push(row);
     }
   }
-  return {version: VERSION + '+' + COUNTERPLAY_VERSION + '+ours:' + (cfg.oursPolicy || 'planned'),
+  return {version: VERSION + '+' + COUNTERPLAY_VERSION + '+ours:' + (cfg.oursPolicy || 'planned') +
+    (actionValue ? '+q:' + actionValue.sha : ''),
     informationScope: 'public_observation', trials};
 }
 module.exports = {lineupMatches};
